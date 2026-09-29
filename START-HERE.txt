@@ -1,0 +1,12 @@
+VUL LETTER GRID — START HERE
+
+1. Install Node.js 20 or newer from https://nodejs.org/
+2. Extract this ZIP to a normal folder.
+3. Open PowerShell, Terminal, or Command Prompt in that folder.
+4. Run:
+
+   npm install
+   npm run dev
+
+On Windows PowerShell, use npm.cmd install and npm.cmd run dev if npm.ps1 is blocked.
+Open the Local address shown in the terminal and keep the terminal open while using the app.
