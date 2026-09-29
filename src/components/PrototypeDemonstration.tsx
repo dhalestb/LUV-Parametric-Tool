@@ -73,6 +73,10 @@ const stages = [
 
 const panelStyle = { borderColor: "var(--line)", background: "var(--panel)" } as const;
 const inputStyle = { borderColor: "var(--line)", background: "var(--panel-soft)" } as const;
+const EXPORT_BACKGROUND = "#000000";
+const EXPORT_GOLD = "#D6AD4F";
+const EXPORT_REFERENCE_BLUE = "#9BD5E4";
+const EXPORT_MEDIUM_BLUE = "#1293C2";
 
 const analysisCache = new WeakMap<CompositionPlacement[], Map<boolean, ReturnType<typeof analyzeSourceGeometry>>>();
 function cachedAnalysis(source: CompositionPlacement[], full: boolean) {
@@ -149,12 +153,9 @@ function sourceForDisplay(source: CompositionPlacement[]) {
 }
 
 function elementColor(kind: ArchitecturalElement["kind"]) {
-  if (kind === "stage") return "#ffbd4a";
-  if (kind === "circulation") return "#58dbe0";
-  if (kind === "enclosure") return "#73838b";
-  if (kind === "connector") return "#b38cff";
-  if (kind === "void") return "#267d86";
-  return "#d9e5e8";
+  if (kind === "stage") return EXPORT_GOLD;
+  if (kind === "circulation" || kind === "connector" || kind === "void") return EXPORT_MEDIUM_BLUE;
+  return EXPORT_REFERENCE_BLUE;
 }
 
 function ElementMesh({ element, section, analytical, offsetX = 0 }: { element: ArchitecturalElement; section: boolean; analytical: boolean; offsetX?: number }) {
@@ -186,7 +187,7 @@ function FinishedMesh({ data, analytical, offset = [0, 0] }: { data: ContinuousM
   }, [data]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   return <mesh geometry={geometry} position={[offset[0], 0, offset[1]]}>
-    <meshStandardMaterial color={analytical ? "#d9f3f4" : "#ffffff"} roughness={0.62} metalness={0.02} side={THREE.DoubleSide} />
+    <meshStandardMaterial color={analytical ? EXPORT_REFERENCE_BLUE : "#ffffff"} roughness={0.62} metalness={0.02} side={THREE.DoubleSide} />
   </mesh>;
 }
 
@@ -270,13 +271,13 @@ function PrototypeViewport({
       gl={{ antialias: true, preserveDrawingBuffer: true }}
       onCreated={({ gl }) => { if (captureRef) captureRef.current = () => gl.domElement.toDataURL("image/png"); }}
     >
-      <color attach="background" args={["#030607"]} />
+      <color attach="background" args={[EXPORT_BACKGROUND]} />
       <ambientLight intensity={0.72} />
       <directionalLight position={[8, 10, 12]} intensity={1.15} />
       <OrthographicCamera makeDefault position={sourceCamera} zoom={Math.min(150, 380 / maximumDimension)} near={0.01} far={300} />
       {showGrid && <lineSegments>
         <edgesGeometry args={[new THREE.BoxGeometry(bounds.width, bounds.height, bounds.depth)]} />
-        <lineBasicMaterial color="#ffbd4a" />
+        <lineBasicMaterial color={EXPORT_GOLD} />
       </lineSegments>}
       {source.map((placement, index) => <mesh
         key={`exact-source-${index}-${placement.cell.id}`}
@@ -289,7 +290,7 @@ function PrototypeViewport({
           placement.scale * (placement.scaleZ ?? 1),
         ]}
       >
-        <meshStandardMaterial color="#c7dbe0" roughness={0.7} side={THREE.DoubleSide} />
+        <meshStandardMaterial color={EXPORT_REFERENCE_BLUE} roughness={0.7} side={THREE.DoubleSide} />
       </mesh>)}
       {showAnalysis && <axesHelper args={[Math.max(0.3, maximumDimension * 0.16)]} />}
       <OrbitControls enablePan enableZoom enableRotate target={[0, 0, 0]} />
@@ -300,19 +301,19 @@ function PrototypeViewport({
     gl={{ antialias: true, preserveDrawingBuffer: true }}
     onCreated={({ gl }) => { if (captureRef) captureRef.current = () => gl.domElement.toDataURL("image/png"); }}
   >
-    <color attach="background" args={["#030607"]} />
+    <color attach="background" args={[EXPORT_BACKGROUND]} />
     <ambientLight intensity={0.72} />
     <directionalLight position={[16, 24, 12]} intensity={1.25} />
     <OrthographicCamera makeDefault position={cameraPosition} zoom={zoom} near={0.01} far={500} />
-    {showGrid && <gridHelper args={[aggregation ? span : TILE_SIZE_FEET, aggregation ? Math.max(4, span / 2) : 10, "#266b70", "#173337"]} />}
-    {showGrid && !aggregation && Array.from({ length: Math.max(0, Math.ceil(variation.verticalExtents.final.maxZ / VERTICAL_INCREMENT_FEET)) }, (_, index) => (index + 1) * VERTICAL_INCREMENT_FEET).map((level) => <gridHelper key={`vertical-grid-${level}`} position={[0, level, 0]} args={[TILE_SIZE_FEET, 10, "#6d5b2d", "#302a1b"]} />)}
+    {showGrid && <gridHelper args={[aggregation ? span : TILE_SIZE_FEET, aggregation ? Math.max(4, span / 2) : 10, EXPORT_REFERENCE_BLUE, EXPORT_REFERENCE_BLUE]} />}
+    {showGrid && !aggregation && Array.from({ length: Math.max(0, Math.ceil(variation.verticalExtents.final.maxZ / VERTICAL_INCREMENT_FEET)) }, (_, index) => (index + 1) * VERTICAL_INCREMENT_FEET).map((level) => <gridHelper key={`vertical-grid-${level}`} position={[0, level, 0]} args={[TILE_SIZE_FEET, 10, EXPORT_GOLD, EXPORT_REFERENCE_BLUE]} />)}
     {showGrid && !aggregation && <lineSegments position={[0, 0.04, 0]}>
       <edgesGeometry args={[new THREE.BoxGeometry(TILE_SIZE_FEET, 0.05, TILE_SIZE_FEET)]} />
-      <lineBasicMaterial color="#3dd6db" />
+      <lineBasicMaterial color={EXPORT_REFERENCE_BLUE} />
     </lineSegments>}
     {showGrid && aggregation?.tileCenters.map((center, index) => <lineSegments key={`tile-boundary-${index}`} position={[center.x, 0.04, center.y]}>
       <edgesGeometry args={[new THREE.BoxGeometry(TILE_SIZE_FEET, 0.05, TILE_SIZE_FEET)]} />
-      <lineBasicMaterial color="#3dd6db" transparent opacity={0.72} />
+      <lineBasicMaterial color={EXPORT_REFERENCE_BLUE} transparent opacity={0.72} />
     </lineSegments>)}
     {!connectionDiagnostic && stage === 1 && variation.unifiedSourceElements?.map((element) => <ElementMesh key={`unified-${element.id}`} element={element} section={view === "section"} analytical />)}
     {showSourceLetters && sourceDisplay.map((placement, index) => <mesh
@@ -322,23 +323,23 @@ function PrototypeViewport({
       rotation={[THREE.MathUtils.degToRad(placement.rx), THREE.MathUtils.degToRad(placement.rz), THREE.MathUtils.degToRad(placement.ry)]}
       scale={[placement.scale, placement.scale, placement.scale]}
     >
-      <meshStandardMaterial color="#c7dbe0" roughness={0.7} transparent={transformation} opacity={transformation ? .78 : 1} />
+      <meshStandardMaterial color={EXPORT_REFERENCE_BLUE} roughness={0.7} transparent={transformation} opacity={transformation ? .78 : 1} />
     </mesh>)}
     {showSourceVoids && voidSeeds.map((voidSeed, index) => <mesh key={`source-void-${index}`} position={[voidSeed.x, voidSeed.z * 0.22 + (2 + voidSeed.size) / 2, voidSeed.y]}>
       <sphereGeometry args={[voidSeed.size / 2, 12, 8]} />
-      <meshStandardMaterial color="#46c8d1" wireframe transparent opacity={0.5} />
+      <meshStandardMaterial color={EXPORT_MEDIUM_BLUE} wireframe transparent opacity={0.5} />
     </mesh>)}
     {!connectionDiagnostic && !finishedStage && (diagnostic || stage === 3 || transformation) && variation.sourceBoundaries.map((boundary) => <lineSegments key={`boundary-${boundary.id}`}>
       <bufferGeometry><bufferAttribute attach="attributes-position" args={[boundaryPositions(boundary.points, boundary.z + (diagnostic ? .08 : .04)), 3]} /></bufferGeometry>
-      <lineBasicMaterial color={boundary.kind === "letter" ? "#ffbd4a" : "#46c8d1"} transparent opacity={diagnostic ? 1 : .55} />
+      <lineBasicMaterial color={boundary.kind === "letter" ? EXPORT_GOLD : EXPORT_MEDIUM_BLUE} transparent opacity={diagnostic ? 1 : .55} />
     </lineSegments>)}
     {(diagnostic || stage === 3) && variation.sourceRelationships.map((relationship, index) => <lineSegments key={`relationship-${index}`}>
       <bufferGeometry><bufferAttribute attach="attributes-position" args={[relationshipPositions(relationship.from, relationship.to, relationship.fromZ, relationship.toZ), 3]} /></bufferGeometry>
-      <lineBasicMaterial color={relationship.kind === "solid-void" ? "#b38cff" : "#8ff2f4"} />
+      <lineBasicMaterial color={relationship.kind === "solid-void" ? EXPORT_MEDIUM_BLUE : EXPORT_REFERENCE_BLUE} />
     </lineSegments>)}
     {connectionDiagnostic === "graph" && variation.proposedConnections.map((relationship, index) => <lineSegments key={`connection-graph-${index}`}>
       <bufferGeometry><bufferAttribute attach="attributes-position" args={[relationshipPositions(relationship.from, relationship.to, relationship.fromZ + .35, relationship.toZ + .35), 3]} /></bufferGeometry>
-      <lineBasicMaterial color={relationship.connectorKind === "ramp" ? "#ffbd4a" : relationship.connectorKind === "bridge" ? "#b38cff" : "#8ff2f4"} />
+      <lineBasicMaterial color={relationship.connectorKind === "ramp" ? EXPORT_GOLD : relationship.connectorKind === "bridge" ? EXPORT_MEDIUM_BLUE : EXPORT_REFERENCE_BLUE} />
     </lineSegments>)}
     {showArchitecture && stage >= 4 && finishedOnly && surfaceFilter === "combined"
       ? aggregation
@@ -360,26 +361,27 @@ function exportBoard(variations: VariationMap, descriptors: DescriptorSettings) 
   canvas.height = 1100;
   const context = canvas.getContext("2d");
   if (!context) return;
-  context.fillStyle = "#030607";
+  context.fillStyle = EXPORT_BACKGROUND;
   context.fillRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = "#e8f2f4";
+  context.fillStyle = EXPORT_GOLD;
   context.font = "bold 44px Arial";
   context.fillText(`${CATEGORY_DEFINITIONS[variations.letters.category].name.toUpperCase()} / ${variations.letters.typologyName.toUpperCase()} — THREE SOURCE MODES`, 70, 70);
   context.font = "22px Arial";
-  context.fillStyle = "#75dce1";
+  context.fillStyle = EXPORT_REFERENCE_BLUE;
   context.fillText("20′ × 20′ registration tile · dimensions in feet · black presentation background", 70, 108);
   modes.forEach((mode, modeIndex) => {
     const variation = variations[mode];
     const left = 55 + modeIndex * 715;
-    context.strokeStyle = mode === "letters" ? "#d9e5e8" : mode === "voids" ? "#46c8d1" : "#b38cff";
+    const modeColor = mode === "letters" ? EXPORT_REFERENCE_BLUE : mode === "voids" ? EXPORT_MEDIUM_BLUE : EXPORT_GOLD;
+    context.strokeStyle = modeColor;
     context.lineWidth = 3;
     context.strokeRect(left, 150, 660, 760);
-    context.fillStyle = "#eef7f8";
+    context.fillStyle = modeColor;
     context.font = "bold 30px Arial";
     context.fillText(variation.name.toUpperCase(), left + 24, 198);
     context.save();
     context.translate(left + 330, 485);
-    context.strokeStyle = "#c8dde0";
+    context.strokeStyle = modeColor;
     context.lineWidth = 22;
     const platforms = variation.elements.filter((element) => element.kind === "platform");
     for (const element of platforms) {
@@ -390,7 +392,7 @@ function exportBoard(variations: VariationMap, descriptors: DescriptorSettings) 
       context.restore();
     }
     context.restore();
-    context.fillStyle = "#b9c9cc";
+    context.fillStyle = EXPORT_REFERENCE_BLUE;
     context.font = "22px Arial";
     const metrics = variation.measurements;
     context.fillText(`Horizontal area: ${metrics.occupiedHorizontalArea.toFixed(1)} ft²`, left + 24, 820);
@@ -400,7 +402,7 @@ function exportBoard(variations: VariationMap, descriptors: DescriptorSettings) 
     context.fillStyle = variation.validation.valid ? "#7fe2b9" : "#ff947e";
     context.fillText(variation.validation.valid ? "TILE VALID" : "REVIEW REQUIRED", left + 24, 890);
   });
-  context.fillStyle = "#8ba2a6";
+  context.fillStyle = EXPORT_REFERENCE_BLUE;
   context.font = "18px Arial";
   const priority = ["convergent", "sequential", "visuallyConnected", "circulationActivated", "verticallyIntegrated", "openVolume", "sculptural"] as const;
   context.fillText(`Descriptor targets: ${priority.map((key) => `${key} ${descriptors[key].intensity}`).join(" · ")}`, 70, 1025);
@@ -704,7 +706,7 @@ export default function PrototypeDemonstration({ sourcePlacements, completeSourc
         </div>
         <div className="flex gap-1 p-2 pt-0"><button type="button" onClick={() => regenerateMode(mode)} className="rounded border px-2 py-1 text-[9px]" style={{ borderColor: "var(--line)" }}>Regenerate</button><button type="button" onClick={() => { setPreferred(mode); onSelectedModeChange(mode); }} className="rounded border px-2 py-1 text-[9px]" style={{ borderColor: preferred === mode ? "#ffbd4a" : "var(--line)" }}>Select</button></div>
       </article>;
-    })}</div> : stage <= 6 ? <div className="mt-3 h-[520px] overflow-hidden rounded-xl border" style={{ borderColor: "var(--line)", background: "#030607" }}>
+    })}</div> : stage <= 6 ? <div className="mt-3 h-[520px] overflow-hidden rounded-xl border" style={{ borderColor: "var(--line)", background: EXPORT_BACKGROUND }}>
       <PrototypeViewport variation={selected} source={activeSource} sourceBounds={sourceScope === "selection" ? sourceBounds : undefined} sourceThickness={sourceThickness} stage={stage} view={view} aggregation={stage === 6 ? aggregation : undefined} captureRef={captureRef} showAnalysis={showAnalysis} showGrid={showGrid} finishedOnly={finishedOnly} surfaceFilter={surfaceFilter} />
     </div> : null}
 
