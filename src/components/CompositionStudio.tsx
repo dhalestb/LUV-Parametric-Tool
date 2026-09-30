@@ -26,6 +26,7 @@ import { optimizeSpatial } from "./spatialOptimizer";
 import { selectionEvaluationGrid } from "./selectionSearch";
 import PrototypeDemonstration from "./PrototypeDemonstration";
 import { DEFAULT_TYPOLOGY_BY_CATEGORY, type PrototypeCategory, type PrototypeGeometryMode, type PrototypeTypologyId } from "./amphitheaterPrototype";
+import { OPTIMIZER_SESSION_KEY, readJson, writeJson } from "./browserSession";
 
 type OverlayState = { circulation: boolean; volume: boolean; sightlines: boolean; hierarchy: boolean; vertical: boolean };
 type DisplayMode = "letters" | "void" | "both";
@@ -57,6 +58,23 @@ type RunHistory = {
   selection: SelectionVolume;
   descriptors: DescriptorSettings;
   alternatives: SpatialAlternative[];
+};
+type OptimizerSession = {
+  descriptors: DescriptorSettings;
+  grid: OrthogonalGrid;
+  rules: GenerationRules;
+  controls: OptimizerControls;
+  selection: SelectionVolume;
+  focus: OptimizationFocus;
+  alternatives: SpatialAlternative[];
+  selectedIndex: number;
+  lockedParent: SpatialAlternative | null;
+  overlays: OverlayState;
+  displayMode: DisplayMode;
+  prototypeCategory: PrototypeCategory;
+  prototypeTypology: PrototypeTypologyId;
+  history: RunHistory[];
+  rankingEnabled: boolean;
 };
 
 const panelStyle = { borderColor: "var(--line)", background: "var(--panel)" } as const;
@@ -315,8 +333,10 @@ export default function CompositionStudio() {
   const [presetName, setPresetName] = useState("My preset");
   const [savedDesigns, setSavedDesigns] = useState<SavedDesign[]>([]);
   const [history, setHistory] = useState<RunHistory[]>([]);
+  const [storageReady, setStorageReady] = useState(false);
+  const [keptNotice, setKeptNotice] = useState("Working session is kept in this browser.");
   const slideSourceSignature = `${store.cols}:${store.rows}:${store.layerMode}:${store.zLayers}:${store.spacing}:${store.zSpacing}:${store.fontSize}:${store.letterThickness}:${store.yRotationEnabled}:${store.yRotationRange}`;
-  const lastSlideSourceSignature = useRef(slideSourceSignature);
+  const lastSlideSourceSignature = useRef<string | null>(null);
   const sourceCells = useMemo(() => [store.cells, ...store.layerCells.slice(0, Math.max(0, store.zLayers - 1))].flat(), [store.cells, store.layerCells, store.zLayers]);
   const evaluationFocus = focus === "auto" ? "combined" : focus;
   const evaluatedAlternatives = useMemo(() => alternatives.map((alternative) => ({
@@ -389,12 +409,52 @@ export default function CompositionStudio() {
       if (presetData) setPresets(JSON.parse(presetData));
       if (designData) setSavedDesigns(JSON.parse(designData));
     } catch { /* Ignore unavailable or corrupted storage. */ }
+    const session = readJson<OptimizerSession>(OPTIMIZER_SESSION_KEY);
+    if (session?.descriptors && session.grid && session.rules && session.controls && session.selection && session.focus) {
+      setDescriptors(session.descriptors);
+      setGrid(session.grid);
+      setRules(session.rules);
+      setControls(session.controls);
+      setSelection(session.selection);
+      setFocus(session.focus);
+      setAlternatives(Array.isArray(session.alternatives) ? session.alternatives : []);
+      setSelectedIndex(session.selectedIndex ?? 0);
+      setLockedParent(session.lockedParent ?? null);
+      if (session.overlays) setOverlays(session.overlays);
+      if (session.displayMode) setDisplayMode(session.displayMode);
+      if (session.prototypeCategory) setPrototypeCategory(session.prototypeCategory);
+      if (session.prototypeTypology) setPrototypeTypology(session.prototypeTypology);
+      if (Array.isArray(session.history)) setHistory(session.history);
+      if (typeof session.rankingEnabled === "boolean") setRankingEnabled(session.rankingEnabled);
+      const count = Array.isArray(session.alternatives) ? session.alternatives.length : 0;
+      setKeptNotice(count > 0 ? `Restored ${count} result${count === 1 ? "" : "s"} from this browser.` : "Working session is kept in this browser.");
+    }
+    setStorageReady(true);
   }, []);
-  useEffect(() => { try { localStorage.setItem("vul-optimizer-presets", JSON.stringify(presets)); } catch {} }, [presets]);
-  useEffect(() => { try { localStorage.setItem("vul-optimizer-designs", JSON.stringify(savedDesigns)); } catch {} }, [savedDesigns]);
   useEffect(() => {
-    setDisplayMode(focus === "letter" ? "letters" : focus === "void" ? "void" : "both");
-  }, [focus]);
+    if (!storageReady) return;
+    writeJson("vul-optimizer-presets", presets);
+  }, [storageReady, presets]);
+  useEffect(() => {
+    if (!storageReady) return;
+    writeJson("vul-optimizer-designs", savedDesigns);
+  }, [storageReady, savedDesigns]);
+  useEffect(() => {
+    if (!storageReady || optimizing) return;
+    const session: OptimizerSession = {
+      descriptors, grid, rules, controls, selection, focus, alternatives, selectedIndex, lockedParent,
+      overlays, displayMode, prototypeCategory, prototypeTypology, history, rankingEnabled,
+    };
+    const persist = () => {
+      if (!writeJson(OPTIMIZER_SESSION_KEY, session)) writeJson(OPTIMIZER_SESSION_KEY, { ...session, history: [] });
+    };
+    const timer = window.setTimeout(persist, 300);
+    return () => {
+      window.clearTimeout(timer);
+      persist();
+    };
+  }, [storageReady, optimizing, descriptors, grid, rules, controls, selection, focus, alternatives, selectedIndex, lockedParent, overlays, displayMode, prototypeCategory, prototypeTypology, history, rankingEnabled]);
+  const displayModeForFocus = (next: OptimizationFocus): DisplayMode => next === "letter" ? "letters" : next === "void" ? "void" : "both";
 
   const runOptimization = useCallback(async () => {
     if (!grid.locked || !selectionValid || activeWeight === 0 || optimizing) return;
@@ -433,6 +493,11 @@ export default function CompositionStudio() {
   }, [grid, selectionValid, activeWeight, optimizing, alternatives, sourceCells, descriptors, rules, controls, focus, selection, lockedParent]);
 
   useEffect(() => {
+    if (!store.slideReady) return;
+    if (lastSlideSourceSignature.current === null) {
+      lastSlideSourceSignature.current = slideSourceSignature;
+      return;
+    }
     if (lastSlideSourceSignature.current === slideSourceSignature) return;
     lastSlideSourceSignature.current = slideSourceSignature;
     const synchronizedGrid = gridFromSlide(store);
@@ -481,6 +546,7 @@ export default function CompositionStudio() {
     setControls({ ...DEFAULT_OPTIMIZER_CONTROLS });
     setSelection({ ...DEFAULT_SELECTION });
     setFocus("combined");
+    setDisplayMode("both");
     setPrototypeCategory("gathering");
     setPrototypeTypology("stepped-amphitheater");
     setLockedParent(null);
@@ -511,12 +577,12 @@ export default function CompositionStudio() {
     setDescriptors(design.descriptors); setAlternatives(design.alternatives); setSelectedIndex(design.selectedIndex);
     if (design.prototypeCategory) setPrototypeCategory(design.prototypeCategory);
     if (design.prototypeTypology) setPrototypeTypology(design.prototypeTypology);
-    if (design.prototypeSource) setDisplayMode(design.prototypeSource === "voids" ? "void" : design.prototypeSource === "combined" ? "both" : "letters");
+    setDisplayMode(design.prototypeSource ? (design.prototypeSource === "voids" ? "void" : design.prototypeSource === "combined" ? "both" : "letters") : displayModeForFocus(design.focus));
   };
   const undo = () => {
     const previous = history[0];
     if (!previous) return;
-    setGrid(previous.grid); setRules(previous.rules); setControls(previous.controls); setSelection(previous.selection ?? { ...DEFAULT_SELECTION }); setFocus(previous.focus);
+    setGrid(previous.grid); setRules(previous.rules); setControls(previous.controls); setSelection(previous.selection ?? { ...DEFAULT_SELECTION }); setFocus(previous.focus); setDisplayMode(displayModeForFocus(previous.focus));
     setDescriptors(previous.descriptors); setAlternatives(previous.alternatives); setHistory((current) => current.slice(1)); setSelectedIndex(0);
   };
 
@@ -530,6 +596,7 @@ export default function CompositionStudio() {
         <button type="button" onClick={() => document.getElementById("prototype-demonstration")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "#7d6433", color: "#f0cf87" }}>Prototype demo</button>
         {selected && <span className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: selectedIsApplied ? "#2b777b" : "#7d6433", color: selectedIsApplied ? "#7decef" : "#f0cf87", background: selectedIsApplied ? "#10272a" : "#211c12" }}>{selectedIsApplied ? "Selected result applied to Slide" : "Selected result ready to apply"}</span>}
         {selected && <button type="button" onClick={applySelectedToSlide} disabled={selectedIsApplied} className="rounded border px-2 py-1 text-[10px] disabled:opacity-50" style={{ borderColor: "#2b777b", color: "#8ff2f4" }}>{selectedIsApplied ? "Applied to Slide" : "Apply selected to Slide"}</button>}
+        <span className="rounded border px-2 py-1 text-[10px]" title="Refresh restores results, descriptors, the selection, the letter field, and prototype settings from this browser. Save configuration stores a named copy. Reset returns the optimizer controls to their defaults." style={{ borderColor: "var(--line)", color: "var(--muted)" }}>{keptNotice}</span>
         <button type="button" onClick={undo} disabled={!history.length} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Undo run</button>
         <button type="button" onClick={saveDesign} disabled={!selected} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Save configuration</button>
         <button type="button" onClick={resetAll} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Reset</button>
@@ -637,7 +704,7 @@ export default function CompositionStudio() {
         <section className="rounded-xl border p-3" style={panelStyle}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div><h2 className="text-sm font-semibold">Optimization focus</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Targets and importance remain unchanged when focus changes.</p></div>
-            <div className="flex flex-wrap gap-1">{(["letter","void","combined","auto"] as OptimizationFocus[]).map((value) => <button key={value} type="button" onClick={() => setFocus(value)} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: focus === value ? "var(--accent)" : "var(--line)", background: focus === value ? "#123235" : "transparent", color: focus === value ? "#8ff2f4" : "var(--muted)" }}>{focusLabels[value]}</button>)}</div>
+            <div className="flex flex-wrap gap-1">{(["letter","void","combined","auto"] as OptimizationFocus[]).map((value) => <button key={value} type="button" onClick={() => { setFocus(value); setDisplayMode(displayModeForFocus(value)); }} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: focus === value ? "var(--accent)" : "var(--line)", background: focus === value ? "#123235" : "transparent", color: focus === value ? "#8ff2f4" : "var(--muted)" }}>{focusLabels[value]}</button>)}</div>
           </div>
           {(focus === "combined" || focus === "auto") && <div className="mt-2"><Slider label="Letter/void" value={controls.combinedBalance} onChange={(value) => setControl("combinedBalance", value)} /><div className="flex justify-between pl-[68px] text-[8px]" style={{ color: "var(--muted)" }}><span>0 · void</span><span>50 · equal</span><span>100 · letter</span></div></div>}
           <div className="mt-2 grid gap-2 border-t pt-2 sm:grid-cols-3" style={{ borderColor: "var(--line)" }}>

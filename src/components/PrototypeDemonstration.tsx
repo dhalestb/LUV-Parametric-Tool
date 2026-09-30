@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import * as THREE from "three";
 import { DESCRIPTORS, type CompositionPlacement, type DescriptorSettings } from "./compositionEngine";
+import { PROTOTYPE_SESSION_KEY, readJson, writeJson } from "./browserSession";
 import { getLetterVolumeGeometry } from "./letterGeometry3d";
 import {
   DEFAULT_CONTINUITY_CONTROLS,
@@ -53,6 +54,22 @@ type Props = {
 type Criterion = { id: string; name: string; value: number; notes: string };
 type VariationMap = Record<PrototypeGeometryMode, AmphitheaterVariation>;
 type SurfaceFilter = ArchitecturalSurfaceClass | "combined";
+type PrototypeSession = {
+  seed: number;
+  continuityControls: ContinuityControls;
+  view: PrototypeView;
+  stage: number;
+  sourceScope: "selection" | "complete";
+  showAnalysis: boolean;
+  showGrid: boolean;
+  finishedOnly: boolean;
+  surfaceFilter: SurfaceFilter;
+  aggregationCount: 2 | 4 | 8;
+  criteria: Criterion[];
+  preferred: PrototypeGeometryMode;
+  rationale: string;
+  finalized: boolean;
+};
 
 const modes: PrototypeGeometryMode[] = ["letters", "voids", "combined"];
 const modeLabels: Record<PrototypeGeometryMode, string> = { letters: "Letters", voids: "Voids", combined: "Letters + Voids" };
@@ -355,7 +372,69 @@ function Status({ valid, children }: { valid: boolean; children: React.ReactNode
   return <span className="rounded border px-1.5 py-0.5 text-[9px]" style={{ borderColor: valid ? "#397a63" : "#955142", color: valid ? "#83e4bd" : "#ff9d87", background: valid ? "#10251e" : "#291612" }}>{children}</span>;
 }
 
-function exportBoard(variations: VariationMap, descriptors: DescriptorSettings) {
+function renderFinalView(mesh: AmphitheaterVariation["continuousMesh"], view: PrototypeView, width: number, height: number) {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, preserveDrawingBuffer: true });
+  renderer.setSize(width, height, false);
+  renderer.setClearColor(EXPORT_BACKGROUND, 1);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(EXPORT_BACKGROUND);
+  scene.add(new THREE.AmbientLight("#ffffff", 0.72));
+  const sun = new THREE.DirectionalLight("#ffffff", 1.25);
+  sun.position.set(16, 24, 12);
+  scene.add(sun);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(mesh.positions, 3));
+  if (mesh.indices.length) geometry.setIndex(mesh.indices);
+  geometry.computeVertexNormals();
+  const material = new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 0.62, metalness: 0.02, side: THREE.DoubleSide });
+  scene.add(new THREE.Mesh(geometry, material));
+  geometry.computeBoundingBox();
+  const bounds = geometry.boundingBox ?? new THREE.Box3(new THREE.Vector3(-1, -1, -1), new THREE.Vector3(1, 1, 1));
+  const center = bounds.getCenter(new THREE.Vector3());
+  const size = bounds.getSize(new THREE.Vector3());
+  const maxDimension = Math.max(size.x, size.y, size.z, 1);
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, maxDimension * 24);
+  const aspect = width / height;
+  const margin = 1.22;
+  const viewWidth = view === "plan" ? size.x : view === "section" ? size.x : maxDimension * 1.45;
+  const viewHeight = view === "plan" ? size.z : view === "section" ? size.y : maxDimension * 1.2;
+  let halfWidth = Math.max(viewWidth, 1) * margin / 2;
+  let halfHeight = Math.max(viewHeight, 1) * margin / 2;
+  if (halfWidth / halfHeight > aspect) halfHeight = halfWidth / aspect;
+  else halfWidth = halfHeight * aspect;
+  camera.left = -halfWidth;
+  camera.right = halfWidth;
+  camera.top = halfHeight;
+  camera.bottom = -halfHeight;
+  if (view === "plan") {
+    camera.up.set(0, 0, 1);
+    camera.position.set(center.x, center.y + maxDimension * 4, center.z);
+  } else if (view === "section") {
+    camera.up.set(0, 1, 0);
+    camera.position.set(center.x, center.y, center.z + maxDimension * 4);
+  } else {
+    camera.up.set(0, 1, 0);
+    camera.position.set(center.x + maxDimension, center.y + maxDimension * 0.72, center.z + maxDimension);
+  }
+  camera.lookAt(center);
+  camera.updateProjectionMatrix();
+  renderer.render(scene, camera);
+  const snapshot = document.createElement("canvas");
+  snapshot.width = width;
+  snapshot.height = height;
+  snapshot.getContext("2d")?.drawImage(canvas, 0, 0);
+  renderer.dispose();
+  renderer.forceContextLoss();
+  geometry.dispose();
+  material.dispose();
+  return snapshot;
+}
+
+function exportBoard(variation: AmphitheaterVariation, descriptors: DescriptorSettings) {
   const canvas = document.createElement("canvas");
   canvas.width = 2200;
   canvas.height = 1100;
@@ -365,48 +444,40 @@ function exportBoard(variations: VariationMap, descriptors: DescriptorSettings) 
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.fillStyle = EXPORT_GOLD;
   context.font = "bold 44px Arial";
-  context.fillText(`${CATEGORY_DEFINITIONS[variations.letters.category].name.toUpperCase()} / ${variations.letters.typologyName.toUpperCase()} — THREE SOURCE MODES`, 70, 70);
+  context.fillText(`${CATEGORY_DEFINITIONS[variation.category].name.toUpperCase()} / ${variation.typologyName.toUpperCase()} — ${modeLabels[variation.mode].toUpperCase()}`, 70, 70);
   context.font = "22px Arial";
   context.fillStyle = EXPORT_REFERENCE_BLUE;
-  context.fillText("20′ × 20′ registration tile · dimensions in feet · black presentation background", 70, 108);
-  modes.forEach((mode, modeIndex) => {
-    const variation = variations[mode];
-    const left = 55 + modeIndex * 715;
-    const modeColor = mode === "letters" ? EXPORT_REFERENCE_BLUE : mode === "voids" ? EXPORT_MEDIUM_BLUE : EXPORT_GOLD;
-    context.strokeStyle = modeColor;
+  context.fillText("Final architectural geometry · plan, isometric, and section · dimensions in feet", 70, 108);
+  const views: Array<[PrototypeView, string]> = [["plan", "Plan"], ["isometric", "Isometric"], ["section", "Section"]];
+  const hasGeometry = variation.continuousMesh.positions.length > 0;
+  views.forEach(([view, label], index) => {
+    const left = 55 + index * 715;
+    context.strokeStyle = EXPORT_GOLD;
     context.lineWidth = 3;
     context.strokeRect(left, 150, 660, 760);
-    context.fillStyle = modeColor;
+    context.fillStyle = EXPORT_GOLD;
     context.font = "bold 30px Arial";
-    context.fillText(variation.name.toUpperCase(), left + 24, 198);
-    context.save();
-    context.translate(left + 330, 485);
-    context.strokeStyle = modeColor;
-    context.lineWidth = 22;
-    const platforms = variation.elements.filter((element) => element.kind === "platform");
-    for (const element of platforms) {
-      context.save();
-      context.translate(element.x * 20, element.y * 20);
-      context.rotate(-element.rotation * Math.PI / 180);
-      context.strokeRect(-element.width * 10, -element.depth * 10, element.width * 20, element.depth * 20);
-      context.restore();
+    context.fillText(label.toUpperCase(), left + 24, 198);
+    if (hasGeometry) {
+      const viewCanvas = renderFinalView(variation.continuousMesh, view, 620, 640);
+      context.drawImage(viewCanvas, left + 20, 220, 620, 640);
+    } else {
+      context.fillStyle = EXPORT_REFERENCE_BLUE;
+      context.font = "22px Arial";
+      context.fillText("No architectural geometry", left + 24, 520);
     }
-    context.restore();
-    context.fillStyle = EXPORT_REFERENCE_BLUE;
-    context.font = "22px Arial";
-    const metrics = variation.measurements;
-    context.fillText(`Horizontal area: ${metrics.occupiedHorizontalArea.toFixed(1)} ft²`, left + 24, 820);
-    context.fillText(`Interconnected void: ${metrics.interconnectedVoidVolume.toFixed(0)} ft³`, left + 24, 850);
-    context.fillText(`Circulation: ${metrics.circulationConnectivity.toFixed(0)}%`, left + 350, 820);
-    context.fillText(`Visibility: ${metrics.platformVisibility.toFixed(0)}%`, left + 350, 850);
-    context.fillStyle = variation.validation.valid ? "#7fe2b9" : "#ff947e";
-    context.fillText(variation.validation.valid ? "TILE VALID" : "REVIEW REQUIRED", left + 24, 890);
   });
+  const metrics = variation.measurements;
+  context.fillStyle = EXPORT_REFERENCE_BLUE;
+  context.font = "22px Arial";
+  context.fillText(`Horizontal area: ${metrics.occupiedHorizontalArea.toFixed(1)} ft²    Interconnected void: ${metrics.interconnectedVoidVolume.toFixed(0)} ft³    Circulation: ${metrics.circulationConnectivity.toFixed(0)}%    Visibility: ${metrics.platformVisibility.toFixed(0)}%`, 70, 960);
+  context.fillStyle = variation.validation.valid ? "#7fe2b9" : "#ff947e";
+  context.fillText(variation.validation.valid ? "TILE VALID" : "REVIEW REQUIRED", 70, 995);
   context.fillStyle = EXPORT_REFERENCE_BLUE;
   context.font = "18px Arial";
   const priority = ["convergent", "sequential", "visuallyConnected", "circulationActivated", "verticallyIntegrated", "openVolume", "sculptural"] as const;
-  context.fillText(`Descriptor targets: ${priority.map((key) => `${key} ${descriptors[key].intensity}`).join(" · ")}`, 70, 1025);
-  canvas.toBlob((blob) => { if (blob) download(`${variations.letters.category}-${variations.letters.typology}-11x22-comparison.png`, blob, "image/png"); }, "image/png");
+  context.fillText(`Descriptor targets: ${priority.map((key) => `${key} ${descriptors[key].intensity}`).join(" · ")}`, 70, 1040);
+  canvas.toBlob((blob) => { if (blob) download(`${variation.category}-${variation.typology}-${variation.mode}-11x22-plan-iso-section.png`, blob, "image/png"); }, "image/png");
 }
 
 export default function PrototypeDemonstration({ sourcePlacements, completeSourcePlacements, sourceLabel, sourceBounds, sourceThickness, sourceOptions, selectedSourceIndex, onSourceIndexChange, descriptors, selectedMode, onSelectedModeChange, selectedCategory, selectedTypology, onSelectedCategoryChange, onSelectedTypologyChange }: Props) {
@@ -427,6 +498,8 @@ export default function PrototypeDemonstration({ sourcePlacements, completeSourc
   const [surfaceFilter, setSurfaceFilter] = useState<SurfaceFilter>("combined");
   const [sourceScope, setSourceScope] = useState<"selection" | "complete">("selection");
   const [elevationComparison, setElevationComparison] = useState<AmphitheaterVariation | null>(null);
+  const [prototypeReady, setPrototypeReady] = useState(false);
+  const pendingFinalRestore = useRef(false);
   const activeSource = sourceScope === "complete" ? completeSourcePlacements : sourcePlacements;
   const activeSourceLabel = sourceScope === "complete" ? `Complete source arrangement · ${completeSourcePlacements.length} objects` : sourceLabel;
   const captureRef = useRef<(() => string) | null>(null);
@@ -453,7 +526,29 @@ export default function PrototypeDemonstration({ sourcePlacements, completeSourc
   }, [activeSource, rawMinZ, rawMaxZ]);
 
   useEffect(() => {
+    const saved = readJson<PrototypeSession>(PROTOTYPE_SESSION_KEY);
+    if (saved && Number.isFinite(saved.seed)) {
+      setSeed(saved.seed);
+      if (saved.continuityControls) setContinuityControls({ ...DEFAULT_CONTINUITY_CONTROLS, ...saved.continuityControls });
+      if (saved.view === "plan" || saved.view === "section" || saved.view === "isometric") setView(saved.view);
+      if (Number.isFinite(saved.stage)) setStage(saved.stage);
+      if (saved.sourceScope === "complete" || saved.sourceScope === "selection") setSourceScope(saved.sourceScope);
+      if (typeof saved.showAnalysis === "boolean") setShowAnalysis(saved.showAnalysis);
+      if (typeof saved.showGrid === "boolean") setShowGrid(saved.showGrid);
+      if (typeof saved.finishedOnly === "boolean") setFinishedOnly(saved.finishedOnly);
+      if (saved.surfaceFilter) setSurfaceFilter(saved.surfaceFilter);
+      if (saved.aggregationCount === 2 || saved.aggregationCount === 4 || saved.aggregationCount === 8) setAggregationCount(saved.aggregationCount);
+      if (Array.isArray(saved.criteria)) setCriteria(saved.criteria);
+      if (saved.preferred === "letters" || saved.preferred === "voids" || saved.preferred === "combined") setPreferred(saved.preferred);
+      if (typeof saved.rationale === "string") setRationale(saved.rationale);
+      pendingFinalRestore.current = saved.finalized === true;
+    }
+    setPrototypeReady(true);
+  }, []);
+
+  useEffect(() => {
     if (initialGeneration.current) { initialGeneration.current = false; setGenerationKey(currentKey); return; }
+    if (pendingFinalRestore.current) return;
     const timer = window.setTimeout(() => {
       setVariations(createVariations(activeSource, descriptors, selectedCategory, selectedTypology, seed, continuityControls, "preview"));
       setGenerationKey(currentKey);
@@ -481,6 +576,30 @@ export default function PrototypeDemonstration({ sourcePlacements, completeSourc
       }
     } finally { setGenerating(null); }
   }, [activeSource, descriptors, selectedCategory, selectedTypology, selectedMode, seed, continuityControls, currentKey]);
+
+  useEffect(() => {
+    if (!prototypeReady || !pendingFinalRestore.current) return;
+    const timer = window.setTimeout(() => {
+      if (!pendingFinalRestore.current) return;
+      pendingFinalRestore.current = false;
+      void generateAll();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [prototypeReady, generateAll]);
+
+  useEffect(() => {
+    if (!prototypeReady) return;
+    const payload: PrototypeSession = {
+      seed, continuityControls, view, stage, sourceScope, showAnalysis, showGrid, finishedOnly,
+      surfaceFilter, aggregationCount, criteria, preferred, rationale,
+      finalized: pendingFinalRestore.current || selected.quality === "final",
+    };
+    const timer = window.setTimeout(() => writeJson(PROTOTYPE_SESSION_KEY, payload), 300);
+    return () => {
+      window.clearTimeout(timer);
+      writeJson(PROTOTYPE_SESSION_KEY, payload);
+    };
+  }, [prototypeReady, seed, continuityControls, view, stage, sourceScope, showAnalysis, showGrid, finishedOnly, surfaceFilter, aggregationCount, criteria, preferred, rationale, selected.quality]);
 
   const regenerateMode = (mode: PrototypeGeometryMode) => {
     const nextSeed = seed + modes.indexOf(mode) + 1;
@@ -738,7 +857,7 @@ export default function PrototypeDemonstration({ sourcePlacements, completeSourc
       <button type="button" disabled={selected.quality !== "final" || stale || selected.elements.length === 0} onClick={() => download(`${selectedCategory}-${selectedTypology}-${selectedMode}.obj`, architecturalObj(selected), "text/plain")} className="rounded border px-2 py-1 text-[9px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Selected OBJ (feet)</button>
       <button type="button" disabled={selected.quality !== "final" || stale || selected.elements.length === 0} onClick={() => download(`${selectedCategory}-${selectedTypology}-${selectedMode}-${aggregationCount}-tiles.obj`, architecturalObj(selected, aggregationCount), "text/plain")} className="rounded border px-2 py-1 text-[9px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Aggregation OBJ</button>
       <button type="button" onClick={exportCurrentPng} className="rounded border px-2 py-1 text-[9px]" style={{ borderColor: "var(--line)" }}>Current {view} PNG</button>
-      <button type="button" onClick={() => exportBoard(variations, descriptors)} className="rounded border px-2 py-1 text-[9px]" style={{ borderColor: "var(--line)" }}>11×22 comparison PNG</button>
+      <button type="button" onClick={() => exportBoard(selected, descriptors)} className="rounded border px-2 py-1 text-[9px]" style={{ borderColor: "var(--line)" }}>11×22 plan / iso / section PNG</button>
       <button type="button" onClick={() => download(`${selectedCategory}-${selectedTypology}-${selectedMode}-record.json`, JSON.stringify(evaluationRecord, null, 2), "application/json")} className="rounded border px-2 py-1 text-[9px]" style={{ borderColor: "var(--line)" }}>Parameters + evaluation JSON</button>
     </div>
     <p className="mt-2 text-[9px]" style={{ color: "var(--muted)" }}>OBJ coordinates are written in feet. Import into a Rhino 8 document whose model units are Feet. The existing Slide page retains the adjustable cut plane and separate section result view.</p>

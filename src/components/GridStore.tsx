@@ -31,6 +31,7 @@ import {
   type GradientMode,
 } from "./rotationGradient";
 import type { CompositionPlacement } from "./compositionEngine";
+import { readJson, readSlideSignature, SLIDE_SESSION_KEY, writeJson } from "./browserSession";
 
 export type AppliedComposition = {
   seed: number;
@@ -52,6 +53,31 @@ export type RotationOptions = {
 export type Permutation = {
   id: string;
   cells: Cell[];
+};
+
+type SlideSession = {
+  cols: number;
+  rows: number;
+  spacing: number;
+  fontSize: number;
+  gradientDirection: GradientDirection;
+  gradientMode: GradientMode;
+  lessDegrees: number;
+  moreDegrees: number;
+  cells: Cell[];
+  layerCells: Cell[][];
+  layerMode: boolean;
+  zLayers: number;
+  zSpacing: number;
+  letterThickness: number;
+  yRotationEnabled: boolean;
+  yRotationRange: number;
+  permutations: Permutation[];
+  showGuides: boolean;
+  cropCriteria: CropCriteria;
+  showFailedCrops: boolean;
+  useAssets: boolean;
+  appliedComposition: AppliedComposition | null;
 };
 
 const PERMUTATION_COUNT = 16;
@@ -200,6 +226,7 @@ type GridStoreValue = {
   resizeGrid: (nextCols: number, nextRows: number) => void;
   appliedComposition: AppliedComposition | null;
   setAppliedComposition: (composition: AppliedComposition | null) => void;
+  slideReady: boolean;
 };
 
 const GridStoreContext = createContext<GridStoreValue | null>(null);
@@ -246,6 +273,7 @@ export function GridStoreProvider({ children }: { children: ReactNode }) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [appliedComposition, setAppliedComposition] = useState<AppliedComposition | null>(null);
   const sourceVersion = useRef({ cells, layerCells, cols, rows, spacing, fontSize, zLayers, zSpacing, letterThickness, yRotationEnabled, yRotationRange });
+  const restoringSlide = useRef(false);
   const fileInputs = useRef<Record<Letter, HTMLInputElement | null>>({
     V: null,
     U: null,
@@ -266,8 +294,53 @@ export function GridStoreProvider({ children }: { children: ReactNode }) {
       || previous.yRotationEnabled !== yRotationEnabled
       || previous.yRotationRange !== yRotationRange;
     sourceVersion.current = { cells, layerCells, cols, rows, spacing, fontSize, zLayers, zSpacing, letterThickness, yRotationEnabled, yRotationRange };
-    if (changed) setAppliedComposition(null);
+    if (changed && !restoringSlide.current) setAppliedComposition(null);
+    restoringSlide.current = false;
   }, [cells, layerCells, cols, rows, spacing, fontSize, zLayers, zSpacing, letterThickness, yRotationEnabled, yRotationRange]);
+
+  const [slideReady, setSlideReady] = useState(false);
+  useEffect(() => {
+    const saved = readJson<SlideSession>(SLIDE_SESSION_KEY);
+    if (saved && readSlideSignature(saved)) {
+      restoringSlide.current = true;
+      setCols(saved.cols);
+      setRows(saved.rows);
+      setSpacing(saved.spacing);
+      setFontSize(saved.fontSize);
+      setGradientDirection(saved.gradientDirection);
+      setGradientMode(saved.gradientMode);
+      setLessDegrees(saved.lessDegrees);
+      setMoreDegrees(saved.moreDegrees);
+      setCells(saved.cells);
+      setLayerCells(saved.layerCells);
+      setLayerMode(saved.layerMode);
+      setZLayers(saved.zLayers);
+      setZSpacing(saved.zSpacing);
+      setLetterThickness(saved.letterThickness);
+      setYRotationEnabled(saved.yRotationEnabled);
+      setYRotationRange(saved.yRotationRange);
+      if (Array.isArray(saved.permutations)) setPermutations(saved.permutations);
+      if (typeof saved.showGuides === "boolean") setShowGuides(saved.showGuides);
+      if (saved.cropCriteria) setCropCriteria(saved.cropCriteria);
+      if (typeof saved.showFailedCrops === "boolean") setShowFailedCrops(saved.showFailedCrops);
+      if (typeof saved.useAssets === "boolean") setUseAssets(saved.useAssets);
+      setAppliedComposition(saved.appliedComposition ?? null);
+    }
+    setSlideReady(true);
+  }, []);
+  useEffect(() => {
+    if (!slideReady) return;
+    const snapshot: SlideSession = {
+      cols, rows, spacing, fontSize, gradientDirection, gradientMode, lessDegrees, moreDegrees,
+      cells, layerCells, layerMode, zLayers, zSpacing, letterThickness, yRotationEnabled, yRotationRange,
+      permutations, showGuides, cropCriteria, showFailedCrops, useAssets, appliedComposition,
+    };
+    const timer = window.setTimeout(() => writeJson(SLIDE_SESSION_KEY, snapshot), 300);
+    return () => {
+      window.clearTimeout(timer);
+      writeJson(SLIDE_SESSION_KEY, snapshot);
+    };
+  }, [slideReady, cols, rows, spacing, fontSize, gradientDirection, gradientMode, lessDegrees, moreDegrees, cells, layerCells, layerMode, zLayers, zSpacing, letterThickness, yRotationEnabled, yRotationRange, permutations, showGuides, cropCriteria, showFailedCrops, useAssets, appliedComposition]);
 
   useEffect(() => {
     return () => {
@@ -484,6 +557,7 @@ export function GridStoreProvider({ children }: { children: ReactNode }) {
       resizeGrid,
       appliedComposition,
       setAppliedComposition,
+      slideReady,
     }),
     [
       cols,
@@ -521,6 +595,7 @@ export function GridStoreProvider({ children }: { children: ReactNode }) {
       applyRotationGradient,
       resizeGrid,
       appliedComposition,
+      slideReady,
     ],
   );
 
