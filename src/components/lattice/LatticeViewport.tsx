@@ -237,6 +237,8 @@ const LatticeViewport = forwardRef<LatticeViewportHandle, Props>(function Lattic
   return (
     <Canvas
       key={canvasKey}
+      frameloop="demand"
+      dpr={[1, 1.5]}
       gl={{ preserveDrawingBuffer: true, antialias: true, powerPreference: "high-performance" }}
       camera={{ position: [80, 64, 80], fov: 40, near: 0.1, far: 8000 }}
       onCreated={({ gl }) => {

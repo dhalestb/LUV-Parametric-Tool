@@ -16,6 +16,7 @@ import { LATTICE_SESSION_KEY, readJson, writeJson } from "../browserSession";
 import {
   clampLatticeCells,
   DEFAULT_LATTICE_FIELD,
+  latticePerformanceWarning,
   MAX_IMPORTS,
   REQUIRED_TILES,
   resolvedUp,
@@ -180,9 +181,11 @@ export default function LatticeStudio() {
   const [sessionReady, setSessionReady] = useState(false);
   const cache = useRef(new Map<string, TileModel>());
   const cancelRef = useRef(0);
+  const busyRef = useRef(false);
   const viewRef = useRef<LatticeViewportHandle>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const pendingAssembly = useRef<{ options: Assembly[]; active: "A" | "B" | "C" | "manual"; placements: Record<string, Placement> } | null>(null);
+  busyRef.current = busy;
 
   const assigned = useMemo(() => LATTICE_SLOTS.flatMap((slot) => {
     const mesh = meshes.find((item) => item.id === assignments[slot.id]);
@@ -202,7 +205,13 @@ export default function LatticeStudio() {
       if (saved.assignments) setAssignments(saved.assignments);
       if (saved.unit) setUnit(saved.unit);
       if (saved.upAxisMode) setUpAxisMode(saved.upAxisMode);
-      if (saved.field) setField(saved.field);
+      if (saved.field) {
+        setField({
+          cellsX: clampLatticeCells(saved.field.cellsX),
+          cellsY: clampLatticeCells(saved.field.cellsY),
+          cellsZ: clampLatticeCells(saved.field.cellsZ),
+        });
+      }
       if (saved.placements) setPlacements(saved.placements);
       if (saved.options) setOptions(saved.options);
       if (saved.activeOption) setActiveOption(saved.activeOption);
@@ -344,7 +353,10 @@ export default function LatticeStudio() {
 
   useEffect(() => {
     if (prefsRevision === 0 || models.length < 1) return;
-    const handle = window.setTimeout(() => { void runSearch(); }, 600);
+    const handle = window.setTimeout(() => {
+      if (busyRef.current) return;
+      void runSearch();
+    }, 900);
     return () => window.clearTimeout(handle);
   }, [prefsRevision, models.length]);
 
@@ -697,7 +709,7 @@ export default function LatticeStudio() {
                     style={buttonStyle}
                     type="number"
                     min={1}
-                    max={24}
+                    max={16}
                     value={field[axis]}
                     onChange={(event) => setLatticeCells(axis, Number(event.target.value))}
                   />
@@ -705,6 +717,9 @@ export default function LatticeStudio() {
               ))}
             </div>
             <p className="mt-1">{field.cellsX * 20} × {field.cellsY * 20} × {field.cellsZ * 20} ft. Assembly chooses tile and orientation from neighbor compatibility.</p>
+            {latticePerformanceWarning(field) && (
+              <p className="mt-1" style={{ color: "var(--danger-text)" }}>{latticePerformanceWarning(field)}</p>
+            )}
           </div>
           <p className="mt-3 text-[12px]">Uploaded: {meshes.length} / {REQUIRED_TILES}</p>
           {meshes.length > 0 && (
