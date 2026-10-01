@@ -333,6 +333,7 @@ export default function CompositionStudio() {
   const [presetName, setPresetName] = useState("My preset");
   const [savedDesigns, setSavedDesigns] = useState<SavedDesign[]>([]);
   const [history, setHistory] = useState<RunHistory[]>([]);
+  const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
   const [storageReady, setStorageReady] = useState(false);
   const [keptNotice, setKeptNotice] = useState("Working session is kept in this browser.");
   const slideSourceSignature = `${store.cols}:${store.rows}:${store.layerMode}:${store.zLayers}:${store.spacing}:${store.zSpacing}:${store.fontSize}:${store.letterThickness}:${store.yRotationEnabled}:${store.yRotationRange}`;
@@ -460,7 +461,6 @@ export default function CompositionStudio() {
     if (!grid.locked || !selectionValid || activeWeight === 0 || optimizing) return;
     setOptimizing(true);
     setProgress(0);
-    const previous = alternatives;
     const result = await optimizeSpatial({
       sourceCells,
       descriptors,
@@ -477,8 +477,9 @@ export default function CompositionStudio() {
     setAlternatives(result.alternatives);
     setRankingEnabled(result.rankingEnabled);
     setSelectedIndex(0);
+    const runId = `${Date.now()}`;
     setHistory((current) => [{
-      id: `${Date.now()}`,
+      id: runId,
       seed: controls.seed,
       focus,
       fit: result.alternatives[0]?.evaluation.fit ?? null,
@@ -487,10 +488,11 @@ export default function CompositionStudio() {
       controls: structuredClone(controls),
       selection: structuredClone(selection),
       descriptors: structuredClone(descriptors),
-      alternatives: structuredClone(previous),
+      alternatives: structuredClone(result.alternatives),
     }, ...current].slice(0, 10));
+    setActiveHistoryId(runId);
     setOptimizing(false);
-  }, [grid, selectionValid, activeWeight, optimizing, alternatives, sourceCells, descriptors, rules, controls, focus, selection, lockedParent]);
+  }, [grid, selectionValid, activeWeight, optimizing, sourceCells, descriptors, rules, controls, focus, selection, lockedParent]);
 
   useEffect(() => {
     if (!store.slideReady) return;
@@ -579,12 +581,22 @@ export default function CompositionStudio() {
     if (design.prototypeTypology) setPrototypeTypology(design.prototypeTypology);
     setDisplayMode(design.prototypeSource ? (design.prototypeSource === "voids" ? "void" : design.prototypeSource === "combined" ? "both" : "letters") : displayModeForFocus(design.focus));
   };
-  const undo = () => {
-    const previous = history[0];
+  const restoreHistoryRun = (index: number) => {
+    const previous = history[index];
     if (!previous) return;
-    setGrid(previous.grid); setRules(previous.rules); setControls(previous.controls); setSelection(previous.selection ?? { ...DEFAULT_SELECTION }); setFocus(previous.focus); setDisplayMode(displayModeForFocus(previous.focus));
-    setDescriptors(previous.descriptors); setAlternatives(previous.alternatives); setHistory((current) => current.slice(1)); setSelectedIndex(0);
+    setGrid(previous.grid);
+    setRules(previous.rules);
+    setControls(previous.controls);
+    setSelection(previous.selection ?? { ...DEFAULT_SELECTION });
+    setFocus(previous.focus);
+    setDisplayMode(displayModeForFocus(previous.focus));
+    setDescriptors(previous.descriptors);
+    setAlternatives(previous.alternatives);
+    setSelectedIndex(0);
+    setLockedParent(null);
+    setActiveHistoryId(previous.id);
   };
+  const undo = () => restoreHistoryRun(0);
 
   return <main className="mx-auto flex min-h-screen w-full max-w-[1900px] flex-col gap-3 px-4 py-4 md:px-5">
     <header className="flex flex-wrap items-center justify-between gap-2">
@@ -786,7 +798,10 @@ export default function CompositionStudio() {
 
         <section className="rounded-xl border p-3" style={panelStyle}>
           <h2 className="text-sm font-semibold">Configuration history</h2>
-          {history.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Optimization runs appear here and can be restored with Undo.</p> : <div className="mt-2 max-h-48 space-y-1 overflow-auto">{history.map((run, index) => <div key={run.id} className="rounded border p-2 text-[9px]" style={{ borderColor: "var(--line)" }}><strong>Run {history.length - index}</strong> · seed {run.seed} · {focusLabels[run.focus]} · {run.fit?.toFixed(1) ?? "unranked"}</div>)}</div>}
+          {history.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Optimization runs are kept here. Select any run to restore it; newer runs stay available.</p> : <div className="mt-2 max-h-48 space-y-1 overflow-auto">{history.map((run, index) => {
+            const isActive = run.id === activeHistoryId;
+            return <button key={run.id} type="button" onClick={() => restoreHistoryRun(index)} className="w-full rounded border p-2 text-left text-[9px] transition-colors hover:bg-[#121516]" style={{ borderColor: isActive ? "#2b777b" : "var(--line)", background: isActive ? "#10272a" : "#0b0d0e", color: isActive ? "#7decef" : undefined }}><strong>Run {history.length - index}</strong> · seed {run.seed} · {focusLabels[run.focus]} · {run.fit?.toFixed(1) ?? "unranked"}{isActive ? " · active" : ""}<div className="mt-0.5 text-[8px]" style={{ color: "var(--muted)" }}>{run.alternatives.length} alternatives · click to restore</div></button>;
+          })}</div>}
         </section>
 
         <section className="rounded-xl border p-3 text-[9px]" style={panelStyle}>
