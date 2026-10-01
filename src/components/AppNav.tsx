@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/shapes", label: "Shapes" },
   { href: "/voids", label: "Voids" },
   { href: "/composition", label: "Composition" },
+  { href: "/lattice", label: "Part 2" },
 ] as const;
 
 export default function AppNav() {
