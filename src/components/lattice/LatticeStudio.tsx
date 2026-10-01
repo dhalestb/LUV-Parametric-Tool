@@ -18,6 +18,7 @@ import {
   DEFAULT_LATTICE_FIELD,
   latticePerformanceWarning,
   MAX_IMPORTS,
+  MAX_LATTICE_CELLS_PER_AXIS,
   REQUIRED_TILES,
   resolvedUp,
   UNIT_TO_FEET,
@@ -709,7 +710,7 @@ export default function LatticeStudio() {
                     style={buttonStyle}
                     type="number"
                     min={1}
-                    max={16}
+                    max={MAX_LATTICE_CELLS_PER_AXIS}
                     value={field[axis]}
                     onChange={(event) => setLatticeCells(axis, Number(event.target.value))}
                   />
