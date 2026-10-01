@@ -6,9 +6,11 @@ export const REQUIRED_TILES = 15;
 export type LatticeField = { cellsX: number; cellsY: number; cellsZ: number };
 export const DEFAULT_LATTICE_FIELD: LatticeField = { cellsX: 8, cellsY: 8, cellsZ: 3 };
 
+export const MAX_LATTICE_CELLS_PER_AXIS = 20;
+
 export function clampLatticeCells(value: number) {
   if (!Number.isFinite(value)) return 1;
-  return Math.max(1, Math.min(16, Math.round(value)));
+  return Math.max(1, Math.min(MAX_LATTICE_CELLS_PER_AXIS, Math.round(value)));
 }
 
 export function latticeCellCount(field: LatticeField) {
@@ -17,7 +19,7 @@ export function latticeCellCount(field: LatticeField) {
 
 export function latticePerformanceWarning(field: LatticeField) {
   const cells = latticeCellCount(field);
-  if (cells > 200) return `Large board (${cells} cells) may stutter in the browser. Prefer ≤ 12×12×1 for smoother Vercel use.`;
+  if (cells > 200) return `Large board (${cells} cells) may stutter in the browser. Prefer a smaller Z depth (for example 20×20×1) when possible.`;
   if (cells > 100) return `Board has ${cells} cells. Assembly and orbiting may feel slower on larger grids.`;
   return null;
 }
