@@ -29,9 +29,13 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .dev-server.*.log
+build-output.log
 
 # generated geometry written by the app
 /exports/
+
+# local session checkpoints
+/checkpoints/
 
 # env files
 .env*
