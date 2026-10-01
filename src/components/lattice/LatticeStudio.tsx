@@ -12,6 +12,7 @@ import { parseObj } from "./parseObj";
 import { evaluateAssembly, placedFromRecord, searchAssemblies } from "./search";
 import { DEFAULT_DISTRIBUTION_PREFS } from "./distribution";
 import { LATTICE_SLOTS, slotById } from "./slots";
+import { LATTICE_SESSION_KEY, readJson, writeJson } from "../browserSession";
 import {
   clampLatticeCells,
   DEFAULT_LATTICE_FIELD,
@@ -94,6 +95,55 @@ function boardFromTiles(
   return { meshes: instanceMeshes, models: instanceModels, placements: instancePlacements };
 }
 
+type PackedMesh = Omit<ImportedObj, "positions" | "normals"> & {
+  positions: number[];
+  normals: number[];
+};
+
+type LatticeSession = {
+  version: 1;
+  meshes: PackedMesh[];
+  assignments: Record<string, string | null>;
+  unit: UnitName;
+  upAxisMode: UpAxisMode;
+  field: LatticeField;
+  placements: Record<string, Placement>;
+  options: Assembly[] | null;
+  activeOption: "A" | "B" | "C" | "manual";
+  selectedId: string | null;
+  colorMode: ColorMode;
+  showLattice: boolean;
+  showConnections: boolean;
+  cameraMode: CameraMode;
+  diagnostic: DiagnosticMode;
+  continuityOverlay: ContinuityOverlay;
+  presentation: boolean;
+  status: string;
+  distributionWeight: number;
+  clusteringPercent: number;
+  balanceTypologies: boolean;
+  balanceCategories: boolean;
+  preventLargeClusters: boolean;
+  stats: SearchStats | null;
+  copyCount: 2 | 4 | 8;
+};
+
+function packMesh(mesh: ImportedObj): PackedMesh {
+  return {
+    ...mesh,
+    positions: Array.from(mesh.positions),
+    normals: Array.from(mesh.normals),
+  };
+}
+
+function unpackMesh(mesh: PackedMesh): ImportedObj {
+  return {
+    ...mesh,
+    positions: new Float32Array(mesh.positions),
+    normals: new Float32Array(mesh.normals),
+  };
+}
+
 export default function LatticeStudio() {
   const [meshes, setMeshes] = useState<ImportedObj[]>([]);
   const [assignments, setAssignments] = useState<Record<string, string | null>>({});
@@ -127,10 +177,12 @@ export default function LatticeStudio() {
   const [copyWarning, setCopyWarning] = useState<string | null>(null);
   const [catalogue, setCatalogue] = useState<Array<{ slotId: string; score: number; tiles: number; warning: string | null }>>([]);
   const [preview, setPreview] = useState<{ meshes: ImportedObj[]; models: TileModel[]; placements: Record<string, Placement> } | null>(null);
+  const [sessionReady, setSessionReady] = useState(false);
   const cache = useRef(new Map<string, TileModel>());
   const cancelRef = useRef(0);
   const viewRef = useRef<LatticeViewportHandle>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const pendingAssembly = useRef<{ options: Assembly[]; active: "A" | "B" | "C" | "manual"; placements: Record<string, Placement> } | null>(null);
 
   const assigned = useMemo(() => LATTICE_SLOTS.flatMap((slot) => {
     const mesh = meshes.find((item) => item.id === assignments[slot.id]);
@@ -141,6 +193,104 @@ export default function LatticeStudio() {
   const selected = (preview?.meshes ?? meshes).find((mesh) => mesh.id === selectedId) ?? null;
   const selectedPlacement = selected ? (preview?.placements[selected.id] ?? placements[selected.id] ?? null) : null;
   const selectedModel = (preview?.models.find((model) => model.id === selectedId) ?? models.find((model) => model.id === (selected ? sourceIdOf(selected.id) : ""))) ?? null;
+
+  useEffect(() => {
+    const saved = readJson<LatticeSession>(LATTICE_SESSION_KEY);
+    if (saved?.version === 1 && Array.isArray(saved.meshes)) {
+      const restoredMeshes = saved.meshes.map(unpackMesh);
+      setMeshes(restoredMeshes);
+      if (saved.assignments) setAssignments(saved.assignments);
+      if (saved.unit) setUnit(saved.unit);
+      if (saved.upAxisMode) setUpAxisMode(saved.upAxisMode);
+      if (saved.field) setField(saved.field);
+      if (saved.placements) setPlacements(saved.placements);
+      if (saved.options) setOptions(saved.options);
+      if (saved.activeOption) setActiveOption(saved.activeOption);
+      if (saved.selectedId !== undefined) setSelectedId(saved.selectedId);
+      if (saved.colorMode) setColorMode(saved.colorMode);
+      if (typeof saved.showLattice === "boolean") setShowLattice(saved.showLattice);
+      if (typeof saved.showConnections === "boolean") setShowConnections(saved.showConnections);
+      if (saved.cameraMode) setCameraMode(saved.cameraMode);
+      if (saved.diagnostic) setDiagnostic(saved.diagnostic);
+      if (saved.continuityOverlay) setContinuityOverlay(saved.continuityOverlay);
+      if (typeof saved.presentation === "boolean") setPresentation(saved.presentation);
+      if (typeof saved.status === "string") setStatus(saved.status);
+      if (typeof saved.distributionWeight === "number") setDistributionWeight(saved.distributionWeight);
+      if (typeof saved.clusteringPercent === "number") setClusteringPercent(saved.clusteringPercent);
+      if (typeof saved.balanceTypologies === "boolean") setBalanceTypologies(saved.balanceTypologies);
+      if (typeof saved.balanceCategories === "boolean") setBalanceCategories(saved.balanceCategories);
+      if (typeof saved.preventLargeClusters === "boolean") setPreventLargeClusters(saved.preventLargeClusters);
+      if (saved.stats) setStats(saved.stats);
+      if (saved.copyCount === 2 || saved.copyCount === 4 || saved.copyCount === 8) setCopyCount(saved.copyCount);
+      if (saved.options?.length) {
+        pendingAssembly.current = {
+          options: saved.options,
+          active: saved.activeOption ?? "A",
+          placements: saved.placements ?? {},
+        };
+      }
+      setStatus(saved.status || `Restored Part 2 session · ${restoredMeshes.length} OBJ${restoredMeshes.length === 1 ? "" : "s"}.`);
+    }
+    setSessionReady(true);
+  }, []);
+
+  useEffect(() => {
+    const pending = pendingAssembly.current;
+    if (!sessionReady || !pending || models.length < 1 || meshes.length < 1) return;
+    pendingAssembly.current = null;
+    const option = pending.options.find((item) => item.id === pending.active) ?? pending.options[0];
+    if (!option) return;
+    setPreview(boardFromTiles(option.tiles, models, meshes, { placements: pending.placements }));
+    setActiveOption(option.id);
+    setDiagnostic("distribution");
+    setColorMode("typology");
+  }, [sessionReady, models, meshes]);
+
+  useEffect(() => {
+    if (!sessionReady) return;
+    const payload: LatticeSession = {
+      version: 1,
+      meshes: meshes.map(packMesh),
+      assignments,
+      unit,
+      upAxisMode,
+      field,
+      placements,
+      options,
+      activeOption,
+      selectedId,
+      colorMode,
+      showLattice,
+      showConnections,
+      cameraMode,
+      diagnostic,
+      continuityOverlay,
+      presentation,
+      status,
+      distributionWeight,
+      clusteringPercent,
+      balanceTypologies,
+      balanceCategories,
+      preventLargeClusters,
+      stats,
+      copyCount,
+    };
+    const handle = window.setTimeout(() => {
+      if (!writeJson(LATTICE_SESSION_KEY, payload)) {
+        // Retry without bulky diagnostic notes if quota is tight.
+        const slim = {
+          ...payload,
+          options: payload.options?.map((option) => ({ ...option, placementNotes: undefined, connections: option.connections.slice(0, 80) })) ?? null,
+        };
+        writeJson(LATTICE_SESSION_KEY, slim);
+      }
+    }, 450);
+    return () => window.clearTimeout(handle);
+  }, [
+    sessionReady, meshes, assignments, unit, upAxisMode, field, placements, options, activeOption, selectedId,
+    colorMode, showLattice, showConnections, cameraMode, diagnostic, continuityOverlay, presentation, status,
+    distributionWeight, clusteringPercent, balanceTypologies, balanceCategories, preventLargeClusters, stats, copyCount,
+  ]);
 
   useEffect(() => {
     let cancelled = false;
@@ -200,6 +350,45 @@ export default function LatticeStudio() {
 
   function bumpDistributionPrefs() {
     setPrefsRevision((current) => current + 1);
+  }
+
+  function clearSavedSession() {
+    cancelRef.current += 1;
+    pendingAssembly.current = null;
+    window.localStorage.removeItem(LATTICE_SESSION_KEY);
+    setMeshes([]);
+    setAssignments({});
+    setUnit("feet");
+    setUpAxisMode("auto");
+    setField(DEFAULT_LATTICE_FIELD);
+    setFieldRevision(0);
+    setPrefsRevision(0);
+    setPlacements({});
+    setModels([]);
+    setOptions(null);
+    setActiveOption("manual");
+    setSelectedId(null);
+    setColorMode("category");
+    setShowLattice(false);
+    setShowConnections(true);
+    setCameraMode("iso");
+    setDiagnostic("originals");
+    setContinuityOverlay("all");
+    setPresentation(false);
+    setStatus("Part 2 session cleared. Upload OBJ meshes to begin again.");
+    setDistributionWeight(70);
+    setClusteringPercent(40);
+    setBalanceTypologies(true);
+    setBalanceCategories(true);
+    setPreventLargeClusters(true);
+    setBusy(false);
+    setProgressPercent(null);
+    setStats(null);
+    setCopyCount(4);
+    setCopyWarning(null);
+    setCatalogue([]);
+    setPreview(null);
+    cache.current.clear();
   }
 
   async function importFiles(files: File[]) {
@@ -645,6 +834,8 @@ export default function LatticeStudio() {
         <aside className="overflow-auto border-l p-3 text-[10px]" style={{ borderColor: "var(--line)" }}>
           <button type="button" className={buttonClass} style={buttonStyle} disabled={busy || models.length < 1} onClick={() => void runSearch()}>ASSEMBLE INTERLOCKING LATTICE</button>
           <button type="button" className={`${buttonClass} mt-2 block`} style={buttonStyle} disabled={busy || models.length < 1} onClick={() => void runSearch()}>REASSEMBLE UNLOCKED CELLS</button>
+          <button type="button" className={`${buttonClass} mt-2 block`} style={buttonStyle} onClick={clearSavedSession}>CLEAR SAVED SESSION</button>
+          <p className="mt-2" style={{ color: "var(--muted)" }}>Part 2 autosaves meshes, prefs, and the last assembly so switching tabs does not reset it.</p>
           {busy && progressPercent !== null && (
             <div className="mt-2 rounded border p-2" style={{ borderColor: "var(--line)" }}>
               <div className="mb-1 flex items-center justify-between">
