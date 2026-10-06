@@ -429,6 +429,18 @@ function fitBoundary(points: Point2[], limit = 9.15): Point2[] {
   return points.map(([x, y]) => [x * factor, y * factor]);
 }
 
+/** Keep distant source clusters in place instead of scaling them toward the origin. */
+function fitBoundaryPreserveCenter(points: Point2[], limit = 9.15): Point2[] {
+  if (points.length < 1) return points;
+  const center = boundaryCenter(points);
+  const maxRadius = Math.max(.001, ...points.map(([x, y]) => Math.hypot(x - center[0], y - center[1])));
+  const centerLimit = Math.max(.5, limit - .4);
+  const shiftedCenter: Point2 = [clamp(center[0], -centerLimit, centerLimit), clamp(center[1], -centerLimit, centerLimit)];
+  const radiusBudget = Math.max(.35, limit - Math.max(Math.abs(shiftedCenter[0]), Math.abs(shiftedCenter[1])));
+  const factor = Math.min(1, radiusBudget / maxRadius);
+  return points.map(([x, y]) => [shiftedCenter[0] + (x - center[0]) * factor, shiftedCenter[1] + (y - center[1]) * factor]);
+}
+
 function ensureBoundaryArea(points: Point2[], minimumArea: number, limit = 8): Point2[] {
   if (points.length < 3) return points;
   const enlarged = scaleBoundary(points, Math.max(1, Math.sqrt(minimumArea / Math.max(.01, polygonArea(points)))));
@@ -1262,10 +1274,16 @@ export function generateProtoArchitecture({ source, descriptors, mode, category 
   const signature = (sourceSignature % 997) / 996;
   const influencePoints = sourceBoundaries.flatMap((boundary) => boundary.points);
   const influenceCenter = influencePoints.length ? boundaryCenter(influencePoints) : gatheringRegion?.center ?? [0, 0];
-  // Typology centralization establishes the primary organization; the source
-  // still contributes a measurable displacement and orientation.
+  // Anchor the primary organizer on the largest source cluster while typology
+  // centralization still pulls toward the field influence center.
   const centerRetention = (.52 - behaviors.centralization * .38) * (.72 + sourcePreservation * .55);
-  let primaryCenter: Point2 = [clamp(influenceCenter[0] * centerRetention, -2.4, 2.4), clamp(influenceCenter[1] * centerRetention, -2.4, 2.4)];
+  const gatheringPull = .58 + sourcePreservation * .3;
+  let primaryCenter: Point2 = gatheringRegion
+    ? [
+        clamp(gatheringRegion.center[0] * gatheringPull + influenceCenter[0] * centerRetention * (1 - gatheringPull), -7.2, 7.2),
+        clamp(gatheringRegion.center[1] * gatheringPull + influenceCenter[1] * centerRetention * (1 - gatheringPull), -7.2, 7.2),
+      ]
+    : [clamp(influenceCenter[0] * centerRetention, -2.4, 2.4), clamp(influenceCenter[1] * centerRetention, -2.4, 2.4)];
   const sourceOrientation = THREE.MathUtils.degToRad(principalOrientation(influencePoints.length >= 3 ? convexHull(influencePoints) : [[-1, 0], [1, 0], [0, 1]]));
   const maximumRegionArea = Math.max(.01, ...sourceBoundaries.map((boundary) => boundary.area));
   const sourceModulation = (angle: number, index: number) => {
@@ -1418,6 +1436,65 @@ export function generateProtoArchitecture({ source, descriptors, mode, category 
     initialElements.push({ ...route, id: `${mode}-initial-terrace-aisle-${side < 0 ? "left" : "right"}` });
     elements.push(route);
   });
+  // Secondary letter/void clusters receive typology-scaled occupied architecture
+  // so distant source geometry is not left as analysis overlay only. Descriptors,
+  // typology behaviors, and continuity controls still drive local form.
+  if (!fullDomain) {
+    const regionCoverageRadius = 1.65 + behaviors.horizontalPlateDominance * .35;
+    const coveredCenters = elements
+      .filter((element) => element.kind === "stage" || element.kind === "platform")
+      .map((element) => (element.footprint ? boundaryCenter(element.footprint) : [element.x, element.y] as Point2));
+    const satelliteRegions = (mode === "voids" ? voidRegions : mode === "letters" ? letterRegions : [...letterRegions, ...voidRegions])
+      .filter((region) => region.points.length >= 3 && region.area >= Math.max(.35, maximumRegionArea * .045));
+    satelliteRegions.forEach((region, index) => {
+      if (coveredCenters.some((center) => Math.hypot(center[0] - region.center[0], center[1] - region.center[1]) < regionCoverageRadius)) return;
+      const relative = clamp(Math.sqrt(region.area / maximumRegionArea), .32, 1);
+      const retain = .42 + sourcePreservation * .38 + continuityControls.preservation / 280;
+      const localRadius = clamp(Math.sqrt(region.area / Math.PI) * (.7 + retain * .55), .55, 2.35) * relative;
+      const footprint = sourcePreservation > .38
+        ? fitBoundaryPreserveCenter(smoothClosedBoundary(scaleBoundary(region.points, .62 + retain * .28 + organicInfluence * boundaryCurvature * .08), 1), 9.45)
+        : fitBoundaryPreserveCenter(
+          behaviors.linearity > .62 || behaviors.horizontalPlateDominance > .82
+            ? orientedRectangleBoundary(region.center, localRadius * (1.15 + behaviors.horizontalPlateDominance * .35), localRadius * (.72 + contextOpen * .18), sourceOrientation + index * .09, .28 + behaviors.surfaceContinuity * .3)
+            : orientedEllipseBoundary(region.center, localRadius * (1.05 + contextOpen * .2), localRadius * (.85 + behaviors.horizontalPlateDominance * .15), sourceOrientation + index * .09, 30, sourceModulation),
+          9.45,
+        );
+      const elevation = architecturalElevation(region);
+      const inner = region.kind === "void" || behaviors.verticalVoidDominance > .55
+        ? fitBoundaryPreserveCenter(orientedEllipseBoundary(region.center, localRadius * (.42 + behaviors.voidPreservation * .18), localRadius * (.36 + open * .12), sourceOrientation, 24), 9.2)
+        : undefined;
+      const plate: ArchitecturalElement = {
+        id: `${mode}-source-cluster-${region.kind}-${index}`,
+        kind: "platform",
+        x: 0, y: 0, z: elevation, width: 1, depth: 1,
+        height: .4 + contextOpen * .1 + continuityControls.verticalIntegration / 900,
+        rotation: 0, footprint, innerFootprint: inner,
+      };
+      initialElements.push({ ...plate, id: `${mode}-initial-source-cluster-${region.kind}-${index}` });
+      elements.push(plate);
+      coveredCenters.push(boundaryCenter(footprint));
+      if (region.kind === "void") {
+        elements.push({
+          id: `${mode}-source-cluster-void-${index}`,
+          kind: "void", x: 0, y: 0, z: region.zMin - .1, width: 1, depth: 1,
+          height: Math.max(1.4, region.zMax - region.zMin + 1.1 + continuityControls.minimumOpening * .08),
+          rotation: 0, footprint: inner ?? fitBoundaryPreserveCenter(scaleBoundary(region.points, .78), 9.2), transparent: true,
+        });
+      }
+      if (behaviors.terracing > .55 && region.kind === "letter" && vertical > .25) {
+        const ring = fitBoundaryPreserveCenter(
+          amphitheaterBand(region.center, localRadius * .95, localRadius * .75, localRadius * 1.45, localRadius * 1.15, sourceOrientation, openingCenter + index * .07, openingAngle * (.7 + contextOpen * .15), sourceModulation),
+          9.45,
+        );
+        const terrace: ArchitecturalElement = {
+          id: `${mode}-source-cluster-terrace-${index}`, kind: "platform",
+          x: 0, y: 0, z: elevation + .16 + armatureRise * .45, width: 1, depth: 1, height: .4, rotation: 0, footprint: ring,
+        };
+        initialElements.push({ ...terrace, id: `${mode}-initial-source-cluster-terrace-${index}` });
+        elements.push(terrace);
+      }
+    });
+  }
   // The three validation organizers replace the legacy small organizer before
   // connections. They consume the full extracted graph, never a detail sample.
   const domain = fullDomain ? buildDomainOrganization(source, analysis, mode, typology, descriptors, continuityControls, seed) : undefined;
@@ -1433,14 +1510,14 @@ export function generateProtoArchitecture({ source, descriptors, mode, category 
     initialElements.length = 0;
     failures.push(typology === "vertical-void-lobby" ? "UNSUPPORTED SOURCE FOR VERTICAL VOID LOBBY — no adequate connected vertical void chain." : "No usable source-domain organizer is available. Choose a larger region or a source mode with extracted components.");
   }
-  // Source regions remain available as analysis anchors and typology influence.
-  // They are no longer converted into a universal set of floors, junctions,
-  // and one-row terrace rings. Actual occupied nodes come from the organizer.
+  // Source clusters remain occupied architecture nodes and connection anchors.
+  // The primary typology organizer still owns the focal form; secondary clusters
+  // contribute satellite plates so every substantial letter/void participates.
   const sourceAnchorRegions = mode === "voids"
-    ? distributedBoundaries(voidRegions, 6)
+    ? distributedBoundaries(voidRegions, 10)
     : mode === "letters"
-      ? distributedBoundaries(letterRegions, 8)
-      : [...distributedBoundaries(letterRegions, 4), ...distributedBoundaries(voidRegions, 2)];
+      ? distributedBoundaries(letterRegions, 12)
+      : [...distributedBoundaries(letterRegions, 8), ...distributedBoundaries(voidRegions, 4)];
   const organizerTargetEntries = elements
     .filter((element) => element.kind !== "void" && element.kind !== "connector" && (!domain || element.kind === "stage" || element.kind === "platform"))
     .map((element, index) => {
@@ -1451,17 +1528,14 @@ export function generateProtoArchitecture({ source, descriptors, mode, category 
     .filter((entry, index, entries) => entries.findIndex((candidate) => Math.hypot(candidate.center[0] - entry.center[0], candidate.center[1] - entry.center[1]) < .35 && Math.abs(candidate.z - entry.z) < .25) === index);
   const organizerOccupiedRegionCount = organizerTargetEntries.length;
 
-  // Secondary BRIDGE / SEQUENCE / OVERLOOK operations may request one source
-  // anchor when the organizer creates only one occupied node. This preserves
-  // source influence without rebuilding the previous six-region skeleton.
-  const sourceFallbackRequired = !domain && organizerTargetEntries.length < 2
-    && (operationEnabled("BRIDGE") || operationEnabled("SEQUENCE") || operationEnabled("OVERLOOK"));
-  if (sourceFallbackRequired) {
-    const fallback = sourceAnchorRegions
-      .map((region) => ({ id: `source-anchor-${region.id}`, kind: region.kind, center: region.center, z: architecturalElevation(region) }))
-      .find((entry) => organizerTargetEntries.every((existing) => Math.hypot(existing.center[0] - entry.center[0], existing.center[1] - entry.center[1]) > .8 || Math.abs(existing.z - entry.z) > .5));
-    if (fallback) organizerTargetEntries.push(fallback);
-  }
+  // Register every uncovered source cluster as a network node so Prim's spanning
+  // tree and connectionDistance loops can reach distant letters and voids.
+  sourceAnchorRegions.forEach((region) => {
+    const entry = { id: `source-anchor-${region.id}`, kind: region.kind, center: region.center, z: architecturalElevation(region) };
+    if (organizerTargetEntries.every((existing) => Math.hypot(existing.center[0] - entry.center[0], existing.center[1] - entry.center[1]) > .8 || Math.abs(existing.z - entry.z) > .5)) {
+      organizerTargetEntries.push(entry);
+    }
+  });
 
   // Capture the source-derived islands before any global circulation is added.
   // This is retained for the connectivity diagnostic and makes the distinction
@@ -1648,7 +1722,13 @@ export function generateProtoArchitecture({ source, descriptors, mode, category 
   addConnector({ id: `${mode}-connector-north`, kind: "connector", x: 0, y: 9.85, z: registeredElevation, width: connectorWidth, depth: 2.3, height: .5, rotation: 0 });
   // In Void mode the bounded voids become occupiable source geometry. In
   // Combined mode, voids not promoted to platforms remain subtractive openings.
-  if (!domain && mode === "combined") voidRegions.slice(2, 5).forEach((region, index) => {
+  if (!domain && mode === "combined") voidRegions.forEach((region, index) => {
+    const alreadyPreserved = elements.some((element) => {
+      if (element.kind !== "void" || !element.id.includes("source-cluster-void")) return false;
+      const center = element.footprint ? boundaryCenter(element.footprint) : [element.x, element.y] as Point2;
+      return Math.hypot(center[0] - region.center[0], center[1] - region.center[1]) < 1.2;
+    });
+    if (alreadyPreserved) return;
     const openingRadius = Math.max(.5, Math.sqrt(region.area / Math.PI));
     const intersectsRequiredConnection = proposedConnections.some((connection) => {
       const averageElevation = (connection.fromZ + connection.toZ) / 2;
@@ -1657,7 +1737,7 @@ export function generateProtoArchitecture({ source, descriptors, mode, category 
     });
     // Required circulation has priority where a bounded void would sever the
     // spanning network. Other voids remain subtractive and fully open.
-    if (!intersectsRequiredConnection) elements.push({ id: `${mode}-source-void-${index + 2}`, kind: "void", x: 0, y: 0, z: architecturalElevation(region), width: 1, depth: 1, height: 1.2 + Math.sqrt(region.area), rotation: 0, footprint: region.points, transparent: true });
+    if (!intersectsRequiredConnection) elements.push({ id: `${mode}-source-void-${index}`, kind: "void", x: 0, y: 0, z: architecturalElevation(region), width: 1, depth: 1, height: 1.2 + Math.sqrt(region.area) + continuityControls.minimumOpening * .05, rotation: 0, footprint: fitBoundaryPreserveCenter(region.points, 9.2), transparent: true });
   });
   const connectors: TileConnector[] = [
     { edge: "north", interface: "male", elevation: registeredElevation, width: connectorWidth, openingWidth: 3 + open * 2 }, { edge: "east", interface: "male", elevation: registeredElevation, width: connectorWidth, openingWidth: 3 + open * 2 },
@@ -1683,7 +1763,7 @@ export function generateProtoArchitecture({ source, descriptors, mode, category 
       : "letter solids and inter-letter openings are resolved together through one mixed source graph";
   const method = domain
     ? `${rule.name}: ${domain.diagnostic.organization}. ${domain.diagnostic.componentsUsed} source regions and ${domain.diagnostic.relationshipsUsed} relationships have explicit local assignments. Whole-field envelope influence is recorded separately and excluded from assignment coverage. Source-graph circulation precedes organic contour development and reconstruction. Geometric connectivity requires separate architectural review.`
-    : `${rule.name}: ${sourceMethod}. The shared transformation engine applies ${Object.entries(behaviors).filter(([, value]) => value >= .65).map(([key]) => key).join(", ")} before descriptor-context modification and common connection generation.`;
+    : `${rule.name}: ${sourceMethod}. Primary typology organization plus source-cluster plates are shaped by active descriptors and continuity controls before connection generation.`;
   const initialSurfaceDiagnostic = elementSurfaceDiagnostic(initialElements);
   const classifiedSurfaceDiagnostic = elementSurfaceDiagnostic(elements);
   const continuousMesh = quality === "preview" ? previewElementMesh(elements) : continuousSurface(elements, continuityControls, domain ? 64 : 40);
