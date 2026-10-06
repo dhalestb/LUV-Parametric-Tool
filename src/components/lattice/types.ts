@@ -44,7 +44,8 @@ export type DiagnosticMode =
   | "validation"
   | "copies"
   | "continuity"
-  | "distribution";
+  | "distribution"
+  | "obj-fidelity";
 
 export type ContinuityOverlay = "all" | "floor" | "void" | "circulation" | "interlock";
 
@@ -125,10 +126,67 @@ export type Placement = {
   ix: number;
   iy: number;
   iz: number;
+  /**
+   * Extra vertical offset in feet inside / across the 20' bay.
+   * World Z = iz * LATTICE_FEET + zLift. Allows stacking with gaps in one plan bay.
+   */
+  zLift?: number;
   locked: boolean;
 };
 
+export type Vec3 = [number, number, number];
+export type ConnectionPortType = "BRANCH_END" | "PLATFORM_EDGE" | "LANDING_EDGE" | "PASSAGE_END" | "CIRCULATION_END" | "EXPOSED_WALKABLE_EDGE";
+export type ConnectionPort = {
+  id: string;
+  sourceFormId: string;
+  type: ConnectionPortType;
+  /** Feet in anchored, Z-up variant coordinates; never file-space coordinates. */
+  localPosition: Vec3;
+  elevation: number;
+  outwardDirection: Vec3;
+  upDirection: Vec3;
+  usableWidth: number;
+  usableDepth: number;
+  confidence: number;
+  sourceCells: number[];
+  /** Reliable usable boundary in local variant coordinates; absent for raster fallback. */
+  profile?: [Vec3,Vec3];
+};
+export type ConnectionClass = "DIRECT" | "ADAPTIVE" | "VERTICAL";
+export type PortRejection = "DISTANCE" | "ANGLE" | "LATERAL OFFSET" | "ELEVATION" | "WIDTH" | "COLLISION" | "LOW CONFIDENCE" | "NETWORK REDUNDANT" | "PORT IN USE";
+export type PortCandidate = { pair: PortPair; accepted: boolean; reason?: PortRejection };
+export type PortPair = {
+  tileA: string;
+  tileB: string;
+  portA: string;
+  portB: string;
+  from: Vec3;
+  to: Vec3;
+  distance: number;
+  plan: number;
+  rise: number;
+  facing: number;
+  widthCompatibility: number;
+  usableWidth: number;
+  confidence: number;
+  score: number;
+  connectionClass?: ConnectionClass;
+  lateralOffset?: number;
+  angle?: number;
+  startWidth?: number;
+  endWidth?: number;
+  startDirection?: Vec3;
+  endDirection?: Vec3;
+  path?: Vec3[];
+  fallback?: boolean;
+  startProfile?: [Vec3,Vec3];
+  endProfile?: [Vec3,Vec3];
+  portOffsetA?: number;
+  portOffsetB?: number;
+};
+
 export type TileVariant = {
+  ports?: ConnectionPort[];
   rotation: Rotation;
   mirror: Mirror;
   occupied: number[];
@@ -168,6 +226,8 @@ export type TileModel = {
   recess: number;
   cellFeet: number;
   variants: TileVariant[];
+  /** Read-only anchored source surface for assignment connector clearance; never rendered. */
+  connectionSurface?: { positions: Float32Array; triangles: number[] };
 };
 
 export type ConnectionReport = {
@@ -203,6 +263,7 @@ export type PlacementNote = {
   ix: number;
   iy: number;
   iz: number;
+  zLift?: number;
   score: number;
   floor: number;
   void: number;
@@ -220,9 +281,17 @@ export type PlacedTile = {
   ix: number;
   iy: number;
   iz: number;
+  /** Feet added to iz * LATTICE_FEET for in-bay stacking / connection alignment. */
+  zLift?: number;
 };
 
+/** World Z (feet, Z-up) for a placed tile root. */
+export function placementWorldZ(tile: Pick<PlacedTile, "iz" | "zLift"> | Pick<Placement, "iz" | "zLift">) {
+  return tile.iz * LATTICE_FEET + (tile.zLift ?? 0);
+}
+
 export type Assembly = {
+  portPairs?: PortPair[];
   id: "A" | "B" | "C";
   title: string;
   tiles: PlacedTile[];

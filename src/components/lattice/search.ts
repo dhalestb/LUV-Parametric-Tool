@@ -22,7 +22,7 @@ import type {
   TileModel,
   TileVariant,
 } from "./types";
-import { DEFAULT_LATTICE_FIELD, DIRECTIONS, LATTICE_FEET, oppositeDirection, packCell, shiftPacked, unpackCell, variantIndex } from "./types";
+import { DEFAULT_LATTICE_FIELD, DIRECTIONS, LATTICE_FEET, oppositeDirection, packCell, placementWorldZ, shiftPacked, unpackCell, variantIndex } from "./types";
 
 type Attachment = {
   from: number;
@@ -88,9 +88,10 @@ function sourceIdOf(id: string) {
   return split === -1 ? id : id.slice(0, split);
 }
 
-function worldShift(ix: number, iy: number, iz: number, cellFeet: number) {
+function worldShift(ix: number, iy: number, iz: number, cellFeet: number, zLift = 0) {
   const step = latticeStep(cellFeet);
-  return [ix * step, iy * step, iz * step] as const;
+  const oz = iz * step + Math.round(zLift / cellFeet);
+  return [ix * step, iy * step, oz] as const;
 }
 
 function shiftedSet(cells: number[], ox: number, oy: number, oz: number) {
@@ -99,9 +100,10 @@ function shiftedSet(cells: number[], ox: number, oy: number, oz: number) {
   return set;
 }
 
-export function describeTransform(model: TileModel, placement: { rotation: TileVariant["rotation"]; mirror: TileVariant["mirror"]; ix: number; iy: number; iz: number }) {
+export function describeTransform(model: TileModel, placement: { rotation: TileVariant["rotation"]; mirror: TileVariant["mirror"]; ix: number; iy: number; iz: number; zLift?: number }) {
   const mirror = placement.mirror === "none" ? "no mirror" : placement.mirror === "x" ? "mirror X" : "mirror Y";
-  return `${placement.rotation}° / ${mirror} / lattice ${placement.ix}, ${placement.iy}, ${placement.iz}`;
+  const lift = placement.zLift ? ` +${placement.zLift.toFixed(1)}'` : "";
+  return `${placement.rotation}° / ${mirror} / lattice ${placement.ix}, ${placement.iy}, ${placement.iz}${lift}`;
 }
 
 function labelFor(model: TileModel) {
@@ -145,9 +147,9 @@ export function evaluateAssembly(models: TileModel[], placed: PlacedTile[]): { c
     const model = resolve(tile.id);
     const variant = model?.variants[tile.variant];
     if (!model || !variant) continue;
-    const [ox, oy, oz] = worldShift(tile.ix, tile.iy, tile.iz, cellFeet);
+    const [ox, oy, oz] = worldShift(tile.ix, tile.iy, tile.iz, cellFeet, tile.zLift ?? 0);
     worlds.push({
-      tile,
+      tile: { ...tile, zLift: tile.zLift ?? 0 },
       model,
       variant,
       occupied: shiftedSet(variant.occupied, ox, oy, oz),
@@ -164,7 +166,11 @@ export function evaluateAssembly(models: TileModel[], placed: PlacedTile[]): { c
   let interlockPass = 0;
   let collisionPenalty = 0;
   const consider = (left: WorldTile, right: WorldTile) => {
-    const dir = dominantDirection(right.tile.ix - left.tile.ix, right.tile.iy - left.tile.iy, right.tile.iz - left.tile.iz);
+    const dir = dominantDirection(
+      right.tile.ix - left.tile.ix,
+      right.tile.iy - left.tile.iy,
+      (placementWorldZ(right.tile) - placementWorldZ(left.tile)) / LATTICE_FEET,
+    );
     const edgeBoost = dir === "none" ? 0 : previewFaces(left.variant, right.variant, dir, 0, 0) * 0.04;
     const scored = scoreVoxelAdjacency(
       { occupied: left.occupied, floor: left.floor, passage: left.passage, voidCells: left.voidCells, vertical: left.vertical },
@@ -195,8 +201,8 @@ export function evaluateAssembly(models: TileModel[], placed: PlacedTile[]): { c
       tileB: right.tile.id,
       labelA: labelFor(left.model),
       labelB: labelFor(right.model),
-      transformA: describeTransform(left.model, { ...left.variant, ix: left.tile.ix, iy: left.tile.iy, iz: left.tile.iz }),
-      transformB: describeTransform(right.model, { ...right.variant, ix: right.tile.ix, iy: right.tile.iy, iz: right.tile.iz }),
+      transformA: describeTransform(left.model, { ...left.variant, ix: left.tile.ix, iy: left.tile.iy, iz: left.tile.iz, zLift: left.tile.zLift }),
+      transformB: describeTransform(right.model, { ...right.variant, ix: right.tile.ix, iy: right.tile.iy, iz: right.tile.iz, zLift: right.tile.zLift }),
       direction: dir,
       floor,
       void: voidGrade,
@@ -485,8 +491,8 @@ async function rankAttachments(models: TileModel[], hooks: Hooks) {
 
 type BeamState = { tiles: PlacedTile[]; score: number };
 
-function worldBounds(variant: TileVariant, ix: number, iy: number, iz: number, cellFeet: number) {
-  const [ox, oy, oz] = worldShift(ix, iy, iz, cellFeet);
+function worldBounds(variant: TileVariant, ix: number, iy: number, iz: number, cellFeet: number, zLift = 0) {
+  const [ox, oy, oz] = worldShift(ix, iy, iz, cellFeet, zLift);
   return {
     minX: ox + variant.bounds.minX, maxX: ox + variant.bounds.maxX,
     minY: oy + variant.bounds.minY, maxY: oy + variant.bounds.maxY,
@@ -551,14 +557,14 @@ function occupancyOverlap(models: TileModel[], tiles: PlacedTile[], next: Placed
   const occupied = new Set<number>();
   let gap = Infinity;
   const nextVariant = byId.get(next.id)!.variants[next.variant];
-  const nextBounds = worldBounds(nextVariant, next.ix, next.iy, next.iz, cellFeet);
+  const nextBounds = worldBounds(nextVariant, next.ix, next.iy, next.iz, cellFeet, next.zLift ?? 0);
   for (const tile of tiles) {
     const variant = byId.get(tile.id)!.variants[tile.variant];
-    gap = Math.min(gap, separatedGap(worldBounds(variant, tile.ix, tile.iy, tile.iz, cellFeet), nextBounds));
-    const [ox, oy, oz] = worldShift(tile.ix, tile.iy, tile.iz, cellFeet);
+    gap = Math.min(gap, separatedGap(worldBounds(variant, tile.ix, tile.iy, tile.iz, cellFeet, tile.zLift ?? 0), nextBounds));
+    const [ox, oy, oz] = worldShift(tile.ix, tile.iy, tile.iz, cellFeet, tile.zLift ?? 0);
     for (const cell of variant.occupied) occupied.add(shiftPacked(cell, ox, oy, oz));
   }
-  const [ox, oy, oz] = worldShift(next.ix, next.iy, next.iz, cellFeet);
+  const [ox, oy, oz] = worldShift(next.ix, next.iy, next.iz, cellFeet, next.zLift ?? 0);
   let overlap = 0;
   for (const cell of nextVariant.occupied) if (occupied.has(shiftPacked(cell, ox, oy, oz))) overlap += 1;
   return { overlap, gap: Number.isFinite(gap) ? gap : 99, count: nextVariant.occupied.length };
@@ -1249,6 +1255,7 @@ export async function searchAssemblies(
     ix: placement.ix,
     iy: placement.iy,
     iz: placement.iz,
+    zLift: placement.zLift ?? 0,
   }));
   const basePrefs = { ...DEFAULT_DISTRIBUTION_PREFS, ...(mode.distribution ?? {}) };
   let tested = 0;
@@ -1341,6 +1348,7 @@ export function placementsFromAssembly(option: Assembly, previous: Record<string
       ix: tile.ix,
       iy: tile.iy,
       iz: tile.iz,
+      zLift: tile.zLift ?? 0,
       locked: false,
     };
   }
@@ -1356,6 +1364,7 @@ export function placedFromRecord(models: TileModel[], placements: Record<string,
       ix: placement?.ix ?? 0,
       iy: placement?.iy ?? 0,
       iz: placement?.iz ?? 0,
+      zLift: placement?.zLift ?? 0,
     };
   });
 }
