@@ -1,7 +1,8 @@
 "use client";
 
 import { Html, Line, OrbitControls } from "@react-three/drei";
-import { Canvas, useThree } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
+import { BoardCanvas as Canvas } from "@/components/BoardCanvas";
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { CATEGORY_COLORS, slotById, typologyColor } from "./slots";

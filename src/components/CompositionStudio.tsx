@@ -1,7 +1,8 @@
 "use client";
 
-import { OrbitControls, OrthographicCamera } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { BoardOrthographicCamera as OrthographicCamera } from "./BoardOrthographicCamera";
+import { BoardCanvas as Canvas } from "@/components/BoardCanvas";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import AppNav from "./AppNav";
@@ -586,7 +587,7 @@ export default function CompositionStudio() {
     setDescriptors(previous.descriptors); setAlternatives(previous.alternatives); setHistory((current) => current.slice(1)); setSelectedIndex(0);
   };
 
-  return <main className="mx-auto flex min-h-screen w-full max-w-[1900px] flex-col gap-3 px-4 py-4 md:px-5">
+  return <main data-board-page="composition" className="mx-auto flex min-h-screen w-full max-w-[1900px] flex-col gap-3 px-4 py-4 md:px-5">
     <header className="flex flex-wrap items-center justify-between gap-2">
       <div className="flex flex-wrap items-center gap-3">
         <div><h1 className="text-lg font-semibold">Parametric Spatial Optimizer</h1><p className="text-[10px] uppercase tracking-[0.13em]" style={{ color: "var(--muted)" }}>fixed orthogonal grid · letter + void evaluation</p></div>
@@ -612,7 +613,7 @@ export default function CompositionStudio() {
       Slide inputs synchronized: Gap {store.spacing} → Cell X/Y {(store.spacing / 50).toFixed(2)}, Z gap {store.zSpacing} → Cell Z {(store.zSpacing / 50).toFixed(2)}, Size {store.fontSize} → maximum letter size {(store.fontSize / 50).toFixed(2)}, Thickness {store.letterThickness}%. Generate creates alternatives without changing Slide; use Apply selected to Slide when you want to transfer one.
     </p>
 
-    <div className="grid gap-3 xl:grid-cols-[360px_minmax(0,1fr)_340px]">
+    <div className="board-composition-content"><div className="grid gap-3 xl:grid-cols-[360px_minmax(0,1fr)_340px]">
       <aside className="space-y-3">
         <section className="rounded-xl border p-3" style={panelStyle}>
           <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Fixed 3D grid</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Dimensions must be locked for generation.</p></div><button type="button" onClick={() => setGridValue("locked", !grid.locked)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: grid.locked ? "#3dd6db" : "#2a2a2a", color: grid.locked ? "#000" : "#ddd" }}>{grid.locked ? "Locked" : "Unlocked"}</button></div>
@@ -814,5 +815,5 @@ export default function CompositionStudio() {
       onSelectedCategoryChange={(category: PrototypeCategory) => { setPrototypeCategory(category); setPrototypeTypology(DEFAULT_TYPOLOGY_BY_CATEGORY[category]); }}
       onSelectedTypologyChange={setPrototypeTypology}
     />
-  </main>;
+  </div></main>;
 }

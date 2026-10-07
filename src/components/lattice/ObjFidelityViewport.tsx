@@ -7,7 +7,8 @@
  */
 
 import { OrbitControls } from "@react-three/drei";
-import { Canvas, useThree } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
+import { BoardCanvas as Canvas } from "@/components/BoardCanvas";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import {

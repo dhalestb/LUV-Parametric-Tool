@@ -9,7 +9,6 @@ import type { LatticeViewportHandle } from "./LatticeViewport";
 
 const LatticeViewport = dynamic(() => import("./LatticeViewport"), { ssr: false });
 const ObjFidelityViewport = dynamic(() => import("./ObjFidelityViewport"), { ssr: false });
-import { parseObj } from "./parseObj";
 import { evaluateAssembly, placedFromRecord, searchAssemblies } from "./search";
 import {
   ASSEMBLY_TEST_LABELS,
@@ -36,11 +35,12 @@ import { matchAssemblyPorts } from "./portMatching";
 import { DEFAULT_DISTRIBUTION_PREFS } from "./distribution";
 import { LATTICE_SLOTS, slotById } from "./slots";
 import { LATTICE_SESSION_KEY, readJson, writeJson } from "../browserSession";
+import { DESCRIPTOR_RANK_STORAGE_KEY, type DescriptorRankSnapshot } from "../evaluations/descriptorRank";
+import { useLatticeSource } from "./latticeSource";
 import {
   clampLatticeCells,
   DEFAULT_LATTICE_FIELD,
   latticePerformanceWarning,
-  MAX_IMPORTS,
   MAX_LATTICE_CELLS_PER_AXIS,
   REQUIRED_TILES,
   resolvedUp,
@@ -163,19 +163,19 @@ function packMesh(mesh: ImportedObj): PackedMesh {
   };
 }
 
-function unpackMesh(mesh: PackedMesh): ImportedObj {
-  return {
-    ...mesh,
-    positions: new Float32Array(mesh.positions),
-    normals: new Float32Array(mesh.normals),
-  };
-}
-
 export default function LatticeStudio() {
-  const [meshes, setMeshes] = useState<ImportedObj[]>([]);
-  const [assignments, setAssignments] = useState<Record<string, string | null>>({});
-  const [unit, setUnit] = useState<UnitName>("feet");
-  const [upAxisMode, setUpAxisMode] = useState<UpAxisMode>("auto");
+  const {
+    hydrated: sourceHydrated,
+    meshes,
+    setMeshes,
+    assignments,
+    setAssignments,
+    unit,
+    setUnit,
+    upAxisMode,
+    setUpAxisMode,
+    importObjFiles,
+  } = useLatticeSource();
   const [field, setField] = useState<LatticeField>(DEFAULT_LATTICE_FIELD);
   const [placements, setPlacements] = useState<Record<string, Placement>>({});
   const [models, setModels] = useState<TileModel[]>([]);
@@ -214,6 +214,15 @@ export default function LatticeStudio() {
   const [fidelityMeshId, setFidelityMeshId] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ meshes: ImportedObj[]; models: TileModel[]; placements: Record<string, Placement> } | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
+  const [descriptorRanks, setDescriptorRanks] = useState<DescriptorRankSnapshot | null>(null);
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(DESCRIPTOR_RANK_STORAGE_KEY);
+      setDescriptorRanks(stored ? JSON.parse(stored) as DescriptorRankSnapshot : null);
+    } catch {
+      setDescriptorRanks(null);
+    }
+  }, []);
   const cache = useRef(new Map<string, TileModel>());
   const cancelRef = useRef(0);
   const viewRef = useRef<LatticeViewportHandle>(null);
@@ -266,11 +275,6 @@ export default function LatticeStudio() {
   useEffect(() => {
     const saved = readJson<LatticeSession>(LATTICE_SESSION_KEY);
     if (saved?.version === 1 && Array.isArray(saved.meshes)) {
-      const restoredMeshes = saved.meshes.map(unpackMesh);
-      setMeshes(restoredMeshes);
-      if (saved.assignments) setAssignments(saved.assignments);
-      if (saved.unit) setUnit(saved.unit);
-      if (saved.upAxisMode) setUpAxisMode(saved.upAxisMode);
       if (saved.field) {
         setField({
           cellsX: clampLatticeCells(saved.field.cellsX),
@@ -323,7 +327,7 @@ export default function LatticeStudio() {
           placements: saved.placements ?? {},
         };
       }
-      setStatus(saved.status || `Restored Part 2 session · ${restoredMeshes.length} OBJ${restoredMeshes.length === 1 ? "" : "s"}.`);
+      setStatus(saved.status || `Restored Part 2 session · ${saved.meshes.length} OBJ${saved.meshes.length === 1 ? "" : "s"}.`);
     }
     setSessionReady(true);
   }, []);
@@ -341,7 +345,7 @@ export default function LatticeStudio() {
   }, [sessionReady, models, meshes]);
 
   useEffect(() => {
-    if (!sessionReady) return;
+    if (!sessionReady || !sourceHydrated) return;
     const payload: LatticeSession = {
       version: 1,
       meshes: meshes.map(packMesh),
@@ -382,7 +386,7 @@ export default function LatticeStudio() {
     }, 450);
     return () => window.clearTimeout(handle);
   }, [
-    sessionReady, meshes, assignments, unit, upAxisMode, field, placements, options, activeOption, selectedId,
+    sessionReady, sourceHydrated, meshes, assignments, unit, upAxisMode, field, placements, options, activeOption, selectedId,
     colorMode, showLattice, showConnections, cameraMode, diagnostic, continuityOverlay, presentation, status,
     distributionWeight, clusteringPercent, balanceTypologies, balanceCategories, preventLargeClusters, stats, copyCount, assemblyMode,
   ]);
@@ -469,30 +473,14 @@ export default function LatticeStudio() {
   }
 
   async function importFiles(files: File[]) {
-    const room = MAX_IMPORTS - meshes.length;
-    const accepted = [...files].filter((file) => file.name.toLowerCase().endsWith(".obj")).slice(0, room);
-    if (!accepted.length) {
-      setStatus(room <= 0 ? `The upload limit is ${MAX_IMPORTS} OBJ files.` : "Choose OBJ files.");
+    setStatus(`Importing ${files.length} OBJ file${files.length === 1 ? "" : "s"}…`);
+    const result = await importObjFiles(files);
+    setPreview(null);
+    if (!result.imported) {
+      setStatus(result.error ?? "Choose OBJ files.");
       return;
     }
-    const parsed: ImportedObj[] = [];
-    const errors: string[] = [];
-    for (let index = 0; index < accepted.length; index += 1) {
-      setStatus(`Importing ${index + 1} / ${accepted.length}: ${accepted[index].name}`);
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      try { parsed.push(parseObj(await accepted[index].text(), accepted[index].name)); }
-      catch (error) { errors.push(error instanceof Error ? error.message : accepted[index].name); }
-    }
-    setMeshes((current) => [...current, ...parsed].slice(0, MAX_IMPORTS));
-    setAssignments((current) => {
-      const next = { ...current };
-      for (const mesh of parsed) {
-        if (mesh.suggestedSlotId && !next[mesh.suggestedSlotId]) next[mesh.suggestedSlotId] = mesh.id;
-      }
-      return next;
-    });
-    setPreview(null);
-    setStatus(`Imported ${parsed.length} OBJ file${parsed.length === 1 ? "" : "s"}.${errors.length ? ` ${errors[0]}` : ""}`);
+    setStatus(`Imported ${result.imported} OBJ file${result.imported === 1 ? "" : "s"}.${result.error ? ` ${result.error}` : ""}`);
   }
 
   function removeMesh(meshId: string) {
@@ -883,7 +871,7 @@ export default function LatticeStudio() {
   if (fidelityActive && fidelityMesh) {
     const fReport = fidelityReport;
     return (
-      <div className="flex h-screen flex-col" data-fidelity-isolated="true">
+      <div data-board-page="lattice" className="flex h-screen flex-col" data-fidelity-isolated="true" data-descriptor-ranks={descriptorRanks?.forms.length ?? 0}>
         <header className="flex items-center justify-between gap-3 border-b px-4 py-2" style={{ borderColor: "var(--line)" }}>
           <div>
             <div className="text-sm">OBJ FIDELITY TEST — isolated import pipeline</div>
@@ -1016,7 +1004,7 @@ export default function LatticeStudio() {
 
   return (
     <div
-      className="flex h-screen flex-col"
+      data-board-page="lattice" className="flex h-screen flex-col" data-descriptor-ranks={descriptorRanks?.forms.length ?? 0}
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => { event.preventDefault(); void importFiles([...event.dataTransfer.files]); }}
     >

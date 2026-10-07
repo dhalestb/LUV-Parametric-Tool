@@ -27,6 +27,7 @@ export default function GridPreview({
 }: GridPreviewProps) {
   return (
     <div
+      data-board-geometry
       className={`mx-auto w-fit ${className}`}
       style={{
         display: "grid",

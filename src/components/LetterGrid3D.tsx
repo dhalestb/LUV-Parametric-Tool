@@ -1,7 +1,9 @@
 "use client";
 
-import { Center, OrbitControls, OrthographicCamera, Text } from "@react-three/drei";
-import { Canvas, useLoader } from "@react-three/fiber";
+import { Center, OrbitControls, Text } from "@react-three/drei";
+import { BoardOrthographicCamera as OrthographicCamera } from "./BoardOrthographicCamera";
+import { useLoader } from "@react-three/fiber";
+import { BoardCanvas as Canvas } from "@/components/BoardCanvas";
 import { Suspense, useLayoutEffect, useMemo } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
