@@ -217,16 +217,18 @@ function evaluateAssignment(instances: TileModel[], tiles: PlacedTile[], collect
 }
 
 function scoreObjective(evaled: ReturnType<typeof evaluateAssembly>, synthesis: SynthesisResult, objective: AssignmentObjective, variationBoost: number, portScore = 0) {
+  const graph = graphAdjustment(synthesis);
   const baseContinuity =
     evaled.parts.floor * 6 +
     evaled.parts.circulation * 6 +
     evaled.parts.void * 3 +
     evaled.parts.connectivity * 5;
-  const continuity = baseContinuity + portScore - synthesis.connectorCost * 0.9 - evaled.parts.collision * 5;
+  const continuity = baseContinuity + portScore + graph - synthesis.connectorCost * 0.9 - evaled.parts.collision * 5;
   const balanced =
     evaled.parts.interlock * 8 +
     baseContinuity * 0.7 +
     portScore +
+    graph +
     evaled.parts.richness * 1.2 -
     synthesis.connectorCost * 1.2 -
     evaled.parts.collision * 5;
@@ -234,6 +236,39 @@ function scoreObjective(evaled: ReturnType<typeof evaluateAssembly>, synthesis: 
   if (objective === "continuity") return continuity;
   if (objective === "variation") return variation;
   return balanced;
+}
+
+/** Prefer one connected assembly. A lofted transition outranks a bare touch. Extra connectors are not rewarded without limit. */
+function graphAdjustment(synthesis: SynthesisResult) {
+  const diagnostics = synthesis.organicDiagnostics;
+  if (!diagnostics) return 0;
+  const forms = Object.keys(diagnostics.degrees).length;
+  if (forms <= 1) return 0;
+  const linkCount = synthesis.connectors.filter((connector) => connector.portPair).length;
+  const span = Math.max(0, forms - 1);
+  const lofted = Math.min(linkCount, span);
+  const branches = Math.min(Math.max(0, linkCount - span), span);
+  const multiSide = Object.values(diagnostics.degrees).filter((degree) => degree >= 2).length;
+  const cohesion = diagnostics.components === 1 ? (lofted > 0 ? 14 : 6) : 0;
+  return (
+    cohesion +
+    lofted * 2.5 +
+    branches * 1.25 +
+    multiSide * 1.5 -
+    diagnostics.isolated.length * 18 -
+    Math.max(0, diagnostics.components - 1) * 12 -
+    diagnostics.interiorShortfall * 6 -
+    diagnostics.directJoints * 4
+  );
+}
+
+/** Deep source overlap. A light shared-face review is not the same thing. */
+function destructiveCollisions(connections: Array<{ collision: string }>) {
+  return connections.filter((connection) => connection.collision === "FAIL").length;
+}
+
+function graphComponents(synthesis: SynthesisResult, fallback: number) {
+  return synthesis.organicDiagnostics?.components ?? fallback;
 }
 
 function typologyRetentionScore(forms: TileModel[], evaled: ReturnType<typeof evaluateAssembly>, synthesis: SynthesisResult) {
@@ -297,13 +332,17 @@ function finalize(
     variation: scoreObjective(evaled, synthesis, "variation", variationBoost + uniqueForms * 2, portScore),
   };
   const score = objectiveScores.balanced;
+  const graphCount = graphComponents(synthesis, evaled.components);
+  const linked = graphCount < tiles.length
+    || synthesis.directInterlocks + synthesis.interlocks + synthesis.organicConnectors + synthesis.bridges + synthesis.ramps + synthesis.stairs + synthesis.landings > 0;
   const hardFail =
     tiles.length < copyCount ||
     evaled.parts.collision > copyCount ||
-    (evaled.connections.length === 0 && portMatches.pairs.length === 0 && copyCount > 1) ||
+    (copyCount > 1 && !linked) ||
     (uniqueForms < Math.min(copyCount, forms.length) && copyCount > 1 && forms.length >= copyCount && uniqueForms === 1);
-  const status: AssignmentResult["status"] = hardFail ? "FAIL" : evaled.components > 1 || typologyRetention < 45 || synthesis.connectorCost > copyCount * 8 || (synthesis.fallbackConnections ?? 0) > 0 ? "REVIEW" : "PASS";
-  const summary = `${copyCount} forms (${formLabel(forms)}) · score ${score.toFixed(1)} · direct ${synthesis.directInterlocks} · bridges ${synthesis.bridges} · ramps ${synthesis.ramps} · stairs ${synthesis.stairs}`;
+  const isolated = synthesis.organicDiagnostics?.isolated.length ?? 0;
+  const status: AssignmentResult["status"] = hardFail ? "FAIL" : graphCount > 1 || isolated > 0 || typologyRetention < 45 || synthesis.connectorCost > copyCount * 8 ? "REVIEW" : "PASS";
+  const summary = `${copyCount} forms (${formLabel(forms)}) · score ${score.toFixed(1)} · direct ${synthesis.directInterlocks} · interlocks ${synthesis.interlocks} · organic ${synthesis.organicConnectors} · bridges ${synthesis.bridges} · ramps ${synthesis.ramps} · stairs ${synthesis.stairs} · components ${graphCount} · isolated ${isolated}`;
   const placementNotes: PlacementNote[] = tiles.map((tile) => {
     const model = instances.find((item) => item.id === tile.id)!;
     const variant = model.variants[tile.variant];
@@ -338,7 +377,7 @@ function finalize(
     synthesis,
     score,
     parts: evaled.parts,
-    components: evaled.components,
+    components: graphCount,
     objectiveScores,
     placementNotes,
     candidatesTested: tested,
@@ -443,8 +482,10 @@ async function searchMixedPair(forms: TileModel[], field: LatticeField, hooks: H
           const differentCategory = categoryOf(forms[0]) !== categoryOf(forms[1]) ? 2 : 0;
           const stackBonus = target.sameBay ? 0.2 : 2;
           const variation = differentCategory + stackBonus + (va !== vb ? 0.3 : 0);
+          const components = graphComponents(synthesis, evaled.components);
           const score = scoreObjective(evaled, synthesis, "balanced", variation, portMatches.score);
-          if (!best || evaled.parts.collision < best.collisions || (evaled.parts.collision === best.collisions && (evaled.components < best.components || (evaled.components === best.components && score > best.score)))) best = { tiles, score, variation, components:evaled.components, collisions:evaled.parts.collision };
+          const collisions = destructiveCollisions(evaled.connections);
+          if (!best || collisions < best.collisions || (collisions === best.collisions && (components < best.components || (components === best.components && score > best.score)))) best = { tiles, score, variation, components, collisions };
         }
       }
     }
@@ -530,8 +571,9 @@ async function growMixedAssembly(
               const categories = new Set(forms.slice(0, tiles.length).map((model) => categoryOf(model))).size;
               const stackBonus = target.sameBay ? 0.2 : 2;
               const variation = state.variation + categories + stackBonus;
+              const components = graphComponents(synthesis, evaled.components);
               const score = scoreObjective(evaled, synthesis, "balanced", variation, portMatches.score);
-              nextBeam.push({ tiles, score, variation, components:evaled.components, collisions:evaled.parts.collision });
+              nextBeam.push({ tiles, score, variation, components, collisions: destructiveCollisions(evaled.connections) });
             }
           }
         }

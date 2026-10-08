@@ -1,6 +1,6 @@
 import type { ConnectionPort, ConnectionReport, PlacedTile, PortCandidate, PortPair, PortRejection, TileModel, TileVariant, Vec3 } from "./types";
 import { LATTICE_FEET, packCell, placementWorldZ } from "./types";
-import { transitionPath, transitionMeshes, pathLength } from "./transitionGeometry";
+import { transitionPath, transitionMeshes, pathLength, circulationProfile } from "./transitionGeometry";
 import { transitionSurfaceClear, type ConnectorSurface } from "./connectionClearance";
 
 export const DEFAULT_PORT_TOLERANCES = Object.freeze({maxDistance:20,maxLateralOffset:12,maxAngularDeviation:115,maxElevation:8,maxDirectElevation:.5,maxDirectSlope:.125,minUsableWidth:2,minConfidence:.55,directDistance:4,directLateralOffset:2,directAngle:35,minCompatibilityScore:4});
@@ -62,18 +62,19 @@ export function assessPortPair(a:ConnectionPort,ta:PlacedTile,b:ConnectionPort,t
   const widthCompatibility=Math.min(startWidth,endWidth)/Math.max(startWidth,endWidth),confidence=Math.min(a.confidence,b.confidence);
   const terminal=(p:ConnectionPort)=>p.type==="BRANCH_END"||p.type==="PASSAGE_END";
   const priority=terminal(a)&&terminal(b)&&plan<=4?2.5:(a.type==="LANDING_EDGE"&&terminal(b))||(b.type==="LANDING_EDGE"&&terminal(a))?2:terminal(a)&&terminal(b)?1.8:a.type==="PLATFORM_EDGE"||b.type==="PLATFORM_EDGE"?1.2:a.type==="CIRCULATION_END"||b.type==="CIRCULATION_END"?1:.2;
-  const score=3*((fa+fb+2)/4)+2*(1-distance/t.maxDistance)+1.5*(1-Math.abs(rise)/t.maxElevation)+widthCompatibility+confidence+priority-lateralOffset/t.maxLateralOffset-angle/180-distance*(startWidth+endWidth)/2*.015;
-  const connectionClass=Math.abs(rise)>t.maxDirectElevation||(Math.abs(rise)>1e-5&&plan<Math.abs(rise)/t.maxDirectSlope)?"VERTICAL":plan<=t.directDistance&&lateralOffset<=t.directLateralOffset&&angle<=t.directAngle?"DIRECT":"ADAPTIVE";
+  const profile=circulationProfile(plan,rise);
+  const slopeTerm=profile.mode==="level"?2:profile.mode==="ramp"?1.75:profile.mode==="switchback"?1.2:profile.mode==="stair"?0.7:-2;
+  const score=3*((fa+fb+2)/4)+1.2*(1-distance/t.maxDistance)+slopeTerm+widthCompatibility+confidence+priority-lateralOffset/t.maxLateralOffset-angle/180-distance*(startWidth+endWidth)/2*.015;
+  const connectionClass=profile.mode==="ramp"||profile.mode==="switchback"||profile.mode==="stair"?"VERTICAL":plan<=t.directDistance&&lateralOffset<=t.directLateralOffset&&angle<=t.directAngle&&Math.abs(rise)<=t.maxDirectElevation?"DIRECT":"ADAPTIVE";
   const pair:PortPair={tileA:ta.id,tileB:tb.id,portA:a.id,portB:b.id,from,to,plan,rise,distance,facing,widthCompatibility,confidence,usableWidth:Math.min(startWidth,endWidth),startWidth,endWidth,startProfile:ap.profile,endProfile:bp.profile,portOffsetA:ap.offset,portOffsetB:bp.offset,startDirection:da,endDirection:db,angle,lateralOffset,connectionClass,score,fallback:(a.type==="EXPOSED_WALKABLE_EDGE"&&a.confidence<.8)||(b.type==="EXPOSED_WALKABLE_EDGE"&&b.confidence<.8)};
   let reason:PortRejection|undefined;
   if(distance>t.maxDistance)reason="DISTANCE";
   else if(facing<-.35||angle>t.maxAngularDeviation)reason="ANGLE";
   else if(lateralOffset>t.maxLateralOffset)reason="LATERAL OFFSET";
-  else if(Math.abs(rise)>t.maxElevation||(connectionClass==="VERTICAL"&&plan<Math.abs(rise)*1.5))reason="ELEVATION";
+  else if(profile.mode==="reject")reason="ELEVATION";
   else if(Math.min(startWidth,endWidth)<t.minUsableWidth)reason="WIDTH";
   else if(confidence<t.minConfidence)reason="LOW CONFIDENCE";
   else if(score<t.minCompatibilityScore)reason=facing<.5||angle>45?"ANGLE":lateralOffset>t.directLateralOffset?"LATERAL OFFSET":Math.max(a.usableWidth,b.usableWidth)>8?"WIDTH":"DISTANCE";
-  else if(distance<1e-5)reason="DISTANCE"; // No remaining gap: do not create a folded zero-length loft.
   return {pair,reason};
 }
 export function scorePortPair(a:ConnectionPort,ta:PlacedTile,b:ConnectionPort,tb:PlacedTile,tolerances:Partial<PortTolerances>={}):PortPair|null {
@@ -124,7 +125,9 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
     const occupied=(key:string,offset:number,width:number)=>(used.get(key)??[]).some(span=>Math.abs(span.offset-offset)<(span.width+width)/2+.25);
     if(occupied(ka,pair.portOffsetA??0,pair.startWidth??pair.usableWidth)||occupied(kb,pair.portOffsetB??0,pair.endWidth??pair.usableWidth)){candidate.reason="PORT IN USE";continue;}
     let accepted:PortPair|undefined;
-    for(const bend of [0,2,-2,4,-4]) {
+    const profile=circulationProfile(pair.plan,pair.rise);
+    const bends=profile.mode==="switchback"?[profile.bend,-profile.bend,0,4,-4]:[0,2,-2,4,-4];
+    for(const bend of bends) {
       const routed={...pair,path:transitionPath(pair,bend),connectionClass:bend&&pair.connectionClass==="DIRECT"?"ADAPTIVE" as const:pair.connectionClass};
       if(pathLength(routed.path)>(tolerances.maxDistance??DEFAULT_PORT_TOLERANCES.maxDistance)*1.4)continue;
       if(routeClear(routed,tiles,models,surfaces)){accepted=routed;break;}

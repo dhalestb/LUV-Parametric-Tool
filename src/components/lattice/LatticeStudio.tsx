@@ -683,7 +683,7 @@ export default function LatticeStudio() {
       setDiagnostic("copies");
       setPresentation(false);
       setProgressPercent(100);
-      setStatus(`${result.summary} · direct ${result.synthesis.directInterlocks} · connectors ${result.synthesis.connectors.length}`);
+      setStatus(result.summary);
     } catch (error) {
       if (!(error instanceof Error && error.message === "cancelled")) setStatus(error instanceof Error ? error.message : "Aggregation test failed.");
     } finally {
@@ -1503,11 +1503,45 @@ export default function LatticeStudio() {
               <div>Transforms: {describeTransformsUsed(assignmentResult).labels.join(" · ") || "identity"}</div>
               <div>Status: {assignmentResult.status}</div>
               <div>DIRECT transition joints: {assignmentResult.synthesis.directInterlocks}</div>
+              <div>Controlled interlocks: {assignmentResult.synthesis.interlocks}</div>
+              <div>Organic connectors: {assignmentResult.synthesis.organicConnectors}</div>
               <div>Generated bridges/plates: {assignmentResult.synthesis.bridges}</div>
               <div>Generated ramps: {assignmentResult.synthesis.ramps}</div>
               <div>Generated stairs: {assignmentResult.synthesis.stairs}</div>
               <div>Generated landings: {assignmentResult.synthesis.landings}</div>
+              <div>
+                Circulation slope:
+                {(() => {
+                  const reported = assignmentResult.synthesis.connectors.filter((connector, index, list) => connector.circulation && list.findIndex((item) => item.fromTile === connector.fromTile && item.toTile === connector.toTile && item.kind === connector.kind && Math.abs((item.circulation?.rise ?? 0) - (connector.circulation?.rise ?? 0)) < 0.05) === index);
+                  if (!reported.length) return " none";
+                  return reported.map((connector) => (
+                    <div key={connector.id}>
+                      {connector.kind}: rise {connector.circulation!.rise.toFixed(1)} ft · run {connector.circulation!.run.toFixed(1)} ft · slope {connector.circulation!.slope.toFixed(3)}
+                      {Math.abs(connector.circulation!.rise) > 0.05 ? ` (1:${(connector.circulation!.run / Math.abs(connector.circulation!.rise)).toFixed(1)})` : " (level)"}
+                    </div>
+                  ));
+                })()}
+              </div>
               <div>Vertical links: {assignmentResult.synthesis.verticalLinks}</div>
+              {assignmentResult.synthesis.organicDiagnostics && (
+                <div>
+                  Forms placed: {Object.keys(assignmentResult.synthesis.organicDiagnostics.degrees).length}
+                  {" · "}Candidates considered: {assignmentResult.synthesis.organicDiagnostics.considered}
+                  {" · "}Graph components: {assignmentResult.synthesis.organicDiagnostics.components}
+                  {" · "}Isolated: {assignmentResult.synthesis.organicDiagnostics.isolated.length}
+                  <br />
+                  Relations: branch→branch {assignmentResult.synthesis.organicDiagnostics.relations["branch-branch"]}
+                  {" · "}branch→plane {assignmentResult.synthesis.organicDiagnostics.relations["branch-plane"]}
+                  {" · "}plane→branch {assignmentResult.synthesis.organicDiagnostics.relations["plane-branch"]}
+                  {" · "}plane→plane {assignmentResult.synthesis.organicDiagnostics.relations["plane-plane"]}
+                  <br />
+                  Degree: {Object.entries(assignmentResult.synthesis.organicDiagnostics.degrees).map(([id, degree]) => `${id} ${degree}`).join(" · ") || "none"}
+                  <br />
+                  Rejected: {assignmentResult.synthesis.organicDiagnostics.rejections.length
+                    ? assignmentResult.synthesis.organicDiagnostics.rejections.map((rejection) => `${rejection.reason} (${rejection.detail})`).join(" · ")
+                    : "none"}
+                </div>
+              )}
               <div>Floor / void / circ pairs: {assignmentResult.parts.floor} / {assignmentResult.parts.void} / {assignmentResult.parts.circulation}</div>
               <div>Typology retention: {assignmentResult.typologyRetention.toFixed(0)}</div>
               <div>Original OBJ geometry: 100% retained</div>

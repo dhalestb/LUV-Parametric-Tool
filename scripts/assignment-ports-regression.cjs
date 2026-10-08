@@ -62,7 +62,9 @@ assert.equal(stairs.stairs,1);
 assert(stairs.connectors.every(c=>c.kind==='stair'));
 assert.equal(stairs.landings,0,'do not add pads to every endpoint');
 for (const tread of stairs.connectors) assert(Math.abs(tread.positions[2]-tread.positions[14])<1e-6,'treads are horizontal');
-assert.equal(synthesizeConnectors(directional,[a,b],[],{portPairs:[]}).connectors.length,0,'do not fallback around facing rejection');
+const edgeLoft = synthesizeConnectors(directional,[a,b],[],{portPairs:[]});
+assert.equal(edgeLoft.connectors.length,1,'a rejected port facing does not erase a separate exposed-edge relationship');
+assert(edgeLoft.connectors.every(connector => connector.portPair),'exposed-edge relationships use the smooth loft');
 
 const samples = fs.readdirSync(path.join(root,'public/part2-samples')).filter(n=>n.endsWith('.obj')).map(name=>{
   const mesh = parseObj(fs.readFileSync(path.join(root,'public/part2-samples',name),'utf8'),name);

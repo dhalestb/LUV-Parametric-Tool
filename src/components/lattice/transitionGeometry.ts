@@ -1,6 +1,76 @@
 import type { PortPair, Vec3 } from "./types";
 
 export type TransitionSection = { center: Vec3; side: Vec3; width: number };
+
+/** Walkable ramp: 1 ft of rise needs 12 ft of run. Steeper than this is not a smooth ramp. */
+export const ACCESSIBLE_RAMP_SLOPE = 1 / 12;
+/** Gentler than 1:20 can read as level when the rise itself stays small. */
+export const LEVEL_SLOPE = 1 / 20;
+/** Rise at or below this is construction flatness. It does not waive a steep slope. */
+export const LEVEL_RISE_TOLERANCE = 0.2;
+export const NEAR_LEVEL_RISE = 1.5;
+export const MAX_CIRCULATION_RISE = 16;
+export const MAX_SWITCHBACK_OFFSET = 14;
+
+export type CirculationMode = "level" | "ramp" | "switchback" | "stair" | "reject";
+
+export type CirculationProfile = {
+  rise: number;
+  run: number;
+  slope: number;
+  mode: CirculationMode;
+  /** Lateral offset, in feet, that lengthens a too-steep gap into a 1:12 ramp with a landing. */
+  bend: number;
+};
+
+/** Rise over horizontal run. Level requires a shallow slope. A short steep step is never a level plate. */
+export function circulationProfile(plan: number, rise: number): CirculationProfile {
+  const absRise = Math.abs(rise);
+  const run = Math.max(0, plan);
+  const slope = absRise / Math.max(run, 0.25);
+  if (absRise > MAX_CIRCULATION_RISE) return { rise, run, slope, mode: "reject", bend: 0 };
+  const level = absRise <= LEVEL_RISE_TOLERANCE || (slope <= LEVEL_SLOPE + 1e-6 && absRise <= NEAR_LEVEL_RISE);
+  if (level) return { rise, run, slope, mode: "level", bend: 0 };
+  if (slope <= ACCESSIBLE_RAMP_SLOPE + 1e-6) return { rise, run, slope, mode: "ramp", bend: 0 };
+  const required = absRise / ACCESSIBLE_RAMP_SLOPE;
+  const deficit = required - run;
+  if (deficit > 0 && deficit <= 12 && run >= 3 && absRise <= 12) {
+    const half = run / 2;
+    const extended = (run + deficit) / 2;
+    const bend = Math.sqrt(Math.max(0, extended * extended - half * half));
+    if (bend <= MAX_SWITCHBACK_OFFSET) return { rise, run: required, slope: ACCESSIBLE_RAMP_SLOPE, mode: "switchback", bend: Math.max(0.5, bend) };
+  }
+  const landing = Math.min(4, Math.max(2, required * 0.12));
+  const leg = Math.max(0, (required - landing) / 2);
+  const straightHalf = run / 2;
+  const offset = leg > straightHalf ? Math.sqrt(Math.max(0, leg * leg - straightHalf * straightHalf)) : 0;
+  if (offset > 0.5 && offset <= MAX_SWITCHBACK_OFFSET && run >= 3 && absRise <= 12) {
+    return { rise, run: required, slope: ACCESSIBLE_RAMP_SLOPE, mode: "switchback", bend: offset };
+  }
+  const stairRun = Math.max(2, absRise * 0.4);
+  if (absRise <= 12 && run >= stairRun) return { rise, run, slope, mode: "stair", bend: 0 };
+  return { rise, run, slope, mode: "reject", bend: 0 };
+}
+
+export function formatCirculation(rise: number, run: number, slope: number) {
+  const ratio = Math.abs(rise) > 0.05 ? `1:${(run / Math.abs(rise)).toFixed(1)}` : "level";
+  return `rise ${rise.toFixed(1)} ft, run ${run.toFixed(1)} ft, slope ${slope.toFixed(3)} (${ratio})`;
+}
+
+export function planRun(path: Vec3[]) {
+  return path.slice(1).reduce((sum, point, index) => sum + Math.hypot(point[0] - path[index][0], point[1] - path[index][1]), 0);
+}
+
+/** Steepest horizontal segment. Sub-foot samples are ignored so a smooth curve is not read as a step. */
+export function maxPlanSlope(path: Vec3[]) {
+  let max = 0;
+  for (let index = 1; index < path.length; index += 1) {
+    const run = Math.hypot(path[index][0] - path[index - 1][0], path[index][1] - path[index - 1][1]);
+    if (run < 0.35) continue;
+    max = Math.max(max, Math.abs(path[index][2] - path[index - 1][2]) / run);
+  }
+  return max;
+}
 const mix = (a: number,b: number,t: number) => a+(b-a)*t;
 export function transitionPath(pair: PortPair, bend = 0): Vec3[] {
   const a=pair.from,b=pair.to, dx=b[0]-a[0],dy=b[1]-a[1],plan=Math.hypot(dx,dy);
