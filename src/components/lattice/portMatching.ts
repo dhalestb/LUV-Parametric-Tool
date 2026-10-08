@@ -1,3 +1,4 @@
+import { beginGeometryValidation, geometryRevision } from "./geometryRevision";
 import { confirmedCirculationReports } from "./surfaceAttachment";
 import { acceptCirculationClass, preparePortConnection, portAttachmentMeets } from "./portConnectionValidation";
 import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
@@ -11,8 +12,9 @@ export type PortTolerances = { [K in keyof typeof DEFAULT_PORT_TOLERANCES]: numb
 export function worldPortPosition(tile:PlacedTile,port:ConnectionPort):Vec3 {
   return [tile.ix*LATTICE_FEET+port.localPosition[0],tile.iy*LATTICE_FEET+port.localPosition[1],placementWorldZ(tile)+port.elevation];
 }
-const validatedPairs=new WeakMap<PortPair,{models:TileModel[];tiles:PlacedTile[];geometry:string;placements:string}>();
-export function portPairClearanceValidated(pair:PortPair,models:TileModel[],tiles:PlacedTile[]) {const record=validatedPairs.get(pair);return record?.models===models&&record?.tiles===tiles&&record.geometry===JSON.stringify(pair)&&record.placements===JSON.stringify(tiles);}
+const modelRevisions = (models: TileModel[]) => models.map(model => `${model.id}:${model.connectionSurface ? geometryRevision(model.connectionSurface).id : "missing"}:${model.variants.map(v => `${v.rotation}/${v.mirror}`).join(",")}`).join("|");
+const validatedPairs=new WeakMap<PortPair,{models:TileModel[];tiles:PlacedTile[];geometry:string;placements:string;sources:string}>();
+export function portPairClearanceValidated(pair:PortPair,models:TileModel[],tiles:PlacedTile[]) {const record=validatedPairs.get(pair);return record?.models===models&&record?.tiles===tiles&&record.geometry===JSON.stringify(pair)&&record.placements===JSON.stringify(tiles)&&record.sources===modelRevisions(models);}
 const occupiedCache=new WeakMap<TileVariant,Set<number>>();
 /** Conservative voxel ribbon/headroom check, retained for source/session compatibility. */
 export function portRouteClear(from:Vec3,to:Vec3,width:number,tiles:PlacedTile[],models:TileModel[],endpointIds:string[]):boolean {
@@ -91,6 +93,8 @@ function routeClear(pair:PortPair,tiles:PlacedTile[],models:TileModel[],existing
   return transitionSurfaceClear(pair,tiles,models,existing);
 }
 export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports:ConnectionReport[]=[],tolerances:Partial<PortTolerances>={},collectDiagnostics=true) {
+  const finishGeometry = beginGeometryValidation();
+  try {
   const finishTiming = startConnectionTiming("candidate generation");
   try {
   const candidates:PortCandidate[]=[],byId=new Map(models.map(m=>[m.id,m]));
@@ -146,7 +150,7 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
       if(routeClear(routed,tiles,models,surfaces)){accepted=routed;break;}
     }
     if(!accepted){candidate.reason=validationReason;connectionDiagnostic("port candidate", validationReason, { pair });continue;}
-    validatedPairs.set(accepted,{models,tiles,geometry:JSON.stringify(accepted),placements:JSON.stringify(tiles)});candidate.pair=accepted;candidate.accepted=true;pairs.push(accepted);
+    validatedPairs.set(accepted,{models,tiles,geometry:JSON.stringify(accepted),placements:JSON.stringify(tiles),sources:modelRevisions(models)});candidate.pair=accepted;candidate.accepted=true;pairs.push(accepted);
     for(const [key,offset,width] of [[ka,accepted.portOffsetA??0,accepted.startWidth??accepted.usableWidth],[kb,accepted.portOffsetB??0,accepted.endWidth??accepted.usableWidth]] as const){const spans=used.get(key)??[];spans.push({offset,width});used.set(key,spans);}join(pair.tileA,pair.tileB);surfaces.push(...transitionMeshes(accepted).map(mesh=>({...mesh,portPair:accepted})));
   }
   const componentsAfter=new Set(tiles.map(t=>find(t.id))).size,connectivityBonus=(componentsBefore-componentsAfter)*5;
@@ -155,4 +159,6 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
   return {pairs,candidates,confirmedReports,componentsBefore,componentsAfter,rejectionCounts,score:pairs.reduce((sum,p)=>sum+p.score,0)+connectivityBonus,multiConnectionBonus:connectivityBonus};
 
   } finally { finishTiming(); }
+
+  } finally { finishGeometry(); }
 }

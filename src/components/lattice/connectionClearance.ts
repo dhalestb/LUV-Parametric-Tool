@@ -1,3 +1,4 @@
+import { beginGeometryValidation, geometryRevision } from "./geometryRevision";
 import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import type { PlacedTile, PortPair, TileModel, Vec3 } from "./types";
 import { placementWorldZ } from "./types";
@@ -84,22 +85,28 @@ function localPoint(p:Vec3,tile:PlacedTile,model:TileModel):Vec3 {
 }
 /** Exact triangle surface intersection; only a 0.04' seam at the intended edge is allowed. */
 export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:TileModel[],existing:ConnectorSurface[]=[]):boolean {
+  const finishGeometry = beginGeometryValidation();
+  try {
   const finishTiming = startConnectionTiming("collision and clearance");
   try {
-  const meshes=transitionMeshes(pair),tris=meshes.flatMap(trianglesOf);
+  let tris: Triangle[] | undefined;
+  const connectorTriangles = () => tris ??= transitionMeshes(pair).flatMap(trianglesOf);
   for(const tile of tiles) {
     const model=models.find(m=>m.id===tile.id||m.id===tile.id.split("::")[0]);
     if(!model?.connectionSurface) continue; // Voxel clearance remains mandatory for older/session models.
     const surface=model.connectionSurface;
-    let tree=cache.get(surface);
-    if(!tree) {const sourceTriangles=trianglesOf({positions:surface.positions,indices:surface.triangles});const closed=closedSurface(sourceTriangles);tree=build(sourceTriangles);tree.closed=closed;cache.set(surface,tree);}
-    let checks=sourceClearanceCache.get(surface);
-    if(!checks){checks=new Map();sourceClearanceCache.set(surface,checks);}
-    const canonical=(p:Vec3)=>p.map(v=>Number(v.toFixed(9))) as Vec3;
+    const revision=geometryRevision(surface);
+    let tree=cache.get(revision);
+    if(!tree) {const sourceTriangles=trianglesOf({positions:surface.positions,indices:surface.triangles});const closed=closedSurface(sourceTriangles);tree=build(sourceTriangles);tree.closed=closed;cache.set(revision,tree);}
+    let checks=sourceClearanceCache.get(revision);
+    if(!checks){checks=new Map();sourceClearanceCache.set(revision,checks);}
+    // Exact local values: even sub-tolerance parameter edits must miss the cache.
+    const canonical=(p:Vec3)=>p;
     const localDirection=(d:Vec3|undefined)=>d?canonical(sub(localPoint(pair.from.map((v,i)=>v+d[i]) as Vec3,tile,model),localPoint(pair.from,tile,model))):undefined;
     const signature=JSON.stringify({role:tile.id===pair.tileA?'A':tile.id===pair.tileB?'B':'obstacle',from:canonical(localPoint(pair.from,tile,model)),to:canonical(localPoint(pair.to,tile,model)),path:pair.path?.map(p=>canonical(localPoint(p,tile,model))),startDirection:localDirection(pair.startDirection),endDirection:localDirection(pair.endDirection),startWidth:pair.startWidth,endWidth:pair.endWidth,width:pair.usableWidth,startProfile:pair.startProfile?.map(p=>canonical(localPoint(p,tile,model))),endProfile:pair.endProfile?.map(p=>canonical(localPoint(p,tile,model))),class:pair.connectionClass,angle:pair.angle,lateralOffset:pair.lateralOffset,rise:pair.rise,plan:pair.plan});
     const previous=checks.get(signature);
-    if(previous!==undefined){if(!previous.clear){connectionDiagnostic("clearance", previous.reason ?? "source collision or clearance", { pair, blocker: tile, filename: model.filename, cached: true });return false;}continue;}
+    if(previous!==undefined){connectionDiagnostic("cache", "source clearance hit");if(!previous.clear){connectionDiagnostic("clearance", previous.reason ?? "source collision or clearance", { pair, blocker: tile, filename: model.filename, cached: true });return false;}continue;}
+    connectionDiagnostic("cache", "source clearance miss");
     let failureReason: string | undefined;
     const clearSource=()=>{
     const endpoint=tile.id===pair.tileA?pair.from:tile.id===pair.tileB?pair.to:null;
@@ -107,7 +114,7 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
     const localEnd=endpoint?localPoint(endpoint,tile,model):null;
     const localDir=endpoint&&direction?sub(localPoint(endpoint.map((v,i)=>v+direction[i]) as Vec3,tile,model),localEnd!):null;
     const allowed=(p:Vec3)=>!!localEnd&&!!localDir&&Math.abs(dot(sub(p,localEnd),localDir))<=.04&&Math.abs(p[2]-localEnd[2])<=.26;
-    for(const tri of tris) if(collides(tri.map(p=>localPoint(p,tile,model)) as Triangle,tree,allowed)){failureReason = "source triangle collision";connectionDiagnostic("clearance", failureReason, { pair, blocker: tile, filename: model.filename });return false;}
+    for(const tri of connectorTriangles()) if(collides(tri.map(p=>localPoint(p,tile,model)) as Triangle,tree,allowed)){failureReason = "source triangle collision";connectionDiagnostic("clearance", failureReason, { pair, blocker: tile, filename: model.filename });return false;}
     // Standing clearance over the walking ribbon, including walls/roof above it.
     for(const section of transitionSections(pair)) for(const side of [-.5,0,.5]) {
       const p=section.center.map((v,i)=>v+section.side[i]*section.width*side) as Vec3;
@@ -134,7 +141,10 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
     if(!clear)return false;
   }
   for(const mesh of existing) {
-    const tree=build(trianglesOf(mesh));
+    const revision=geometryRevision(mesh);
+    let tree=cache.get(revision);
+    if(!tree){tree=build(trianglesOf(mesh));cache.set(revision,tree);connectionDiagnostic("cache", "connector tree miss");}
+    else connectionDiagnostic("cache", "connector tree hit");
     const other=mesh.portPair;
     const seamContact=(p:Vec3)=>{
       if(!other)return false;
@@ -146,9 +156,11 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
       }
       return false;
     };
-    if(tris.some(tri=>collides(tri,tree,seamContact))) { connectionDiagnostic("clearance", "connector collision", { pair, blocker: other }); return false; }
+    if(connectorTriangles().some(tri=>collides(tri,tree,seamContact))) { connectionDiagnostic("clearance", "connector collision", { pair, blocker: other }); return false; }
   }
   return true;
 
   } finally { finishTiming(); }
+
+  } finally { finishGeometry(); }
 }

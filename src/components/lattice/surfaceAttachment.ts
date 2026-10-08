@@ -1,3 +1,4 @@
+import { beginGeometryValidation, geometryRevision } from "./geometryRevision";
 import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import type { ConnectionReport, PlacedTile, PortPair, TileModel, Vec3 } from "./types";
 import { placementWorldZ } from "./types";
@@ -34,6 +35,7 @@ type Run = { a: Vec3; b: Vec3; mid: Vec3; length: number; outward: Vec3; min: Ve
 type SurfaceIndex = { triangles: Triangle[]; runs: Run[]; triGrid: Map<string, number[]>; runGrid: Map<string, number[]>; min: Vec3; max: Vec3 };
 
 const indexCache = new WeakMap<object, SurfaceIndex>();
+const gapCache = new WeakMap<object, Map<string, SurfaceGap>>();
 const interfaceCache = new Map<string, { meets: boolean; elevation: number }>();
 
 const sub = (a: Vec3, b: Vec3) => a.map((value, index) => value - b[index]) as Vec3;
@@ -144,7 +146,8 @@ function boundsOf(points: Vec3[]) {
 }
 
 function buildIndex(surface: { positions: Float32Array; triangles: number[] }): SurfaceIndex {
-  const cached = indexCache.get(surface);
+  const revision = geometryRevision(surface);
+  const cached = indexCache.get(revision);
   if (cached) return cached;
   const triangles: Triangle[] = [];
   const triGrid = new Map<string, number[]>();
@@ -252,7 +255,7 @@ function buildIndex(surface: { positions: Float32Array; triangles: number[] }): 
   }
 
   const index = { triangles, runs, triGrid, runGrid, min, max };
-  indexCache.set(surface, index);
+  indexCache.set(revision, index);
   return index;
 }
 
@@ -285,6 +288,18 @@ export function measureSurfaceGap(model: TileModel, tile: PlacedTile, worldPoint
   const index = surfaceIndex(model);
   if (!index) return { distance: Infinity, kind: "open", normalZ: 0 };
   const local = localPoint(worldPoint, tile, model);
+  const revision = geometryRevision(model.connectionSurface!);
+  let gaps = gapCache.get(revision);
+  if (!gaps) { gaps = new Map(); gapCache.set(revision, gaps); }
+  const key = JSON.stringify([local, radius, walkableWithin]);
+  const cached = gaps.get(key);
+  if (cached) { connectionDiagnostic("cache", "surface gap hit"); return {...cached}; }
+  connectionDiagnostic("cache", "surface gap miss");
+  const remember = (gap: SurfaceGap) => {
+    if (gaps.size >= 8192) gaps.delete(gaps.keys().next().value!);
+    gaps.set(key, gap);
+    return {...gap};
+  };
   let best = Infinity;
   let bestNz = 0;
   let bestPoint: Vec3 | null = null;
@@ -300,6 +315,9 @@ export function measureSurfaceGap(model: TileModel, tile: PlacedTile, worldPoint
       if (local[0] < triangle.min[0] - radius || local[0] > triangle.max[0] + radius) continue;
       if (local[1] < triangle.min[1] - radius || local[1] > triangle.max[1] + radius) continue;
       if (local[2] < triangle.min[2] - radius || local[2] > triangle.max[2] + radius) continue;
+      // A triangle cannot beat either incumbent if its bounding box is farther away.
+      const lowerBound = Math.hypot(...local.map((value, axis) => Math.max(triangle.min[axis] - value, 0, value - triangle.max[axis])));
+      if (lowerBound > best && (!triangle.walkable || lowerBound > walkable)) continue;
       const closest = closestOnTriangle(local, triangle);
       const distance = hypot3(sub(local, closest));
       if (distance < best) {
@@ -327,8 +345,8 @@ export function measureSurfaceGap(model: TileModel, tile: PlacedTile, worldPoint
       }
     }
   }
-  if (!Number.isFinite(distance)) return { distance: Infinity, kind: "open", normalZ: 0 };
-  return { distance, kind: classify(distance, normalZ, nearEdge), normalZ };
+  if (!Number.isFinite(distance)) return remember({ distance: Infinity, kind: "open", normalZ: 0 });
+  return remember({ distance, kind: classify(distance, normalZ, nearEdge), normalZ });
 }
 
 function gapAccepts(gap: SurfaceGap, allowWall: boolean, tolerance = SURFACE_CONTACT_TOLERANCE) {
@@ -360,6 +378,8 @@ function sectionMeets(pair: PortPair, end: "start" | "end", models: TileModel[],
 
 /** Shrink each loft end until its real section sits on a suitable surface. */
 export function fitLoftContact(pair: PortPair, models: TileModel[], tiles: PlacedTile[], allowWall: boolean) {
+  const finishGeometry = beginGeometryValidation();
+  try {
   const finishTiming = startConnectionTiming("surface attachment selection");
   try {
   const ends: Array<{ key: "startWidth" | "endWidth"; which: "start" | "end" }> = [
@@ -395,6 +415,8 @@ export function fitLoftContact(pair: PortPair, models: TileModel[], tiles: Place
   return pair.usableWidth >= 2;
 
   } finally { finishTiming(); }
+
+  } finally { finishGeometry(); }
 }
 
 /** A window of `width` centered on `point` and clamped to the source edge. */
@@ -500,7 +522,8 @@ function gapToBox(point: Vec3, box: { minX: number; minY: number; minZ: number; 
 }
 
 function interfaceKey(model: TileModel, tile: PlacedTile) {
-  return `${model.id}:${tile.variant}:${tile.ix}:${tile.iy}:${tile.iz}:${tile.zLift ?? 0}`;
+  const variant = variantOf(model, tile);
+  return `${model.connectionSurface ? geometryRevision(model.connectionSurface).id : "missing"}:${model.id}:${variant.rotation}:${variant.mirror}:${tile.ix}:${tile.iy}:${tile.iz}:${tile.zLift ?? 0}`;
 }
 
 /** Shared graph gate: a proxy report is a proposal until Stage 1 confirms its OBJ interface. */
@@ -520,6 +543,8 @@ export function confirmedCirculationReports(models: TileModel[], tiles: PlacedTi
 
 /** True only when walkable triangles or their boundaries actually meet. Voxel overlap alone does not. */
 export function confirmedWalkableInterface(modelA: TileModel, tileA: PlacedTile, modelB: TileModel, tileB: PlacedTile) {
+  const finishGeometry = beginGeometryValidation();
+  try {
   const finishTiming = startConnectionTiming("surface attachment selection");
   try {
   const key = `${interfaceKey(modelA, tileA)}|${interfaceKey(modelB, tileB)}`;
@@ -532,6 +557,8 @@ export function confirmedWalkableInterface(modelA: TileModel, tileA: PlacedTile,
   return result;
 
   } finally { finishTiming(); }
+
+  } finally { finishGeometry(); }
 }
 
 function nearestMeeting(modelA: TileModel, tileA: PlacedTile, modelB: TileModel, tileB: PlacedTile) {

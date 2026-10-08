@@ -1,3 +1,4 @@
+import { beginGeometryValidation } from "./geometryRevision";
 import { acceptCirculationClass, preparePortConnection, portAttachmentMeets, switchbackRampPath } from "./portConnectionValidation";
 import { connectionDiagnostic } from "./connectionDiagnostics";
 import type { ConnectionReport, Direction, Mirror, PlacedTile, PortCandidate, PortPair, PortRejection, Rotation, TileModel } from "./types";
@@ -273,6 +274,8 @@ export function synthesizeConnectors(
   connections: ConnectionReport[],
   options?: { portPairs: PortPair[]; candidates?: PortCandidate[]; componentsBefore?:number; componentsAfter?:number; rejectionCounts?:Partial<Record<PortRejection,number>> },
 ): SynthesisResult {
+  const finishGeometry = beginGeometryValidation();
+  try {
   if (options) {
     const result=synthesizePortConnectors(models,placed,connections,options.portPairs);
     result.portCandidates=options.candidates;
@@ -403,6 +406,8 @@ export function synthesizeConnectors(
     organicConnectors: 0,
     connectorCost,
   };
+
+  } finally { finishGeometry(); }
 }
 
 /** Assignment-only synthesis. Existing GLOBAL FIELD callers keep the legacy path above. */
