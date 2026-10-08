@@ -1,0 +1,116 @@
+{
+  "checkpoint": {
+    "analysisMs": [
+      2250.0531,
+      2136.6216000000004
+    ],
+    "classificationMs": [
+      1637.4032000000002,
+      1584.8336000000004
+    ],
+    "localMs": [
+      0,
+      0
+    ],
+    "coldMs": [
+      3165.7896999999994,
+      3450.8722
+    ],
+    "warmMs": [
+      197.9992000000002,
+      69.22619999999915,
+      93.55210000000079,
+      90.2464,
+      61.398699999999735,
+      60.96270000000004
+    ],
+    "wholeColdMs": [
+      5415.842799999999,
+      5587.4938
+    ],
+    "bySource": [
+      {
+        "code": "O2",
+        "classificationMeanMs": 321.1070000000002,
+        "cachedMeanMs": 0.375331000000001,
+        "localMeanMs": 0
+      },
+      {
+        "code": "O1",
+        "classificationMeanMs": 90.74624999999992,
+        "cachedMeanMs": 0.16048899999999777,
+        "localMeanMs": 0
+      },
+      {
+        "code": "G1",
+        "classificationMeanMs": 738.4427500000002,
+        "cachedMeanMs": 1.1508389999999964,
+        "localMeanMs": 0
+      },
+      {
+        "code": "L1",
+        "classificationMeanMs": 460.8224,
+        "cachedMeanMs": 0.6520959999999969,
+        "localMeanMs": 0
+      }
+    ],
+    "warmMedianMs": 79.73629999999957
+  },
+  "updated": {
+    "analysisMs": [
+      3869.3152999999993,
+      4566.7608
+    ],
+    "classificationMs": [
+      3246.9971,
+      3746.9337000000005
+    ],
+    "localMs": [
+      1728.6912000000002,
+      1914.328799999999
+    ],
+    "coldMs": [
+      2841.3016000000007,
+      3202.0311999999994
+    ],
+    "warmMs": [
+      109.69270000000051,
+      64.7456000000002,
+      71.60750000000007,
+      153.60179999999855,
+      103.34779999999955,
+      97.1211000000003
+    ],
+    "wholeColdMs": [
+      6710.6169,
+      7768.7919999999995
+    ],
+    "bySource": [
+      {
+        "code": "O2",
+        "classificationMeanMs": 708.3190500000001,
+        "cachedMeanMs": 0.4804774999999972,
+        "localMeanMs": 381.7201
+      },
+      {
+        "code": "O1",
+        "classificationMeanMs": 197.12440000000004,
+        "cachedMeanMs": 0.2146100000000024,
+        "localMeanMs": 105.16700000000003
+      },
+      {
+        "code": "G1",
+        "classificationMeanMs": 1997.612,
+        "cachedMeanMs": 1.2263205000000017,
+        "localMeanMs": 1333.4031499999999
+      },
+      {
+        "code": "L1",
+        "classificationMeanMs": 593.90995,
+        "cachedMeanMs": 0.8891095000000041,
+        "localMeanMs": 1.219749999999749
+      }
+    ],
+    "warmMedianMs": 100.23444999999992
+  }
+}

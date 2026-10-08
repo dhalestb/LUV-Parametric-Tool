@@ -1,0 +1,2278 @@
+{
+  "rows": [
+    {
+      "source": "O1",
+      "sourcePort": "surface-2-2.1-0.8",
+      "target": "A",
+      "from": [
+        13.863612365722656,
+        2.4420928955078125,
+        10.751643959399896
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 17,
+          "area": 2.844753035486369,
+          "expected": 4.2
+        },
+        "ms": 18.758000000000266,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 17,
+          "area": 2.844753035486369,
+          "expected": 6.300000000000001
+        },
+        "ms": 8.313799999999901,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-2-2.1-0.8",
+      "target": "B",
+      "from": [
+        13.863612365722656,
+        2.4420928955078125,
+        10.751643959399896
+      ],
+      "to": [
+        40,
+        10.283156394958496,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 17,
+          "area": 2.844753035486369,
+          "expected": 4.2
+        },
+        "ms": 2.7377000000001317,
+        "cacheHit": true
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 17,
+          "area": 2.844753035486369,
+          "expected": 6.300000000000001
+        },
+        "ms": 2.3114000000000487,
+        "cacheHit": true
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-4-2.1-0.2",
+      "target": "C",
+      "from": [
+        18.09355926513672,
+        7.613131713867188,
+        19.408327102661133
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        20.331989288330078
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 24,
+          "area": 1.1701514964427167,
+          "expected": 4.2
+        },
+        "ms": 4.166700000000219,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 24,
+          "area": 1.1701514964427167,
+          "expected": 6.300000000000001
+        },
+        "ms": 4.169300000000021,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "walking approach support",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "walking approach support",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-0-2.1-0.5",
+      "target": "B",
+      "from": [
+        30,
+        2.753143310546875,
+        2.2481608390808105
+      ],
+      "to": [
+        40,
+        10.283156394958496,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 3,
+          "area": 4.172444738021575,
+          "expected": 4.2
+        },
+        "ms": 3.51720000000023,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 3,
+          "area": 5.722333269412086,
+          "expected": 6.300000000000001
+        },
+        "ms": 3.5108000000000175,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "self-intersecting ribbon",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-1-2.1-0.5",
+      "target": "B",
+      "from": [
+        17.588104248046875,
+        -10,
+        2.2481608390808105
+      ],
+      "to": [
+        40,
+        10.283156394958496,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 5,
+          "area": 4.158135039599555,
+          "expected": 4.2
+        },
+        "ms": 8.408499999999549,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 5,
+          "area": 5.693479677608957,
+          "expected": 6.300000000000001
+        },
+        "ms": 5.621599999999944,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "outside fixed lattice footprint",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "outside fixed lattice footprint",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "outside fixed lattice footprint",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "outside fixed lattice footprint",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-2-2.1-0.5",
+      "target": "A",
+      "from": [
+        13.677658081054688,
+        2.4420928955078125,
+        10.755028247833252
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 17,
+          "area": 2.8165192943871062,
+          "expected": 4.2
+        },
+        "ms": 5.278999999999996,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 17,
+          "area": 2.8165192943871062,
+          "expected": 6.300000000000001
+        },
+        "ms": 4.756000000000313,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "stair cross slope",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-3-2.1-0.5",
+      "target": "C",
+      "from": [
+        17.285369873046875,
+        6.174724578857422,
+        15.34876823425293
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        20.331989288330078
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 21,
+          "area": 2.2908613132871003,
+          "expected": 4.2
+        },
+        "ms": 5.769999999999982,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 21,
+          "area": 2.2947844482550868,
+          "expected": 6.300000000000001
+        },
+        "ms": 5.3521999999998116,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-4-2.1-0.5",
+      "target": "C",
+      "from": [
+        18.09355926513672,
+        7.418926239013672,
+        19.408327102661133
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        20.331989288330078
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 24,
+          "area": 1.1308628950724224,
+          "expected": 4.2
+        },
+        "ms": 5.418500000000222,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 24,
+          "area": 1.1308628950724224,
+          "expected": 6.300000000000001
+        },
+        "ms": 4.378600000000006,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "walking approach support",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "walking approach support",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-5-2.1-0.5",
+      "target": "C",
+      "from": [
+        19.70720672607422,
+        8.663131713867188,
+        20
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        20.331989288330078
+      ],
+      "rampApproach": {
+        "valid": true,
+        "reason": "verified existing floor approach",
+        "details": {
+          "region": 25,
+          "area": 4.199999999999999,
+          "width": 2.1,
+          "depth": 2,
+          "maxSlope": 0,
+          "maxCrossSlope": 0,
+          "minHeadroom": null,
+          "representation": "existing source surface; no generated slab",
+          "openingOutsideDepth": 0.5
+        },
+        "ms": 225.7185999999997,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 25,
+          "area": 5.2256629943847654,
+          "expected": 6.300000000000001
+        },
+        "ms": 5.576599999999871,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "source triangle collision",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "curved",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "source triangle collision",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "source triangle collision",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "source triangle collision",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-6-2.1-0.5",
+      "target": "C",
+      "from": [
+        18.496292114257812,
+        7.418926239013672,
+        20
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        20.331989288330078
+      ],
+      "rampApproach": {
+        "valid": true,
+        "reason": "verified existing floor approach",
+        "details": {
+          "region": 25,
+          "area": 4.199999999999998,
+          "width": 2.1,
+          "depth": 2,
+          "maxSlope": 0,
+          "maxCrossSlope": 0,
+          "minHeadroom": null,
+          "representation": "existing source surface; no generated slab",
+          "openingOutsideDepth": 0.5
+        },
+        "ms": 116.46810000000005,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "local approach slope",
+        "details": {
+          "region": 25,
+          "maxSlope": 0.912694212376668,
+          "maxCrossSlope": 0,
+          "area": 6.3
+        },
+        "ms": 7.068400000000111,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "curved",
+          "firstFailure": "folded or reversed section",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "source triangle collision",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-7-2.1-0.5",
+      "target": "C",
+      "from": [
+        19.70720672607422,
+        6.174720764160156,
+        20
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        20.331989288330078
+      ],
+      "rampApproach": {
+        "valid": true,
+        "reason": "verified existing floor approach",
+        "details": {
+          "region": 25,
+          "area": 4.2,
+          "width": 2.1,
+          "depth": 2,
+          "maxSlope": 0,
+          "maxCrossSlope": 0,
+          "minHeadroom": null,
+          "representation": "existing source surface; no generated slab",
+          "openingOutsideDepth": 0.5
+        },
+        "ms": 102.21450000000004,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 25,
+          "area": 5.2256629943847654,
+          "expected": 6.300000000000001
+        },
+        "ms": 5.5999000000001615,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "curved",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "source triangle collision",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "source triangle collision",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": true
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "sourcePort": "surface-0-2.1-0.2",
+      "target": "B",
+      "from": [
+        30,
+        2.8016693115234377,
+        2.2481608390808105
+      ],
+      "to": [
+        40,
+        10.283156394958496,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 3,
+          "area": 4.157714264344852,
+          "expected": 4.2
+        },
+        "ms": 4.452099999999973,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 3,
+          "area": 5.7085234864614876,
+          "expected": 6.300000000000001
+        },
+        "ms": 3.906600000000253,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "self-intersecting ribbon",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-55-2.1-0.5",
+      "target": "A",
+      "from": [
+        25.771796703338623,
+        26.8717098236084,
+        8.250940322875977
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 62,
+          "area": 2.217780691198625,
+          "expected": 4.2
+        },
+        "ms": 15.01909999999998,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 62,
+          "area": 3.057972539822659,
+          "expected": 6.300000000000001
+        },
+        "ms": 17.440399999999954,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "walking approach support",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "walking approach support",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "walking approach support",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "walking approach support",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "walking approach support",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "walking approach support",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-42-2.1-0.5",
+      "target": "B",
+      "from": [
+        13.639554977416992,
+        12.2415452003479,
+        6.619451522827148
+      ],
+      "to": [
+        40,
+        10.283156394958496,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "local approach slope",
+        "details": {
+          "region": 57,
+          "maxSlope": 0.09234954737837602,
+          "maxCrossSlope": 0,
+          "area": 4.2
+        },
+        "ms": 12.247899999999845,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 57,
+          "area": 6.0138914154618925,
+          "expected": 6.300000000000001
+        },
+        "ms": 24.753400000000056,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "ramp",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-133-2.1-0.5",
+      "target": "C",
+      "from": [
+        15.637604713439941,
+        12.361394882202148,
+        19.42383575439453
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        20.331989288330078
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "local approach slope",
+        "details": {
+          "region": 172,
+          "maxSlope": 0.31559361180464274,
+          "maxCrossSlope": 0.28334716812464084,
+          "area": 4.199999999999999
+        },
+        "ms": 11.846100000000206,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "local approach slope",
+        "details": {
+          "region": 172,
+          "maxSlope": 0.8959219040519854,
+          "maxCrossSlope": 0.28334716812464084,
+          "area": 6.3
+        },
+        "ms": 32.20769999999993,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "continuous approach: local approach slope",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "continuous approach: local approach slope",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "continuous approach: local approach slope",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "continuous approach: local approach slope",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "individual ramp segment slope",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "switchback landing length",
+          "kind": "bridge",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-1-2.1-0.5",
+      "target": "A",
+      "from": [
+        10.750136375427246,
+        12.523425579071045,
+        0.9001238942146301
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 0,
+          "area": 3.292081446806539,
+          "expected": 4.2
+        },
+        "ms": 21.209299999999985,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 0,
+          "area": 4.5290239764848845,
+          "expected": 6.300000000000001
+        },
+        "ms": 35.885499999999865,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-2-2.1-0.5",
+      "target": "A",
+      "from": [
+        13.33915662765503,
+        12.523425579071045,
+        0.9001238942146301
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 0,
+          "area": 3.2966522008480634,
+          "expected": 4.2
+        },
+        "ms": 29.51220000000012,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 0,
+          "area": 4.529023976484884,
+          "expected": 6.300000000000001
+        },
+        "ms": 34.97579999999971,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-4-2.1-0.5",
+      "target": "A",
+      "from": [
+        16.668926239013672,
+        11.959664821624756,
+        1.098567247390747
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 1,
+          "area": 3.6311845025397598,
+          "expected": 4.2
+        },
+        "ms": 34.173499999999876,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 1,
+          "area": 4.933227612413261,
+          "expected": 6.300000000000001
+        },
+        "ms": 18.865200000000186,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-5-2.1-0.5",
+      "target": "A",
+      "from": [
+        17.030124187469482,
+        26.053677082061768,
+        1.098567247390747
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 5,
+          "area": 4.068960577275176,
+          "expected": 4.2
+        },
+        "ms": 29.572799999999916,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 5,
+          "area": 6.168807239502672,
+          "expected": 6.300000000000001
+        },
+        "ms": 52.45040000000017,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-6-2.1-0.5",
+      "target": "A",
+      "from": [
+        13.128291130065918,
+        25.771796703338623,
+        1.584274172782898
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 3,
+          "area": 2.217782001477774,
+          "expected": 4.2
+        },
+        "ms": 23.446200000000317,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 3,
+          "area": 3.0579734364286884,
+          "expected": 6.300000000000001
+        },
+        "ms": 17.764700000000175,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-8-2.1-0.5",
+      "target": "A",
+      "from": [
+        17.56565284729004,
+        26.053677082061768,
+        2.2245986461639404
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 22,
+          "area": 4.011428953778886,
+          "expected": 4.2
+        },
+        "ms": 10.899599999999737,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 22,
+          "area": 4.797565104138994,
+          "expected": 6.300000000000001
+        },
+        "ms": 9.769400000000132,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-9-2.1-0.5",
+      "target": "A",
+      "from": [
+        19.940003395080566,
+        26.053677082061768,
+        2.2245986461639404
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 22,
+          "area": 4.011428953778887,
+          "expected": 4.2
+        },
+        "ms": 24.102499999999964,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 22,
+          "area": 4.797565104138993,
+          "expected": 6.300000000000001
+        },
+        "ms": 19.235599999999977,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-11-2.1-0.5",
+      "target": "A",
+      "from": [
+        10.565324783325195,
+        11.959664821624756,
+        3.6328682899475098
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 33,
+          "area": 4.114645821231715,
+          "expected": 4.2
+        },
+        "ms": 28.125500000000102,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 33,
+          "area": 6.214645821231716,
+          "expected": 6.300000000000001
+        },
+        "ms": 43.46459999999979,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "folded or reversed section",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    },
+    {
+      "source": "G1",
+      "sourcePort": "surface-12-2.1-0.5",
+      "target": "A",
+      "from": [
+        27.443679809570312,
+        11.959664821624756,
+        3.818572759628296
+      ],
+      "to": [
+        35.84433937072754,
+        12,
+        8.357694625854492
+      ],
+      "rampApproach": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 34,
+          "area": 3.458569624476563,
+          "expected": 4.2
+        },
+        "ms": 39.02500000000009,
+        "cacheHit": false
+      },
+      "stairLanding": {
+        "valid": false,
+        "reason": "incomplete or overlapping floor coverage",
+        "details": {
+          "region": 34,
+          "area": 5.174586064479319,
+          "expected": 6.300000000000001
+        },
+        "ms": 18.86080000000038,
+        "cacheHit": false
+      },
+      "outcomes": [
+        {
+          "route": "direct",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "curved",
+          "firstFailure": "stair landing support",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left detour",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right detour",
+          "firstFailure": "stair tread",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left bridge alignment",
+          "firstFailure": "self-intersecting ribbon",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right bridge alignment",
+          "firstFailure": "self-intersecting ribbon",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "left switchback",
+          "firstFailure": "self-intersecting ribbon",
+          "kind": "stair",
+          "sourceApproachValid": false
+        },
+        {
+          "route": "right switchback",
+          "firstFailure": "self-intersecting ribbon",
+          "kind": "stair",
+          "sourceApproachValid": false
+        }
+      ]
+    }
+  ],
+  "entrances": [
+    {
+      "name": "A",
+      "width": 3,
+      "depth": 5,
+      "valid": true,
+      "reason": "verified existing floor approach",
+      "details": {
+        "region": 21,
+        "area": 15,
+        "width": 3,
+        "depth": 5,
+        "maxSlope": 0,
+        "maxCrossSlope": 0,
+        "minHeadroom": 10.155473709106445,
+        "representation": "existing source surface; no generated slab",
+        "openingOutsideDepth": 0.5
+      },
+      "ms": 485.52479999999923,
+      "cacheHit": false
+    },
+    {
+      "name": "A",
+      "width": 3,
+      "depth": 6,
+      "valid": false,
+      "reason": "local approach slope",
+      "details": {
+        "region": 21,
+        "maxSlope": 0.42839535927682026,
+        "maxCrossSlope": 0.4897875496910146,
+        "area": 17.999999999999996
+      },
+      "ms": 40.10199999999986,
+      "cacheHit": false
+    },
+    {
+      "name": "A",
+      "width": 3.5,
+      "depth": 5,
+      "valid": false,
+      "reason": "incomplete or overlapping floor coverage",
+      "details": {
+        "region": 21,
+        "area": 17.33421802520752,
+        "expected": 17.5
+      },
+      "ms": 23.21050000000014,
+      "cacheHit": false
+    },
+    {
+      "name": "A",
+      "width": 4,
+      "depth": 5,
+      "valid": false,
+      "reason": "incomplete or overlapping floor coverage",
+      "details": {
+        "region": 21,
+        "area": 18.58421802520752,
+        "expected": 20
+      },
+      "ms": 21.321999999999207,
+      "cacheHit": false
+    },
+    {
+      "name": "A",
+      "width": 5,
+      "depth": 5,
+      "valid": false,
+      "reason": "incomplete or overlapping floor coverage",
+      "details": {
+        "region": 21,
+        "area": 21.08421802520752,
+        "expected": 25
+      },
+      "ms": 15.735499999999774,
+      "cacheHit": false
+    },
+    {
+      "name": "B",
+      "width": 3,
+      "depth": 5,
+      "valid": true,
+      "reason": "verified existing floor approach",
+      "details": {
+        "region": 21,
+        "area": 15,
+        "width": 3,
+        "depth": 5,
+        "maxSlope": 0,
+        "maxCrossSlope": 0,
+        "minHeadroom": 10.155473709106445,
+        "representation": "existing source surface; no generated slab",
+        "openingOutsideDepth": 0.5
+      },
+      "ms": 405.1288000000004,
+      "cacheHit": false
+    },
+    {
+      "name": "B",
+      "width": 3,
+      "depth": 6,
+      "valid": true,
+      "reason": "verified existing floor approach",
+      "details": {
+        "region": 21,
+        "area": 18.000000000000004,
+        "width": 3,
+        "depth": 6,
+        "maxSlope": 0,
+        "maxCrossSlope": 0,
+        "minHeadroom": 10.155473709106445,
+        "representation": "existing source surface; no generated slab",
+        "openingOutsideDepth": 0.5
+      },
+      "ms": 491.9915000000001,
+      "cacheHit": false
+    },
+    {
+      "name": "B",
+      "width": 3.5,
+      "depth": 5,
+      "valid": false,
+      "reason": "local approach slope",
+      "details": {
+        "region": 21,
+        "maxSlope": 0.4897875496910146,
+        "maxCrossSlope": 0.42839535927682026,
+        "area": 17.5
+      },
+      "ms": 32.40650000000005,
+      "cacheHit": false
+    },
+    {
+      "name": "B",
+      "width": 4,
+      "depth": 5,
+      "valid": false,
+      "reason": "local approach slope",
+      "details": {
+        "region": 21,
+        "maxSlope": 0.4897875496910146,
+        "maxCrossSlope": 0.42839535927682026,
+        "area": 20
+      },
+      "ms": 34.66889999999967,
+      "cacheHit": false
+    },
+    {
+      "name": "B",
+      "width": 5,
+      "depth": 5,
+      "valid": false,
+      "reason": "local approach slope",
+      "details": {
+        "region": 21,
+        "maxSlope": 0.5021130108184064,
+        "maxCrossSlope": 0.42839535927682026,
+        "area": 24.999999999999996
+      },
+      "ms": 31.638199999999415,
+      "cacheHit": false
+    }
+  ]
+}

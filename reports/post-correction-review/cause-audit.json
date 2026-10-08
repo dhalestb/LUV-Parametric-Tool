@@ -1,0 +1,286 @@
+{
+  "affected": [
+    {
+      "source": "O1",
+      "port": "surface-3-2.1-0.5",
+      "target": "C",
+      "depth": 2,
+      "hits": [
+        {
+          "triangle": 3509,
+          "area": 0.005412954487837851,
+          "physicalTop": false,
+          "slope": 0
+        },
+        {
+          "triangle": 3741,
+          "area": 0.005412954487837851,
+          "physicalTop": false,
+          "slope": 0
+        }
+      ]
+    },
+    {
+      "source": "O1",
+      "port": "surface-3-2.1-0.5",
+      "target": "C",
+      "depth": 3,
+      "hits": [
+        {
+          "triangle": 3509,
+          "area": 0.005412954487837851,
+          "physicalTop": false,
+          "slope": 0
+        },
+        {
+          "triangle": 3741,
+          "area": 0.005412954487837851,
+          "physicalTop": false,
+          "slope": 0
+        }
+      ]
+    }
+  ],
+  "independent": [
+    {
+      "port": "surface-5-2.1-0.5",
+      "target": "C",
+      "route": "direct",
+      "firstFailure": "source triangle collision",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-5-2.1-0.5",
+      "target": "C",
+      "route": "curved",
+      "firstFailure": "individual ramp segment slope",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-5-2.1-0.5",
+      "target": "C",
+      "route": "left detour",
+      "firstFailure": "source triangle collision",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-5-2.1-0.5",
+      "target": "C",
+      "route": "right detour",
+      "firstFailure": "source triangle collision",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-5-2.1-0.5",
+      "target": "C",
+      "route": "left bridge alignment",
+      "firstFailure": "source triangle collision",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-5-2.1-0.5",
+      "target": "C",
+      "route": "right bridge alignment",
+      "firstFailure": "folded or reversed section",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-5-2.1-0.5",
+      "target": "C",
+      "route": "left switchback",
+      "firstFailure": "switchback landing length",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-5-2.1-0.5",
+      "target": "C",
+      "route": "right switchback",
+      "firstFailure": "switchback landing length",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-6-2.1-0.5",
+      "target": "C",
+      "route": "direct",
+      "firstFailure": "folded or reversed section",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-6-2.1-0.5",
+      "target": "C",
+      "route": "curved",
+      "firstFailure": "folded or reversed section",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-6-2.1-0.5",
+      "target": "C",
+      "route": "left detour",
+      "firstFailure": "individual ramp segment slope",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-6-2.1-0.5",
+      "target": "C",
+      "route": "right detour",
+      "firstFailure": "folded or reversed section",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-6-2.1-0.5",
+      "target": "C",
+      "route": "left bridge alignment",
+      "firstFailure": "source triangle collision",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-6-2.1-0.5",
+      "target": "C",
+      "route": "right bridge alignment",
+      "firstFailure": "folded or reversed section",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-6-2.1-0.5",
+      "target": "C",
+      "route": "left switchback",
+      "firstFailure": "switchback landing length",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-6-2.1-0.5",
+      "target": "C",
+      "route": "right switchback",
+      "firstFailure": "switchback landing length",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-7-2.1-0.5",
+      "target": "C",
+      "route": "direct",
+      "firstFailure": "folded or reversed section",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-7-2.1-0.5",
+      "target": "C",
+      "route": "curved",
+      "firstFailure": "individual ramp segment slope",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-7-2.1-0.5",
+      "target": "C",
+      "route": "left detour",
+      "firstFailure": "folded or reversed section",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-7-2.1-0.5",
+      "target": "C",
+      "route": "right detour",
+      "firstFailure": "source triangle collision",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-7-2.1-0.5",
+      "target": "C",
+      "route": "left bridge alignment",
+      "firstFailure": "folded or reversed section",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-7-2.1-0.5",
+      "target": "C",
+      "route": "right bridge alignment",
+      "firstFailure": "source triangle collision",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-7-2.1-0.5",
+      "target": "C",
+      "route": "left switchback",
+      "firstFailure": "switchback landing length",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    },
+    {
+      "port": "surface-7-2.1-0.5",
+      "target": "C",
+      "route": "right switchback",
+      "firstFailure": "switchback landing length",
+      "collisionHeadroomClear": false,
+      "clearance": [
+        "clearance: source triangle collision"
+      ]
+    }
+  ]
+}

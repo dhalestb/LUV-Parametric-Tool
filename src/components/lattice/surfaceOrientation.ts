@@ -1,8 +1,9 @@
 import { geometryRevision } from "./geometryRevision";
+import { materialSideIndex, type MaterialInterval } from "./materialSideEvidence";
 import type { Vec3 } from "./types";
 
 export type SourceSurface = { positions: Float32Array; triangles: number[] };
-export type OrientedTriangle = { points: [Vec3, Vec3, Vec3]; rawNormal: Vec3; normalZ: number; area: number; component: number; region: number };
+export type OrientedTriangle = { points: [Vec3, Vec3, Vec3]; rawNormal: Vec3; normalZ: number; area: number; component: number; region: number; localMaterial?: { accepted: boolean; reason: string; samples: MaterialInterval[] } };
 export type OrientationComponent = { triangles: number[]; boundaryEdges: number; inconsistentEdges: number; volume: number; sign: number; witnesses: number; uncertainty: string | null };
 const cache = new WeakMap<object, ReturnType<typeof build>>();
 const sub = (a: Vec3, b: Vec3): Vec3 => [a[0]-b[0],a[1]-b[1],a[2]-b[2]];
@@ -109,7 +110,7 @@ function build(surface: SourceSurface) {
     }
     if(conflict || c.witnesses<Math.min(4,witnesses.length) || !c.witnesses) {c.uncertainty="material-side witnesses ambiguous";continue;}
     c.sign=sign;
-    if(c.boundaryEdges||c.inconsistentEdges)c.uncertainty="imperfect component: only balanced local material columns are eligible";
+    if(c.boundaryEdges||c.inconsistentEdges)c.uncertainty="imperfect component: balanced columns or bounded local material evidence required";
   }
   // Spatial columns independently check below-material / above-free ordering on open shells.
   const spanX=boxes.reduce((v,b)=>Math.max(v,b.max[0]-b.min[0]),0),spanY=boxes.reduce((v,b)=>Math.max(v,b.max[1]-b.min[1]),0);
@@ -150,10 +151,42 @@ function build(surface: SourceSurface) {
     const below=above+at;
     if(!balanced || (nz>0 ? above!==0||below!==1 : above!==1||below!==0))t.normalZ=NaN;
   }
+  // A defective distant column crossing is not sufficient evidence against a
+  // local top. Only disputed upward faces receive this bounded fallback; accepted
+  // faces, walls, undersides, and components without material semantics are kept.
+  const localStarted = performance.now(), materialIndexes = new Map<number, ReturnType<typeof materialSideIndex>>();
+  const barycentric = [[1/3,1/3,1/3],[.6,.2,.2],[.2,.6,.2],[.2,.2,.6]];
+  for (const t of triangles) {
+    const component = components[t.component], nz = t.rawNormal[2] * component.sign;
+    if (Number.isFinite(t.normalZ) || nz < .65 || !component.sign) continue;
+    let index = materialIndexes.get(t.component);
+    if (!index) { index = materialSideIndex(triangles, component.triangles); materialIndexes.set(t.component, index); }
+    const evidence = { accepted: true, reason: "bounded material below / free space above at four local witnesses and two offsets", samples: [] as MaterialInterval[] };
+    const witnesses: Array<{point: Vec3; expected: number}> = [];
+    for (const weights of barycentric) {
+      const p = t.points[0].map((_, k) => weights.reduce((sum, w, j) => sum + w * t.points[j][k], 0)) as Vec3;
+      for (const offset of [.005, .02]) for (const side of [-1, 1]) {
+        witnesses.push({ point: p.map((v,k) => v + side * component.sign * t.rawNormal[k] * offset) as Vec3, expected: side < 0 ? component.sign : 0 });
+      }
+    }
+    const query = index.prepare(witnesses.map(w => w.point));
+    for (const {point,expected} of witnesses) {
+      const sample = query(point);
+      evidence.samples.push(sample);
+      if (sample.exhausted || !Number.isFinite(sample.value) || !Number.isFinite(sample.error) || Math.abs(sample.value - expected) + sample.error >= .1) {
+        evidence.accepted = false;
+        evidence.reason = sample.exhausted ? "bounded material query exhausted" : "contradictory or uncertain local material side";
+        break;
+      }
+    }
+    t.localMaterial = evidence;
+    if (evidence.accepted) t.normalZ = nz;
+  }
+  const localMaterial = { buildMs: performance.now() - localStarted, components: [...materialIndexes].map(([component, index]) => ({ component, ...index.stats })) };
   // Edge-connected support patches are not automatically a navigable internal network.
   triangles.forEach((_,i)=>parents[i]=i);
   for(const refs of edges.values())if(refs.length===2 && refs.every(r=>triangles[r.triangle].normalZ>=.65))parents[find(refs[0].triangle)]=find(refs[1].triangle);
   const regions=new Map<number,number>();
   triangles.forEach((t,i)=>{if(t.normalZ>=.65){const root=find(i);if(!regions.has(root))regions.set(root,regions.size);t.region=regions.get(root)!;}});
-  return {triangles,components,regionCount:regions.size,buildMs:performance.now()-started};
+  return {triangles,components,regionCount:regions.size,localMaterial,buildMs:performance.now()-started};
 }
