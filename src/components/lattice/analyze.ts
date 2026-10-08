@@ -1,6 +1,8 @@
 import { faceTriangles } from "./parseObj";
-import type { Direction, FaceLayer, FaceSample, ImportedObj, Mirror, Rotation, TileModel, TileVariant, UpAxis } from "./types";
+import { extractConnectionPorts, extractSourceEdgePorts } from "./connectionPorts";
+import type { Direction, FaceLayer, FaceSample, ImportedObj, Mirror, Rotation, TileModel, TileVariant, UpAxis, Vec3 } from "./types";
 import { CELL_FEET, DIRECTIONS, fileToSpec, MIRRORS, packCell, ROTATIONS, unpackCell } from "./types";
+import { combinedBoundsSpec } from "./objFidelity";
 
 type MutableCell = { occupied: boolean; floor: boolean; vertical: boolean };
 
@@ -206,6 +208,8 @@ function scaledSpec(mesh: ImportedObj, scale: number, up: UpAxis) {
 
 function rasterize(mesh: ImportedObj, scale: number, cellFeet: number, up: UpAxis) {
   const cells = new Map<number, MutableCell>();
+  // Preserve sample bounds solely to locate ports on the original surfaces within each voxel.
+  const surfaceBounds = new Map<number, { min: [number,number,number]; max: [number,number,number] }>();
   const positions = scaledSpec(mesh, scale, up);
   let minX = Infinity;
   let minY = Infinity;
@@ -241,6 +245,15 @@ function rasterize(mesh: ImportedObj, scale: number, cellFeet: number, up: UpAxi
     current.floor = current.floor || floor;
     current.vertical = current.vertical || vertical;
     cells.set(packed, current);
+    if (!vertical) {
+      const point: [number,number,number] = [x-anchor[0],y-anchor[1],z-anchor[2]];
+      const bounds = surfaceBounds.get(packed) ?? {min:[...point],max:[...point]};
+      for (let axis=0;axis<3;axis++) {
+        bounds.min[axis]=Math.min(bounds.min[axis],point[axis]);
+        bounds.max[axis]=Math.max(bounds.max[axis],point[axis]);
+      }
+      surfaceBounds.set(packed,bounds);
+    }
   };
 
   for (const face of mesh.faces) {
@@ -292,6 +305,7 @@ function rasterize(mesh: ImportedObj, scale: number, cellFeet: number, up: UpAxi
     horizontalArea,
     verticalArea,
     cells,
+    surfaceBounds,
   };
 }
 
@@ -371,18 +385,39 @@ export function analyzeMesh(mesh: ImportedObj, slotId: string | null, unitScale:
   }
   const variants = ROTATIONS.flatMap((rotation) => MIRRORS.map((mirror) => variantFromBase(baseOccupied, baseFloor, baseVertical, rotation, mirror, cellFeet)));
   const identity = variants[0];
+  const rootBounds = combinedBoundsSpec(mesh, unitScale, up);
+  const connectionPositions = scaledSpec(mesh, unitScale, up);
+  for (let i=0;i<connectionPositions.length;i++) connectionPositions[i] -= rootBounds.anchor[i%3];
+  const basePorts = extractSourceEdgePorts(mesh,connectionPositions,extractConnectionPorts(mesh.id, identity, cellFeet, raster.surfaceBounds));
+  for (const variant of variants) {
+    variant.ports = basePorts.map(port => {
+      const localPosition = rotateMirror(...port.localPosition, variant.rotation, variant.mirror);
+      return {
+        ...port, localPosition, elevation: localPosition[2],
+        profile:port.profile?[rotateMirror(...port.profile[0],variant.rotation,variant.mirror),rotateMirror(...port.profile[1],variant.rotation,variant.mirror)] as [Vec3,Vec3]:undefined,
+        outwardDirection: rotateMirror(...port.outwardDirection, variant.rotation, variant.mirror),
+        upDirection: rotateMirror(...port.upDirection, variant.rotation, variant.mirror),
+        sourceCells: port.sourceCells.map(packed => {
+          const [x,y,z] = unpackCell(packed);
+          const moved = rotateMirror((x+.5)*cellFeet,(y+.5)*cellFeet,(z+.5)*cellFeet,variant.rotation,variant.mirror);
+          return packCell(...moved.map(v=>Math.floor(v/cellFeet)) as [number,number,number]);
+        }),
+      };
+    });
+  }
   const projection = DIRECTIONS.reduce((sum, direction) => sum + identity.faces[direction].projection, 0);
   const recess = DIRECTIONS.reduce((sum, direction) => sum + identity.faces[direction].recess, 0);
   return {
+    connectionSurface: {positions: connectionPositions, triangles: mesh.faces.flatMap(faceTriangles).flat()},
     id: mesh.id,
     filename: mesh.filename,
     slotId,
-    anchor: raster.anchor,
-    bboxMin: raster.bboxMin,
-    bboxMax: raster.bboxMax,
-    center: raster.center,
-    minZ: raster.bboxMin[2],
-    maxZ: raster.bboxMax[2],
+    anchor: rootBounds.anchor,
+    bboxMin: rootBounds.min,
+    bboxMax: rootBounds.max,
+    center: rootBounds.center,
+    minZ: rootBounds.min[2],
+    maxZ: rootBounds.max[2],
     vertexCount: mesh.positions.length / 3,
     faceCount: mesh.faces.length,
     occupiedVolume: baseOccupied.length * cellFeet ** 3,

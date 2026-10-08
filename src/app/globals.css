@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./board.css";
 
 :root {
   --ink: #f2f2f2;

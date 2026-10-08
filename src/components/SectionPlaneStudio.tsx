@@ -1,7 +1,8 @@
 "use client";
 
-import { OrbitControls, OrthographicCamera } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { BoardOrthographicCamera as OrthographicCamera } from "./BoardOrthographicCamera";
+import { BoardCanvas as Canvas } from "@/components/BoardCanvas";
 import { useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
 import { getLetterVolumeGeometry } from "./letterGeometry3d";

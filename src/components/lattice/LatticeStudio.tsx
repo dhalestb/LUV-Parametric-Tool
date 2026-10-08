@@ -8,16 +8,39 @@ import { assembledObj, assemblyManifest, voxelUnionObj } from "./exportAssembly"
 import type { LatticeViewportHandle } from "./LatticeViewport";
 
 const LatticeViewport = dynamic(() => import("./LatticeViewport"), { ssr: false });
-import { parseObj } from "./parseObj";
+const ObjFidelityViewport = dynamic(() => import("./ObjFidelityViewport"), { ssr: false });
 import { evaluateAssembly, placedFromRecord, searchAssemblies } from "./search";
+import {
+  ASSEMBLY_TEST_LABELS,
+  assignmentToAssembly,
+  buildAssignedSourcePool,
+  describeTransformsUsed,
+  mappingStatus,
+  registrationLabel,
+  runCatalogTest,
+  searchAssignmentCopies,
+  type AssemblyTestMode,
+  type AssignmentResult,
+  type CatalogRow,
+} from "./assignmentSearch";
+import {
+  compareFidelity,
+  fidelityMetricsRaw,
+  fidelityMetricsRegistered,
+  IDENTITY_PLACEMENT,
+} from "./objFidelity";
+import type { GeneratedConnector } from "./connectionSynthesis";
+import { synthesizeConnectors } from "./connectionSynthesis";
+import { matchAssemblyPorts } from "./portMatching";
 import { DEFAULT_DISTRIBUTION_PREFS } from "./distribution";
 import { LATTICE_SLOTS, slotById } from "./slots";
 import { LATTICE_SESSION_KEY, readJson, writeJson } from "../browserSession";
+import { DESCRIPTOR_RANK_STORAGE_KEY, type DescriptorRankSnapshot } from "../evaluations/descriptorRank";
+import { useLatticeSource } from "./latticeSource";
 import {
   clampLatticeCells,
   DEFAULT_LATTICE_FIELD,
   latticePerformanceWarning,
-  MAX_IMPORTS,
   MAX_LATTICE_CELLS_PER_AXIS,
   REQUIRED_TILES,
   resolvedUp,
@@ -51,7 +74,7 @@ function download(name: string, content: BlobPart, type: string) {
 }
 
 function emptyPlacement(meshId: string, slotId: string | null): Placement {
-  return { meshId, slotId, rotation: 0, mirror: "none", ix: 0, iy: 0, iz: 0, locked: false };
+  return { meshId, slotId, rotation: 0, mirror: "none", ix: 0, iy: 0, iz: 0, zLift: 0, locked: false };
 }
 
 function sourceIdOf(id: string) {
@@ -91,6 +114,7 @@ function boardFromTiles(
       ix: tile.ix,
       iy: tile.iy,
       iz: tile.iz,
+      zLift: tile.zLift ?? 0,
       locked: lockedCells.has(`${tile.ix},${tile.iy},${tile.iz}`),
     };
   }
@@ -127,7 +151,8 @@ type LatticeSession = {
   balanceCategories: boolean;
   preventLargeClusters: boolean;
   stats: SearchStats | null;
-  copyCount: 2 | 4 | 8;
+  copyCount: 1 | 2 | 3 | 4 | 8;
+  assemblyMode?: AssemblyTestMode;
 };
 
 function packMesh(mesh: ImportedObj): PackedMesh {
@@ -138,22 +163,20 @@ function packMesh(mesh: ImportedObj): PackedMesh {
   };
 }
 
-function unpackMesh(mesh: PackedMesh): ImportedObj {
-  return {
-    ...mesh,
-    positions: new Float32Array(mesh.positions),
-    normals: new Float32Array(mesh.normals),
-  };
-}
-
 export default function LatticeStudio() {
-  const [meshes, setMeshes] = useState<ImportedObj[]>([]);
-  const [assignments, setAssignments] = useState<Record<string, string | null>>({});
-  const [unit, setUnit] = useState<UnitName>("feet");
-  const [upAxisMode, setUpAxisMode] = useState<UpAxisMode>("auto");
+  const {
+    hydrated: sourceHydrated,
+    meshes,
+    setMeshes,
+    assignments,
+    setAssignments,
+    unit,
+    setUnit,
+    upAxisMode,
+    setUpAxisMode,
+    importObjFiles,
+  } = useLatticeSource();
   const [field, setField] = useState<LatticeField>(DEFAULT_LATTICE_FIELD);
-  const [fieldRevision, setFieldRevision] = useState(0);
-  const [prefsRevision, setPrefsRevision] = useState(0);
   const [placements, setPlacements] = useState<Record<string, Placement>>({});
   const [models, setModels] = useState<TileModel[]>([]);
   const [options, setOptions] = useState<Assembly[] | null>(null);
@@ -162,6 +185,7 @@ export default function LatticeStudio() {
   const [colorMode, setColorMode] = useState<ColorMode>("category");
   const [showLattice, setShowLattice] = useState(false);
   const [showConnections, setShowConnections] = useState(true);
+  const [showConnectionPorts, setShowConnectionPorts] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>("iso");
   const [diagnostic, setDiagnostic] = useState<DiagnosticMode>("originals");
   const [continuityOverlay, setContinuityOverlay] = useState<ContinuityOverlay>("all");
@@ -175,18 +199,35 @@ export default function LatticeStudio() {
   const [busy, setBusy] = useState(false);
   const [progressPercent, setProgressPercent] = useState<number | null>(null);
   const [stats, setStats] = useState<SearchStats | null>(null);
-  const [copyCount, setCopyCount] = useState<2 | 4 | 8>(4);
+  const [copyCount, setCopyCount] = useState<1 | 2 | 3 | 4 | 8>(4);
   const [copyWarning, setCopyWarning] = useState<string | null>(null);
-  const [catalogue, setCatalogue] = useState<Array<{ slotId: string; score: number; tiles: number; warning: string | null }>>([]);
+  const [catalogue, setCatalogue] = useState<CatalogRow[]>([]);
+  const [assemblyMode, setAssemblyMode] = useState<AssemblyTestMode>("copies-4");
+  const [assignmentResult, setAssignmentResult] = useState<AssignmentResult | null>(null);
+  const [generatedConnectors, setGeneratedConnectors] = useState<GeneratedConnector[]>([]);
+  const [showGeneratedConnectors, setShowGeneratedConnectors] = useState(true);
+  const [showOriginalTiles, setShowOriginalTiles] = useState(true);
+  const [connectionStage, setConnectionStage] = useState<"before" | "after">("after");
+  const [gatheringSlot, setGatheringSlot] = useState("G1");
+  const [officeSlot, setOfficeSlot] = useState("O3");
+  const [lobbySlot, setLobbySlot] = useState("L1");
+  const [fidelityMeshId, setFidelityMeshId] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ meshes: ImportedObj[]; models: TileModel[]; placements: Record<string, Placement> } | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
+  const [descriptorRanks, setDescriptorRanks] = useState<DescriptorRankSnapshot | null>(null);
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(DESCRIPTOR_RANK_STORAGE_KEY);
+      setDescriptorRanks(stored ? JSON.parse(stored) as DescriptorRankSnapshot : null);
+    } catch {
+      setDescriptorRanks(null);
+    }
+  }, []);
   const cache = useRef(new Map<string, TileModel>());
   const cancelRef = useRef(0);
-  const busyRef = useRef(false);
   const viewRef = useRef<LatticeViewportHandle>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const pendingAssembly = useRef<{ options: Assembly[]; active: "A" | "B" | "C" | "manual"; placements: Record<string, Placement> } | null>(null);
-  busyRef.current = busy;
 
   const assigned = useMemo(() => LATTICE_SLOTS.flatMap((slot) => {
     const mesh = meshes.find((item) => item.id === assignments[slot.id]);
@@ -197,15 +238,43 @@ export default function LatticeStudio() {
   const selected = (preview?.meshes ?? meshes).find((mesh) => mesh.id === selectedId) ?? null;
   const selectedPlacement = selected ? (preview?.placements[selected.id] ?? placements[selected.id] ?? null) : null;
   const selectedModel = (preview?.models.find((model) => model.id === selectedId) ?? models.find((model) => model.id === (selected ? sourceIdOf(selected.id) : ""))) ?? null;
+  const fidelityMesh = meshes.find((mesh) => mesh.id === (fidelityMeshId ?? selectedId)) ?? meshes[0] ?? null;
+  const fidelityReport = useMemo(() => {
+    if (!fidelityMesh || diagnostic !== "obj-fidelity") return null;
+    const raw = fidelityMetricsRaw(fidelityMesh, unit, upAxisMode);
+    const registered = fidelityMetricsRegistered(fidelityMesh, unit, upAxisMode, IDENTITY_PLACEMENT(fidelityMesh.id));
+    const copy2 = fidelityMetricsRegistered(fidelityMesh, unit, upAxisMode, { ...IDENTITY_PLACEMENT(fidelityMesh.id), ix: 1 }, "COPY 2");
+    return { raw, registered, copy2, compare: compareFidelity(raw, registered, copy2) };
+  }, [fidelityMesh, unit, upAxisMode, diagnostic]);
+
+  function enterObjFidelityTest(meshId?: string) {
+    const target = meshId ?? selectedId ?? meshes[0]?.id ?? null;
+    if (!target) {
+      setStatus("Upload an OBJ before running OBJ Fidelity Test.");
+      return;
+    }
+    setFidelityMeshId(target);
+    setDiagnostic("obj-fidelity");
+    // Hard isolate: clear all aggregation / synthesis state from the active view.
+    setPreview(null);
+    setGeneratedConnectors([]);
+    setShowGeneratedConnectors(false);
+    setShowConnections(false);
+    setShowLattice(false);
+    setShowOriginalTiles(true);
+    setConnectionStage("before");
+    setPresentation(false);
+    setColorMode("white");
+    setCameraMode("iso");
+    setContinuityOverlay("all");
+    setStatus(`OBJ FIDELITY TEST · ${meshes.find((mesh) => mesh.id === target)?.filename ?? target} · isolated RAW | REGISTERED | COPY 2 only. Aggregation / connectors disabled.`);
+  }
+
+  const fidelityActive = diagnostic === "obj-fidelity";
 
   useEffect(() => {
     const saved = readJson<LatticeSession>(LATTICE_SESSION_KEY);
     if (saved?.version === 1 && Array.isArray(saved.meshes)) {
-      const restoredMeshes = saved.meshes.map(unpackMesh);
-      setMeshes(restoredMeshes);
-      if (saved.assignments) setAssignments(saved.assignments);
-      if (saved.unit) setUnit(saved.unit);
-      if (saved.upAxisMode) setUpAxisMode(saved.upAxisMode);
       if (saved.field) {
         setField({
           cellsX: clampLatticeCells(saved.field.cellsX),
@@ -214,16 +283,35 @@ export default function LatticeStudio() {
         });
       }
       if (saved.placements) setPlacements(saved.placements);
-      if (saved.options) setOptions(saved.options);
+      const restoredMode = saved.assemblyMode && saved.assemblyMode in ASSEMBLY_TEST_LABELS
+        ? saved.assemblyMode
+        : saved.copyCount === 2 ? "copies-2" : saved.copyCount === 3 ? "copies-3" : saved.copyCount === 8 ? "copies-8" : "copies-4";
+      setAssemblyMode(restoredMode);
+      const requestedCount = restoredMode === "copies-2" ? 2 : restoredMode === "copies-3" ? 3 : restoredMode === "copies-8" ? 8 : 4;
+      const restoredOptions = restoredMode === "global-field" || restoredMode === "catalog"
+        ? saved.options
+        : saved.options?.filter(option => option.tiles.length === requestedCount) ?? null;
+      if (restoredOptions) setOptions(restoredOptions);
       if (saved.activeOption) setActiveOption(saved.activeOption);
       if (saved.selectedId !== undefined) setSelectedId(saved.selectedId);
       if (saved.colorMode) setColorMode(saved.colorMode);
-      if (typeof saved.showLattice === "boolean") setShowLattice(saved.showLattice);
-      if (typeof saved.showConnections === "boolean") setShowConnections(saved.showConnections);
       if (saved.cameraMode) setCameraMode(saved.cameraMode);
       if (saved.diagnostic) setDiagnostic(saved.diagnostic);
       if (saved.continuityOverlay) setContinuityOverlay(saved.continuityOverlay);
       if (typeof saved.presentation === "boolean") setPresentation(saved.presentation);
+      // Fidelity sessions must never restore aggregation overlays.
+      if (saved.diagnostic === "obj-fidelity") {
+        setShowLattice(false);
+        setShowConnections(false);
+        setShowGeneratedConnectors(false);
+        setGeneratedConnectors([]);
+        setPreview(null);
+        setPresentation(false);
+        if (saved.selectedId) setFidelityMeshId(saved.selectedId);
+      } else {
+        if (typeof saved.showLattice === "boolean") setShowLattice(saved.showLattice);
+        if (typeof saved.showConnections === "boolean") setShowConnections(saved.showConnections);
+      }
       if (typeof saved.status === "string") setStatus(saved.status);
       if (typeof saved.distributionWeight === "number") setDistributionWeight(saved.distributionWeight);
       if (typeof saved.clusteringPercent === "number") setClusteringPercent(saved.clusteringPercent);
@@ -231,15 +319,15 @@ export default function LatticeStudio() {
       if (typeof saved.balanceCategories === "boolean") setBalanceCategories(saved.balanceCategories);
       if (typeof saved.preventLargeClusters === "boolean") setPreventLargeClusters(saved.preventLargeClusters);
       if (saved.stats) setStats(saved.stats);
-      if (saved.copyCount === 2 || saved.copyCount === 4 || saved.copyCount === 8) setCopyCount(saved.copyCount);
-      if (saved.options?.length) {
+      if (saved.copyCount === 1 || saved.copyCount === 2 || saved.copyCount === 3 || saved.copyCount === 4 || saved.copyCount === 8) setCopyCount(saved.copyCount);
+      if (restoredOptions?.length) {
         pendingAssembly.current = {
-          options: saved.options,
+          options: restoredOptions,
           active: saved.activeOption ?? "A",
           placements: saved.placements ?? {},
         };
       }
-      setStatus(saved.status || `Restored Part 2 session · ${restoredMeshes.length} OBJ${restoredMeshes.length === 1 ? "" : "s"}.`);
+      setStatus(saved.status || `Restored Part 2 session · ${saved.meshes.length} OBJ${saved.meshes.length === 1 ? "" : "s"}.`);
     }
     setSessionReady(true);
   }, []);
@@ -257,7 +345,7 @@ export default function LatticeStudio() {
   }, [sessionReady, models, meshes]);
 
   useEffect(() => {
-    if (!sessionReady) return;
+    if (!sessionReady || !sourceHydrated) return;
     const payload: LatticeSession = {
       version: 1,
       meshes: meshes.map(packMesh),
@@ -284,6 +372,7 @@ export default function LatticeStudio() {
       preventLargeClusters,
       stats,
       copyCount,
+      assemblyMode,
     };
     const handle = window.setTimeout(() => {
       if (!writeJson(LATTICE_SESSION_KEY, payload)) {
@@ -297,9 +386,9 @@ export default function LatticeStudio() {
     }, 450);
     return () => window.clearTimeout(handle);
   }, [
-    sessionReady, meshes, assignments, unit, upAxisMode, field, placements, options, activeOption, selectedId,
+    sessionReady, sourceHydrated, meshes, assignments, unit, upAxisMode, field, placements, options, activeOption, selectedId,
     colorMode, showLattice, showConnections, cameraMode, diagnostic, continuityOverlay, presentation, status,
-    distributionWeight, clusteringPercent, balanceTypologies, balanceCategories, preventLargeClusters, stats, copyCount,
+    distributionWeight, clusteringPercent, balanceTypologies, balanceCategories, preventLargeClusters, stats, copyCount, assemblyMode,
   ]);
 
   useEffect(() => {
@@ -346,25 +435,6 @@ export default function LatticeStudio() {
     return () => { cancelled = true; };
   }, [meshes, assignments, unit, upAxisMode]);
 
-  useEffect(() => {
-    if (fieldRevision === 0 || models.length < 1) return;
-    const handle = window.setTimeout(() => { void runSearch(); }, 400);
-    return () => window.clearTimeout(handle);
-  }, [fieldRevision, models.length]);
-
-  useEffect(() => {
-    if (prefsRevision === 0 || models.length < 1) return;
-    const handle = window.setTimeout(() => {
-      if (busyRef.current) return;
-      void runSearch();
-    }, 900);
-    return () => window.clearTimeout(handle);
-  }, [prefsRevision, models.length]);
-
-  function bumpDistributionPrefs() {
-    setPrefsRevision((current) => current + 1);
-  }
-
   function clearSavedSession() {
     cancelRef.current += 1;
     pendingAssembly.current = null;
@@ -374,8 +444,6 @@ export default function LatticeStudio() {
     setUnit("feet");
     setUpAxisMode("auto");
     setField(DEFAULT_LATTICE_FIELD);
-    setFieldRevision(0);
-    setPrefsRevision(0);
     setPlacements({});
     setModels([]);
     setOptions(null);
@@ -405,30 +473,14 @@ export default function LatticeStudio() {
   }
 
   async function importFiles(files: File[]) {
-    const room = MAX_IMPORTS - meshes.length;
-    const accepted = [...files].filter((file) => file.name.toLowerCase().endsWith(".obj")).slice(0, room);
-    if (!accepted.length) {
-      setStatus(room <= 0 ? `The upload limit is ${MAX_IMPORTS} OBJ files.` : "Choose OBJ files.");
+    setStatus(`Importing ${files.length} OBJ file${files.length === 1 ? "" : "s"}…`);
+    const result = await importObjFiles(files);
+    setPreview(null);
+    if (!result.imported) {
+      setStatus(result.error ?? "Choose OBJ files.");
       return;
     }
-    const parsed: ImportedObj[] = [];
-    const errors: string[] = [];
-    for (let index = 0; index < accepted.length; index += 1) {
-      setStatus(`Importing ${index + 1} / ${accepted.length}: ${accepted[index].name}`);
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      try { parsed.push(parseObj(await accepted[index].text(), accepted[index].name)); }
-      catch (error) { errors.push(error instanceof Error ? error.message : accepted[index].name); }
-    }
-    setMeshes((current) => [...current, ...parsed].slice(0, MAX_IMPORTS));
-    setAssignments((current) => {
-      const next = { ...current };
-      for (const mesh of parsed) {
-        if (mesh.suggestedSlotId && !next[mesh.suggestedSlotId]) next[mesh.suggestedSlotId] = mesh.id;
-      }
-      return next;
-    });
-    setPreview(null);
-    setStatus(`Imported ${parsed.length} OBJ file${parsed.length === 1 ? "" : "s"}.${errors.length ? ` ${errors[0]}` : ""}`);
+    setStatus(`Imported ${result.imported} OBJ file${result.imported === 1 ? "" : "s"}.${result.error ? ` ${result.error}` : ""}`);
   }
 
   function removeMesh(meshId: string) {
@@ -458,6 +510,7 @@ export default function LatticeStudio() {
   }
 
   async function runSearch() {
+    if (assemblyMode !== "global-field") return;
     const token = ++cancelRef.current;
     setBusy(true);
     setProgressPercent(0);
@@ -495,6 +548,9 @@ export default function LatticeStudio() {
       setStats(result.stats);
       setPreview(board);
       setActiveOption("A");
+      setAssignmentResult(null);
+      setGeneratedConnectors([]);
+      setShowGeneratedConnectors(false);
       setDiagnostic("distribution");
       setColorMode("typology");
       setPresentation(false);
@@ -535,6 +591,10 @@ export default function LatticeStudio() {
       next.ix = Math.max(0, Math.min(field.cellsX - 1, next.ix));
       next.iy = Math.max(0, Math.min(field.cellsY - 1, next.iy));
       next.iz = Math.max(0, Math.min(field.cellsZ - 1, next.iz));
+      if (assignmentResult && assemblyMode !== "global-field" && assignmentResult.field.cellsZ === 1) {
+        next.iz = 0;
+        next.zLift = 0;
+      }
       return { ...current, [selected.id]: next };
     };
     if (preview) setPreview({ ...preview, placements: apply(preview.placements) });
@@ -548,43 +608,84 @@ export default function LatticeStudio() {
     const cells = clampLatticeCells(value);
     if (field[axis] === cells) return;
     setField({ ...field, [axis]: cells });
-    setFieldRevision((current) => current + 1);
   }
 
-  async function runCopies(count: 2 | 4 | 8) {
-    const model = selectedModel ?? models[0];
-    const mesh = meshes.find((item) => item.id === model?.id);
-    if (!model || !mesh) return;
+  async function runCopies(count: 1 | 2 | 3 | 4 | 8, seedModels?: TileModel[]) {
+    let eligibleModels: TileModel[];
+    try {
+      eligibleModels = buildAssignedSourcePool(models, meshes, assignments);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Assigned sources unavailable.");
+      return;
+    }
+    if (!eligibleModels.length) {
+      setStatus("Load / map OBJ tiles before running an aggregation test.");
+      return;
+    }
+    if (count > 1 && eligibleModels.length < 2) {
+      setStatus("Need at least 2 distinct mapped forms to aggregate different typologies.");
+      return;
+    }
+    const seeds = seedModels?.length
+      ? seedModels
+      : selectedModel
+        ? [selectedModel]
+        : [];
     const token = ++cancelRef.current;
     setBusy(true);
     setProgressPercent(0);
     setCopyCount(count);
-    const copies = Array.from({ length: count }, (_, index) => ({ ...model, id: `${model.id}::${index}`, filename: `${mesh.filename} copy ${index + 1}` }));
-    const copyMeshes = copies.map((copy, index) => ({ ...mesh, id: copy.id, filename: copy.filename, suggestedSlotId: mesh.suggestedSlotId }));
+    const mode: AssemblyTestMode = count === 1 ? "catalog" : count === 2 ? "copies-2" : count === 3 ? "copies-3" : count === 4 ? "copies-4" : "copies-8";
+    setAssemblyMode(mode);
     try {
-      const result = await searchAssemblies(copies, [], {
+      const result = await searchAssignmentCopies(eligibleModels, count, {
         cancelled: () => token !== cancelRef.current,
         onProgress: (message, percent) => {
           setStatus(message);
           if (percent !== undefined) setProgressPercent(percent);
         },
-      }, field);
+      }, mode, field, seeds, new Set(eligibleModels.map(model => model.id)));
       if (token !== cancelRef.current) return;
-      const best = result.options[0];
-      const failed = best.tiles.length < count || best.connections.length === 0 || best.connections.every((connection) => connection.interlock === "FAIL");
-      setCopyWarning(failed ? `${slotById(model.slotId)?.code ?? mesh.filename} cannot form a ${count}-copy interlock through rotation, mirror, and lattice shifts alone. The source mesh was not remodeled.` : null);
-      const nextPlacements: Record<string, Placement> = {};
-      for (const tile of best.tiles) {
-        const variant = copies.find((item) => item.id === tile.id)?.variants[tile.variant];
-        nextPlacements[tile.id] = { meshId: tile.id, slotId: model.slotId, rotation: variant?.rotation ?? 0, mirror: variant?.mirror ?? "none", ix: tile.ix, iy: tile.iy, iz: tile.iz, locked: false };
-      }
-      setPreview({ meshes: copyMeshes, models: copies, placements: nextPlacements });
+      const meshById = new Map(meshes.map((mesh) => [mesh.id, mesh]));
+      const copyMeshes = result.models.flatMap((instance, index) => {
+        const sourceMesh = meshById.get(sourceIdOf(instance.id));
+        if (!sourceMesh) return [];
+        return [{
+          ...sourceMesh,
+          id: instance.id,
+          filename: instance.filename || `${sourceMesh.filename} · form ${index + 1}`,
+          suggestedSlotId: instance.slotId ?? sourceMesh.suggestedSlotId,
+        }];
+      });
+      setAssignmentResult(result);
+      setGeneratedConnectors(result.synthesis.connectors);
+      setConnectionStage("after");
+      setShowGeneratedConnectors(true);
+      setShowOriginalTiles(true);
+      setShowConnections(true);
+      setShowLattice(true);
+      setColorMode("typology");
+      const uniqueForms = new Set(result.formIds).size;
+      setCopyWarning(
+        result.status === "FAIL"
+          ? result.summary
+          : uniqueForms < count && eligibleModels.length >= count
+            ? `Only ${uniqueForms} unique forms available for a ${count}-form test.`
+            : null,
+      );
+      setPreview({ meshes: copyMeshes, models: result.models, placements: result.placements });
+      setOptions([
+        assignmentToAssembly(result, "A", "Balanced interlock"),
+        { ...assignmentToAssembly(result, "B", "Architectural continuity"), score: result.objectiveScores.continuity },
+        { ...assignmentToAssembly(result, "C", "Spatial variation"), score: result.objectiveScores.variation },
+      ]);
+      setActiveOption("A");
       setDiagnostic("copies");
       setPresentation(false);
       setProgressPercent(100);
-      setStatus(`${count}-copy test score ${best.score.toFixed(1)}.`);
+      setStatus(`${result.summary} · direct ${result.synthesis.directInterlocks} · connectors ${result.synthesis.connectors.length}`);
     } catch (error) {
-      if (!(error instanceof Error && error.message === "cancelled")) setStatus(error instanceof Error ? error.message : "Copy test failed.");
+      if (!(error instanceof Error && error.message === "cancelled")) setStatus(error instanceof Error ? error.message : "Aggregation test failed.");
     } finally {
       if (token === cancelRef.current) {
         setBusy(false);
@@ -593,41 +694,132 @@ export default function LatticeStudio() {
     }
   }
 
+  async function runAssemblyTest(mode: AssemblyTestMode = assemblyMode) {
+    setAssemblyMode(mode);
+    if (mode === "catalog") {
+      await runCatalogue();
+      return;
+    }
+    if (mode === "global-field") {
+      await runSearch();
+      return;
+    }
+    const count: 1 | 2 | 3 | 4 | 8 = mode === "copies-2" ? 2 : mode === "copies-3" ? 3 : mode === "copies-4" ? 4 : 8;
+    await runCopies(count);
+  }
+
+  function selectAssemblyMode(next: AssemblyTestMode) {
+    cancelRef.current += 1;
+    setBusy(false);
+    setProgressPercent(null);
+    if ((next === "global-field") !== (assemblyMode === "global-field")) {
+      pendingAssembly.current = null;
+      setPreview(null);
+      setOptions(null);
+      setActiveOption("manual");
+      setAssignmentResult(null);
+      setGeneratedConnectors([]);
+      setStats(null);
+      setDiagnostic("originals");
+    }
+    setAssemblyMode(next);
+    if (next !== "catalog" && next !== "global-field") {
+      setCopyCount(next === "copies-2" ? 2 : next === "copies-3" ? 3 : next === "copies-4" ? 4 : 8);
+    }
+    setStatus(`${ASSEMBLY_TEST_LABELS[next]} selected. Edit settings, then press RUN ORIENTATION + ASSEMBLY.`);
+  }
+
   async function runCatalogue() {
+    let eligibleModels: TileModel[];
+    try {
+      eligibleModels = buildAssignedSourcePool(models, meshes, assignments);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Assigned sources unavailable.");
+      return;
+    }
+    const map = mappingStatus(eligibleModels);
+    if (!map.complete) {
+      setStatus(`Catalog blocked — missing mappings: ${map.missing.join(", ")}`);
+      return;
+    }
     if (!models.length) return;
     const token = ++cancelRef.current;
     setBusy(true);
     setProgressPercent(0);
-    const rows: Array<{ slotId: string; score: number; tiles: number; warning: string | null }> = [];
-    for (let index = 0; index < models.length; index += 1) {
-      const model = models[index];
-      if (token !== cancelRef.current) return;
-      const mesh = meshes.find((item) => item.id === model.id);
-      if (!mesh) continue;
-      const cataloguePct = Math.round((index / Math.max(1, models.length)) * 100);
-      setProgressPercent(cataloguePct);
-      setStatus(`Catalogue ${slotById(model.slotId)?.code ?? model.filename} · ${cataloguePct}%`);
-      const copies = Array.from({ length: 4 }, (_, copyIndex) => ({ ...model, id: `${model.id}::${copyIndex}` }));
-      const result = await searchAssemblies(copies, [], {
+    setAssemblyMode("catalog");
+    try {
+      const rows = await runCatalogTest(eligibleModels, {
         cancelled: () => token !== cancelRef.current,
-        onProgress: (_message, percent) => {
-          if (percent === undefined) return;
-          const local = cataloguePct + Math.round((percent / 100) * (100 / Math.max(1, models.length)));
-          setProgressPercent(Math.min(99, local));
+        onProgress: (message, percent) => {
+          setStatus(message);
+          if (percent !== undefined) setProgressPercent(percent);
         },
-      }, field);
-      const best = result.options[0];
-      const warning = best.tiles.length < 4 || best.connections.every((connection) => connection.interlock === "FAIL") ? "Needs review: rigid copies did not interlock." : null;
-      rows.push({ slotId: model.slotId ?? model.filename, score: best.score, tiles: best.tiles.length, warning });
-    }
-    if (token === cancelRef.current) {
+      });
+      if (token !== cancelRef.current) return;
       setCatalogue(rows);
+      const best = rows.find((row) => row.result)?.result ?? null;
+      if (best) {
+        const meshById = new Map(meshes.map((mesh) => [mesh.id, mesh]));
+        setAssignmentResult(best);
+        setGeneratedConnectors(best.synthesis.connectors);
+        setConnectionStage("after");
+        setShowGeneratedConnectors(true);
+        setShowOriginalTiles(true);
+        setShowConnections(true);
+        setShowLattice(true);
+        setColorMode("typology");
+        setPreview({
+          meshes: best.models.flatMap((instance, index) => {
+            const sourceMesh = meshById.get(sourceIdOf(instance.id));
+            if (!sourceMesh) return [];
+            return [{ ...sourceMesh, id: instance.id, filename: instance.filename || `${sourceMesh.filename} · form ${index + 1}` }];
+          }),
+          models: best.models,
+          placements: best.placements,
+        });
+        setOptions([
+          assignmentToAssembly(best, "A", "Balanced interlock"),
+          { ...assignmentToAssembly(best, "B", "Architectural continuity"), score: best.objectiveScores.continuity },
+          { ...assignmentToAssembly(best, "C", "Spatial variation"), score: best.objectiveScores.variation },
+        ]);
+        setActiveOption("A");
+      }
       setDiagnostic("copies");
+      setPresentation(false);
       setProgressPercent(100);
-      setStatus(`Catalogue test finished for ${rows.length} typologies.`);
-      setBusy(false);
-      setProgressPercent(null);
+      setStatus(`Catalog test finished · ${rows.filter((row) => row.status !== "UNMAPPED").length} mapped typologies.`);
+    } catch (error) {
+      if (!(error instanceof Error && error.message === "cancelled")) setStatus(error instanceof Error ? error.message : "Catalog test failed.");
+    } finally {
+      if (token === cancelRef.current) {
+        setBusy(false);
+        setProgressPercent(null);
+      }
     }
+  }
+
+  async function runSelectedCategoryTests() {
+    let eligibleModels: TileModel[];
+    try {
+      eligibleModels = buildAssignedSourcePool(models, meshes, assignments);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Assigned sources unavailable.");
+      return;
+    }
+    const assignedBySlot = new Map(eligibleModels.map(model => [model.slotId, model]));
+    const picks = [gatheringSlot, officeSlot, lobbySlot]
+      .map((slotId) => assignedBySlot.get(slotId))
+      .filter((model): model is TileModel => !!model);
+    if (picks.length < 3) {
+      setStatus("Select mapped Gathering, Office, and Lobby typologies before the mixed-form presentation test.");
+      return;
+    }
+    if (assemblyMode === "catalog" || assemblyMode === "global-field") {
+      setStatus("Select 2/3/4/8 FORMS before assembling presentation picks.");
+      return;
+    }
+    const count = assemblyMode === "copies-2" ? 2 : assemblyMode === "copies-3" ? 3 : assemblyMode === "copies-4" ? 4 : 8;
+    await runCopies(count, picks);
   }
 
   function exportPng(name: string, overlay: "clean" | "lattice" = "clean", nextCamera?: CameraMode) {
@@ -654,6 +846,15 @@ export default function LatticeStudio() {
   }
 
   const shown = preview ?? { meshes: assigned.map((item) => item.mesh), models, placements };
+  // Keep endpoints and exported connectors attached to the currently displayed transforms.
+  const liveAssignmentSynthesis = useMemo(() => {
+    if (!assignmentResult || !preview || assemblyMode === "global-field") return null;
+    const tiles = placedFromRecord(preview.models, preview.placements);
+    const evaluated = evaluateAssembly(preview.models, tiles);
+    const matched = matchAssemblyPorts(preview.models, tiles, evaluated.connections);
+    return synthesizeConnectors(preview.models, tiles, evaluated.connections, {portPairs: matched.pairs, ...matched});
+  }, [assignmentResult, preview, assemblyMode]);
+  const displayedConnectors = liveAssignmentSynthesis?.connectors ?? generatedConnectors;
   const activeAssembly = options?.find((option) => option.id === activeOption) ?? null;
   const shownReport = preview && activeAssembly ? activeAssembly : report;
   const cellCount = field.cellsX * field.cellsY * field.cellsZ;
@@ -663,16 +864,154 @@ export default function LatticeStudio() {
     ?? null;
   const selectedLinks = shownReport?.connections.filter((connection) => connection.tileA === selectedId || connection.tileB === selectedId) ?? [];
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // HARD STOP — OBJ FIDELITY MODE
+  // Entire aggregation UI is not mounted. No connectors, no assembly viewport.
+  // ═══════════════════════════════════════════════════════════════════════════
+  if (fidelityActive && fidelityMesh) {
+    const fReport = fidelityReport;
+    return (
+      <div data-board-page="lattice" className="flex h-screen flex-col" data-fidelity-isolated="true" data-descriptor-ranks={descriptorRanks?.forms.length ?? 0}>
+        <header className="flex items-center justify-between gap-3 border-b px-4 py-2" style={{ borderColor: "var(--line)" }}>
+          <div>
+            <div className="text-sm">OBJ FIDELITY TEST — isolated import pipeline</div>
+            <div className="text-[10px]" style={{ color: "var(--muted)" }}>
+              RAW (white) · REGISTERED (gray) · COPY 2 (gold, +20&apos; X). Aggregation / connectors unmounted.
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className={buttonClass}
+              style={buttonStyle}
+              onClick={() => {
+                setDiagnostic("originals");
+                setStatus("Exited OBJ Fidelity Test. Aggregation available again.");
+              }}
+            >
+              EXIT FIDELITY TEST
+            </button>
+            <AppNav />
+          </div>
+        </header>
+        <div className="grid min-h-0 flex-1 grid-cols-[220px_minmax(0,1fr)_300px]">
+          <aside className="overflow-auto border-r p-3 text-[10px]" style={{ borderColor: "var(--line)" }}>
+            <div className="text-[11px]">Source OBJ</div>
+            <p className="mt-1" style={{ color: "var(--muted)" }}>Select one file. Only that complete OBJ is shown three times.</p>
+            <div className="mt-2 flex flex-col gap-1">
+              {meshes.map((mesh) => (
+                <button
+                  key={mesh.id}
+                  type="button"
+                  className={`${buttonClass} text-left`}
+                  style={{ ...buttonStyle, borderColor: fidelityMesh.id === mesh.id ? "var(--accent)" : "var(--line)" }}
+                  onClick={() => enterObjFidelityTest(mesh.id)}
+                >
+                  {mesh.filename}
+                </button>
+              ))}
+            </div>
+            <label className="mt-4 block" style={{ color: "var(--muted)" }}>
+              Global units
+              <select className="mt-1 w-full rounded border bg-transparent px-2 py-1" style={buttonStyle} value={unit} onChange={(event) => setUnit(event.target.value as UnitName)}>
+                <option value="feet">Feet</option>
+                <option value="inches">Inches</option>
+                <option value="meters">Meters</option>
+                <option value="millimeters">Millimeters</option>
+              </select>
+            </label>
+            <label className="mt-3 block" style={{ color: "var(--muted)" }}>
+              Up axis
+              <select className="mt-1 w-full rounded border bg-transparent px-2 py-1" style={buttonStyle} value={upAxisMode} onChange={(event) => setUpAxisMode(event.target.value as UpAxisMode)}>
+                <option value="auto">Auto</option>
+                <option value="y">Y up</option>
+                <option value="z">Z up</option>
+              </select>
+            </label>
+            <button type="button" className={`${buttonClass} mt-4 w-full`} style={{ ...buttonStyle, borderColor: showLattice ? "var(--accent)" : "var(--line)" }} onClick={() => setShowLattice((value) => !value)}>
+              {showLattice ? "20' Grid On (optional)" : "20' Grid Off (optional)"}
+            </button>
+          </aside>
+          <main className="relative min-h-0">
+            <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2 text-[10px]">
+              <span className="rounded border px-2 py-1" style={{ borderColor: "#fff", color: "#fff" }}>RAW IMPORT</span>
+              <span className="rounded border px-2 py-1" style={{ borderColor: "#c8c8c8", color: "#c8c8c8" }}>REGISTERED TILE</span>
+              <span className="rounded border px-2 py-1" style={{ borderColor: "#d4a84b", color: "#d4a84b" }}>COPY 2 (+20&apos; X)</span>
+            </div>
+            <ObjFidelityViewport
+              mesh={fidelityMesh}
+              unitScale={UNIT_TO_FEET[unit]}
+              upAxisMode={upAxisMode}
+              showLattice={showLattice}
+            />
+            <p className="absolute bottom-3 left-3 right-3 text-[10px]" style={{ color: "var(--muted)" }}>{status}</p>
+          </main>
+          <aside className="overflow-auto border-l p-3 text-[10px]" style={{ borderColor: "var(--line)" }}>
+            {fReport ? (
+              <div className="space-y-2 rounded border p-2" style={{ borderColor: fReport.compare.passed ? "#2f6b4f" : "var(--danger-text)" }}>
+                <div className="text-[11px]">OBJ FIDELITY — {fReport.compare.passed ? "PASS" : "FAIL"}</div>
+                <p style={{ color: "var(--muted)" }}>{fidelityMesh.filename}</p>
+                <div className="rounded border p-2" style={{ borderColor: "var(--line)" }}>
+                  <div className="font-medium">Gold object</div>
+                  <p className="mt-1">COPY 2 = exact clone of the complete source OBJ after registration, translated +20&apos; X. Not a connector, proxy, or reconstruction.</p>
+                </div>
+                <table className="w-full border-collapse text-[9px]">
+                  <thead>
+                    <tr style={{ color: "var(--muted)" }}>
+                      <th className="border-b py-1 text-left" style={{ borderColor: "var(--line)" }} />
+                      <th className="border-b py-1 text-right" style={{ borderColor: "var(--line)" }}>RAW</th>
+                      <th className="border-b py-1 text-right" style={{ borderColor: "var(--line)" }}>REG</th>
+                      <th className="border-b py-1 text-right" style={{ borderColor: "var(--line)" }}>COPY2</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {([
+                      ["Child meshes", fReport.raw.childMeshCount, fReport.registered.childMeshCount, fReport.copy2.childMeshCount],
+                      ["Vertices", fReport.raw.vertexCount, fReport.registered.vertexCount, fReport.copy2.vertexCount],
+                      ["Triangles", fReport.raw.triangleCount, fReport.registered.triangleCount, fReport.copy2.triangleCount],
+                      ["Bound X", fReport.raw.bboxSize[0].toFixed(2), fReport.registered.bboxSize[0].toFixed(2), fReport.copy2.bboxSize[0].toFixed(2)],
+                      ["Bound Y", fReport.raw.bboxSize[1].toFixed(2), fReport.registered.bboxSize[1].toFixed(2), fReport.copy2.bboxSize[1].toFixed(2)],
+                      ["Bound Z", fReport.raw.bboxSize[2].toFixed(2), fReport.registered.bboxSize[2].toFixed(2), fReport.copy2.bboxSize[2].toFixed(2)],
+                      ["Aspect", fReport.raw.aspect.map((v) => v.toFixed(2)).join(":"), fReport.registered.aspect.map((v) => v.toFixed(2)).join(":"), fReport.copy2.aspect.map((v) => v.toFixed(2)).join(":")],
+                    ] as const).map(([label, a, b, c]) => (
+                      <tr key={label}>
+                        <td className="py-0.5 pr-1">{label}</td>
+                        <td className="py-0.5 text-right">{a}</td>
+                        <td className="py-0.5 text-right">{b}</td>
+                        <td className="py-0.5 text-right">{c}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div>Counts: {fReport.compare.countsOk ? "PASS" : "FAIL"}</div>
+                <div>REG = COPY2 size: {fReport.compare.sizeOk ? "PASS" : "FAIL"}</div>
+                <div>RAW ↔ REG aspect: {fReport.compare.aspectOk ? "PASS" : "FAIL"}</div>
+                <div>Child locals identity: {fReport.compare.childrenOk ? "PASS" : "FAIL"}</div>
+                {fReport.raw.children.map((child) => (
+                  <div key={child.name}>{child.name}: scale {child.localScale.join(",")} · faces {child.faceCount}</div>
+                ))}
+                {fReport.compare.failures.map((failure) => <div key={failure} style={{ color: "var(--danger-text)" }}>{failure}</div>)}
+                <p className="mt-2" style={{ color: "var(--muted)" }}>HARD STOP — aggregation unmounted until EXIT FIDELITY TEST.</p>
+              </div>
+            ) : (
+              <p style={{ color: "var(--muted)" }}>Computing fidelity metrics…</p>
+            )}
+          </aside>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
-      className="flex h-screen flex-col"
+      data-board-page="lattice" className="flex h-screen flex-col" data-descriptor-ranks={descriptorRanks?.forms.length ?? 0}
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => { event.preventDefault(); void importFiles([...event.dataTransfer.files]); }}
     >
       <header className="flex items-center justify-between gap-3 border-b px-4 py-2" style={{ borderColor: "var(--line)" }}>
         <div>
-          <div className="text-sm">Part 2 registration lattice for 15 OBJ meshes</div>
-          <div className="text-[10px]" style={{ color: "var(--muted)" }}>{field.cellsX} × {field.cellsY} × {field.cellsZ} cells · 20 ft each. Interlock + global distribution assembly.</div>
+          <div className="text-sm">Part 2 assignment aggregation · 15 proto-form tiles</div>
+          <div className="text-[10px]" style={{ color: "var(--muted)" }}>{registrationLabel(assemblyMode === "global-field" ? undefined : field.cellsZ)}. {assemblyMode === "global-field" ? "GLOBAL FIELD — EXPERIMENTAL" : `ASSIGNMENT MODE — ${ASSEMBLY_TEST_LABELS[assemblyMode]}`}.</div>
         </div>
         <AppNav />
       </header>
@@ -699,8 +1038,31 @@ export default function LatticeStudio() {
             </select>
           </label>
           <p className="mt-1 text-[10px]" style={{ color: "var(--muted)" }}>Auto stands a standard OBJ upright. Choose Z up when the file was saved with Z vertical.</p>
+          <label className="mt-3 block text-[10px]" style={{ color: "var(--muted)" }}>
+            Assembly Test
+            <select
+              className="mt-1 w-full rounded border bg-transparent px-2 py-1 text-[11px]"
+              style={buttonStyle}
+              value={assemblyMode}
+              onChange={(event) => selectAssemblyMode(event.target.value as AssemblyTestMode)}
+            >
+              {(Object.keys(ASSEMBLY_TEST_LABELS) as AssemblyTestMode[]).map((mode) => (
+                <option key={mode} value={mode}>{ASSEMBLY_TEST_LABELS[mode]}</option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            className={`${buttonClass} mt-2 w-full`}
+            style={buttonStyle}
+            disabled={busy || models.length < 1}
+            onClick={() => void runAssemblyTest()}
+          >
+            {assemblyMode === "global-field" ? "ASSEMBLE GLOBAL FIELD (EXPERIMENTAL)" : "RUN ORIENTATION + ASSEMBLY"}
+          </button>
+          <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Registration increment is always 20 ft. Choose a mode, adjust X/Y/Z if needed, then press RUN ORIENTATION + ASSEMBLY. Settings do not run the solver.</p>
           <div className="mt-3 text-[10px]" style={{ color: "var(--muted)" }}>
-            Lattice cells
+            Lattice cell counts (registration slots)
             <div className="mt-1 grid grid-cols-3 gap-1">
               {([["cellsX", "X"], ["cellsY", "Y"], ["cellsZ", "Z"]] as const).map(([axis, label]) => (
                 <label key={axis}>
@@ -717,7 +1079,10 @@ export default function LatticeStudio() {
                 </label>
               ))}
             </div>
-            <p className="mt-1">{field.cellsX * 20} × {field.cellsY * 20} × {field.cellsZ * 20} ft. Assembly chooses tile and orientation from neighbor compatibility.</p>
+            <p className="mt-1">Board: {field.cellsX} × {field.cellsY} × {field.cellsZ} slots ({field.cellsX * 20} × {field.cellsY * 20} × {field.cellsZ * 20} ft).</p>
+            {assemblyMode === "global-field" && (
+              <p className="mt-1">GLOBAL FIELD — EXPERIMENTAL uses these counts as the full search board.</p>
+            )}
             {latticePerformanceWarning(field) && (
               <p className="mt-1" style={{ color: "var(--danger-text)" }}>{latticePerformanceWarning(field)}</p>
             )}
@@ -733,7 +1098,9 @@ export default function LatticeStudio() {
               ))}
             </ul>
           )}
-          <p className="text-[11px]" style={{ color: missing.length ? "var(--danger-text)" : "var(--muted)" }}>Assigned: {assigned.length} / {REQUIRED_TILES}. {missing.length ? `Missing ${missing.map((slot) => slot.code).join(", ")}` : "Every typology slot has a mesh."}</p>
+          <p className="text-[11px]" style={{ color: missing.length ? "var(--danger-text)" : "var(--muted)" }}>SOURCE SLOT MAPPING</p>
+          <p className="mt-1 text-[10px]" style={{ color: "var(--muted)" }}>Assign each uploaded OBJ to its catalog identity. The solver determines lattice position and orientation automatically.</p>
+          <p className="mt-1 text-[11px]" style={{ color: missing.length ? "var(--danger-text)" : "var(--muted)" }}>Mapped sources: {assigned.length} / {REQUIRED_TILES}. {missing.length ? `Missing ${missing.map((slot) => slot.code).join(", ")}` : "Every typology slot has a mesh."}</p>
           <div className="mt-3 space-y-1">
             {LATTICE_SLOTS.map((slot) => (
               <label key={slot.id} className="grid grid-cols-[42px_1fr] items-center gap-1 text-[10px]">
@@ -784,53 +1151,66 @@ export default function LatticeStudio() {
         </aside>
         <main className="relative min-h-0">
           <div className="absolute left-3 top-3 z-10 flex max-w-[70%] flex-wrap gap-1">
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setColorMode("white")}>White Model</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setColorMode("category")}>Color by Category</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setColorMode("typology")}>Color by Typology</button>
-            <button
-              type="button"
-              className={buttonClass}
-              style={{ ...buttonStyle, borderColor: showLattice ? "var(--accent)" : "var(--line)" }}
-              onClick={() => setShowLattice((value) => !value)}
-            >
-              {showLattice ? "Lattice Grid On" : "Lattice Grid Off"}
-            </button>
-            <button
-              type="button"
-              className={buttonClass}
-              style={{ ...buttonStyle, borderColor: showConnections ? "var(--accent)" : "var(--line)" }}
-              onClick={() => setShowConnections((value) => !value)}
-            >
-              {showConnections ? "Connections On" : "Connections Off"}
-            </button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("continuity"); setContinuityOverlay("all"); setPresentation(false); }}>Interlock Graph</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("continuity"); setContinuityOverlay("floor"); setPresentation(false); }}>Floor Paths</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("continuity"); setContinuityOverlay("void"); setPresentation(false); }}>Void Paths</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("continuity"); setContinuityOverlay("circulation"); setPresentation(false); }}>Circulation Paths</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("distribution"); setColorMode("typology"); setPresentation(false); }}>Distribution Map</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("iso")}>Isometric</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("plan")}>Plan</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("section")}>Section</button>
-            <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setPresentation((value) => !value)}>{presentation ? "Exit Presentation" : "Presentation Mode"}</button>
+            <button type="button" className={buttonClass} style={{ ...buttonStyle, borderColor: fidelityActive ? "var(--accent)" : "var(--line)" }} onClick={() => enterObjFidelityTest()}>OBJ FIDELITY TEST</button>
+            {fidelityActive ? (
+              <>
+                <button type="button" className={buttonClass} style={{ ...buttonStyle, borderColor: showLattice ? "var(--accent)" : "var(--line)" }} onClick={() => setShowLattice((value) => !value)}>{showLattice ? "20' Grid On" : "20' Grid Off (optional)"}</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("iso")}>Isometric</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("plan")}>Plan</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("section")}>Section</button>
+                <span className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>Isolated: RAW white · REGISTERED gray · COPY 2 gold · no connectors</span>
+              </>
+            ) : (
+              <>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setColorMode("white")}>White Model</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setColorMode("category")}>Color by Category</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setColorMode("typology")}>Color by Typology</button>
+                <button type="button" className={buttonClass} style={{ ...buttonStyle, borderColor: showLattice ? "var(--accent)" : "var(--line)" }} onClick={() => setShowLattice((value) => !value)}>{showLattice ? "20' Grid On" : "20' Grid Off"}</button>
+                <button type="button" className={buttonClass} style={{ ...buttonStyle, borderColor: showOriginalTiles ? "var(--accent)" : "var(--line)" }} onClick={() => setShowOriginalTiles((value) => !value)}>Original Tile Geometry</button>
+                <button type="button" className={buttonClass} style={{ ...buttonStyle, borderColor: showGeneratedConnectors ? "var(--accent)" : "var(--line)" }} onClick={() => setShowGeneratedConnectors((value) => !value)}>Generated Connectors</button>
+                {assemblyMode !== "global-field" && <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setShowConnectionPorts(value => !value)}>Connection Ports {showConnectionPorts ? "On" : "Off"}</button>}
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setConnectionStage("before"); setShowGeneratedConnectors(false); setShowOriginalTiles(true); }}>Before Synthesis</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setConnectionStage("after"); setShowGeneratedConnectors(true); setShowOriginalTiles(true); }}>After Synthesis</button>
+                <button type="button" className={buttonClass} style={{ ...buttonStyle, borderColor: showConnections ? "var(--accent)" : "var(--line)" }} onClick={() => setShowConnections((value) => !value)}>
+                  {showConnections ? "Connections On" : "Connections Off"}
+                </button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("continuity"); setContinuityOverlay("all"); setPresentation(false); }}>Interlock Graph</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("continuity"); setContinuityOverlay("floor"); setPresentation(false); }}>Floor Paths</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("continuity"); setContinuityOverlay("void"); setPresentation(false); }}>Void Paths</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("continuity"); setContinuityOverlay("circulation"); setPresentation(false); }}>Circulation Paths</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => { setDiagnostic("distribution"); setColorMode("typology"); setPresentation(false); }}>Distribution Map</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("iso")}>Isometric</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("plan")}>Plan</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("section")}>Section</button>
+                <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setPresentation((value) => !value)}>{presentation ? "Exit Presentation" : "Presentation Mode"}</button>
+              </>
+            )}
           </div>
           <LatticeViewport
             ref={viewRef}
-            meshes={shown.meshes}
-            models={shown.models}
-            placements={shown.placements}
+            meshes={fidelityActive ? [] : shown.meshes}
+            models={fidelityActive ? [] : shown.models}
+            placements={fidelityActive ? {} : shown.placements}
             unitScale={UNIT_TO_FEET[unit]}
             upAxisMode={upAxisMode}
-            field={field}
+            field={assignmentResult?.field ?? field}
             colorMode={presentation ? "white" : colorMode}
             showLattice={showLattice}
-            showConnections={showConnections}
+            showConnections={fidelityActive ? false : showConnections}
+            showConnectionPorts={!fidelityActive && assemblyMode !== "global-field" && showConnectionPorts}
+            portPairs={!fidelityActive ? liveAssignmentSynthesis?.portPairs : undefined}
+            portCandidates={!fidelityActive ? liveAssignmentSynthesis?.portCandidates : undefined}
+            showGeneratedConnectors={fidelityActive ? false : connectionStage === "after" && showGeneratedConnectors}
+            showOriginalTiles={fidelityActive ? false : showOriginalTiles}
+            connectors={fidelityActive ? [] : displayedConnectors}
             cameraMode={cameraMode}
             diagnostic={diagnostic}
             continuityOverlay={continuityOverlay}
-            presentation={presentation}
+            presentation={fidelityActive ? false : presentation}
             selectedId={selectedId}
-            connections={shownReport?.connections ?? []}
+            connections={fidelityActive ? [] : shownReport?.connections ?? []}
             onSelect={setSelectedId}
+            fidelityMesh={fidelityActive ? fidelityMesh : null}
           />
           <div className="absolute bottom-3 left-3 right-3 space-y-1">
             {busy && progressPercent !== null && (
@@ -848,8 +1228,10 @@ export default function LatticeStudio() {
           </div>
         </main>
         <aside className="overflow-auto border-l p-3 text-[10px]" style={{ borderColor: "var(--line)" }}>
-          <button type="button" className={buttonClass} style={buttonStyle} disabled={busy || models.length < 1} onClick={() => void runSearch()}>ASSEMBLE INTERLOCKING LATTICE</button>
-          <button type="button" className={`${buttonClass} mt-2 block`} style={buttonStyle} disabled={busy || models.length < 1} onClick={() => void runSearch()}>REASSEMBLE UNLOCKED CELLS</button>
+          <button type="button" className={buttonClass} style={buttonStyle} disabled={fidelityActive || busy || models.length < 1} onClick={() => void runAssemblyTest()}>
+            {fidelityActive ? "AGGREGATION PAUSED (FIDELITY)" : assemblyMode === "global-field" ? "ASSEMBLE GLOBAL FIELD (EXPERIMENTAL)" : "ASSEMBLE SELECTED FORMS"}
+          </button>
+          <button type="button" className={`${buttonClass} mt-2 block`} style={buttonStyle} disabled={busy || models.length < 1 || assemblyMode !== "global-field"} onClick={() => void runSearch()}>REASSEMBLE UNLOCKED CELLS</button>
           <button type="button" className={`${buttonClass} mt-2 block`} style={buttonStyle} onClick={clearSavedSession}>CLEAR SAVED SESSION</button>
           <p className="mt-2" style={{ color: "var(--muted)" }}>Part 2 autosaves meshes, prefs, and the last assembly so switching tabs does not reset it.</p>
           {busy && progressPercent !== null && (
@@ -865,7 +1247,7 @@ export default function LatticeStudio() {
           )}
           <div className="mt-3 rounded border p-2 space-y-2" style={{ borderColor: "var(--line)" }}>
             <div className="text-[11px]">DISTRIBUTION</div>
-            <p style={{ color: "var(--muted)" }}>Changing these controls re-assembles after a short pause.</p>
+            <p style={{ color: "var(--muted)" }}>Changing these controls updates settings. Press the run button to assemble.</p>
             <label className="block" style={{ color: "var(--muted)" }}>
               Dispersion {distributionWeight}% · 0% interlock bias · 100% maximum dispersion
               <input
@@ -876,7 +1258,6 @@ export default function LatticeStudio() {
                 value={distributionWeight}
                 onChange={(event) => {
                   setDistributionWeight(Number(event.target.value));
-                  bumpDistributionPrefs();
                 }}
               />
             </label>
@@ -890,7 +1271,6 @@ export default function LatticeStudio() {
                 value={clusteringPercent}
                 onChange={(event) => {
                   setClusteringPercent(Number(event.target.value));
-                  bumpDistributionPrefs();
                 }}
               />
             </label>
@@ -903,7 +1283,6 @@ export default function LatticeStudio() {
                 checked={balanceTypologies}
                 onChange={(event) => {
                   setBalanceTypologies(event.target.checked);
-                  bumpDistributionPrefs();
                 }}
               />
               Balance Typologies
@@ -914,7 +1293,6 @@ export default function LatticeStudio() {
                 checked={balanceCategories}
                 onChange={(event) => {
                   setBalanceCategories(event.target.checked);
-                  bumpDistributionPrefs();
                 }}
               />
               Balance Categories
@@ -925,22 +1303,41 @@ export default function LatticeStudio() {
                 checked={preventLargeClusters}
                 onChange={(event) => {
                   setPreventLargeClusters(event.target.checked);
-                  bumpDistributionPrefs();
                 }}
               />
               Prevent Large Clusters
             </label>
           </div>
-          <div className="mt-2 flex flex-wrap gap-1">
-            {([2, 4, 8] as const).map((count) => <button type="button" key={count} className={buttonClass} style={buttonStyle} disabled={busy || !models.length} onClick={() => void runCopies(count)}>INTERLOCK TEST {count}</button>)}
+          <div className="mt-2 space-y-2 rounded border p-2 text-[10px]" style={{ borderColor: "var(--line)" }}>
+            <div className="text-[11px]">Assignment presentation picks</div>
+            <label>Gathering
+              <select className="mt-1 w-full rounded border bg-transparent px-1 py-1" style={buttonStyle} value={gatheringSlot} onChange={(event) => setGatheringSlot(event.target.value)}>
+                {LATTICE_SLOTS.filter((slot) => slot.category === "Gathering").map((slot) => <option key={slot.id} value={slot.id}>{slot.code} {slot.name}</option>)}
+              </select>
+            </label>
+            <label>Office
+              <select className="mt-1 w-full rounded border bg-transparent px-1 py-1" style={buttonStyle} value={officeSlot} onChange={(event) => setOfficeSlot(event.target.value)}>
+                {LATTICE_SLOTS.filter((slot) => slot.category === "Office").map((slot) => <option key={slot.id} value={slot.id}>{slot.code} {slot.name}</option>)}
+              </select>
+            </label>
+            <label>Lobby
+              <select className="mt-1 w-full rounded border bg-transparent px-1 py-1" style={buttonStyle} value={lobbySlot} onChange={(event) => setLobbySlot(event.target.value)}>
+                {LATTICE_SLOTS.filter((slot) => slot.category === "Lobby").map((slot) => <option key={slot.id} value={slot.id}>{slot.code} {slot.name}</option>)}
+              </select>
+            </label>
+            <button type="button" className={buttonClass} style={buttonStyle} disabled={busy || !models.length} onClick={() => void runSelectedCategoryTests()}>ASSEMBLE PRESENTATION PICKS</button>
           </div>
-          <button type="button" className={`${buttonClass} mt-2`} style={buttonStyle} disabled={busy || !models.length} onClick={() => void runCatalogue()}>CATALOGUE TEST</button>
+          <div className="mt-2 flex flex-wrap gap-1">
+            {([2, 3, 4, 8] as const).map((count) => <button type="button" key={count} className={buttonClass} style={buttonStyle} disabled={busy || models.length < 2} onClick={() => selectAssemblyMode(`copies-${count}` as AssemblyTestMode)}>{count} FORMS</button>)}
+          </div>
+          <button type="button" className={`${buttonClass} mt-2`} style={buttonStyle} disabled={busy || !models.length} onClick={() => selectAssemblyMode("catalog")}>SELECT CATALOG TEST (ALL 15)</button>
           {busy && <button type="button" className={`${buttonClass} mt-2`} style={buttonStyle} onClick={() => { cancelRef.current += 1; }}>Cancel</button>}
-          <p className="mt-3" style={{ color: "var(--muted)" }}>Interlock stays primary. Clustering scales same-type aggregation only; 0% is not a forced checkerboard.</p>
+          <p className="mt-3" style={{ color: "var(--muted)" }}>Assignment mode orients distinct forms toward compatible existing circulation edges on 20&apos; plan bays. Z Grid = 1 keeps every root at Z = 0; source geometry may extend above it. Z Grid &gt; 1 permits stacking. Connectors close remaining short gaps. Hover a Connection Ports label for its type, elevation, width, and confidence.</p>
           <div className="mt-2 space-y-1">
             {options?.map((option) => (
               <button type="button" key={option.id} className={`${buttonClass} block w-full text-left`} style={{ ...buttonStyle, outline: activeOption === option.id ? "1px solid var(--accent)" : undefined }} onClick={() => chooseOption(option)}>
-                Option {option.id} — {option.title}. Interlock {option.score.toFixed(1)} · Distribution {option.distributionScore.toFixed(1)}. Largest cluster {option.distribution?.maxCluster ?? "—"}. Cells {option.tiles.length}/{cellCount}.
+                Option {option.id} — {option.title}. Score {option.score.toFixed(1)}
+                {assignmentResult ? ` · connectors ${assignmentResult.synthesis.connectors.length}` : ` · Distribution ${option.distributionScore.toFixed(1)}`}.
               </button>
             ))}
           </div>
@@ -969,10 +1366,10 @@ export default function LatticeStudio() {
               ))}
             </div>
           )}
-          {shownReport && (
+          {!fidelityActive && shownReport && (
             <div className="mt-3 space-y-1">
               <div>OBJ types loaded: {meshes.length}</div>
-              <div>Cells assembled: {shown.models.length} / {cellCount}</div>
+              <div>Cells assembled: {shown.models.length}{assemblyMode === "global-field" ? ` / ${cellCount}` : ""}</div>
               <div>OBJ types used: {new Set(shown.models.map((model) => sourceIdOf(model.id))).size}</div>
               <div>Connected components: {shownReport.components}</div>
               <div>Valid interlocks: {shownReport.connections.filter((connection) => connection.interlock === "PASS").length}</div>
@@ -992,7 +1389,7 @@ export default function LatticeStudio() {
               )}
             </div>
           )}
-          {activeAssembly?.distribution && (
+          {!fidelityActive && activeAssembly?.distribution && (
             <div className="mt-3 max-h-56 space-y-1 overflow-auto rounded border p-2" style={{ borderColor: "var(--line)" }}>
               <div className="text-[11px]">Typology distribution</div>
               {activeAssembly.distribution.typologyRows.map((row) => (
@@ -1002,38 +1399,137 @@ export default function LatticeStudio() {
               ))}
             </div>
           )}
-          {copyWarning && <p className="mt-3 rounded p-2" style={{ background: "var(--danger-bg)", color: "var(--danger-text)" }}>{copyWarning}</p>}
-          <div className="mt-3 max-h-48 space-y-2 overflow-auto">
-            {shownReport && shownReport.connections.length > listedConnections.length && <p style={{ color: "var(--muted)" }}>Showing {listedConnections.length} of {shownReport.connections.length} neighbor checks.</p>}
-            {listedConnections.map((connection, index) => (
-              <div key={`${connection.tileA}-${connection.tileB}-${index}`} className="border-t pt-1" style={{ borderColor: "var(--line)" }}>
-                <div>Tile A: {connection.labelA}</div>
-                <div>Tile B: {connection.labelB}</div>
-                <div>Transform A: {connection.transformA}</div>
-                <div>Transform B: {connection.transformB}</div>
-                <div>Connection direction: {connection.direction}</div>
-                <div>Floor continuity: {connection.floor}</div>
-                <div>Void continuity: {connection.void}</div>
-                <div>Circulation continuity: {connection.circulation}</div>
-                <div>Collision: {connection.collision}</div>
-                <div>Interlock: {connection.interlock}</div>
+          {!fidelityActive && copyWarning && <p className="mt-3 rounded p-2" style={{ background: "var(--danger-bg)", color: "var(--danger-text)" }}>{copyWarning}</p>}
+          {!fidelityActive && (
+            <div className="mt-3 max-h-48 space-y-2 overflow-auto">
+              {shownReport && shownReport.connections.length > listedConnections.length && <p style={{ color: "var(--muted)" }}>Showing {listedConnections.length} of {shownReport.connections.length} neighbor checks.</p>}
+              {listedConnections.map((connection, index) => (
+                <div key={`${connection.tileA}-${connection.tileB}-${index}`} className="border-t pt-1" style={{ borderColor: "var(--line)" }}>
+                  <div>Tile A: {connection.labelA}</div>
+                  <div>Tile B: {connection.labelB}</div>
+                  <div>Transform A: {connection.transformA}</div>
+                  <div>Transform B: {connection.transformB}</div>
+                  <div>Connection direction: {connection.direction}</div>
+                  <div>Floor continuity: {connection.floor}</div>
+                  <div>Void continuity: {connection.void}</div>
+                  <div>Circulation continuity: {connection.circulation}</div>
+                  <div>Collision: {connection.collision}</div>
+                  <div>Interlock: {connection.interlock}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {fidelityActive && fidelityReport && (
+            <div className="mt-3 space-y-2 rounded border p-2" style={{ borderColor: fidelityReport.compare.passed ? "#2f6b4f" : "var(--danger-text)" }}>
+              <div className="text-[11px]">OBJ FIDELITY — {fidelityReport.compare.passed ? "PASS" : "FAIL"}</div>
+              <p style={{ color: "var(--muted)" }}>{fidelityMesh?.filename}</p>
+              <div className="rounded border p-2" style={{ borderColor: "var(--line)" }}>
+                <div className="font-medium">Gold object identification</div>
+                <p className="mt-1">The gold mesh is <strong>COPY 2</strong>: an exact clone of the complete source OBJ after registration, translated +20&apos; in X.</p>
+                <p className="mt-1" style={{ color: "var(--muted)" }}>It is not a connector, bounding box, proxy, registration volume, collision mesh, or reconstructed form. Connectors are removed from this mode.</p>
               </div>
-            ))}
-          </div>
-          {catalogue.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {meshes.slice(0, 15).map((mesh) => (
+                  <button key={mesh.id} type="button" className={buttonClass} style={{ ...buttonStyle, borderColor: fidelityMesh?.id === mesh.id ? "var(--accent)" : "var(--line)" }} onClick={() => enterObjFidelityTest(mesh.id)}>{mesh.filename.replace(/\.obj$/i, "").slice(0, 18)}</button>
+                ))}
+              </div>
+              <table className="mt-2 w-full border-collapse text-[9px]">
+                <thead>
+                  <tr style={{ color: "var(--muted)" }}>
+                    <th className="border-b py-1 text-left" style={{ borderColor: "var(--line)" }} />
+                    <th className="border-b py-1 text-right" style={{ borderColor: "var(--line)" }}>RAW</th>
+                    <th className="border-b py-1 text-right" style={{ borderColor: "var(--line)" }}>REGISTERED</th>
+                    <th className="border-b py-1 text-right" style={{ borderColor: "var(--line)" }}>COPY 2</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {([
+                    ["Child meshes", fidelityReport.raw.childMeshCount, fidelityReport.registered.childMeshCount, fidelityReport.copy2.childMeshCount],
+                    ["Vertices", fidelityReport.raw.vertexCount, fidelityReport.registered.vertexCount, fidelityReport.copy2.vertexCount],
+                    ["Triangles", fidelityReport.raw.triangleCount, fidelityReport.registered.triangleCount, fidelityReport.copy2.triangleCount],
+                    ["Bounding X", fidelityReport.raw.bboxSize[0].toFixed(3), fidelityReport.registered.bboxSize[0].toFixed(3), fidelityReport.copy2.bboxSize[0].toFixed(3)],
+                    ["Bounding Y", fidelityReport.raw.bboxSize[1].toFixed(3), fidelityReport.registered.bboxSize[1].toFixed(3), fidelityReport.copy2.bboxSize[1].toFixed(3)],
+                    ["Bounding Z", fidelityReport.raw.bboxSize[2].toFixed(3), fidelityReport.registered.bboxSize[2].toFixed(3), fidelityReport.copy2.bboxSize[2].toFixed(3)],
+                    ["Aspect X:Y:Z", fidelityReport.raw.aspect.map((v) => v.toFixed(3)).join(":"), fidelityReport.registered.aspect.map((v) => v.toFixed(3)).join(":"), fidelityReport.copy2.aspect.map((v) => v.toFixed(3)).join(":")],
+                  ] as const).map(([label, a, b, c]) => (
+                    <tr key={label}>
+                      <td className="py-0.5 pr-2">{label}</td>
+                      <td className="py-0.5 text-right">{a}</td>
+                      <td className="py-0.5 text-right">{b}</td>
+                      <td className="py-0.5 text-right">{c}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="border-t pt-1" style={{ borderColor: "var(--line)" }}>
+                <div>Counts equal: {fidelityReport.compare.countsOk ? "PASS" : "FAIL"}</div>
+                <div>REGISTERED = COPY 2 size: {fidelityReport.compare.sizeOk ? "PASS" : "FAIL"}</div>
+                <div>RAW ↔ REGISTERED aspect: {fidelityReport.compare.aspectOk ? "PASS" : "FAIL"}</div>
+                <div>Child locals identity only: {fidelityReport.compare.childrenOk ? "PASS" : "FAIL"}</div>
+                <div>Root RAW T {fidelityReport.raw.rootTranslation.join(", ")} · unit×{fidelityReport.raw.unitScale}</div>
+                <div>Root REG T {fidelityReport.registered.rootTranslation.map((v) => v.toFixed(1)).join(", ")} · unit×{fidelityReport.registered.unitScale.toFixed(4)} · up {fidelityReport.registered.upAxis}</div>
+                <div>Root COPY2 T {fidelityReport.copy2.rootTranslation.map((v) => v.toFixed(1)).join(", ")} (+20&apos; X vs REG)</div>
+              </div>
+              <div className="border-t pt-1" style={{ borderColor: "var(--line)" }}>
+                <div className="font-medium">Child transform check</div>
+                {fidelityReport.raw.children.map((child) => (
+                  <div key={child.name}>{child.name}: pos {child.localPosition.join(",")} · rot {child.localRotation.join(",")} · scale {child.localScale.join(",")} · faces {child.faceCount}</div>
+                ))}
+                <p className="mt-1" style={{ color: "var(--muted)" }}>Only the tile root may transform. Children stay at identity local transforms.</p>
+              </div>
+              {fidelityReport.compare.failures.map((failure) => <div key={failure} style={{ color: "var(--danger-text)" }}>{failure}</div>)}
+              <p className="mt-2" style={{ color: "var(--muted)" }}>HARD STOP — aggregation / bridges / ramps / stairs disabled until this screen is approved.</p>
+            </div>
+          )}
+          {!fidelityActive && catalogue.length > 0 && (
             <div className="mt-3">
-              {catalogue.map((row) => <div key={row.slotId}>{row.slotId} · score {row.score.toFixed(1)} · {row.tiles} copies{row.warning ? ` · ${row.warning}` : ""}</div>)}
+              {catalogue.map((row) => (
+                <div key={row.slotId} style={{ color: row.status === "UNMAPPED" ? "var(--danger-text)" : undefined }}>
+                  {row.code} {row.name} · {row.status}
+                  {row.mapped ? ` · best ${row.bestCopies}-form · score ${row.score.toFixed(1)}` : " · missing OBJ mapping"}
+                  {row.warning ? ` · ${row.warning}` : ""}
+                </div>
+              ))}
+            </div>
+          )}
+          {!fidelityActive && assignmentResult && (
+            <div className="mt-3 space-y-1 rounded border p-2" style={{ borderColor: "var(--line)" }}>
+              <div className="text-[11px]">Assignment result</div>
+              <div>Mode: {ASSEMBLY_TEST_LABELS[assignmentResult.mode]}</div>
+              <div>Copy count: {assignmentResult.copyCount}</div>
+              <div>Registration: {registrationLabel(assignmentResult.field.cellsZ)}</div>
+              {liveAssignmentSynthesis?.connectionDiagnostics && <div>Port candidates: {liveAssignmentSynthesis.connectionDiagnostics.candidateCount} · Accepted: {liveAssignmentSynthesis.connectionDiagnostics.acceptedCount} · Rejected: {liveAssignmentSynthesis.connectionDiagnostics.rejectedCount}<br />Circulation components: {liveAssignmentSynthesis.connectionDiagnostics.componentsBefore} → {liveAssignmentSynthesis.connectionDiagnostics.componentsAfter}<br />{Object.entries(liveAssignmentSynthesis.connectionDiagnostics.rejectionCounts).map(([reason,count])=>`${reason}: ${count}`).join(" · ")}</div>}
+              <div>Accepted port relationships: {liveAssignmentSynthesis?.portPairs?.length ?? assignmentResult.synthesis.portPairs?.length ?? 0}</div>
+              <div>Transforms: {describeTransformsUsed(assignmentResult).labels.join(" · ") || "identity"}</div>
+              <div>Status: {assignmentResult.status}</div>
+              <div>DIRECT transition joints: {assignmentResult.synthesis.directInterlocks}</div>
+              <div>Generated bridges/plates: {assignmentResult.synthesis.bridges}</div>
+              <div>Generated ramps: {assignmentResult.synthesis.ramps}</div>
+              <div>Generated stairs: {assignmentResult.synthesis.stairs}</div>
+              <div>Generated landings: {assignmentResult.synthesis.landings}</div>
+              <div>Vertical links: {assignmentResult.synthesis.verticalLinks}</div>
+              <div>Floor / void / circ pairs: {assignmentResult.parts.floor} / {assignmentResult.parts.void} / {assignmentResult.parts.circulation}</div>
+              <div>Typology retention: {assignmentResult.typologyRetention.toFixed(0)}</div>
+              <div>Original OBJ geometry: 100% retained</div>
+              <div>Source prominence: {assignmentResult.primaryPreserved.toFixed(0)}%</div>
+              <div>Connector cost: {assignmentResult.synthesis.connectorCost.toFixed(1)}</div>
+              <div>Overall score: {assignmentResult.score.toFixed(1)}</div>
+              <div>Stage: {connectionStage === "before" ? "Before synthesis" : "After synthesis"}</div>
             </div>
           )}
           <div className="mt-3 flex flex-wrap gap-1">
-            {(["originals", "lattice", "interfaces", "pairwise", "transforms", "assembly", "validation", "continuity", "distribution", "copies"] as DiagnosticMode[]).map((mode) => (
+            {(["originals", "obj-fidelity", "lattice", "interfaces", "pairwise", "transforms", "assembly", "validation", "continuity", "distribution", "copies"] as DiagnosticMode[]).map((mode) => (
               <button type="button" key={mode} className={buttonClass} style={buttonStyle} onClick={() => {
+                if (mode === "obj-fidelity") {
+                  enterObjFidelityTest();
+                  return;
+                }
                 setDiagnostic(mode);
                 setPresentation(false);
                 if (mode === "continuity") setContinuityOverlay("all");
                 if (mode === "distribution") setColorMode("typology");
                 if (mode !== "copies" && mode !== "assembly" && mode !== "continuity" && mode !== "validation" && mode !== "distribution") setPreview(null);
-              }}>{mode}</button>
+              }}>{mode === "obj-fidelity" ? "OBJ FIDELITY" : mode}</button>
             ))}
           </div>
           {diagnostic === "interfaces" && selectedModel && <p className="mt-2">Open boundary cells {selectedModel.openBoundary}. Projection {selectedModel.projection.toFixed(1)} ft. Recess {selectedModel.recess.toFixed(1)} ft. Horizontal area {selectedModel.horizontalArea.toFixed(1)} ft². Vertical area {selectedModel.verticalArea.toFixed(1)} ft².</p>}
@@ -1042,14 +1538,14 @@ export default function LatticeStudio() {
             return <div key={model.id}>{slotById(model.slotId)?.code} {placement ? `${placement.rotation}° ${placement.mirror} @ ${placement.ix},${placement.iy},${placement.iz}${placement.locked ? " locked" : ""}` : "unplaced"}</div>;
           })}
           <div className="mt-3 flex flex-wrap gap-1">
-            <button type="button" className={buttonClass} style={buttonStyle} disabled={!shown.models.length} onClick={() => download("assembly.obj", assembledObj(shown.meshes, shown.placements, shown.models, UNIT_TO_FEET[unit], upAxisMode), "text/plain")}>EXPORT ASSEMBLED OBJ</button>
+            <button type="button" className={buttonClass} style={buttonStyle} disabled={!shown.models.length} onClick={() => download("assembly.obj", assembledObj(shown.meshes, shown.placements, shown.models, UNIT_TO_FEET[unit], upAxisMode, connectionStage === "after" ? displayedConnectors : []), "text/plain")}>EXPORT ASSEMBLED OBJ</button>
             <button type="button" className={buttonClass} style={buttonStyle} disabled={!shown.models.length} onClick={() => download("assembly.json", JSON.stringify(assemblyManifest(shown.meshes, shown.placements, shown.models, UNIT_TO_FEET[unit], unit, field), null, 2), "application/json")}>assembly.json</button>
             <button type="button" className={buttonClass} style={buttonStyle} disabled={!shown.models.length} onClick={() => download("assembly-union.obj", voxelUnionObj(shown.models, shown.placements), "text/plain")}>UNION FOR EXPORT</button>
             <button type="button" className={buttonClass} style={buttonStyle} onClick={() => exportPng("lattice-isometric.png", "clean", "iso")}>Isometric PNG</button>
             <button type="button" className={buttonClass} style={buttonStyle} onClick={() => exportPng("lattice-plan.png", "clean", "plan")}>Plan PNG</button>
             <button type="button" className={buttonClass} style={buttonStyle} onClick={() => exportPng("lattice-section.png", "clean", "section")}>Section PNG</button>
             <button type="button" className={buttonClass} style={buttonStyle} onClick={() => exportPng("lattice-assembly.png", "lattice", "iso")}>Lattice + assembly PNG</button>
-            <button type="button" className={buttonClass} style={buttonStyle} disabled={!preview} onClick={() => download(`interlock-${copyCount}.obj`, assembledObj(shown.meshes, shown.placements, shown.models, UNIT_TO_FEET[unit], upAxisMode), "text/plain")}>{copyCount}-copy OBJ</button>
+            <button type="button" className={buttonClass} style={buttonStyle} disabled={!preview} onClick={() => download(`interlock-${copyCount}.obj`, assembledObj(shown.meshes, shown.placements, shown.models, UNIT_TO_FEET[unit], upAxisMode, connectionStage === "after" ? displayedConnectors : []), "text/plain")}>{copyCount}-copy OBJ</button>
           </div>
         </aside>
       </div>

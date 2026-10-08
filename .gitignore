@@ -43,3 +43,6 @@ build-output.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Generated descriptor calibration snapshots
+reports/descriptor-calibration/*.json

@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import GridPreview from "./GridPreview";
+import { useBoardMode } from "./BoardMode";
 import type { Cell, LetterAssets } from "./letterTypes";
 
 type Props = {
@@ -17,6 +18,7 @@ type Props = {
 
 /** Fits a letter grid inside its parent by uniformly scaling it. */
 export default function ScaledGridPreview(props: Props) {
+  const board = useBoardMode();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -28,7 +30,9 @@ export default function ScaledGridPreview(props: Props) {
     if (!el) return;
 
     const update = () => {
-      const { width, height } = el.getBoundingClientRect();
+      const { width, height } = board
+        ? { width: el.clientWidth, height: el.clientHeight }
+        : el.getBoundingClientRect();
       if (width <= 0 || height <= 0 || gridW <= 0 || gridH <= 0) return;
       const next = Math.min(width / gridW, height / gridH) * 0.92;
       setScale(Number.isFinite(next) ? next : 1);
@@ -38,7 +42,7 @@ export default function ScaledGridPreview(props: Props) {
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [gridW, gridH]);
+  }, [gridW, gridH, board]);
 
   return (
     <div ref={wrapRef} className="relative flex h-full w-full items-center justify-center overflow-hidden">
