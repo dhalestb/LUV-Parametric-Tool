@@ -1,0 +1,67 @@
+{
+  "baseline": [
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/descriptorCache.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    },
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/descriptorCache.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    },
+    {
+      "code": 2352,
+      "file": "src/components/evaluations/descriptorCache.test.ts",
+      "message": "Conversion of type '{ rotation: 0; mirror: \"none\"; occupied: number[]; floor: never[]; passage: never[]; voidCells: never[]; vertical: never[]; bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number; }; faces: {}; }' to type 'TileVariant' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.   Types of property 'faces' are incompatible.     Type '{}' is missing the following properties from type 'Record<Direction, FaceLayer>': \"+X\", \"-X\", \"+Y\", \"-Y\", and 2 more."
+    },
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    },
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/descriptorV2.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    },
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/openVolume.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    }
+  ],
+  "updated": [
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/descriptorCache.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    },
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/descriptorCache.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    },
+    {
+      "code": 2352,
+      "file": "src/components/evaluations/descriptorCache.test.ts",
+      "message": "Conversion of type '{ rotation: 0; mirror: \"none\"; occupied: number[]; floor: never[]; passage: never[]; voidCells: never[]; vertical: never[]; bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number; }; faces: {}; }' to type 'TileVariant' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.   Types of property 'faces' are incompatible.     Type '{}' is missing the following properties from type 'Record<Direction, FaceLayer>': \"+X\", \"-X\", \"+Y\", \"-Y\", and 2 more."
+    },
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    },
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/descriptorV2.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    },
+    {
+      "code": 5097,
+      "file": "src/components/evaluations/openVolume.test.ts",
+      "message": "An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled."
+    }
+  ],
+  "identical": true
+}

@@ -1,3 +1,4 @@
+import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import { matchAssemblyPorts } from "./portMatching";
 import { synthesizeConnectors, type SynthesisResult } from "./connectionSynthesis";
 import { evaluateAssembly } from "./search";
@@ -204,16 +205,20 @@ function materializeInstances(forms: TileModel[]): TileModel[] {
 
 /** Extend only assignment connectivity with accepted, collision-checked port routes. */
 function evaluateAssignment(instances: TileModel[], tiles: PlacedTile[], collectDiagnostics=false) {
+  const finishTiming = startConnectionTiming("search candidate evaluation");
+  try {
   const evaled = evaluateAssembly(instances, tiles);
   const portMatches = matchAssemblyPorts(instances, tiles, evaled.connections, {}, collectDiagnostics);
   const parent = new Map(tiles.map(tile => [tile.id, tile.id]));
   const find = (id: string): string => parent.get(id) === id ? id : find(parent.get(id)!);
-  for (const edge of [...evaled.connections.filter(c => c.interlock === "PASS" && c.collision !== "FAIL" && (c.floor === "PASS" || c.circulation === "PASS")), ...portMatches.pairs]) {
+  for (const edge of [...portMatches.confirmedReports, ...portMatches.pairs]) {
     parent.set(find(edge.tileA), find(edge.tileB));
   }
   evaled.components = new Set(tiles.map(tile => find(tile.id))).size;
   evaled.parts = {...evaled.parts, connectivity: Math.max(0, tiles.length-evaled.components)};
   return {evaled, portMatches};
+
+  } finally { finishTiming(); }
 }
 
 function scoreObjective(evaled: ReturnType<typeof evaluateAssembly>, synthesis: SynthesisResult, objective: AssignmentObjective, variationBoost: number, portScore = 0) {
@@ -494,6 +499,7 @@ async function searchMixedPair(forms: TileModel[], field: LatticeField, hooks: H
       await new Promise((resolve) => setTimeout(resolve, 0));
     }
   }
+  connectionDiagnostic("search", "initial pair pruning", { tested, retained: best ? 1 : 0, forms: forms.map(model => ({ id: model.id, filename: model.filename })), winner: best?.tiles });
   return { instances, best, tested };
 }
 
@@ -530,6 +536,7 @@ async function growMixedAssembly(
   while (beam[0] && beam[0].tiles.length < targetCount) {
     const nextBeam: typeof beam = [];
     const nextIndex = beam[0].tiles.length;
+    connectionDiagnostic("search", "growth ordering and beam limit", { nextIndex, order: instances.map(model => ({ id: model.id, filename: model.filename })), availableStates: beam.length, expandedStates: Math.min(6, beam.length) });
     const nextModel = instances[nextIndex];
     const nextSource = sourceIdOf(nextModel.id);
     if (!nextModel) break;
@@ -589,6 +596,7 @@ async function growMixedAssembly(
       unique.push(item);
       if (unique.length >= 8) break;
     }
+    connectionDiagnostic("search", "growth pruning", { evaluated: nextBeam.length, retained: unique.length, retainedPlacements: unique.map(state => state.tiles) });
     // Preserve the last evaluated partial assembly if growth cannot continue.
     if (!unique.length) break;
     beam = unique;

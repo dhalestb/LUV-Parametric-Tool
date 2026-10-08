@@ -1,3 +1,4 @@
+import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import type { PlacedTile, PortPair, TileModel, Vec3 } from "./types";
 import { placementWorldZ } from "./types";
 import { transitionMeshes, transitionSections } from "./transitionGeometry";
@@ -7,7 +8,7 @@ type Bounds = {min:Vec3;max:Vec3};
 type Node = Bounds & {left?:Node;right?:Node;triangles?:Triangle[];closed?:boolean};
 export type ConnectorSurface = {positions:Float32Array;indices:number[];portPair?:PortPair};
 const cache=new WeakMap<object,Node>();
-const sourceClearanceCache=new WeakMap<object,Map<string,boolean>>();
+const sourceClearanceCache=new WeakMap<object,Map<string,{ clear: boolean; reason?: string }>>();
 const sub=(a:Vec3,b:Vec3)=>a.map((v,i)=>v-b[i]) as Vec3;
 const dot=(a:Vec3,b:Vec3)=>a.reduce((n,v,i)=>n+v*b[i],0);
 const cross=(a:Vec3,b:Vec3):Vec3=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
@@ -83,6 +84,8 @@ function localPoint(p:Vec3,tile:PlacedTile,model:TileModel):Vec3 {
 }
 /** Exact triangle surface intersection; only a 0.04' seam at the intended edge is allowed. */
 export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:TileModel[],existing:ConnectorSurface[]=[]):boolean {
+  const finishTiming = startConnectionTiming("collision and clearance");
+  try {
   const meshes=transitionMeshes(pair),tris=meshes.flatMap(trianglesOf);
   for(const tile of tiles) {
     const model=models.find(m=>m.id===tile.id||m.id===tile.id.split("::")[0]);
@@ -96,21 +99,22 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
     const localDirection=(d:Vec3|undefined)=>d?canonical(sub(localPoint(pair.from.map((v,i)=>v+d[i]) as Vec3,tile,model),localPoint(pair.from,tile,model))):undefined;
     const signature=JSON.stringify({role:tile.id===pair.tileA?'A':tile.id===pair.tileB?'B':'obstacle',from:canonical(localPoint(pair.from,tile,model)),to:canonical(localPoint(pair.to,tile,model)),path:pair.path?.map(p=>canonical(localPoint(p,tile,model))),startDirection:localDirection(pair.startDirection),endDirection:localDirection(pair.endDirection),startWidth:pair.startWidth,endWidth:pair.endWidth,width:pair.usableWidth,startProfile:pair.startProfile?.map(p=>canonical(localPoint(p,tile,model))),endProfile:pair.endProfile?.map(p=>canonical(localPoint(p,tile,model))),class:pair.connectionClass,angle:pair.angle,lateralOffset:pair.lateralOffset,rise:pair.rise,plan:pair.plan});
     const previous=checks.get(signature);
-    if(previous!==undefined){if(!previous)return false;continue;}
+    if(previous!==undefined){if(!previous.clear){connectionDiagnostic("clearance", previous.reason ?? "source collision or clearance", { pair, blocker: tile, filename: model.filename, cached: true });return false;}continue;}
+    let failureReason: string | undefined;
     const clearSource=()=>{
     const endpoint=tile.id===pair.tileA?pair.from:tile.id===pair.tileB?pair.to:null;
     const direction=tile.id===pair.tileA?pair.startDirection:pair.endDirection;
     const localEnd=endpoint?localPoint(endpoint,tile,model):null;
     const localDir=endpoint&&direction?sub(localPoint(endpoint.map((v,i)=>v+direction[i]) as Vec3,tile,model),localEnd!):null;
     const allowed=(p:Vec3)=>!!localEnd&&!!localDir&&Math.abs(dot(sub(p,localEnd),localDir))<=.04&&Math.abs(p[2]-localEnd[2])<=.26;
-    for(const tri of tris) if(collides(tri.map(p=>localPoint(p,tile,model)) as Triangle,tree,allowed))return false;
+    for(const tri of tris) if(collides(tri.map(p=>localPoint(p,tile,model)) as Triangle,tree,allowed)){failureReason = "source triangle collision";connectionDiagnostic("clearance", failureReason, { pair, blocker: tile, filename: model.filename });return false;}
     // Standing clearance over the walking ribbon, including walls/roof above it.
     for(const section of transitionSections(pair)) for(const side of [-.5,0,.5]) {
       const p=section.center.map((v,i)=>v+section.side[i]*section.width*side) as Vec3;
       const a=localPoint([p[0],p[1],p[2]+.05],tile,model),b=localPoint([p[0],p[1],p[2]+6.5],tile,model);
       const probeBounds=bounds([[a,b,b]]);
       const probe=(node:Node):boolean=>overlaps(probeBounds,node)&&(node.triangles?node.triangles.some(t=>!!segmentHit(a,b,t)):probe(node.left!)||probe(node.right!));
-      if(probe(tree))return false;
+      if(probe(tree)){failureReason = "headroom";connectionDiagnostic("clearance", failureReason, { pair, blocker: tile, filename: model.filename, point: p });return false;}
       if(tree.closed) {
         const far:Vec3=[a[0],a[1],tree.max[2]+1],hits:number[]=[],rayBounds=bounds([[a,[a[0],a[1],tree.max[2]+1],[a[0],a[1],tree.max[2]+1]]]);
         const collect=(node:Node)=>{
@@ -119,14 +123,14 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
           else {collect(node.left!);collect(node.right!);}
         };
         collect(tree);hits.sort((x,y)=>x-y);
-        if(hits.filter((z,i)=>i===0||Math.abs(z-hits[i-1])>1e-5).length%2===1)return false;
+        if(hits.filter((z,i)=>i===0||Math.abs(z-hits[i-1])>1e-5).length%2===1){failureReason = "inside closed source";connectionDiagnostic("clearance", failureReason, { pair, blocker: tile, filename: model.filename, point: p });return false;}
       }
     }
     return true;
     };
     const clear=clearSource();
     if(checks.size>=2000)checks.delete(checks.keys().next().value!);
-    checks.set(signature,clear);
+    checks.set(signature,{ clear, reason: failureReason });
     if(!clear)return false;
   }
   for(const mesh of existing) {
@@ -142,7 +146,9 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
       }
       return false;
     };
-    if(tris.some(tri=>collides(tri,tree,seamContact))) return false;
+    if(tris.some(tri=>collides(tri,tree,seamContact))) { connectionDiagnostic("clearance", "connector collision", { pair, blocker: other }); return false; }
   }
   return true;
+
+  } finally { finishTiming(); }
 }

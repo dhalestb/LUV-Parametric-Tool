@@ -1,3 +1,6 @@
+import { confirmedCirculationReports } from "./surfaceAttachment";
+import { acceptCirculationClass, preparePortConnection, portAttachmentMeets } from "./portConnectionValidation";
+import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import type { ConnectionPort, ConnectionReport, PlacedTile, PortCandidate, PortPair, PortRejection, TileModel, TileVariant, Vec3 } from "./types";
 import { LATTICE_FEET, packCell, placementWorldZ } from "./types";
 import { transitionPath, transitionMeshes, pathLength, circulationProfile } from "./transitionGeometry";
@@ -8,8 +11,8 @@ export type PortTolerances = { [K in keyof typeof DEFAULT_PORT_TOLERANCES]: numb
 export function worldPortPosition(tile:PlacedTile,port:ConnectionPort):Vec3 {
   return [tile.ix*LATTICE_FEET+port.localPosition[0],tile.iy*LATTICE_FEET+port.localPosition[1],placementWorldZ(tile)+port.elevation];
 }
-const validatedPairs=new WeakMap<PortPair,{models:TileModel[];tiles:PlacedTile[]}>();
-export function portPairClearanceValidated(pair:PortPair,models:TileModel[],tiles:PlacedTile[]) {const record=validatedPairs.get(pair);return record?.models===models&&record?.tiles===tiles;}
+const validatedPairs=new WeakMap<PortPair,{models:TileModel[];tiles:PlacedTile[];geometry:string;placements:string}>();
+export function portPairClearanceValidated(pair:PortPair,models:TileModel[],tiles:PlacedTile[]) {const record=validatedPairs.get(pair);return record?.models===models&&record?.tiles===tiles&&record.geometry===JSON.stringify(pair)&&record.placements===JSON.stringify(tiles);}
 const occupiedCache=new WeakMap<TileVariant,Set<number>>();
 /** Conservative voxel ribbon/headroom check, retained for source/session compatibility. */
 export function portRouteClear(from:Vec3,to:Vec3,width:number,tiles:PlacedTile[],models:TileModel[],endpointIds:string[]):boolean {
@@ -75,6 +78,8 @@ export function assessPortPair(a:ConnectionPort,ta:PlacedTile,b:ConnectionPort,t
   else if(Math.min(startWidth,endWidth)<t.minUsableWidth)reason="WIDTH";
   else if(confidence<t.minConfidence)reason="LOW CONFIDENCE";
   else if(score<t.minCompatibilityScore)reason=facing<.5||angle>45?"ANGLE":lateralOffset>t.directLateralOffset?"LATERAL OFFSET":Math.max(a.usableWidth,b.usableWidth)>8?"WIDTH":"DISTANCE";
+  const constraint = !reason ? undefined : distance > t.maxDistance ? "proximity" : facing < -.35 || angle > t.maxAngularDeviation ? "facing" : lateralOffset > t.maxLateralOffset ? "lateral offset" : profile.mode === "reject" ? "slope classification" : Math.min(startWidth,endWidth) < t.minUsableWidth ? "insufficient usable width" : confidence < t.minConfidence ? "confidence" : "compatibility score";
+  if (reason) connectionDiagnostic("port assessment", reason, { pair, constraint });
   return {pair,reason};
 }
 export function scorePortPair(a:ConnectionPort,ta:PlacedTile,b:ConnectionPort,tb:PlacedTile,tolerances:Partial<PortTolerances>={}):PortPair|null {
@@ -86,11 +91,14 @@ function routeClear(pair:PortPair,tiles:PlacedTile[],models:TileModel[],existing
   return transitionSurfaceClear(pair,tiles,models,existing);
 }
 export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports:ConnectionReport[]=[],tolerances:Partial<PortTolerances>={},collectDiagnostics=true) {
+  const finishTiming = startConnectionTiming("candidate generation");
+  try {
   const candidates:PortCandidate[]=[],byId=new Map(models.map(m=>[m.id,m]));
   for(let i=0;i<tiles.length;i++)for(let j=i+1;j<tiles.length;j++) {
     const a=tiles[i],b=tiles[j];
     const ma=byId.get(a.id)??byId.get(a.id.split("::")[0]),mb=byId.get(b.id)??byId.get(b.id.split("::")[0]);
-    if(!ma||!mb)continue;
+    if(!ma||!mb){connectionDiagnostic("port candidate", "no source model", { tileA: a, tileB: b });continue;}
+    if (!ma.variants[a.variant].ports?.length || !mb.variants[b.variant].ports?.length) connectionDiagnostic("port candidate", "no candidate attachment", { tileA: a, tileB: b });
     const collision=reports.some(r=>((r.tileA===a.id&&r.tileB===b.id)||(r.tileB===a.id&&r.tileA===b.id))&&r.collision==="FAIL");
     if(!collectDiagnostics&&collision)continue;
     for(const pa of ma.variants[a.variant].ports??[])for(const pb of mb.variants[b.variant].ports??[]) {
@@ -115,29 +123,36 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
   const find=(id:string):string=>parent.get(id)===id?id:find(parent.get(id)!);
   const join=(a:string,b:string)=>parent.set(find(a),find(b));
   // Only proven source circulation is already an edge. Mere proxy overlap is not circulation.
-  for(const r of reports) if(r.collision!=="FAIL"&&r.interlock==="PASS"&&(r.floor==="PASS"||r.circulation==="PASS"))join(r.tileA,r.tileB);
+  const confirmedReports = confirmedCirculationReports(models, tiles, reports);
+  for(const r of confirmedReports) join(r.tileA,r.tileB);
   const componentsBefore=new Set(tiles.map(t=>find(t.id))).size;
   const pairs:PortPair[]=[],used=new Map<string,Array<{offset:number;width:number}>>(),surfaces:ConnectorSurface[]=[];
   const sorted=candidates.filter(c=>!c.reason).sort((a,b)=>Number(a.pair.fallback??false)-Number(b.pair.fallback??false)||b.pair.score-a.pair.score||a.pair.distance-b.pair.distance||(`${a.pair.tileA}:${a.pair.tileB}:${a.pair.portA}:${a.pair.portB}`).localeCompare(`${b.pair.tileA}:${b.pair.tileB}:${b.pair.portA}:${b.pair.portB}`));
   for(const candidate of sorted) {
     const pair=candidate.pair,ka=`${pair.tileA}:${pair.portA}`,kb=`${pair.tileB}:${pair.portB}`;
-    if(find(pair.tileA)===find(pair.tileB)){candidate.reason="NETWORK REDUNDANT";continue;}
+    if(find(pair.tileA)===find(pair.tileB)){candidate.reason="NETWORK REDUNDANT";connectionDiagnostic("port candidate", "network redundant", { pair });continue;}
     const occupied=(key:string,offset:number,width:number)=>(used.get(key)??[]).some(span=>Math.abs(span.offset-offset)<(span.width+width)/2+.25);
-    if(occupied(ka,pair.portOffsetA??0,pair.startWidth??pair.usableWidth)||occupied(kb,pair.portOffsetB??0,pair.endWidth??pair.usableWidth)){candidate.reason="PORT IN USE";continue;}
+    if(occupied(ka,pair.portOffsetA??0,pair.startWidth??pair.usableWidth)||occupied(kb,pair.portOffsetB??0,pair.endWidth??pair.usableWidth)){candidate.reason="PORT IN USE";connectionDiagnostic("port candidate", "port occupied", { pair });continue;}
     let accepted:PortPair|undefined;
+    let validationReason:PortRejection = "COLLISION";
     const profile=circulationProfile(pair.plan,pair.rise);
     const bends=profile.mode==="switchback"?[profile.bend,-profile.bend,0,4,-4]:[0,2,-2,4,-4];
     for(const bend of bends) {
-      const routed={...pair,path:transitionPath(pair,bend),connectionClass:bend&&pair.connectionClass==="DIRECT"?"ADAPTIVE" as const:pair.connectionClass};
-      if(pathLength(routed.path)>(tolerances.maxDistance??DEFAULT_PORT_TOLERANCES.maxDistance)*1.4)continue;
+      const routed=preparePortConnection({...pair,path:transitionPath(pair,bend),connectionClass:bend&&pair.connectionClass==="DIRECT"?"ADAPTIVE" as const:pair.connectionClass});
+      if(pathLength(routed.path!)>(tolerances.maxDistance??DEFAULT_PORT_TOLERANCES.maxDistance)*1.4){validationReason="DISTANCE";connectionDiagnostic("port route", "route length", { pair: routed, bend });continue;}
+      if (!portAttachmentMeets(routed, models, tiles)) { validationReason = "SURFACE ATTACHMENT"; connectionDiagnostic("port route", "surface attachment", { pair: routed, bend }); continue; }
+      if (!acceptCirculationClass(routed)) { validationReason = "SLOPE"; connectionDiagnostic("port route", "slope", { pair: routed, bend }); continue; }
+      validationReason = "COLLISION";
       if(routeClear(routed,tiles,models,surfaces)){accepted=routed;break;}
     }
-    if(!accepted){candidate.reason="COLLISION";continue;}
-    validatedPairs.set(accepted,{models,tiles});candidate.pair=accepted;candidate.accepted=true;pairs.push(accepted);
-    for(const [key,offset,width] of [[ka,pair.portOffsetA??0,pair.startWidth??pair.usableWidth],[kb,pair.portOffsetB??0,pair.endWidth??pair.usableWidth]] as const){const spans=used.get(key)??[];spans.push({offset,width});used.set(key,spans);}join(pair.tileA,pair.tileB);surfaces.push(...transitionMeshes(accepted).map(mesh=>({...mesh,portPair:accepted})));
+    if(!accepted){candidate.reason=validationReason;connectionDiagnostic("port candidate", validationReason, { pair });continue;}
+    validatedPairs.set(accepted,{models,tiles,geometry:JSON.stringify(accepted),placements:JSON.stringify(tiles)});candidate.pair=accepted;candidate.accepted=true;pairs.push(accepted);
+    for(const [key,offset,width] of [[ka,accepted.portOffsetA??0,accepted.startWidth??accepted.usableWidth],[kb,accepted.portOffsetB??0,accepted.endWidth??accepted.usableWidth]] as const){const spans=used.get(key)??[];spans.push({offset,width});used.set(key,spans);}join(pair.tileA,pair.tileB);surfaces.push(...transitionMeshes(accepted).map(mesh=>({...mesh,portPair:accepted})));
   }
   const componentsAfter=new Set(tiles.map(t=>find(t.id))).size,connectivityBonus=(componentsBefore-componentsAfter)*5;
   const rejectionCounts:Partial<Record<PortRejection,number>>={};
   for(const c of candidates)if(c.reason)rejectionCounts[c.reason]=(rejectionCounts[c.reason]??0)+1;
-  return {pairs,candidates,componentsBefore,componentsAfter,rejectionCounts,score:pairs.reduce((sum,p)=>sum+p.score,0)+connectivityBonus,multiConnectionBonus:connectivityBonus};
+  return {pairs,candidates,confirmedReports,componentsBefore,componentsAfter,rejectionCounts,score:pairs.reduce((sum,p)=>sum+p.score,0)+connectivityBonus,multiConnectionBonus:connectivityBonus};
+
+  } finally { finishTiming(); }
 }

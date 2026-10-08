@@ -1,4 +1,5 @@
-import type { PlacedTile, PortPair, TileModel, Vec3 } from "./types";
+import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
+import type { ConnectionReport, PlacedTile, PortPair, TileModel, Vec3 } from "./types";
 import { placementWorldZ } from "./types";
 import { transitionSections } from "./transitionGeometry";
 
@@ -359,6 +360,8 @@ function sectionMeets(pair: PortPair, end: "start" | "end", models: TileModel[],
 
 /** Shrink each loft end until its real section sits on a suitable surface. */
 export function fitLoftContact(pair: PortPair, models: TileModel[], tiles: PlacedTile[], allowWall: boolean) {
+  const finishTiming = startConnectionTiming("surface attachment selection");
+  try {
   const ends: Array<{ key: "startWidth" | "endWidth"; which: "start" | "end" }> = [
     { key: "startWidth", which: "start" },
     { key: "endWidth", which: "end" },
@@ -385,11 +388,13 @@ export function fitLoftContact(pair: PortPair, models: TileModel[], tiles: Place
         break;
       }
     }
-    if (accepted < 2) return false;
+    if (accepted < 2) { connectionDiagnostic("attachment", "insufficient attached width", { pair, end: end.which, requested, minimum: 2 }); return false; }
     pair[end.key] = accepted;
   }
   pair.usableWidth = Math.min(pair.startWidth ?? pair.usableWidth, pair.endWidth ?? pair.usableWidth);
   return pair.usableWidth >= 2;
+
+  } finally { finishTiming(); }
 }
 
 /** A window of `width` centered on `point` and clamped to the source edge. */
@@ -422,8 +427,10 @@ export function resolveWalkableAttachment(
   toward: Vec3,
   maxWidth = 6,
 ): WalkableAnchor | null {
+  const finishTiming = startConnectionTiming("surface attachment selection");
+  try {
   const index = surfaceIndex(model);
-  if (!index || !index.runs.length) return null;
+  if (!index || !index.runs.length) { connectionDiagnostic("attachment", "no candidate attachment", { tile, source: model.filename, candidate }); return null; }
   const local = localPoint(candidate, tile, model);
   const target = localPoint(toward, tile, model);
   const towardDelta = sub(target, local);
@@ -436,15 +443,15 @@ export function resolveWalkableAttachment(
       seen.add(runIndex);
       const run = index.runs[runIndex];
       const closest = closestOnSegment(local, run.a, run.b);
-      if (closest.distance > ATTACHMENT_SEARCH_RADIUS) continue;
+      if (closest.distance > ATTACHMENT_SEARCH_RADIUS) { connectionDiagnostic("attachment", "proximity", { tile, candidate, distance: closest.distance }); continue; }
       const facing = towardLength < 0.2 ? 1 : (run.outward[0] * towardDelta[0] + run.outward[1] * towardDelta[1]) / towardLength;
-      if (facing <= 0) continue;
+      if (facing <= 0) { connectionDiagnostic("attachment", "facing", { tile, candidate, facing }); continue; }
       if (!best || closest.distance < best.distance - 0.05 || (Math.abs(closest.distance - best.distance) <= 0.05 && facing > best.facing)) {
         best = { run, distance: closest.distance, facing };
       }
     }
   }
-  if (!best) return null;
+  if (!best) { connectionDiagnostic("attachment", "no candidate attachment", { tile, source: model.filename, candidate, toward }); return null; }
   const a = worldFromLocal(best.run.a, tile, model);
   const b = worldFromLocal(best.run.b, tile, model);
   const point = worldFromLocal(closestOnSegment(local, best.run.a, best.run.b).point, tile, model);
@@ -456,6 +463,8 @@ export function resolveWalkableAttachment(
     kind: "edge",
     snap: best.distance,
   };
+
+  } finally { finishTiming(); }
 }
 
 function worldBox(model: TileModel, tile: PlacedTile) {
@@ -494,8 +503,25 @@ function interfaceKey(model: TileModel, tile: PlacedTile) {
   return `${model.id}:${tile.variant}:${tile.ix}:${tile.iy}:${tile.iz}:${tile.zLift ?? 0}`;
 }
 
+/** Shared graph gate: a proxy report is a proposal until Stage 1 confirms its OBJ interface. */
+export function confirmedCirculationReports(models: TileModel[], tiles: PlacedTile[], reports: ConnectionReport[]) {
+  const finishTiming = startConnectionTiming("network graph");
+  try {
+    return reports.filter(report => {
+      if (report.collision === "FAIL" || report.interlock !== "PASS" || (report.floor !== "PASS" && report.circulation !== "PASS")) return false;
+      const a = tiles.find(tile => tile.id === report.tileA), b = tiles.find(tile => tile.id === report.tileB);
+      const ma = resolveModel(models, report.tileA), mb = resolveModel(models, report.tileB);
+      const confirmed = a && b && ma && mb && confirmedWalkableInterface(ma, a, mb, b).meets;
+      connectionDiagnostic("network", confirmed ? "confirmed interface" : "provisional interface rejected", { report, tileA: a, tileB: b });
+      return Boolean(confirmed);
+    });
+  } finally { finishTiming(); }
+}
+
 /** True only when walkable triangles or their boundaries actually meet. Voxel overlap alone does not. */
 export function confirmedWalkableInterface(modelA: TileModel, tileA: PlacedTile, modelB: TileModel, tileB: PlacedTile) {
+  const finishTiming = startConnectionTiming("surface attachment selection");
+  try {
   const key = `${interfaceKey(modelA, tileA)}|${interfaceKey(modelB, tileB)}`;
   const cached = interfaceCache.get(key);
   if (cached) return cached;
@@ -504,6 +530,8 @@ export function confirmedWalkableInterface(modelA: TileModel, tileA: PlacedTile,
   interfaceCache.set(key, result);
   if (interfaceCache.size > 4000) interfaceCache.delete(interfaceCache.keys().next().value!);
   return result;
+
+  } finally { finishTiming(); }
 }
 
 function nearestMeeting(modelA: TileModel, tileA: PlacedTile, modelB: TileModel, tileB: PlacedTile) {

@@ -1,3 +1,4 @@
+import { startConnectionTiming } from "./connectionDiagnostics";
 import type { PortPair, Vec3 } from "./types";
 
 export type TransitionSection = { center: Vec3; side: Vec3; width: number };
@@ -135,6 +136,8 @@ export function loftSections(sections: TransitionSection[],thickness=.25) {
 }
 /** True horizontal treads and risers, with edge-aligned first/last transition sections. */
 export function transitionMeshes(pair: PortPair) {
+  const finishTiming = startConnectionTiming("connector geometry");
+  try {
   const sections=transitionSections(pair),route=pair.path??transitionPath(pair),run=route.slice(1).reduce((sum,p,i)=>sum+Math.hypot(p[0]-route[i][0],p[1]-route[i][1]),0),rise=Math.abs(pair.rise);
   if(pair.connectionClass!=="VERTICAL"||run>=rise*12) return [{kind:(pair.connectionClass==="VERTICAL"?"ramp":pair.connectionClass==="DIRECT"?"plate":"bridge") as "ramp"|"plate"|"bridge",...loftSections(sections)}];
   const steps=Math.max(1,Math.ceil(rise/.6)),path=pair.path??transitionPath(pair),out:ReturnType<typeof loftSections>[]=[];
@@ -153,4 +156,6 @@ export function transitionMeshes(pair: PortPair) {
     out.push(loftSections([a,b,next]));
   }
   return out.map(mesh=>({kind:"stair" as const,...mesh}));
+
+  } finally { finishTiming(); }
 }

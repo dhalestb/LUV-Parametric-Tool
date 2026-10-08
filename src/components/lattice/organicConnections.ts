@@ -1,3 +1,4 @@
+import { connectionDiagnostic, connectionDiagnosticsEnabled, startConnectionTiming } from "./connectionDiagnostics";
 import { portRouteClear } from "./portMatching";
 import { edgeWindow, profileLength, profileMidpoint, resolveWalkableAttachment, type WalkableAnchor } from "./surfaceAttachment";
 import { circulationProfile, type CirculationMode } from "./transitionGeometry";
@@ -160,7 +161,7 @@ function topCells(variant: TileVariant) {
   return [...best.values()].map((entry) => entry.packed);
 }
 
-function detectFeatures(variant: TileVariant, cellFeet: number): Feature[] {
+function detectFeatures(variant: TileVariant, cellFeet: number, source: { id: string; filename: string }): Feature[] {
   const cached = featureCache.get(variant);
   if (cached) return cached;
   const occupied = variant.occupied;
@@ -280,6 +281,7 @@ function detectFeatures(variant: TileVariant, cellFeet: number): Feature[] {
       features.push({ kind, a, b, outward, width: Math.max(2.5, port.usableWidth), elevation: z });
     }
   }
+  if (connectionDiagnosticsEnabled()) connectionDiagnostic("features", "feature limits", { source: { id: source.id, filename: source.filename }, tips: tips.length, retainedTips: Math.min(10, tips.length), edges: edges.length, retainedEdges: Math.min(8, edges.length), total: features.length, omitted: features.slice(18), rotation: variant.rotation, mirror: variant.mirror });
   const capped = features.slice(0, 18);
   featureCache.set(variant, capped);
   return capped;
@@ -449,6 +451,8 @@ function emptyDiagnostics(tiles: PlacedTile[]): OrganicDiagnostics {
 
 /** Pair exposed architectural features of neighboring forms. A form may branch to each neighbor, including at a second elevation. */
 export function findOrganicLinks(models: TileModel[], tiles: PlacedTile[], alreadyJoined: JoinedStory[]): OrganicDiagnostics {
+  const finishTiming = startConnectionTiming("candidate generation");
+  try {
   const diagnostics = emptyDiagnostics(tiles);
   const parent = new Map(tiles.map((tile) => [tile.id, tile.id]));
   const find = (id: string): string => (parent.get(id) === id ? id : find(parent.get(id)!));
@@ -490,7 +494,7 @@ export function findOrganicLinks(models: TileModel[], tiles: PlacedTile[], alrea
     for (let j = i + 1; j < tiles.length; j += 1) {
       const tileA = tiles[i];
       const tileB = tiles[j];
-      if (Math.max(Math.abs(tileA.ix - tileB.ix), Math.abs(tileA.iy - tileB.iy)) > 1) continue;
+      if (Math.max(Math.abs(tileA.ix - tileB.ix), Math.abs(tileA.iy - tileB.iy)) > 1) { connectionDiagnostic("organic", "pair proximity", { tileA, tileB }); continue; }
       const label = `${tileA.id} ↔ ${tileB.id}`;
       const modelA = resolveModel(models, tileA.id);
       const modelB = resolveModel(models, tileB.id);
@@ -512,8 +516,8 @@ export function findOrganicLinks(models: TileModel[], tiles: PlacedTile[], alrea
 
       const variantA = modelA.variants[tileA.variant] ?? modelA.variants[0];
       const variantB = modelB.variants[tileB.variant] ?? modelB.variants[0];
-      const featuresA = detectFeatures(variantA, modelA.cellFeet);
-      const featuresB = detectFeatures(variantB, modelB.cellFeet);
+      const featuresA = detectFeatures(variantA, modelA.cellFeet, modelA);
+      const featuresB = detectFeatures(variantB, modelB.cellFeet, modelB);
       const boxA = worldBox(tileA, modelA);
       const boxB = worldBox(tileB, modelB);
       const near = (tile: PlacedTile, feature: Feature, box: Box) => {
@@ -524,7 +528,9 @@ export function findOrganicLinks(models: TileModel[], tiles: PlacedTile[], alrea
       };
       const nearA = featuresA.filter((feature) => near(tileA, feature, boxB));
       const nearB = featuresB.filter((feature) => near(tileB, feature, boxA));
+      connectionDiagnostic("organic", "feature proximity", { tileA, tileB, source: modelA.filename, target: modelB.filename, featuresA: featuresA.length, featuresB: featuresB.length, nearA: nearA.length, nearB: nearB.length });
       if (!nearA.length || !nearB.length) {
+        connectionDiagnostic("organic", "no candidate attachment", { tileA, tileB, featuresA: featuresA.length, featuresB: featuresB.length, nearA: nearA.length, nearB: nearB.length });
         diagnostics.considered += 1;
         diagnostics.rejections.push({
           pair: label,
@@ -537,6 +543,7 @@ export function findOrganicLinks(models: TileModel[], tiles: PlacedTile[], alrea
       const drafts: Array<{ score: number; link: OrganicLink }> = [];
       const nearestFail: { current: { reason: OrganicRejection; detail: string; distance: number } | null } = { current: null };
       const noteFail = (reason: OrganicRejection, detail: string, distance: number) => {
+        connectionDiagnostic("organic attachment", reason, { tileA, tileB, source: modelA.filename, target: modelB.filename, detail, distance });
         if (!nearestFail.current || distance < nearestFail.current.distance) nearestFail.current = { reason, detail, distance };
       };
       const towardA: Vec3 = [tileB.ix * LATTICE_FEET + 10, tileB.iy * LATTICE_FEET + 10, placementWorldZ(tileB) + 4];
@@ -638,17 +645,19 @@ export function findOrganicLinks(models: TileModel[], tiles: PlacedTile[], alrea
       }
 
       drafts.sort((a, b) => b.score - a.score);
+      if (connectionDiagnosticsEnabled()) connectionDiagnostic("organic", "draft limit", { tileA, tileB, total: drafts.length, retained: Math.min(12, drafts.length), omitted: drafts.slice(12) });
       const chosen: OrganicLink[] = [];
       let routeFailed = false;
       const acceptDraft = (link: OrganicLink) => {
-        if (chosen.length >= 8) return false;
-        if (chosen.some((existing) => Math.abs((existing.from[2] + existing.to[2]) / 2 - (link.from[2] + link.to[2]) / 2) < 4 && Math.hypot(existing.from[0] - link.from[0], existing.from[1] - link.from[1]) < 3)) return false;
+        if (chosen.length >= 8) { connectionDiagnostic("organic", "chosen link limit", { tileA, tileB, link }); return false; }
+        if (chosen.some((existing) => Math.abs((existing.from[2] + existing.to[2]) / 2 - (link.from[2] + link.to[2]) / 2) < 4 && Math.hypot(existing.from[0] - link.from[0], existing.from[1] - link.from[1]) < 3)) { connectionDiagnostic("organic", "similar attachment pruned", { tileA, tileB, link }); return false; }
         chosen.push(link);
         return true;
       };
       for (const draft of drafts.slice(0, 12)) {
         if (chosen.length >= 8) break;
         if (draft.link.fromProfile && draft.link.toProfile) {
+          connectionDiagnostic("organic", "profiled route deferred to synthesis", { link: draft.link });
           acceptDraft(draft.link);
           continue;
         }
@@ -724,10 +733,14 @@ export function findOrganicLinks(models: TileModel[], tiles: PlacedTile[], alrea
     if (neighbors >= 2 && (diagnostics.degrees[tile.id] ?? 0) < 2) diagnostics.interiorShortfall += 1;
   }
   return diagnostics;
+
+  } finally { finishTiming(); }
 }
 
 /** Rebuild the circulation graph from confirmed interfaces and lofts that actually meshed. */
 export function sealOrganicGraph(diagnostics: OrganicDiagnostics, tiles: PlacedTile[], joined: JoinedStory[], links: OrganicLink[]) {
+  const finishTiming = startConnectionTiming("network graph");
+  try {
   const parent = new Map(tiles.map((tile) => [tile.id, tile.id]));
   const find = (id: string): string => (parent.get(id) === id ? id : find(parent.get(id)!));
   const degrees: Record<string, number> = {};
@@ -764,4 +777,6 @@ export function sealOrganicGraph(diagnostics: OrganicDiagnostics, tiles: PlacedT
     const neighbors = tiles.filter((other) => other.id !== tile.id && Math.abs(other.ix - tile.ix) + Math.abs(other.iy - tile.iy) === 1).length;
     if (neighbors >= 2 && (degrees[tile.id] ?? 0) < 2) diagnostics.interiorShortfall += 1;
   }
+
+  } finally { finishTiming(); }
 }
