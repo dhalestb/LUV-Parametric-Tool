@@ -5,6 +5,7 @@ import { landingHeadroomCheck, transitionSurfaceClear, type ConnectorSurface } f
 import { captureConnectionDiagnostics } from "./connectionDiagnostics";
 import { switchbackRampPath } from "./portConnectionValidation";
 import { ACCESSIBLE_RAMP_SLOPE, planRun, transitionMeshes, transitionPath, transitionSections } from "./transitionGeometry";
+import { validateWalkingApproach } from "./walkingApproach";
 
 export type RoutingBudget = { attachments: number; pairs: number; routes: number; maxSpan: number; maxRun: number };
 export const DEFAULT_ROUTING_BUDGET: RoutingBudget = { attachments: 64, pairs: 96, routes: 768, maxSpan: 50, maxRun: 72 };
@@ -13,7 +14,7 @@ const distance = (a: Vec3, b: Vec3) => Math.hypot(a[0]-b[0],a[1]-b[1]);
 
 /** No global search/UI integration: explicitly evaluate one requested relationship. */
 export function evaluateAlternativeRoutes(models: TileModel[], tiles: PlacedTile[], sourceId: string, targetId: string,
-  existing: ConnectorSurface[], budget: RoutingBudget = DEFAULT_ROUTING_BUDGET) {
+  existing: ConnectorSurface[], budget: RoutingBudget = DEFAULT_ROUTING_BUDGET, focus?: { targetAnchors: Anchor[] }) {
   if (!Number.isInteger(budget.pairs) || budget.pairs < 1 || budget.pairs > 512 || !Number.isInteger(budget.routes) || budget.routes < 1 || budget.routes > 4608
     || !Number.isFinite(budget.maxSpan) || budget.maxSpan <= 0 || budget.maxSpan > 60 || !Number.isFinite(budget.maxRun) || budget.maxRun <= 0 || budget.maxRun > 96) throw new Error("Invalid bounded routing budget");
   const finish = beginGeometryValidation(), started = performance.now();
@@ -22,6 +23,10 @@ export function evaluateAlternativeRoutes(models: TileModel[], tiles: PlacedTile
     const ma = models.find(m=>m.id===sourceId), mb = models.find(m=>m.id===targetId);
     if (!source || !target || !ma?.connectionSurface || !mb?.connectionSurface || sourceId===targetId) throw new Error("Two distinct placed OBJ surfaces are required");
     const a = enumerateWalkableAttachments(ma,source,budget.attachments), b = enumerateWalkableAttachments(mb,target,budget.attachments);
+    if(focus) {
+      if(focus.targetAnchors.length>budget.attachments)throw new Error("Focused anchors exceed attachment budget");
+      b.anchors=focus.targetAnchors;
+    }
     const generationStart = performance.now();
     const candidates: Array<{ a: Anchor; b: Anchor; rank: number }> = [];
     let distanceRejected = 0;
@@ -34,7 +39,8 @@ export function evaluateAlternativeRoutes(models: TileModel[], tiles: PlacedTile
     }
     candidates.sort((x,y)=>x.rank-y.rank);
     // Each source region gets a turn; the budget cannot be consumed by one preferred source end.
-    const queues = [...a.anchors.map(anchor=>candidates.filter(c=>c.a===anchor)), ...b.anchors.map(anchor=>candidates.filter(c=>c.b===anchor))];
+    const sourceQueues=a.anchors.map(anchor=>candidates.filter(c=>c.a===anchor)),targetQueues=b.anchors.map(anchor=>candidates.filter(c=>c.b===anchor));
+    const queues = focus ? [...targetQueues,...sourceQueues] : [...sourceQueues,...targetQueues];
     const selected: typeof candidates = [];
     const chosen=new Set<typeof candidates[number]>();
     for(let i=0; selected.length<budget.pairs && queues.some(q=>q[i]);i++) for(const q of queues) if(q[i] && !chosen.has(q[i]) && selected.length<budget.pairs) { selected.push(q[i]);chosen.add(q[i]); }
@@ -153,6 +159,8 @@ export function validateAlternative(pair: PortPair,models: TileModel[],tiles: Pl
       if(gap.distance>SURFACE_CONTACT_TOLERANCE || !["edge","floor"].includes(gap.kind)) return fail(stair?"stair landing support":"walking approach support",{id,point:p,gap});
       landingPoints.push(p);
     }
+    const approach=validateWalkingApproach(model,tile,point,direction,width,depth,models,tiles,existing,stair);
+    if(!approach.valid)return fail("continuous approach: "+approach.reason,{id,...approach.details as object});
   }
   if(!transitionSurfaceClear(pair,tiles,models,existing)) return fail("collision or route headroom");
   const headroom=landingHeadroomCheck(landingPoints,tiles,models,existing);

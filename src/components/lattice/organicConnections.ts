@@ -1,4 +1,5 @@
 import { connectionDiagnostic, connectionDiagnosticsEnabled, startConnectionTiming } from "./connectionDiagnostics";
+import { geometryRevision } from "./geometryRevision";
 import { portRouteClear } from "./portMatching";
 import { edgeWindow, profileLength, profileMidpoint, resolveWalkableAttachment, type WalkableAnchor } from "./surfaceAttachment";
 import { circulationProfile, type CirculationMode } from "./transitionGeometry";
@@ -88,7 +89,7 @@ type Feature = {
 
 type Box = { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number };
 
-const featureCache = new WeakMap<TileVariant, Feature[]>();
+const featureCache = new WeakMap<TileVariant, { signature: string; features: Feature[] }>();
 const occupiedCache = new WeakMap<TileVariant, Set<number>>();
 const aabbCache = new WeakMap<TileVariant, Box>();
 
@@ -161,9 +162,12 @@ function topCells(variant: TileVariant) {
   return [...best.values()].map((entry) => entry.packed);
 }
 
-function detectFeatures(variant: TileVariant, cellFeet: number, source: { id: string; filename: string }): Feature[] {
+function detectFeatures(variant: TileVariant, cellFeet: number, source: TileModel): Feature[] {
+  // Floor/port proposals come from analyzeMesh's physical orientation metadata.
+  // Re-analysis replaces variants; an in-place edit must not reuse cached feature records.
+  const signature=JSON.stringify([source.connectionSurface?geometryRevision(source.connectionSurface).id:0,cellFeet,variant.rotation,variant.mirror,variant.floor,variant.ports]);
   const cached = featureCache.get(variant);
-  if (cached) return cached;
+  if (cached?.signature===signature) return cached.features;
   const occupied = variant.occupied;
   const index = new Set<string>();
   let centroidX = 0;
@@ -283,7 +287,7 @@ function detectFeatures(variant: TileVariant, cellFeet: number, source: { id: st
   }
   if (connectionDiagnosticsEnabled()) connectionDiagnostic("features", "feature limits", { source: { id: source.id, filename: source.filename }, tips: tips.length, retainedTips: Math.min(10, tips.length), edges: edges.length, retainedEdges: Math.min(8, edges.length), total: features.length, omitted: features.slice(18), rotation: variant.rotation, mirror: variant.mirror });
   const capped = features.slice(0, 18);
-  featureCache.set(variant, capped);
+  featureCache.set(variant, {signature,features:capped});
   return capped;
 }
 

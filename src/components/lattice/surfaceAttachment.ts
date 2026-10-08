@@ -1,4 +1,5 @@
 import { beginGeometryValidation, geometryRevision } from "./geometryRevision";
+import { surfaceOrientation } from "./surfaceOrientation";
 import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import type { ConnectionReport, PlacedTile, PortPair, TileModel, Vec3 } from "./types";
 import { placementWorldZ } from "./types";
@@ -13,7 +14,7 @@ export const INTERFACE_TOLERANCE = 0.25;
 const WALKABLE_NORMAL_Z = 0.7;
 const CELL = 4;
 
-export type SurfaceKind = "floor" | "edge" | "wall" | "underside" | "open";
+export type SurfaceKind = "floor" | "edge" | "wall" | "underside" | "open" | "uncertain";
 
 export type SurfaceGap = {
   distance: number;
@@ -149,6 +150,7 @@ function buildIndex(surface: { positions: Float32Array; triangles: number[] }): 
   const revision = geometryRevision(surface);
   const cached = indexCache.get(revision);
   if (cached) return cached;
+  const orientation = surfaceOrientation(surface);
   const triangles: Triangle[] = [];
   const triGrid = new Map<string, number[]>();
   const min: Vec3 = [Infinity, Infinity, Infinity];
@@ -162,7 +164,7 @@ function buildIndex(surface: { positions: Float32Array; triangles: number[] }): 
     const ac = sub(c, a);
     const normal: Vec3 = [ab[1] * ac[2] - ab[2] * ac[1], ab[2] * ac[0] - ab[0] * ac[2], ab[0] * ac[1] - ab[1] * ac[0]];
     const length = hypot3(normal);
-    const nz = length > 1e-8 ? normal[2] / length : 0;
+    const nz = length > 1e-8 ? orientation.triangles[index / 3].normalZ : NaN;
     const box = boundsOf([a, b, c]);
     const triangle = { a, b, c, nz, min: box.min, max: box.max, walkable: nz >= WALKABLE_NORMAL_Z };
     triangles.push(triangle);
@@ -315,6 +317,7 @@ function cellsNear(point: Vec3, radius: number) {
 
 function classify(distance: number, normalZ: number, nearEdge: boolean): SurfaceKind {
   if (distance > 1) return "open";
+  if (!Number.isFinite(normalZ)) return "uncertain";
   if (normalZ <= -0.65) return "underside";
   if (normalZ >= 0.65) return nearEdge ? "edge" : "floor";
   return "wall";
