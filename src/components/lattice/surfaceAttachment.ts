@@ -265,6 +265,40 @@ function surfaceIndex(model: TileModel) {
   return model.connectionSurface ? buildIndex(model.connectionSurface) : null;
 }
 
+/** Bounded opening-window proposals for continuous interior approach discovery.
+ * Uses actual mesh support edges, never lattice faces. Qualification is separate.
+ * Midpoints/legacy fractions, target projections and one-foot lateral steps are
+ * round-robin sampled across runs before the proposal cap is applied. */
+export function enumerateApproachWindows(model: TileModel, tile: PlacedTile, limit = 256, targets: Vec3[] = []) {
+  if (!Number.isInteger(limit) || limit < 1 || limit > 1024 || targets.length > 8) throw new Error("Invalid approach discovery budget");
+  const finish = beginGeometryValidation();
+  try {
+    const runs = surfaceIndex(model)?.runs ?? [];
+    const groups = runs.map((run, index) => {
+      const a = worldFromLocal(run.a,tile,model), b = worldFromLocal(run.b,tile,model), outward = worldDirection(run.outward,tile,model);
+      const direction = sub(b,a), length = Math.hypot(direction[0],direction[1]);
+      const windows: Array<WalkableAnchor & {id:string}> = [];
+      for (const width of [3,2.1]) {
+        if (width > length) continue;
+        const projected = targets.map(p => ((p[0]-a[0])*direction[0]+(p[1]-a[1])*direction[1])/length);
+        const positions = [...projected,length*.5,length*.2,length*.8,width/2,length-width/2];
+        // At most 32 extra offsets per run/width, including both ends of long runs.
+        for (let i=1;i<=16;i++) positions.push(width/2+i,length-width/2-i);
+        for (const raw of positions) {
+          const d=Math.max(width/2,Math.min(length-width/2,raw));
+          const point=add(a,scale(direction,d/length)),profile=edgeWindow([a,b],point,width);
+          if(profile)windows.push({id:`approach-${index}-${width}-${d.toFixed(6)}`,point:profileMidpoint(profile),run:profile,width,outward,kind:"edge",snap:0});
+        }
+      }
+      const seen=new Set<string>();
+      return windows.filter(w=>{const key=JSON.stringify([w.run,w.outward]);if(seen.has(key))return false;seen.add(key);return true;});
+    });
+    const all: Array<WalkableAnchor & {id:string}>=[],seen=new Set<string>();
+    for(let i=0;groups.some(g=>g[i]);i++)for(const group of groups){const w=group[i];if(!w)continue;const key=JSON.stringify([w.run,w.outward]);if(!seen.has(key)){seen.add(key);all.push(w);}}
+    return {anchors:all.slice(0,limit),runs:runs.length,available:all.length,omitted:Math.max(0,all.length-limit)};
+  } finally {finish();}
+}
+
 /** Opt-in Stage 2A discovery, independent of the 32-port and 18-feature caps.
  * Windows are proposals only; callers must validate the emitted section and circulation.
  */

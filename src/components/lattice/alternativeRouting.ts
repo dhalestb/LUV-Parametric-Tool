@@ -6,11 +6,79 @@ import { captureConnectionDiagnostics } from "./connectionDiagnostics";
 import { switchbackRampPath } from "./portConnectionValidation";
 import { ACCESSIBLE_RAMP_SLOPE, planRun, transitionMeshes, transitionPath, transitionSections } from "./transitionGeometry";
 import { validateWalkingApproach } from "./walkingApproach";
+import { discoverInteriorApproaches, type ApproachAnchor, type QualifiedApproach } from "./interiorApproaches";
 
 export type RoutingBudget = { attachments: number; pairs: number; routes: number; maxSpan: number; maxRun: number };
 export const DEFAULT_ROUTING_BUDGET: RoutingBudget = { attachments: 64, pairs: 96, routes: 768, maxSpan: 50, maxRun: 72 };
 type Anchor = ReturnType<typeof enumerateWalkableAttachments>["anchors"][number];
 const distance = (a: Vec3, b: Vec3) => Math.hypot(a[0]-b[0],a[1]-b[1]);
+
+/** Qualified, bounded opt-in workflow. The legacy raw proposal evaluator below
+ * remains available for exact diagnostic replay; global placement is untouched. */
+export function evaluateQualifiedInteriorRoutes(models:TileModel[],tiles:PlacedTile[],sourceId:string,targetId:string,targets:ApproachAnchor[],
+  existing:ConnectorSurface[]=[],budget:RoutingBudget=DEFAULT_ROUTING_BUDGET,windows=256) {
+  if(!Number.isInteger(budget.pairs)||budget.pairs<1||budget.pairs>512||!Number.isInteger(budget.routes)||budget.routes<1||budget.routes>4608
+    ||!Number.isFinite(budget.maxSpan)||budget.maxSpan<=0||budget.maxSpan>60||!Number.isFinite(budget.maxRun)||budget.maxRun<=0||budget.maxRun>96||targets.length>8)throw new Error("Invalid qualified routing budget");
+  const finish=beginGeometryValidation(),start=performance.now();
+  try {
+    const source=tiles.find(t=>t.id===sourceId),target=tiles.find(t=>t.id===targetId),ma=models.find(m=>m.id===sourceId),mb=models.find(m=>m.id===targetId);
+    if(!source||!target||!ma||!mb||sourceId===targetId)throw new Error("Two distinct placed OBJ forms required");
+    const destination=discoverInteriorApproaches(mb,target,models,tiles,existing,{windows:Math.max(1,targets.length),anchors:targets});
+    const discovery=discoverInteriorApproaches(ma,source,models,tiles,existing,{windows,targets:targets.map(t=>t.point)});
+    type Candidate={pair:PortPair; source:QualifiedApproach; destination:QualifiedApproach; targetIndex:number; selected:boolean};
+    const pairs:Candidate[]=[],preconstruction:Array<{pair?:PortPair; stage:string; reason:string; details?:unknown}>=[];
+    for(const o of discovery.outcomes)if(o.stage!=="QUALIFIED_WALKING_OPENING")preconstruction.push({stage:o.stage,reason:o.reason,details:o});
+    for(const o of destination.outcomes)if(o.stage!=="QUALIFIED_WALKING_OPENING")preconstruction.push({stage:o.stage==="B_NO_OPENING"?o.stage:"C_NO_DESTINATION_APPROACH",reason:o.reason,details:o});
+    for(const a of discovery.qualified)for(const b of destination.qualified){
+      const pair=makePair(sourceId,targetId,a.anchor,b.anchor);
+      if(pair.plan<.75||pair.plan>budget.maxSpan){preconstruction.push({pair,stage:"D_ROUTE_FEASIBILITY",reason:"span outside bounded route family"});continue;}
+      if(!fitLoftContact(pair,models,tiles,false)){preconstruction.push({pair,stage:"B_NO_OPENING",reason:"attachment profile fails Stage 1 surface contact"});continue;}
+      if(Math.abs(pair.rise)>budget.maxRun*ACCESSIBLE_RAMP_SLOPE+1e-6&&(!a.landing.valid||!b.landing.valid)){
+        preconstruction.push({pair,stage:"G_ARCHITECTURAL_REQUIREMENTS",reason:"ramp requires more than bounded run; stair landing is invalid",details:{requiredRampRun:Math.abs(pair.rise)/ACCESSIBLE_RAMP_SLOPE,maxRun:budget.maxRun,sourceLanding:a.landing,destinationLanding:b.landing}});continue;
+      }
+      // Opening clearance is already a full-width swept throat, not a centre
+      // point probe. A blocked straight chord does not eliminate possible detours.
+      pairs.push({pair,source:a,destination:b,targetIndex:targets.findIndex(t=>t.id===b.anchor.id),selected:false});
+    }
+    const queues=targets.map((_,i)=>pairs.filter(p=>p.targetIndex===i).sort((a,b)=>Math.abs(a.pair.rise)-Math.abs(b.pair.rise)||a.pair.plan-b.pair.plan||a.pair.portA.localeCompare(b.pair.portA)));
+    const selected:Candidate[]=[];
+    for(let i=0;selected.length<budget.pairs&&queues.some(q=>q[i]);i++)for(const q of queues)if(q[i]&&selected.length<budget.pairs){q[i].selected=true;selected.push(q[i]);}
+    const outcomes:Array<{pair:PortPair;route:string;stage:string;reason:string;details?:unknown;constructed:boolean;independentEmittedClearance?:boolean;clearanceEvidence?:unknown}>=[];
+    const accepted:Array<{pair:PortPair;route:string;meshes:ReturnType<typeof transitionMeshes>}>=[];
+    let constructionMs=0;
+    for(const candidate of selected){
+      if(outcomes.length>=budget.routes)break;
+      for(const alternative of routeAlternatives(candidate.pair)){
+        if(outcomes.length>=budget.routes)break;
+        const pair=alternative.pair,path=pair.path!,run=planRun(path);
+        const reject=(stage:string,reason:string,details?:unknown)=>outcomes.push({pair,route:alternative.name,stage,reason,details,constructed:false});
+        if(run>budget.maxRun){reject("D_ROUTE_FEASIBILITY","route run limit");continue;}
+        const startStep=[path[1][0]-path[0][0],path[1][1]-path[0][1]],n=path.length-1,endStep=[path[n-1][0]-path[n][0],path[n-1][1]-path[n][1]];
+        if(startStep[0]*pair.startDirection![0]+startStep[1]*pair.startDirection![1]<=1e-6||endStep[0]*pair.endDirection![0]+endStep[1]*pair.endDirection![1]<=1e-6){reject("D_ROUTE_FEASIBILITY","path reverses through opening interface");continue;}
+        const stair=pair.connectionClass==="VERTICAL"&&run<Math.abs(pair.rise)*12;
+        if(stair&&(!candidate.source.landing.valid||!candidate.destination.landing.valid)){reject("G_ARCHITECTURAL_REQUIREMENTS","stair landing lacks continuous flat support",{source:candidate.source.landing,destination:candidate.destination.landing});continue;}
+        if(!stair&&path.slice(1).some((p,i)=>Math.abs(p[2]-path[i][2])>ACCESSIBLE_RAMP_SLOPE*distance(p,path[i])+1e-6)){reject("D_ROUTE_FEASIBILITY","centreline exceeds individual ramp segment slope");continue;}
+        const tick=performance.now(),capture=captureConnectionDiagnostics(()=>validateAlternative(pair,models,tiles,existing,budget,alternative.name),100);
+        const value=capture.value;
+        const clearance=Object.keys(capture.trace.counts).find(k=>k.startsWith("clearance:"))?.replace("clearance: ","");
+        const reason=value.reason==="collision or route headroom"?clearance??value.reason:value.reason;
+        const stage=reason==="accepted"?"ACCEPTED":reason.includes("collision")?"F_ORIGINAL_GEOMETRY_COLLISION":reason.includes("headroom")||reason.includes("landing")||reason.includes("usable width")?"G_ARCHITECTURAL_REQUIREMENTS":"E_CONNECTOR_CONSTRUCTION";
+        // A construction first failure is not proof that repairing construction
+        // would suffice. Independently inspect that emitted geometry's clearance.
+        const independent=stage==="E_CONNECTOR_CONSTRUCTION"?captureConnectionDiagnostics(()=>transitionSurfaceClear(pair,tiles,models,existing),16):undefined;
+        outcomes.push({pair,route:alternative.name,stage,reason,details:value.details,constructed:true,independentEmittedClearance:independent?.value,
+          clearanceEvidence:(independent??capture).trace.events.filter(e=>e.stage==="clearance")});
+        if(reason==="accepted")accepted.push({pair,route:alternative.name,meshes:transitionMeshes(pair)});
+        constructionMs+=performance.now()-tick;
+      }
+    }
+    return {source:{id:sourceId,filename:ma.filename,placement:source},target:{id:targetId,filename:mb.filename,placement:target},budget,discovery,destination,
+      qualifiedPairs:pairs,preconstruction,outcomes,accepted,omittedPairs:pairs.filter(p=>!p.selected).length,
+      untestedSelectedPairs:selected.filter(p=>!outcomes.some(o=>o.pair.portA===p.pair.portA&&o.pair.portB===p.pair.portB)).length,
+      timing:{discoveryMs:discovery.ms+destination.ms,constructionMs,totalMs:performance.now()-start},
+      representation:"existing interior floor to verified opening, then emitted external connector",accessibility:"not code-compliance verification"};
+  } finally {finish();}
+}
 
 /** No global search/UI integration: explicitly evaluate one requested relationship. */
 export function evaluateAlternativeRoutes(models: TileModel[], tiles: PlacedTile[], sourceId: string, targetId: string,
