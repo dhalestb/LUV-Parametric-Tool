@@ -263,6 +263,42 @@ function surfaceIndex(model: TileModel) {
   return model.connectionSurface ? buildIndex(model.connectionSurface) : null;
 }
 
+/** Opt-in Stage 2A discovery, independent of the 32-port and 18-feature caps.
+ * Windows are proposals only; callers must validate the emitted section and circulation.
+ */
+export function enumerateWalkableAttachments(model: TileModel, tile: PlacedTile, limit = 64) {
+  if (!Number.isInteger(limit) || limit < 1 || limit > 256) throw new Error("Attachment budget must be 1..256");
+  const finish = beginGeometryValidation();
+  try {
+    const index = surfaceIndex(model);
+    const groups = (index?.runs ?? []).map((run, runIndex) => {
+      const windows: Array<WalkableAnchor & { id: string }> = [];
+      for (const width of [3, 2.1]) {
+        if (width > run.length) continue;
+        for (const fraction of [.5, .2, .8]) {
+          const t = Math.max(width / (2 * run.length), Math.min(1 - width / (2 * run.length), fraction));
+          const point = worldFromLocal(add(run.a, scale(sub(run.b, run.a), t)), tile, model);
+          const profile = edgeWindow([worldFromLocal(run.a, tile, model), worldFromLocal(run.b, tile, model)], point, width);
+          if (!profile) continue;
+          windows.push({ id: `surface-${runIndex}-${width}-${fraction}`, point: profileMidpoint(profile), run: profile,
+            width, outward: worldDirection(run.outward, tile, model), kind: "edge", snap: 0 });
+        }
+      }
+      return windows;
+    });
+    // Round-robin retains different source regions before alternate widths/windows on one region.
+    const all: Array<WalkableAnchor & { id: string }> = [];
+    const seen = new Set<string>();
+    for (let window = 0; window < 6; window++) for (const group of groups) {
+      const anchor = group[window];
+      if (!anchor) continue;
+      const key = JSON.stringify([anchor.run, anchor.outward]);
+      if (!seen.has(key)) { seen.add(key); all.push(anchor); }
+    }
+    return { anchors: all.slice(0, limit), runs: index?.runs.length ?? 0, available: all.length, omitted: Math.max(0, all.length - limit) };
+  } finally { finish(); }
+}
+
 function cellsNear(point: Vec3, radius: number) {
   const keys: string[] = [];
   const reach = Math.ceil(radius / CELL);

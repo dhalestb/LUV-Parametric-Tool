@@ -83,6 +83,43 @@ function localPoint(p:Vec3,tile:PlacedTile,model:TileModel):Vec3 {
   const rx=x*Math.cos(angle)-y*Math.sin(angle),ry=x*Math.sin(angle)+y*Math.cos(angle);
   return [variant.mirror==="x"?-rx:rx,variant.mirror==="y"?-ry:ry,p[2]-placementWorldZ(tile)];
 }
+
+/** Additional Stage 2A landing probes. Uses the same 6.5 ft vertical clearance as routes. */
+export function landingHeadroomCheck(points: Vec3[], tiles: PlacedTile[], models: TileModel[], existing: ConnectorSurface[] = []) {
+  const finish = beginGeometryValidation();
+  try {
+    for (const tile of tiles) {
+      const model = models.find(m => m.id === tile.id || m.id === tile.id.split("::")[0]);
+      if (!model?.connectionSurface) return { clear: false, reason: "missing surface", id: tile.id };
+      const revision = geometryRevision(model.connectionSurface);
+      let tree = cache.get(revision);
+      if (!tree) {
+        const triangles = trianglesOf({ positions: model.connectionSurface.positions, indices: model.connectionSurface.triangles });
+        tree = build(triangles); tree.closed = closedSurface(triangles); cache.set(revision, tree);
+      }
+      for (const point of points) {
+        const a = localPoint([point[0], point[1], point[2] + .05], tile, model);
+        const b = localPoint([point[0], point[1], point[2] + 6.5], tile, model);
+        const box = bounds([[a,b,b]]);
+        const probe = (node: Node): boolean => overlaps(box,node) && (node.triangles
+          ? node.triangles.some(t => !!segmentHit(a,b,t)) : probe(node.left!) || probe(node.right!));
+        if (probe(tree)) return { clear: false, reason: "headroom", id: tile.id, filename: model.filename, point };
+      }
+    }
+    for (const mesh of existing) {
+      const revision=geometryRevision(mesh);
+      let tree=cache.get(revision);
+      if(!tree){tree=build(trianglesOf(mesh));cache.set(revision,tree);}
+      for(const point of points) {
+        const a:Vec3=[point[0],point[1],point[2]+.05],b:Vec3=[point[0],point[1],point[2]+6.5];
+        const box=bounds([[a,b,b]]);
+        const probe=(node:Node):boolean=>overlaps(box,node)&&(node.triangles?node.triangles.some(t=>!!segmentHit(a,b,t)):probe(node.left!)||probe(node.right!));
+        if(probe(tree))return {clear:false,reason:"connector headroom",point};
+      }
+    }
+    return { clear: true };
+  } finally { finish(); }
+}
 /** Exact triangle surface intersection; only a 0.04' seam at the intended edge is allowed. */
 export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:TileModel[],existing:ConnectorSurface[]=[]):boolean {
   const finishGeometry = beginGeometryValidation();
