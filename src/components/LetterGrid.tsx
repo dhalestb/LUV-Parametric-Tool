@@ -143,7 +143,7 @@ export default function LetterGrid() {
             type="button"
             onClick={regenerate}
             className="rounded px-2.5 py-1 text-[11px] font-medium text-black hover:opacity-90"
-            style={{ background: "var(--accent)" }}
+            style={{ background: "var(--accent-primary)" }}
           >
             Regenerate
           </button>
@@ -190,11 +190,11 @@ export default function LetterGrid() {
         </p>
       )}
       {appliedComposition && (
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2" style={{ borderColor: "#2b777b", background: "#10272a" }}>
-          <p className="text-[11px]" style={{ color: "#8ff2f4" }}>
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2" style={{ borderColor: "var(--accent-secondary)", background: "var(--panel-background)" }}>
+          <p className="text-[11px]" style={{ color: "var(--accent-pale)" }}>
             Composition seed {appliedComposition.seed}, alternative {appliedComposition.alternativeIndex + 1}, is active. The Slide preview and letter/void exports use these transformed placements{appliedComposition.sourceCenter ? `, extracted from overall coordinates (${appliedComposition.sourceCenter.x.toFixed(1)}, ${appliedComposition.sourceCenter.y.toFixed(1)}, ${appliedComposition.sourceCenter.z.toFixed(1)})` : ""}.
           </p>
-          <button type="button" onClick={() => setAppliedComposition(null)} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "#4c9da1" }}>
+          <button type="button" onClick={() => setAppliedComposition(null)} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--accent-intermediate)" }}>
             Use original grid
           </button>
         </div>
@@ -488,7 +488,7 @@ export default function LetterGrid() {
                 disabled={exportingVolume || (useAssets && hasAnyAsset)}
                 onClick={() => exportVolume("void", "mesh")}
                 className="rounded border px-2.5 py-1 text-[11px] font-medium disabled:cursor-not-allowed disabled:opacity-50"
-                style={{ borderColor: "var(--accent)", background: "var(--accent)", color: "#000" }}
+                style={{ borderColor: "var(--accent)", background: "var(--accent-primary)", color: "var(--app-background)" }}
                 title="Export the void between these exact letters, bounded by their box"
               >
                 {exportingVolume && volumeTarget === "void" ? "Exporting void…" : "Export void between letters (OBJ)"}
