@@ -12,7 +12,7 @@ const VoidsAxoGrid = dynamic(() => import("./VoidsAxoGrid"), {
   loading: () => (
     <div
       className="flex h-full items-center justify-center text-[10px]"
-      style={{ background: "#050505", color: "var(--muted)" }}
+      style={{ background: "var(--input-background)", color: "var(--muted)" }}
     >
       …
     </div>
@@ -85,7 +85,7 @@ export default function VoidsPage() {
             onClick={onExport}
             disabled={visible.length === 0 || exporting}
             className="rounded px-2.5 py-1 text-[11px] font-medium text-black hover:opacity-90 disabled:opacity-40"
-            style={{ background: "var(--accent)" }}
+            style={{ background: "var(--accent-primary)" }}
           >
             {exporting ? "Exporting…" : "Export all OBJ"}
           </button>
@@ -127,7 +127,7 @@ export default function VoidsPage() {
             className="overflow-hidden rounded-xl border"
             style={{
               borderColor: "var(--line)",
-              background: "#050505",
+              background: "var(--input-background)",
               height: "min(56vh, 560px)",
               minHeight: 420,
             }}

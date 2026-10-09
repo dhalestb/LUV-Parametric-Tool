@@ -45,7 +45,7 @@ export default function CropsPage({ evaluationsOnly = false }: { evaluationsOnly
           type="button"
           onClick={regenerate}
           className="rounded px-2.5 py-1 text-[11px] font-medium text-black hover:opacity-90"
-          style={{ background: "var(--accent)" }}
+          style={{ background: "var(--accent-primary)" }}
         >
           Regenerate source
         </button>

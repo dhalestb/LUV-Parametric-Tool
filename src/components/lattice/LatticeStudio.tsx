@@ -63,6 +63,7 @@ import {
 
 const buttonClass = "rounded border px-2 py-1 text-[10px] disabled:opacity-40";
 const buttonStyle = { borderColor: "var(--line)" } as const;
+const actionStyle = { ...buttonStyle, background: "var(--accent-primary)", color: "var(--app-background)" } as const;
 
 function download(name: string, content: BlobPart, type: string) {
   const url = typeof content === "string" && content.startsWith("data:") ? content : URL.createObjectURL(new Blob([content], { type }));
@@ -895,7 +896,7 @@ export default function LatticeStudio() {
           </div>
         </header>
         <div className="grid min-h-0 flex-1 grid-cols-[220px_minmax(0,1fr)_300px]">
-          <aside className="overflow-auto border-r p-3 text-[10px]" style={{ borderColor: "var(--line)" }}>
+          <aside className="overflow-auto border-r p-3 text-[10px]" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
             <div className="text-[11px]">Source OBJ</div>
             <p className="mt-1" style={{ color: "var(--muted)" }}>Select one file. Only that complete OBJ is shown three times.</p>
             <div className="mt-2 flex flex-col gap-1">
@@ -946,7 +947,7 @@ export default function LatticeStudio() {
             />
             <p className="absolute bottom-3 left-3 right-3 text-[10px]" style={{ color: "var(--muted)" }}>{status}</p>
           </main>
-          <aside className="overflow-auto border-l p-3 text-[10px]" style={{ borderColor: "var(--line)" }}>
+          <aside className="overflow-auto border-l p-3 text-[10px]" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
             {fReport ? (
               <div className="space-y-2 rounded border p-2" style={{ borderColor: fReport.compare.passed ? "#2f6b4f" : "var(--danger-text)" }}>
                 <div className="text-[11px]">OBJ FIDELITY — {fReport.compare.passed ? "PASS" : "FAIL"}</div>
@@ -1016,7 +1017,7 @@ export default function LatticeStudio() {
         <AppNav />
       </header>
       <div className="grid min-h-0 flex-1 grid-cols-[300px_minmax(0,1fr)_320px]">
-        <aside className="overflow-auto border-r p-3" style={{ borderColor: "var(--line)" }}>
+        <aside className="overflow-auto border-r p-3" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
           <button type="button" className={buttonClass} style={buttonStyle} onClick={() => fileRef.current?.click()}>Upload OBJ files</button>
           <input ref={fileRef} type="file" accept=".obj" multiple hidden onChange={(event) => { if (event.target.files) void importFiles([...event.target.files]); event.target.value = ""; }} />
             <button type="button" className={`${buttonClass} ml-2`} style={buttonStyle} onClick={() => void loadSamples(importFiles).catch((error) => setStatus(error instanceof Error ? error.message : "Sample load failed."))}>Load 15 samples</button>
@@ -1054,7 +1055,7 @@ export default function LatticeStudio() {
           <button
             type="button"
             className={`${buttonClass} mt-2 w-full`}
-            style={buttonStyle}
+            style={actionStyle}
             disabled={busy || models.length < 1}
             onClick={() => void runAssemblyTest()}
           >
@@ -1214,12 +1215,12 @@ export default function LatticeStudio() {
           />
           <div className="absolute bottom-3 left-3 right-3 space-y-1">
             {busy && progressPercent !== null && (
-              <div className="rounded border px-2 py-1.5" style={{ borderColor: "var(--line)", background: "color-mix(in srgb, var(--panel) 88%, transparent)" }}>
+              <div className="rounded border px-2 py-1.5" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
                 <div className="mb-1 flex items-center justify-between gap-2 text-[10px]">
                   <span style={{ color: "var(--muted)" }}>Assembly progress</span>
                   <span style={{ color: "var(--accent)" }}>{Math.round(progressPercent)}%</span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded" style={{ background: "color-mix(in srgb, var(--line) 70%, transparent)" }}>
+                <div className="h-1.5 w-full overflow-hidden rounded" style={{ background: "var(--input-background)" }}>
                   <div className="h-full transition-[width] duration-150 ease-out" style={{ width: `${Math.max(0, Math.min(100, progressPercent))}%`, background: "var(--accent)" }} />
                 </div>
               </div>
@@ -1227,8 +1228,8 @@ export default function LatticeStudio() {
             <p className="text-[10px]" style={{ color: "var(--muted)" }}>{status}</p>
           </div>
         </main>
-        <aside className="overflow-auto border-l p-3 text-[10px]" style={{ borderColor: "var(--line)" }}>
-          <button type="button" className={buttonClass} style={buttonStyle} disabled={fidelityActive || busy || models.length < 1} onClick={() => void runAssemblyTest()}>
+        <aside className="overflow-auto border-l p-3 text-[10px]" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
+          <button type="button" className={buttonClass} style={actionStyle} disabled={fidelityActive || busy || models.length < 1} onClick={() => void runAssemblyTest()}>
             {fidelityActive ? "AGGREGATION PAUSED (FIDELITY)" : assemblyMode === "global-field" ? "ASSEMBLE GLOBAL FIELD (EXPERIMENTAL)" : "ASSEMBLE SELECTED FORMS"}
           </button>
           <button type="button" className={`${buttonClass} mt-2 block`} style={buttonStyle} disabled={busy || models.length < 1 || assemblyMode !== "global-field"} onClick={() => void runSearch()}>REASSEMBLE UNLOCKED CELLS</button>
@@ -1240,7 +1241,7 @@ export default function LatticeStudio() {
                 <span style={{ color: "var(--muted)" }}>Progress</span>
                 <span style={{ color: "var(--accent)" }}>{Math.round(progressPercent)}%</span>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded" style={{ background: "color-mix(in srgb, var(--line) 70%, transparent)" }}>
+              <div className="h-1.5 w-full overflow-hidden rounded" style={{ background: "var(--input-background)" }}>
                 <div className="h-full transition-[width] duration-150 ease-out" style={{ width: `${Math.max(0, Math.min(100, progressPercent))}%`, background: "var(--accent)" }} />
               </div>
             </div>
