@@ -1,0 +1,25 @@
+{
+  "sessionSHA256": "6172019acf6d7cd88a4af2dca1ff570cd8e751a10fabc39da4efd65b12bc920b",
+  "solids": [
+    {
+      "code": "O2",
+      "status": "BLOCKED",
+      "reason": "Not manifold"
+    },
+    {
+      "code": "O1",
+      "status": "BLOCKED",
+      "reason": "Not manifold"
+    },
+    {
+      "code": "G1",
+      "status": "BLOCKED",
+      "reason": "Not manifold"
+    },
+    {
+      "code": "L1",
+      "status": "BLOCKED",
+      "reason": "Not manifold"
+    }
+  ]
+}

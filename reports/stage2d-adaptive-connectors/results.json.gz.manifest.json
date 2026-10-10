@@ -1,0 +1,9 @@
+{
+  "source": "reports/stage2d-adaptive-connectors/results.json",
+  "archive": "reports/stage2d-adaptive-connectors/results.json.gz",
+  "sourceBytes": 36320142,
+  "archiveBytes": 2897691,
+  "sourceSha256": "6f97fe03a114bfefad338963fca24fcc4c24785680481bcc30524b8b4af54325",
+  "archiveSha256": "3f31516c287786e0838acce76564ef4025d1fc5ff821e1da3dc4553dc4326c5d",
+  "byteIdenticalRoundTrip": true
+}
