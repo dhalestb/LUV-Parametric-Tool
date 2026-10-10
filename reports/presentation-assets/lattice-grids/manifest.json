@@ -1,0 +1,86 @@
+{
+  "projection": {
+    "axisAngleDegrees": 30,
+    "verticalAxisDegrees": 90
+  },
+  "moduleFeet": 20,
+  "palette": {
+    "bg": "#000000",
+    "primary": "#F7F6F5",
+    "secondary": "#B9BEC6",
+    "construction": "#71BEDA",
+    "highlight": "#D6AD4F"
+  },
+  "assets": [
+    {
+      "svg": "lattice-2x2x1.svg",
+      "transparentPNG": "lattice-2x2x1.png",
+      "blackPNG": "lattice-2x2x1-black.png",
+      "horizontalCellCounts": [
+        4
+      ],
+      "svgViewBox": [
+        720,
+        690
+      ],
+      "pngPixels": [
+        3600,
+        3450
+      ],
+      "dpi": 300
+    },
+    {
+      "svg": "lattice-4x4x1.svg",
+      "transparentPNG": "lattice-4x4x1.png",
+      "blackPNG": "lattice-4x4x1-black.png",
+      "horizontalCellCounts": [
+        16
+      ],
+      "svgViewBox": [
+        1073,
+        910
+      ],
+      "pngPixels": [
+        3600,
+        3053
+      ],
+      "dpi": 300
+    },
+    {
+      "svg": "lattice-8x8x1.svg",
+      "transparentPNG": "lattice-8x8x1.png",
+      "blackPNG": "lattice-8x8x1-black.png",
+      "horizontalCellCounts": [
+        64
+      ],
+      "svgViewBox": [
+        1835,
+        1350
+      ],
+      "pngPixels": [
+        3600,
+        2648
+      ],
+      "dpi": 300
+    },
+    {
+      "svg": "lattice-comparison-horizontal.svg",
+      "transparentPNG": "lattice-comparison-horizontal.png",
+      "blackPNG": "lattice-comparison-horizontal-black.png",
+      "horizontalCellCounts": [
+        4,
+        16,
+        64
+      ],
+      "svgViewBox": [
+        2900,
+        1300
+      ],
+      "pngPixels": [
+        6400,
+        2869
+      ],
+      "dpi": 300
+    }
+  ]
+}

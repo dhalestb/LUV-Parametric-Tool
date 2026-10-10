@@ -237,7 +237,7 @@ export default function ArchitecturalEvaluations() {
             disabled={busy || !hydrated}
             onClick={() => void analyzeAll()}
             className="rounded px-2.5 py-1 text-[11px] font-medium text-black hover:opacity-90"
-            style={{ background: "var(--accent)" }}
+            style={{ background: "var(--accent-primary)" }}
           >
             {busy ? "Working…" : "Analyze All Forms"}
           </button>
@@ -250,7 +250,7 @@ export default function ArchitecturalEvaluations() {
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>{status}</p>
 
       <div className="evaluations-layout grid min-h-0 flex-1 gap-3 lg:grid-cols-[280px_minmax(0,1fr)_320px]">
-        <aside className="min-h-0 overflow-auto rounded border p-2" style={{ borderColor: "var(--line)", background: "var(--panel-soft)" }}>
+        <aside className="min-h-0 overflow-auto rounded border p-2" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
           <div className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--muted)" }}>
             Lattice source registry · {assignedCount}/15
           </div>
@@ -264,7 +264,7 @@ export default function ArchitecturalEvaluations() {
                     className="w-full rounded border px-2 py-1.5 text-left text-[11px]"
                     style={{
                       borderColor: active ? "var(--accent)" : "var(--line)",
-                      background: active ? "#152525" : "transparent",
+                      background: active ? "var(--accent-dark)" : "transparent",
                       color: "var(--ink)",
                     }}
                     onClick={() => setSelectedSlotId(row.slot.id)}
@@ -285,7 +285,7 @@ export default function ArchitecturalEvaluations() {
           </ul>
         </aside>
 
-        <main className="flex min-h-0 flex-col gap-2 rounded border p-2" style={{ borderColor: "var(--line)", background: "#080a0b" }}>
+        <main className="flex min-h-0 flex-col gap-2 rounded border p-2" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
           <div className="text-[11px]" style={{ color: "var(--muted)" }}>
             {selected ? `${selected.slot.code} ${selected.slot.name}` : "No selection"}
             {selected?.mesh ? ` · ${selected.mesh.filename}` : " · no source assigned"}
@@ -379,7 +379,7 @@ export default function ArchitecturalEvaluations() {
           )}
         </main>
 
-        <aside className="min-h-0 overflow-auto rounded border p-3" style={{ borderColor: "var(--line)", background: "var(--panel-soft)" }}>
+        <aside className="min-h-0 overflow-auto rounded border p-3" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
           <div className="text-[11px] font-medium uppercase tracking-wide" style={{ color: "var(--muted)" }}>
             Explain Score
           </div>

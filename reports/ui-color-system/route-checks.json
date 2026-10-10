@@ -1,0 +1,486 @@
+[
+  {
+    "route": "/lattice",
+    "background": "rgb(0, 0, 0)",
+    "backgroundImage": "none",
+    "panels": [
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)"
+    ],
+    "scrollWidth": 1280,
+    "sliders": [
+      "rgb(113, 190, 218)",
+      "rgb(113, 190, 218)"
+    ],
+    "width": 1280
+  },
+  {
+    "route": "/",
+    "background": "rgb(0, 0, 0)",
+    "backgroundImage": "none",
+    "panels": [
+      "rgb(16, 29, 43)",
+      "rgb(0, 0, 0)"
+    ],
+    "scrollWidth": 1280,
+    "sliders": [
+      "rgb(113, 190, 218)",
+      "rgb(113, 190, 218)",
+      "rgb(113, 190, 218)",
+      "rgb(113, 190, 218)",
+      "rgb(113, 190, 218)",
+      "rgb(113, 190, 218)"
+    ],
+    "width": 1280
+  },
+  {
+    "route": "/crops",
+    "background": "rgb(0, 0, 0)",
+    "backgroundImage": "none",
+    "panels": [
+      "rgb(16, 29, 43)",
+      "rgba(0, 0, 0, 0)"
+    ],
+    "scrollWidth": 1280,
+    "sliders": [],
+    "width": 1280
+  },
+  {
+    "route": "/shapes",
+    "background": "rgb(0, 0, 0)",
+    "backgroundImage": "none",
+    "panels": [],
+    "scrollWidth": 1280,
+    "sliders": [],
+    "width": 1280
+  },
+  {
+    "route": "/voids",
+    "background": "rgb(0, 0, 0)",
+    "backgroundImage": "none",
+    "board": null,
+    "panels": [
+      "rgb(8, 15, 24)"
+    ],
+    "scrollWidth": 1280,
+    "sliders": [],
+    "width": 1280
+  },
+  {
+    "route": "/composition",
+    "background": "rgb(0, 0, 0)",
+    "backgroundImage": "none",
+    "board": null,
+    "panels": [
+      "rgba(0, 0, 0, 0)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgba(0, 0, 0, 0)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgba(0, 0, 0, 0)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)"
+    ],
+    "scrollWidth": 1265,
+    "sliders": [
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Letter/void50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Intensity55"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Preserve0"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Surreal L50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Surreal V50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Surface smoothness58%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Blending strength58%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Connection distance8.0 ft"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Curvature intensity42%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Flat platform retention62%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Minimum opening2.2 ft"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Vertical Integration70%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Interlevel Surface Continuity75%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Original Elevation Preservation85%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Organic Influence45%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Boundary Curvature55%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Blend Radius50%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Surface Relaxation45%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Branching Influence35%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Source Preservation62%"
+      }
+    ],
+    "width": 1265
+  },
+  {
+    "route": "/evaluations",
+    "background": "rgb(0, 0, 0)",
+    "backgroundImage": "none",
+    "board": null,
+    "panels": [
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)"
+    ],
+    "scrollWidth": 1265,
+    "sliders": [],
+    "width": 1265
+  },
+  {
+    "route": "/composition?board=7407x2160",
+    "background": "rgb(0, 0, 0)",
+    "backgroundImage": "none",
+    "board": "rgb(0, 0, 0)",
+    "panels": [
+      "rgba(0, 0, 0, 0)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgba(0, 0, 0, 0)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgba(0, 0, 0, 0)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)",
+      "rgb(16, 29, 43)"
+    ],
+    "scrollWidth": 1280,
+    "sliders": [
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Target35"
+      },
+      {
+        "accent": "rgb(214, 173, 79)",
+        "label": "Importance50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Letter/void50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Intensity55"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Preserve0"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Surreal L50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Surreal V50"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Surface smoothness58%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Blending strength58%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Connection distance8.0 ft"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Curvature intensity42%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Flat platform retention62%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Minimum opening2.2 ft"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Vertical Integration70%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Interlevel Surface Continuity75%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Original Elevation Preservation85%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Organic Influence45%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Boundary Curvature55%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Blend Radius50%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Surface Relaxation45%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Branching Influence35%"
+      },
+      {
+        "accent": "rgb(113, 190, 218)",
+        "label": "Source Preservation62%"
+      }
+    ],
+    "width": 1280
+  }
+]

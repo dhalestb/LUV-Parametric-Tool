@@ -263,7 +263,7 @@ function OptimizationScene({ alternative, grid, thickness, overlays, displayMode
   </Canvas>;
 }
 
-function Slider({ label, value, onChange, color = "#3dd6db", disabled = false }: {
+function Slider({ label, value, onChange, color = "var(--accent-light)", disabled = false }: {
   label: string; value: number; onChange: (value: number) => void; color?: string; disabled?: boolean;
 }) {
   return <label className="grid grid-cols-[66px_minmax(70px,1fr)_30px] items-center gap-1 text-[10px]">
@@ -305,7 +305,7 @@ function clampSelectionToGrid(selection: SelectionVolume, dimensions: ReturnType
 }
 
 function Check({ label, checked, onChange, disabled = false }: { label: string; checked: boolean; onChange: (checked: boolean) => void; disabled?: boolean }) {
-  return <label className="flex cursor-pointer items-center gap-1.5 text-[10px]" style={{ color: disabled ? "#5f6668" : "var(--muted)" }}>
+  return <label className="flex cursor-pointer items-center gap-1.5 text-[10px]" style={{ color: disabled ? "var(--text-secondary)" : "var(--muted)" }}>
     <input type="checkbox" checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} className="accent-[var(--accent)]" />
     {label}
   </label>;
@@ -594,29 +594,29 @@ export default function CompositionStudio() {
         <AppNav />
       </div>
       <div className="flex flex-wrap items-center gap-1">
-        <button type="button" onClick={() => document.getElementById("prototype-demonstration")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "#7d6433", color: "#f0cf87" }}>Prototype demo</button>
-        {selected && <span className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: selectedIsApplied ? "#2b777b" : "#7d6433", color: selectedIsApplied ? "#7decef" : "#f0cf87", background: selectedIsApplied ? "#10272a" : "#211c12" }}>{selectedIsApplied ? "Selected result applied to Slide" : "Selected result ready to apply"}</span>}
-        {selected && <button type="button" onClick={applySelectedToSlide} disabled={selectedIsApplied} className="rounded border px-2 py-1 text-[10px] disabled:opacity-50" style={{ borderColor: "#2b777b", color: "#8ff2f4" }}>{selectedIsApplied ? "Applied to Slide" : "Apply selected to Slide"}</button>}
+        <button type="button" onClick={() => document.getElementById("prototype-demonstration")?.scrollIntoView({ behavior: "smooth", block: "start" })} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--accent-gold)", color: "var(--accent-gold)" }}>Prototype demo</button>
+        {selected && <span className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: selectedIsApplied ? "var(--accent-secondary)" : "var(--accent-gold)", color: selectedIsApplied ? "var(--accent-light)" : "var(--accent-gold)", background: selectedIsApplied ? "var(--panel-background)" : "var(--input-background)" }}>{selectedIsApplied ? "Selected result applied to Slide" : "Selected result ready to apply"}</span>}
+        {selected && <button type="button" onClick={applySelectedToSlide} disabled={selectedIsApplied} className="rounded border px-2 py-1 text-[10px] disabled:opacity-50" style={{ borderColor: "var(--accent-secondary)", background: "var(--accent-secondary)", color: "var(--text-primary)" }}>{selectedIsApplied ? "Applied to Slide" : "Apply selected to Slide"}</button>}
         <span className="rounded border px-2 py-1 text-[10px]" title="Refresh restores results, descriptors, the selection, the letter field, and prototype settings from this browser. Save configuration stores a named copy. Reset returns the optimizer controls to their defaults." style={{ borderColor: "var(--line)", color: "var(--muted)" }}>{keptNotice}</span>
         <button type="button" onClick={undo} disabled={!history.length} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Undo run</button>
         <button type="button" onClick={saveDesign} disabled={!selected} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Save configuration</button>
         <button type="button" onClick={resetAll} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Reset</button>
-        <button type="button" onClick={() => void runOptimization()} disabled={!grid.locked || !selectionValid || activeWeight === 0 || optimizing} className="rounded px-3 py-1 text-[11px] font-semibold text-black disabled:opacity-40" style={{ background: "var(--accent)" }}>{optimizing ? `Optimizing ${progress}%` : "Generate + optimize"}</button>
+        <button type="button" onClick={() => void runOptimization()} disabled={!grid.locked || !selectionValid || activeWeight === 0 || optimizing} className="rounded px-3 py-1 text-[11px] font-semibold text-black disabled:opacity-40" style={{ background: "var(--accent-primary)" }}>{optimizing ? `Optimizing ${progress}%` : "Generate + optimize"}</button>
       </div>
     </header>
 
-    {optimizing && <div className="h-1 overflow-hidden rounded bg-[#162326]"><div className="h-full bg-[var(--accent)] transition-all" style={{ width: `${progress}%` }} /></div>}
+    {optimizing && <div className="h-1 overflow-hidden rounded bg-[var(--input-background)]"><div className="h-full bg-[var(--accent)] transition-all" style={{ width: `${progress}%` }} /></div>}
     {!grid.locked && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b7634", color: "#ffd38a", background: "#2b2415" }}>Lock the orthogonal grid before optimization.</p>}
     {!selectionValid && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>The selection volume must fit completely inside the overall solution volume.</p>}
     {activeWeight === 0 && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>Automatic ranking is disabled. Set at least one applicable descriptor importance above zero.</p>}
-    <p className="rounded border px-3 py-2 text-[10px]" style={{ borderColor: "#2b777b", color: "#8ff2f4", background: "#10272a" }}>
+    <p className="rounded border px-3 py-2 text-[10px]" style={{ borderColor: "var(--accent-secondary)", color: "var(--accent-pale)", background: "var(--panel-background)" }}>
       Slide inputs synchronized: Gap {store.spacing} → Cell X/Y {(store.spacing / 50).toFixed(2)}, Z gap {store.zSpacing} → Cell Z {(store.zSpacing / 50).toFixed(2)}, Size {store.fontSize} → maximum letter size {(store.fontSize / 50).toFixed(2)}, Thickness {store.letterThickness}%. Generate creates alternatives without changing Slide; use Apply selected to Slide when you want to transfer one.
     </p>
 
     <div className="board-composition-content"><div className="grid gap-3 xl:grid-cols-[360px_minmax(0,1fr)_340px]">
       <aside className="space-y-3">
         <section className="rounded-xl border p-3" style={panelStyle}>
-          <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Fixed 3D grid</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Dimensions must be locked for generation.</p></div><button type="button" onClick={() => setGridValue("locked", !grid.locked)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: grid.locked ? "#3dd6db" : "#2a2a2a", color: grid.locked ? "#000" : "#ddd" }}>{grid.locked ? "Locked" : "Unlocked"}</button></div>
+          <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Fixed 3D grid</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Dimensions must be locked for generation.</p></div><button type="button" onClick={() => setGridValue("locked", !grid.locked)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: grid.locked ? "var(--accent-light)" : "var(--input-background)", color: grid.locked ? "var(--app-background)" : "var(--text-primary)" }}>{grid.locked ? "Locked" : "Unlocked"}</button></div>
           <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
             <NumberInput label="X cells" value={grid.xCells} min={2} max={16} disabled={grid.locked} onChange={(value) => setGridValue("xCells", value)} />
             <NumberInput label="Cell X" value={grid.cellX} min={0.4} max={8} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellX", value)} />
@@ -630,13 +630,13 @@ export default function CompositionStudio() {
             <NumberInput label="Overall Y" value={Number(dimensions.height.toFixed(2))} min={2} max={100} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellY", value / grid.yCells)} />
             <NumberInput label="Overall Z" value={Number(dimensions.depth.toFixed(2))} min={2} max={100} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellZ", value / grid.zCells)} />
           </div>
-          <p className="mt-2 rounded bg-black/30 px-2 py-1 text-[10px] tabular-nums" style={{ color: "#8bdfe3" }}>Overall: {dimensions.width.toFixed(1)} × {dimensions.height.toFixed(1)} × {dimensions.depth.toFixed(1)} · {dimensions.volume.toFixed(1)} units³</p>
+          <p className="mt-2 rounded bg-[var(--input-background)] px-2 py-1 text-[10px] tabular-nums" style={{ color: "var(--accent-pale)" }}>Overall: {dimensions.width.toFixed(1)} × {dimensions.height.toFixed(1)} × {dimensions.depth.toFixed(1)} · {dimensions.volume.toFixed(1)} units³</p>
         </section>
 
         <section className="rounded-xl border p-3" style={panelStyle}>
           <div className="flex items-center justify-between gap-2">
             <div><h2 className="text-sm font-semibold">Selection volume</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Search a smaller composition inside the overall solution.</p></div>
-            <button type="button" onClick={() => setSelectionValue("enabled", !selection.enabled)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: selection.enabled ? "#ffbd4a" : "#2a2a2a", color: selection.enabled ? "#000" : "#ddd" }}>{selection.enabled ? "Enabled" : "Disabled"}</button>
+            <button type="button" onClick={() => setSelectionValue("enabled", !selection.enabled)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: selection.enabled ? "var(--accent-gold)" : "var(--input-background)", color: selection.enabled ? "var(--app-background)" : "var(--text-primary)" }}>{selection.enabled ? "Enabled" : "Disabled"}</button>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
             <NumberInput label="Selection X" value={selection.width} min={Math.min(0.5, dimensions.width)} max={dimensions.width} step={0.1} disabled={!selection.enabled} onChange={(value) => setSelectionValue("width", value)} />
@@ -646,13 +646,13 @@ export default function CompositionStudio() {
             <NumberInput label="Selection Z" value={selection.depth} min={Math.min(0.5, dimensions.depth)} max={dimensions.depth} step={0.1} disabled={!selection.enabled} onChange={(value) => setSelectionValue("depth", value)} />
             <NumberInput label="Search step Z" value={selection.stepZ} min={0.1} max={Math.max(0.1, dimensions.depth)} step={0.1} disabled={!selection.enabled} onChange={(value) => setSelectionValue("stepZ", value)} />
           </div>
-          <p className="mt-2 text-[9px]" style={{ color: selection.enabled ? "#d9b86f" : "var(--muted)" }}>{selection.enabled ? `The optimizer searches ${selection.width.toFixed(1)} × ${selection.height.toFixed(1)} × ${selection.depth.toFixed(1)} windows and exports the winning subsection. Selection dimensions automatically reduce when the overall solution becomes smaller.` : "The entire overall grid is evaluated and exported."}</p>
+          <p className="mt-2 text-[9px]" style={{ color: selection.enabled ? "var(--accent-gold)" : "var(--muted)" }}>{selection.enabled ? `The optimizer searches ${selection.width.toFixed(1)} × ${selection.height.toFixed(1)} × ${selection.depth.toFixed(1)} windows and exports the winning subsection. Selection dimensions automatically reduce when the overall solution becomes smaller.` : "The entire overall grid is evaluated and exported."}</p>
         </section>
 
         <section className="rounded-xl border p-3" style={panelStyle}>
           <h2 className="text-sm font-semibold">Hard constraints</h2>
           <p className="text-[9px]" style={{ color: "var(--muted)" }}>Shared source geometry and feasibility limits used to generate and rank alternatives.</p>
-          <h3 className="mt-2 text-[10px] font-semibold uppercase tracking-wide" style={{ color: "#8bdfe3" }}>Shared Slide geometry</h3>
+          <h3 className="mt-2 text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--accent-pale)" }}>Shared Slide geometry</h3>
           <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1">
             <NumberInput label="Columns" value={store.cols} min={2} max={16} onChange={(value) => store.resizeGrid(value, store.rows)} />
             <NumberInput label="Rows" value={store.rows} min={2} max={12} onChange={(value) => store.resizeGrid(store.cols, value)} />
@@ -667,7 +667,7 @@ export default function CompositionStudio() {
             <Check label="3D layers" checked={store.layerMode} onChange={store.setLayerMode} />
             <Check label="Y rotation" checked={store.yRotationEnabled} onChange={store.setYRotationEnabled} />
           </div>
-          <h3 className="mt-3 border-t pt-2 text-[10px] font-semibold uppercase tracking-wide" style={{ borderColor: "var(--line)", color: "#8bdfe3" }}>Optimizer feasibility</h3>
+          <h3 className="mt-3 border-t pt-2 text-[10px] font-semibold uppercase tracking-wide" style={{ borderColor: "var(--line)", color: "var(--accent-pale)" }}>Optimizer feasibility</h3>
           <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
             <NumberInput label="Clearance" value={rules.minimumClearance} min={0} max={4} step={0.1} onChange={(value) => setRule("minimumClearance", value)} />
             <NumberInput label="Max intersections" value={rules.maximumIntersections} min={0} max={500} onChange={(value) => setRule("maximumIntersections", value)} />
@@ -690,10 +690,10 @@ export default function CompositionStudio() {
         <section className="rounded-xl border p-3" style={panelStyle}>
           <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Descriptor targets</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Zero importance excludes ranking, not measurement.</p></div></div>
           <div className="mt-2 max-h-[620px] space-y-1.5 overflow-auto pr-1">
-            {DESCRIPTORS.map((descriptor) => <div key={descriptor.id} className="rounded-lg border p-2" style={{ borderColor: "var(--line)", background: "#0b0d0e" }}>
-              <div className="mb-1 flex justify-between"><strong className="text-[10px]">{descriptor.name}</strong><span className="text-[8px] uppercase" style={{ color: descriptor.kind === "objective" ? "#7decef" : "#e2a7eb" }}>{descriptor.kind}</span></div>
+            {DESCRIPTORS.map((descriptor) => <div key={descriptor.id} className="rounded-lg border p-2" style={{ borderColor: "var(--line)", background: "var(--input-background)" }}>
+              <div className="mb-1 flex justify-between"><strong className="text-[10px]">{descriptor.name}</strong><span className="text-[8px] uppercase" style={{ color: descriptor.kind === "objective" ? "var(--accent-light)" : "var(--accent-gold)" }}>{descriptor.kind}</span></div>
               <Slider label="Target" value={descriptors[descriptor.id].intensity} onChange={(value) => setDescriptor(descriptor.id, "intensity", value)} />
-              <Slider label="Importance" value={descriptors[descriptor.id].importance} color="#e2a7eb" onChange={(value) => setDescriptor(descriptor.id, "importance", value)} />
+              <Slider label="Importance" value={descriptors[descriptor.id].importance} color="var(--accent-gold)" onChange={(value) => setDescriptor(descriptor.id, "importance", value)} />
             </div>)}
           </div>
           <div className="mt-2 flex gap-1"><input value={presetName} onChange={(event) => setPresetName(event.target.value)} className="min-w-0 flex-1 rounded border px-2 py-1 text-[10px]" style={inputStyle} /><button type="button" onClick={savePreset} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Save preset</button></div>
@@ -705,7 +705,7 @@ export default function CompositionStudio() {
         <section className="rounded-xl border p-3" style={panelStyle}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div><h2 className="text-sm font-semibold">Optimization focus</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Targets and importance remain unchanged when focus changes.</p></div>
-            <div className="flex flex-wrap gap-1">{(["letter","void","combined","auto"] as OptimizationFocus[]).map((value) => <button key={value} type="button" onClick={() => { setFocus(value); setDisplayMode(displayModeForFocus(value)); }} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: focus === value ? "var(--accent)" : "var(--line)", background: focus === value ? "#123235" : "transparent", color: focus === value ? "#8ff2f4" : "var(--muted)" }}>{focusLabels[value]}</button>)}</div>
+            <div className="flex flex-wrap gap-1">{(["letter","void","combined","auto"] as OptimizationFocus[]).map((value) => <button key={value} type="button" onClick={() => { setFocus(value); setDisplayMode(displayModeForFocus(value)); }} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: focus === value ? "var(--accent)" : "var(--line)", background: focus === value ? "var(--accent-dark)" : "transparent", color: focus === value ? "var(--accent-pale)" : "var(--muted)" }}>{focusLabels[value]}</button>)}</div>
           </div>
           {(focus === "combined" || focus === "auto") && <div className="mt-2"><Slider label="Letter/void" value={controls.combinedBalance} onChange={(value) => setControl("combinedBalance", value)} /><div className="flex justify-between pl-[68px] text-[8px]" style={{ color: "var(--muted)" }}><span>0 · void</span><span>50 · equal</span><span>100 · letter</span></div></div>}
           <div className="mt-2 grid gap-2 border-t pt-2 sm:grid-cols-3" style={{ borderColor: "var(--line)" }}>
@@ -713,19 +713,19 @@ export default function CompositionStudio() {
             <NumberInput label="Generations" value={controls.generations} min={1} max={30} onChange={(value) => setControl("generations", value)} />
             <NumberInput label="Random seed" value={controls.seed} min={1} max={999999} onChange={(value) => setControl("seed", value)} />
             <div className="sm:col-span-3"><Slider label="Intensity" value={controls.intensity} onChange={(value) => setControl("intensity", value)} /></div>
-            <div className="sm:col-span-3"><Slider label="Preserve" value={controls.preservePercent} color="#b38cff" disabled={!lockedParent} onChange={(value) => setControl("preservePercent", value)} /></div>
-            <div><Slider label="Surreal L" value={controls.surrealManualLetter} color="#e2a7eb" onChange={(value) => setControl("surrealManualLetter", value)} /></div>
-            <div><Slider label="Surreal V" value={controls.surrealManualVoid} color="#e2a7eb" onChange={(value) => setControl("surrealManualVoid", value)} /></div>
+            <div className="sm:col-span-3"><Slider label="Preserve" value={controls.preservePercent} color="var(--accent-light)" disabled={!lockedParent} onChange={(value) => setControl("preservePercent", value)} /></div>
+            <div><Slider label="Surreal L" value={controls.surrealManualLetter} color="var(--accent-light)" onChange={(value) => setControl("surrealManualLetter", value)} /></div>
+            <div><Slider label="Surreal V" value={controls.surrealManualVoid} color="var(--accent-light)" onChange={(value) => setControl("surrealManualVoid", value)} /></div>
           </div>
         </section>
 
         <section className="rounded-xl border p-3" style={panelStyle}>
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <div><h2 className="text-sm font-semibold">Alternative comparison</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>{focus === "auto" ? "All focus types are re-scored with the same combined objective before comparison." : "At least three alternatives share the same objective basis."}</p></div>
-            <div className="flex gap-1"><select value={displayMode} onChange={(event) => setDisplayMode(event.target.value as DisplayMode)} className="rounded border px-2 py-1 text-[10px]" style={inputStyle}><option value="letters">Letters</option><option value="void">Void proxy</option><option value="both">Letters + void</option></select>{Object.entries(overlays).map(([key, value]) => <button key={key} type="button" onClick={() => setOverlays((current) => ({ ...current, [key]: !value }))} className="rounded border px-1.5 py-1 text-[9px]" style={{ borderColor: value ? "var(--accent)" : "var(--line)", color: value ? "#8ff2f4" : "var(--muted)" }}>{key}</button>)}</div>
+            <div className="flex gap-1"><select value={displayMode} onChange={(event) => setDisplayMode(event.target.value as DisplayMode)} className="rounded border px-2 py-1 text-[10px]" style={inputStyle}><option value="letters">Letters</option><option value="void">Void proxy</option><option value="both">Letters + void</option></select>{Object.entries(overlays).map(([key, value]) => <button key={key} type="button" onClick={() => setOverlays((current) => ({ ...current, [key]: !value }))} className="rounded border px-1.5 py-1 text-[9px]" style={{ borderColor: value ? "var(--accent)" : "var(--line)", color: value ? "var(--accent-pale)" : "var(--muted)" }}>{key}</button>)}</div>
           </div>
           {evaluatedAlternatives.length === 0 ? <div className="flex h-72 items-center justify-center text-sm" style={{ color: "var(--muted)" }}>Generate alternatives to begin comparison.</div> : <div className="grid gap-2 lg:grid-cols-3">
-            {evaluatedAlternatives.slice(0, Math.max(3, controls.alternatives)).map((alternative, index) => <article key={alternative.id} className="overflow-hidden rounded-lg border" style={{ borderColor: index === selectedIndex ? "var(--accent)" : "var(--line)", background: "#080a0b" }}>
+            {evaluatedAlternatives.slice(0, Math.max(3, controls.alternatives)).map((alternative, index) => <article key={alternative.id} className="overflow-hidden rounded-lg border" style={{ borderColor: index === selectedIndex ? "var(--accent)" : "var(--line)", background: "var(--input-background)" }}>
               <button type="button" onClick={() => setSelectedIndex(index)} className="flex w-full items-center justify-between px-2 py-1.5 text-left">
                 <span className="text-[10px] font-medium">Alt {index + 1} · {focusLabels[alternative.focus]}{index === selectedIndex ? " · prototype source" : ""}</span>
                 <span className="text-[10px] tabular-nums" style={{ color: alternative.evaluation.fit === null ? "#ff927f" : "#7ee8c2" }}>{alternative.evaluation.fit === null ? "Infeasible" : `Fit ${alternative.evaluation.fit.toFixed(1)}`}</span>
@@ -740,7 +740,7 @@ export default function CompositionStudio() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div><h2 className="text-sm font-semibold">Selected configuration</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Seed {selected.seed} · {focusLabels[selected.focus]} · {selected.placements.length} objects{selected.selection ? ` · window center (${selected.selection.centerX.toFixed(1)}, ${selected.selection.centerY.toFixed(1)}, ${selected.selection.centerZ.toFixed(1)})` : ""}</p></div>
             <div className="flex flex-wrap gap-1">
-              <button type="button" onClick={() => setLockedParent(lockedParent?.id === selected.id ? null : selected)} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: lockedParent?.id === selected.id ? "#b38cff" : "var(--line)", color: lockedParent?.id === selected.id ? "#d6c0ff" : "var(--ink)" }}>{lockedParent?.id === selected.id ? "Configuration locked" : "Lock for next run"}</button>
+              <button type="button" onClick={() => setLockedParent(lockedParent?.id === selected.id ? null : selected)} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: lockedParent?.id === selected.id ? "var(--accent-light)" : "var(--line)", color: lockedParent?.id === selected.id ? "var(--accent-pale)" : "var(--ink)" }}>{lockedParent?.id === selected.id ? "Configuration locked" : "Lock for next run"}</button>
               <button type="button" onClick={() => downloadFile(`vul-optimized-${selected.seed}.obj`, compositionObj(selected, store.letterThickness), "text/plain")} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Export OBJ</button>
               <button type="button" onClick={() => downloadFile(`vul-analysis-${selected.seed}.json`, JSON.stringify({ grid, selection, rules, controls, focus, descriptors, alternative: selected }, null, 2), "application/json")} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Export JSON</button>
               <button type="button" onClick={() => downloadFile(`vul-analysis-${selected.seed}.csv`, resultsCsv(selected), "text/csv")} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Export CSV</button>
@@ -749,7 +749,7 @@ export default function CompositionStudio() {
           <div className="mt-2 overflow-x-auto">
             <table className="w-full min-w-[900px] border-collapse text-[9px]">
               <thead style={{ color: "var(--muted)" }}><tr><th className="p-1 text-left">Descriptor</th><th>Target</th><th>Importance</th><th>Active</th><th>Deviation</th><th>Letter raw</th><th>Letter 0–100</th><th>Void raw</th><th>Void 0–100</th><th className="text-left">Reliability</th></tr></thead>
-              <tbody>{selected.evaluation.descriptors.map((item) => <tr key={item.id} className="border-t" style={{ borderColor: "#222" }}>
+              <tbody>{selected.evaluation.descriptors.map((item) => <tr key={item.id} className="border-t" style={{ borderColor: "var(--panel-border)" }}>
                 <td className="p-1 font-medium">{DESCRIPTORS.find((descriptor) => descriptor.id === item.id)?.name}</td>
                 <td className="text-center">{item.target}</td><td className="text-center">{item.importance}</td>
                 <td className="text-center">{item.activeValue?.toFixed(1) ?? "N/A"}</td><td className="text-center">{item.deviation?.toFixed(1) ?? "N/A"}</td>
@@ -757,7 +757,7 @@ export default function CompositionStudio() {
                 <td className="text-center">{item.letter.normalized?.toFixed(1) ?? "N/A"}</td>
                 <td className="text-center" title={item.void.method}>{item.void.applicable ? `${item.void.raw?.toFixed(2)} ${item.void.unit}` : "N/A"}</td>
                 <td className="text-center">{item.void.normalized?.toFixed(1) ?? "N/A"}</td>
-                <td className="text-left" style={{ color: item.letter.reliability === "manual assessment" || item.void.reliability === "manual assessment" ? "#e2a7eb" : "var(--muted)" }}>{item.letter.reliability === item.void.reliability ? item.letter.reliability : `L: ${item.letter.reliability}; V: ${item.void.reliability}`}</td>
+                <td className="text-left" style={{ color: item.letter.reliability === "manual assessment" || item.void.reliability === "manual assessment" ? "var(--accent-gold)" : "var(--muted)" }}>{item.letter.reliability === item.void.reliability ? item.letter.reliability : `L: ${item.letter.reliability}; V: ${item.void.reliability}`}</td>
               </tr>)}</tbody>
             </table>
           </div>
@@ -769,20 +769,20 @@ export default function CompositionStudio() {
           <h2 className="text-sm font-semibold">Analysis summary</h2>
           {!selected ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>No selected result.</p> : <>
             <div className="mt-2 grid grid-cols-2 gap-1.5">
-              {[["Weighted fit", selected.evaluation.fit?.toFixed(1) ?? "Not ranked"],["Void volume", `${(selected.evaluation.raw.voidRatio * 100).toFixed(1)}%`],["Accessible void", `${(selected.evaluation.raw.accessibleVoidRatio * 100).toFixed(1)}%`],["Sightlines", `${(selected.evaluation.raw.sightlineRatio * 100).toFixed(1)}%`],["Sky proxy", `${(selected.evaluation.raw.skyExposureRatio * 100).toFixed(1)}%`],["Intersections", selected.evaluation.raw.intersectionCount]].map(([label, value]) => <div key={String(label)} className="rounded border p-2" style={{ borderColor: "var(--line)", background: "#0b0d0e" }}><div className="text-[8px] uppercase" style={{ color: "var(--muted)" }}>{label}</div><div className="text-sm tabular-nums">{value}</div></div>)}
+              {[["Weighted fit", selected.evaluation.fit?.toFixed(1) ?? "Not ranked"],["Void volume", `${(selected.evaluation.raw.voidRatio * 100).toFixed(1)}%`],["Accessible void", `${(selected.evaluation.raw.accessibleVoidRatio * 100).toFixed(1)}%`],["Sightlines", `${(selected.evaluation.raw.sightlineRatio * 100).toFixed(1)}%`],["Sky proxy", `${(selected.evaluation.raw.skyExposureRatio * 100).toFixed(1)}%`],["Intersections", selected.evaluation.raw.intersectionCount]].map(([label, value]) => <div key={String(label)} className="rounded border p-2" style={{ borderColor: "var(--line)", background: "var(--input-background)" }}><div className="text-[8px] uppercase" style={{ color: "var(--muted)" }}>{label}</div><div className="text-sm tabular-nums">{value}</div></div>)}
             </div>
-            {selected.selection && <div className="mt-2 rounded border p-2 text-[9px]" style={{ borderColor: "#7d6433", color: "#f0cf87", background: "#211c12" }}>
+            {selected.selection && <div className="mt-2 rounded border p-2 text-[9px]" style={{ borderColor: "var(--accent-gold)", color: "var(--accent-gold)", background: "var(--input-background)" }}>
               Best {selected.selection.width.toFixed(1)} × {selected.selection.height.toFixed(1)} × {selected.selection.depth.toFixed(1)} subsection at overall coordinates ({selected.selection.centerX.toFixed(2)}, {selected.selection.centerY.toFixed(2)}, {selected.selection.centerZ.toFixed(2)}). Evaluated {selected.selection.evaluatedPositions} candidate positions{selected.selection.exhaustive ? " exhaustively" : ` from ${selected.selection.totalPositions} grid positions plus source-aware samples`}.
             </div>}
             <div className="mt-2 rounded border p-2 text-[10px]" style={{ borderColor: selected.evaluation.constraints.feasible ? "#245e4d" : "#874b3e", color: selected.evaluation.constraints.feasible ? "#7ee8c2" : "#ff927f" }}>{selected.evaluation.constraints.feasible ? "All hard constraints satisfied." : selected.evaluation.constraints.violations.map((violation) => <div key={violation}>• {violation}</div>)}</div>
             <div className="mt-2"><h3 className="text-[10px] font-medium">Key tradeoffs</h3>{selected.evaluation.tradeoffs.map((tradeoff) => <p key={tradeoff} className="mt-1 text-[9px]" style={{ color: "var(--muted)" }}>• {tradeoff}</p>)}</div>
-            <p className="mt-2 text-[9px]" style={{ color: "#9d8580" }}>Void connectivity, visibility, and daylight are geometric voxel proxies. They are not validated circulation, code, or daylight-performance simulations.</p>
+            <p className="mt-2 text-[9px]" style={{ color: "var(--text-secondary)" }}>Void connectivity, visibility, and daylight are geometric voxel proxies. They are not validated circulation, code, or daylight-performance simulations.</p>
           </>}
         </section>
 
         <section className="rounded-xl border p-3" style={panelStyle}>
           <div className="flex justify-between"><h2 className="text-sm font-semibold">Saved configurations</h2>{savedDesigns.length > 0 && <button type="button" onClick={() => setSavedDesigns([])} className="text-[9px]" style={{ color: "var(--muted)" }}>Clear</button>}</div>
-          {savedDesigns.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Save a complete grid, objective, geometry, and analysis state.</p> : <div className="mt-2 max-h-64 space-y-1 overflow-auto">{savedDesigns.map((design) => <button key={design.id} type="button" onClick={() => restoreDesign(design)} className="w-full rounded border p-2 text-left" style={{ borderColor: "var(--line)", background: "#0b0d0e" }}><div className="text-[10px] font-medium">{design.name}</div><div className="text-[8px]" style={{ color: "var(--muted)" }}>{design.created} · {design.alternatives.length} alternatives</div></button>)}</div>}
+          {savedDesigns.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Save a complete grid, objective, geometry, and analysis state.</p> : <div className="mt-2 max-h-64 space-y-1 overflow-auto">{savedDesigns.map((design) => <button key={design.id} type="button" onClick={() => restoreDesign(design)} className="w-full rounded border p-2 text-left" style={{ borderColor: "var(--line)", background: "var(--input-background)" }}><div className="text-[10px] font-medium">{design.name}</div><div className="text-[8px]" style={{ color: "var(--muted)" }}>{design.created} · {design.alternatives.length} alternatives</div></button>)}</div>}
         </section>
 
         <section className="rounded-xl border p-3" style={panelStyle}>

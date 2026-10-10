@@ -32,7 +32,7 @@ export default function AppNav() {
             className="rounded px-2.5 py-1 text-[11px] transition"
             style={{
               background: active ? "var(--accent)" : "transparent",
-              color: active ? "#000" : "var(--muted)",
+              color: active ? "var(--app-background)" : "var(--muted)",
               border: active ? "1px solid transparent" : "1px solid var(--line)",
               fontWeight: active ? 600 : 400,
             }}
