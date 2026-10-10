@@ -1,0 +1,1082 @@
+{
+  "before": [
+    [
+      {
+        "valid": true,
+        "status": "PASS",
+        "reason": "flush full-width walking interface",
+        "horizontalGap": 0,
+        "flushGap": 0,
+        "boundaryGap": 0,
+        "boundaryVerified": true,
+        "maxElevationDiscontinuity": 4.440892098500626e-16,
+        "segments": [
+          {
+            "start": 0,
+            "end": 0,
+            "triangle": 7136,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              -0.49278001719676984,
+              0.8701539258381538
+            ]
+          },
+          {
+            "start": 0,
+            "end": 0,
+            "triangle": 7137,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              -0.49278001719676984,
+              0.8701539258381538
+            ]
+          },
+          {
+            "start": 0,
+            "end": 0.33332831823789605,
+            "triangle": 7172,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.33332831823789605,
+            "end": 0.33332831823789605,
+            "triangle": 7173,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.33332831823789605,
+            "end": 0.666664159118948,
+            "triangle": 7210,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.6666641591189479,
+            "end": 0.6666641591189479,
+            "triangle": 7211,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.6666641591189479,
+            "end": 1,
+            "triangle": 7248,
+            "sourceElevations": [
+              1.730741143226624,
+              1.730741143226624
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 7249,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 7290,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0.49278551980246116,
+              0.8701508096146426
+            ]
+          }
+        ]
+      },
+      {
+        "valid": false,
+        "status": "FAIL",
+        "reason": "unsupported interface gap",
+        "horizontalGap": 3.7326278686523438,
+        "flushGap": 3.7326278686523438,
+        "boundaryGap": 3.7326278686523438,
+        "boundaryVerified": false,
+        "maxElevationDiscontinuity": 0,
+        "segments": [
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 1382,
+            "sourceElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "connectorElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 1383,
+            "sourceElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "connectorElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 1389,
+            "sourceElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "connectorElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          }
+        ]
+      }
+    ],
+    [
+      {
+        "valid": true,
+        "status": "PASS",
+        "reason": "flush full-width walking interface",
+        "horizontalGap": 0,
+        "flushGap": 0,
+        "boundaryGap": 0,
+        "boundaryVerified": true,
+        "maxElevationDiscontinuity": 0,
+        "segments": [
+          {
+            "start": 0,
+            "end": 0,
+            "triangle": 11763,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0.4927736037805462,
+              0,
+              0.8701575578118789
+            ]
+          },
+          {
+            "start": 0,
+            "end": 0,
+            "triangle": 11764,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0.4927736037805462,
+              0,
+              0.8701575578118789
+            ]
+          },
+          {
+            "start": 0,
+            "end": 0.33332957199760777,
+            "triangle": 11799,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.33332957199760777,
+            "end": 0.33332957199760777,
+            "triangle": 11800,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.33332957199760777,
+            "end": 0.6666666666666666,
+            "triangle": 11837,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.6666666666666667,
+            "end": 0.6666666666666667,
+            "triangle": 11838,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.6666666666666666,
+            "end": 1,
+            "triangle": 11875,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 11876,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 11917,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              -0.49278460888145287,
+              0,
+              0.870151325488592
+            ]
+          }
+        ]
+      },
+      {
+        "valid": true,
+        "status": "PASS",
+        "reason": "flush full-width walking interface",
+        "horizontalGap": 1.1259736022793503e-16,
+        "flushGap": 1.1259736022793503e-16,
+        "boundaryGap": 0,
+        "boundaryVerified": true,
+        "maxElevationDiscontinuity": 8.881784197001252e-16,
+        "segments": [
+          {
+            "start": 0,
+            "end": 0.2779363807675381,
+            "triangle": 13653,
+            "sourceElevations": [
+              6.666666507720946,
+              6.666666507720947
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.2779363807675382,
+            "end": 0.27793638076753824,
+            "triangle": 13666,
+            "sourceElevations": [
+              6.666666507720948,
+              6.666666507720948
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.2779363807675382,
+            "end": 0.5558737018690078,
+            "triangle": 13667,
+            "sourceElevations": [
+              6.666666507720948,
+              6.666666507720947
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.5558737018690078,
+            "end": 0.8338110229704774,
+            "triangle": 13683,
+            "sourceElevations": [
+              6.666666507720947,
+              6.666666507720948
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.8338110229704774,
+            "end": 0.8338110229704774,
+            "triangle": 13704,
+            "sourceElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.8338110229704774,
+            "end": 1,
+            "triangle": 13705,
+            "sourceElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          }
+        ]
+      }
+    ]
+  ],
+  "after": [
+    [
+      {
+        "valid": true,
+        "status": "PASS",
+        "reason": "flush full-width walking interface",
+        "horizontalGap": 0,
+        "flushGap": 0,
+        "boundaryGap": 0,
+        "boundaryVerified": true,
+        "maxElevationDiscontinuity": 4.440892098500626e-16,
+        "segments": [
+          {
+            "start": 0,
+            "end": 0,
+            "triangle": 7136,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              -0.49278001719676984,
+              0.8701539258381538
+            ]
+          },
+          {
+            "start": 0,
+            "end": 0,
+            "triangle": 7137,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              -0.49278001719676984,
+              0.8701539258381538
+            ]
+          },
+          {
+            "start": 0,
+            "end": 0.33332831823789605,
+            "triangle": 7172,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.33332831823789605,
+            "end": 0.33332831823789605,
+            "triangle": 7173,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.33332831823789605,
+            "end": 0.666664159118948,
+            "triangle": 7210,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.6666641591189479,
+            "end": 0.6666641591189479,
+            "triangle": 7211,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.6666641591189479,
+            "end": 1,
+            "triangle": 7248,
+            "sourceElevations": [
+              1.730741143226624,
+              1.730741143226624
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 7249,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 7290,
+            "sourceElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "connectorElevations": [
+              1.7307411432266235,
+              1.7307411432266235
+            ],
+            "normal": [
+              0,
+              0.49278551980246116,
+              0.8701508096146426
+            ]
+          }
+        ]
+      },
+      {
+        "valid": false,
+        "status": "FAIL",
+        "reason": "unsupported interface gap",
+        "horizontalGap": 3.7326278686523438,
+        "flushGap": 3.7326278686523438,
+        "boundaryGap": 3.7326278686523438,
+        "boundaryVerified": false,
+        "maxElevationDiscontinuity": 0,
+        "segments": [
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 1382,
+            "sourceElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "connectorElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 1383,
+            "sourceElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "connectorElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 1389,
+            "sourceElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "connectorElevations": [
+              2.2481608390808105,
+              2.2481608390808105
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          }
+        ]
+      }
+    ],
+    [
+      {
+        "valid": true,
+        "status": "PASS",
+        "reason": "flush full-width walking interface",
+        "horizontalGap": 0,
+        "flushGap": 0,
+        "boundaryGap": 0,
+        "boundaryVerified": true,
+        "maxElevationDiscontinuity": 0,
+        "segments": [
+          {
+            "start": 0,
+            "end": 0,
+            "triangle": 11763,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0.4927736037805462,
+              0,
+              0.8701575578118789
+            ]
+          },
+          {
+            "start": 0,
+            "end": 0,
+            "triangle": 11764,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0.4927736037805462,
+              0,
+              0.8701575578118789
+            ]
+          },
+          {
+            "start": 0,
+            "end": 0.33332957199760777,
+            "triangle": 11799,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.33332957199760777,
+            "end": 0.33332957199760777,
+            "triangle": 11800,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.33332957199760777,
+            "end": 0.6666666666666666,
+            "triangle": 11837,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.6666666666666667,
+            "end": 0.6666666666666667,
+            "triangle": 11838,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.6666666666666666,
+            "end": 1,
+            "triangle": 11875,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 11876,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "triangle": 11917,
+            "sourceElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "connectorElevations": [
+              9.452584266662598,
+              9.452584266662598
+            ],
+            "normal": [
+              -0.49278460888145287,
+              0,
+              0.870151325488592
+            ]
+          }
+        ]
+      },
+      {
+        "valid": true,
+        "status": "PASS",
+        "reason": "flush full-width walking interface",
+        "horizontalGap": 1.1259736022793503e-16,
+        "flushGap": 1.1259736022793503e-16,
+        "boundaryGap": 0,
+        "boundaryVerified": true,
+        "maxElevationDiscontinuity": 8.881784197001252e-16,
+        "segments": [
+          {
+            "start": 0,
+            "end": 0.2779363807675381,
+            "triangle": 13653,
+            "sourceElevations": [
+              6.666666507720946,
+              6.666666507720947
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.2779363807675382,
+            "end": 0.27793638076753824,
+            "triangle": 13666,
+            "sourceElevations": [
+              6.666666507720948,
+              6.666666507720948
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.2779363807675382,
+            "end": 0.5558737018690078,
+            "triangle": 13667,
+            "sourceElevations": [
+              6.666666507720948,
+              6.666666507720947
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.5558737018690078,
+            "end": 0.8338110229704774,
+            "triangle": 13683,
+            "sourceElevations": [
+              6.666666507720947,
+              6.666666507720948
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.8338110229704774,
+            "end": 0.8338110229704774,
+            "triangle": 13704,
+            "sourceElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "start": 0.8338110229704774,
+            "end": 1,
+            "triangle": 13705,
+            "sourceElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "connectorElevations": [
+              6.666666507720947,
+              6.666666507720947
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          }
+        ]
+      }
+    ]
+  ]
+}

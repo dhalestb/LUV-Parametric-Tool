@@ -88,6 +88,14 @@ export function transitionPath(pair: PortPair, bend = 0): Vec3[] {
       u*u*u*a[1]+3*u*u*t*c[1]+3*u*t*t*d[1]+t*t*t*b[1]+forward[0]*bulge,
       mix(a[2],b[2],t)]);
   }
+  // Elevation follows actual horizontal travel, rather than Bezier parameter speed.
+  // This avoids steep short segments at otherwise shallow ramp ends.
+  const run=planRun(points);
+  let traveled=0;
+  for(let i=1;i<points.length;i++) {
+    traveled+=Math.hypot(points[i][0]-points[i-1][0],points[i][1]-points[i-1][1]);
+    points[i][2]=mix(a[2],b[2],run>0?traveled/run:i/count);
+  }
   return points;
 }
 export function pathLength(path: Vec3[]) { return path.slice(1).reduce((sum,p,i)=>sum+Math.hypot(...p.map((v,k)=>v-path[i][k])),0); }
@@ -117,7 +125,7 @@ export function transitionSections(pair: PortPair, path=pair.path??transitionPat
     };
     const slope=mix(profileSlope(pair.startProfile,pair.startDirection),profileSlope(pair.endProfile,pair.endDirection?.map(v=>-v) as Vec3|undefined),t);
     const flare=pair.connectionClass==="ADAPTIVE"&&((pair.angle??0)>35||(pair.lateralOffset??0)>2)?.08:-.04;
-    return {center,side:[-dy/len,dx/len,slope],width:mix(wa,wb,t)*(1+flare*Math.sin(Math.PI*t)**2)};
+    return {center,side:[-dy/len,dx/len,slope],width:Math.max(Math.min(wa,wb),mix(wa,wb,t)*(1+flare*Math.sin(Math.PI*t)**2))};
   });
 }
 export function loftSections(sections: TransitionSection[],thickness=.25) {
@@ -132,7 +140,17 @@ export function loftSections(sections: TransitionSection[],thickness=.25) {
   }
   const end=(sections.length-1)*4;
   indices.push(0,2,3,0,3,1,end,end+1,end+3,end,end+3,end+2);
-  return {positions:new Float32Array(positions),indices:indices.flatMap((_,i)=>i%3===0?[indices[i],indices[i+2],indices[i+1]]:[])};
+  const emitted=new Float32Array(positions),faces:number[]=[];
+  for(let i=0;i<indices.length;i+=3) {
+    const a=indices[i]*3,b=indices[i+1]*3,c=indices[i+2]*3;
+    const u=[emitted[b]-emitted[a],emitted[b+1]-emitted[a+1],emitted[b+2]-emitted[a+2]];
+    const v=[emitted[c]-emitted[a],emitted[c+1]-emitted[a+1],emitted[c+2]-emitted[a+2]];
+    // Repeated stair sections can collapse a side/cap triangle. Test the actual
+    // Float32 vertices so no zero-area faces are sent to collision or rendering.
+    if(Math.hypot(u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0])>1e-9)
+      faces.push(indices[i],indices[i+2],indices[i+1]);
+  }
+  return {positions:emitted,indices:faces};
 }
 /** True horizontal treads and risers, with edge-aligned first/last transition sections. */
 export function transitionMeshes(pair: PortPair) {
@@ -150,10 +168,12 @@ export function transitionMeshes(pair: PortPair) {
       const norm=Math.hypot(side[0],side[1])||1;side[0]/=norm;side[1]/=norm;
       return {center:[mix(a.center[0],b.center[0],u),mix(a.center[1],b.center[1],u),z] as Vec3,side,width:mix(a.width,b.width,u)};
     };
-    // The first tread meets A; the last transition climbs/descends into B.
+    // Ascending: riser then tread, so the final tread joins B at its floor level.
+    // Descending: tread then riser, beginning flush with A. No final raised cap.
     const z=pair.from[2]+pair.rise*step/steps;
-    const a=sectionAt(t0,z),b=sectionAt(t1,z),next=sectionAt(t1,pair.from[2]+pair.rise*(step+1)/steps);
-    out.push(loftSections([a,b,next]));
+    const nextZ=pair.from[2]+pair.rise*(step+1)/steps;
+    const a=sectionAt(t0,z),b=sectionAt(t1,pair.rise>0?nextZ:z),next=sectionAt(pair.rise>0?t0:t1,nextZ);
+    out.push(loftSections(pair.rise>0?[a,next,b]:[a,b,next]));
   }
   return out.map(mesh=>({kind:"stair" as const,...mesh}));
 

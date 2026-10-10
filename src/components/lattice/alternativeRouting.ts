@@ -1,11 +1,10 @@
 import type { PlacedTile, PortPair, TileModel, Vec3 } from "./types";
 import { beginGeometryValidation } from "./geometryRevision";
-import { enumerateWalkableAttachments, fitLoftContact, measureSurfaceGap, SURFACE_CONTACT_TOLERANCE } from "./surfaceAttachment";
-import { landingHeadroomCheck, transitionSurfaceClear, type ConnectorSurface } from "./connectionClearance";
+import { enumerateWalkableAttachments, fitLoftContact } from "./surfaceAttachment";
+import { transitionSurfaceClear, type ConnectorSurface } from "./connectionClearance";
 import { captureConnectionDiagnostics } from "./connectionDiagnostics";
-import { switchbackRampPath } from "./portConnectionValidation";
-import { ACCESSIBLE_RAMP_SLOPE, planRun, transitionMeshes, transitionPath, transitionSections } from "./transitionGeometry";
-import { validateWalkingApproach } from "./walkingApproach";
+import { switchbackRampPath, validateCirculationConnection } from "./portConnectionValidation";
+import { ACCESSIBLE_RAMP_SLOPE, planRun, transitionPath, transitionMeshes } from "./transitionGeometry";
 import { discoverInteriorApproaches, type ApproachAnchor, type QualifiedApproach } from "./interiorApproaches";
 
 export type RoutingBudget = { attachments: number; pairs: number; routes: number; maxSpan: number; maxRun: number };
@@ -163,76 +162,7 @@ export function routeAlternatives(original: PortPair) {
   });
 }
 
-/** Additional opt-in checks; legacy thresholds/classification are not changed. */
+/** Opt-in routing retains its bounded footprint and run policy; circulation checks are shared. */
 export function validateAlternative(pair: PortPair,models: TileModel[],tiles: PlacedTile[],existing: ConnectorSurface[],budget: RoutingBudget, routeName = "") {
-  const fail = (reason: string,details?: unknown) => ({reason,details});
-  if(!pair.path || pair.path.length<2 || pair.path.some(p=>p.some(v=>!Number.isFinite(v)))) return fail("invalid route path");
-  if(Math.hypot(...pair.path[0].map((v,i)=>v-pair.from[i]))>1e-6 || Math.hypot(...pair.path.at(-1)!.map((v,i)=>v-pair.to[i]))>1e-6 || Math.abs(pair.to[2]-pair.from[2]-pair.rise)>1e-6) return fail("route endpoint discontinuity");
-  if (!fitLoftContact(pair,models,tiles,false)) return fail("surface attachment");
-  const path=pair.path??[],run=planRun(path);
-  if(run>budget.maxRun || path.length<2) return fail("route run limit");
-  const sections=transitionSections(pair);
-  if(sections.some(s=>s.width<2-1e-6)) return fail("usable width");
-  if(routeName.includes("switchback") && Math.abs(pair.rise)>.02) {
-    let flatRun=0,maxFlatRun=0;
-    for(let i=1;i<path.length;i++) {
-      flatRun=Math.abs(path[i][2]-path[i-1][2])<1e-6?flatRun+distance(path[i],path[i-1]):0;
-      maxFlatRun=Math.max(maxFlatRun,flatRun);
-    }
-    if(maxFlatRun+1e-6<Math.max(3,...sections.map(s=>s.width))) return fail("switchback landing length",{maxFlatRun});
-  }
-  // A folded ribbon cannot represent continuous forward travel, even if its centreline clears obstacles.
-  for(let i=1;i<sections.length;i++) {
-    const a=sections[i-1],b=sections[i],dx=b.center[0]-a.center[0],dy=b.center[1]-a.center[1];
-    if(dx*a.side[1]-dy*a.side[0]<=1e-6 || dx*b.side[1]-dy*b.side[0]<=1e-6) return fail("folded or reversed section");
-  }
-  const left=sections.map(s=>s.center.map((v,k)=>v-s.side[k]*s.width/2) as Vec3);
-  const right=sections.map(s=>s.center.map((v,k)=>v+s.side[k]*s.width/2) as Vec3);
-  const orient=(a:Vec3,b:Vec3,c:Vec3)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
-  for(const first of [left,right]) for(const second of [left,right]) for(let i=1;i<first.length;i++) for(let j=i+2;j<second.length;j++) {
-    if(orient(first[i-1],first[i],second[j-1])*orient(first[i-1],first[i],second[j])<0 && orient(second[j-1],second[j],first[i-1])*orient(second[j-1],second[j],first[i])<0) return fail("self-intersecting ribbon");
-  }
-  const meshes=transitionMeshes(pair),stair=meshes[0]?.kind==="stair";
-  if(meshes.some(mesh=>Array.from(mesh.positions).some(v=>!Number.isFinite(v)))) return fail("nonfinite emitted geometry");
-  // Bays are centered at 0,20,40,60 ft, consistent with the rendered root transforms.
-  if(meshes.some(mesh=>Array.from(mesh.positions).some((v,i)=>i%3!==2 && (v< -10 || v>70)))) return fail("outside fixed lattice footprint");
-  if(stair) {
-    // Inspect actual emitted tread/riser vertices, including left and right walking edges.
-    for(const mesh of meshes) {
-      const at=(i:number)=>Array.from(mesh.positions.slice(i*3,i*3+3)) as Vec3;
-      for(const side of [0,1]) {
-        const a=at(side),b=at(4+side),c=at(8+side);
-        if(Math.abs(c[2]-b[2])>.6+1e-6 || Math.abs(c[2]-b[2])<1e-5) return fail("stair riser");
-        if(distance(a,b)<.75 || Math.abs(a[2]-b[2])>.02) return fail("stair tread");
-      }
-      if(Math.abs(at(0)[2]-at(1)[2])>.02) return fail("stair cross slope");
-    }
-  } else {
-    // Every segment, including short samples and both ribbon edges; never average-only slope.
-    for(const edge of [left,right,path]) for(let i=1;i<edge.length;i++) {
-      const span=distance(edge[i-1],edge[i]),rise=Math.abs(edge[i][2]-edge[i-1][2]);
-      if(rise>ACCESSIBLE_RAMP_SLOPE*span+1e-6) return fail("individual ramp segment slope");
-    }
-    if(sections.some(s=>Math.abs(s.side[2])>1/48)) return fail("walking cross slope");
-  }
-  // Landing/support probes lie behind each outward edge, on the original source surface.
-  const landingPoints:Vec3[]=[];
-  for(const [id,point,direction,width] of [[pair.tileA,pair.from,pair.startDirection,pair.startWidth],[pair.tileB,pair.to,pair.endDirection,pair.endWidth]] as const) {
-    const model=models.find(m=>m.id===id),tile=tiles.find(t=>t.id===id);
-    if(!model||!tile||!direction||!width) return fail("missing landing interface");
-    const depth=stair?Math.max(3,width):2;
-    for(let d=0;d<=depth;d+=.5) for(let s=-1;s<=1;s+=.5) {
-      const p:Vec3=[point[0]-direction[0]*d-direction[1]*width*.5*s,point[1]-direction[1]*d+direction[0]*width*.5*s,point[2]];
-      const gap=measureSurfaceGap(model,tile,p,1,SURFACE_CONTACT_TOLERANCE);
-      if(gap.distance>SURFACE_CONTACT_TOLERANCE || !["edge","floor"].includes(gap.kind)) return fail(stair?"stair landing support":"walking approach support",{id,point:p,gap});
-      landingPoints.push(p);
-    }
-    const approach=validateWalkingApproach(model,tile,point,direction,width,depth,models,tiles,existing,stair);
-    if(!approach.valid)return fail("continuous approach: "+approach.reason,{id,...approach.details as object});
-  }
-  if(!transitionSurfaceClear(pair,tiles,models,existing)) return fail("collision or route headroom");
-  const headroom=landingHeadroomCheck(landingPoints,tiles,models,existing);
-  if(!headroom.clear) return fail("landing headroom",headroom);
-  // Return the geometry just validated; caller regenerates via the same immutable pair.
-  return fail("accepted",{kind:meshes[0]?.kind,run,stairSteps:stair?meshes.length:0});
+  return validateCirculationConnection(pair,models,tiles,existing,{maxRun:budget.maxRun,fixedFootprint:true,routeName});
 }

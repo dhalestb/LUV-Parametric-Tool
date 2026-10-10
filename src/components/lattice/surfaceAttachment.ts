@@ -11,6 +11,8 @@ export const SURFACE_CONTACT_TOLERANCE = 0.2;
 export const ATTACHMENT_SEARCH_RADIUS = 8;
 /** Two walkable surfaces this close are a real interface, not a voxel coincidence. */
 export const INTERFACE_TOLERANCE = 0.25;
+/** Numerical alignment, not the much larger proximity allowance used to find candidates. */
+export const FLUSH_INTERFACE_TOLERANCE = 1e-4;
 const WALKABLE_NORMAL_Z = 0.7;
 const CELL = 4;
 
@@ -21,6 +23,54 @@ export type SurfaceGap = {
   kind: SurfaceKind;
   normalZ: number;
 };
+
+/** Exact piecewise-linear coverage of a complete emitted walking edge on physical slab tops.
+ * XY clipping supplies triangle intervals; plane equations verify height throughout each interval.
+ * Source coordinates and face winding are never edited. Triangle IDs are source triangulation IDs.
+ */
+export function measureFlushWalkingInterface(model:TileModel,tile:PlacedTile,edge:[Vec3,Vec3]) {
+  const finish=beginGeometryValidation();
+  try {
+    const index=surfaceIndex(model);
+    if(!index)return {valid:false,status:"UNVERIFIED" as const,reason:"missing original surface",horizontalGap:Infinity,boundaryGap:Infinity,boundaryVerified:false,maxElevationDiscontinuity:Infinity,segments:[]};
+    const [a,b]=edge.map(point=>localPoint(point,tile,model)),length=Math.hypot(b[0]-a[0],b[1]-a[1]);
+    const supported:Array<{start:number;end:number;triangle:number;sourceElevations:number[];connectorElevations:number[];normal:Vec3}>=[];
+    const projected:Array<[number,number]>=[];
+    let closestMismatch=Infinity;
+    for(const [triangleId,tri] of index.triangles.entries()) {
+      if(!tri.walkable || Math.max(a[0],b[0])<tri.min[0] || Math.min(a[0],b[0])>tri.max[0] || Math.max(a[1],b[1])<tri.min[1] || Math.min(a[1],b[1])>tri.max[1])continue;
+      const u=sub(tri.b,tri.a),v=sub(tri.c,tri.a),den=u[0]*v[1]-u[1]*v[0];
+      if(Math.abs(den)<1e-12)continue;
+      const bary=(p:Vec3)=>{const x=p[0]-tri.a[0],y=p[1]-tri.a[1],s=(x*v[1]-y*v[0])/den,t=(u[0]*y-u[1]*x)/den;return [1-s-t,s,t];};
+      const ba=bary(a),bb=bary(b);let lo=0,hi=1;
+      for(let k=0;k<3;k++) {
+        const delta=bb[k]-ba[k];
+        if(Math.abs(delta)<1e-14){if(ba[k]<-1e-10){hi=-1;break;}}
+        else if(delta>0)lo=Math.max(lo,-ba[k]/delta);else hi=Math.min(hi,-ba[k]/delta);
+      }
+      if(hi<lo || hi<0 || lo>1)continue;
+      lo=Math.max(0,lo);hi=Math.min(1,hi);projected.push([lo,hi]);
+      const floorAt=(t:number)=>{const q=ba.map((w,k)=>w+(bb[k]-w)*t);return q[0]*tri.a[2]+q[1]*tri.b[2]+q[2]*tri.c[2];};
+      const source=[floorAt(lo),floorAt(hi)],connector=[a[2]+(b[2]-a[2])*lo,a[2]+(b[2]-a[2])*hi];
+      const mismatch=Math.max(...source.map((z,i)=>Math.abs(z-connector[i])));closestMismatch=Math.min(closestMismatch,mismatch);
+      if(mismatch>FLUSH_INTERFACE_TOLERANCE)continue;
+      const normal:Vec3=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],den],norm=Math.hypot(...normal);
+      supported.push({start:lo,end:hi,triangle:triangleId,sourceElevations:source.map(z=>z+placementWorldZ(tile)),connectorElevations:connector.map(z=>z+placementWorldZ(tile)),normal:normal.map(n=>n/norm*(den>=0?1:-1)) as Vec3});
+    }
+    const gap=(ranges:Array<[number,number]>)=>{let end=0,missing=0;for(const [a,b] of ranges.sort((x,y)=>x[0]-y[0])){missing+=Math.max(0,a-end);end=Math.max(end,b);}return (missing+Math.max(0,1-end))*length;};
+    const horizontalGap=gap(projected),flushGap=gap(supported.map(s=>[s.start,s.end]));
+    const boundaryRanges:Array<[number,number]>=[];
+    for(const run of index.runs) {
+      const project=(p:Vec3)=>((p[0]-a[0])*(b[0]-a[0])+(p[1]-a[1])*(b[1]-a[1]))/(length*length);
+      const ta=project(run.a),tb=project(run.b);
+      const onLine=(p:Vec3,t:number)=>Math.hypot(...p.map((v,k)=>v-(a[k]+(b[k]-a[k])*t)))<=FLUSH_INTERFACE_TOLERANCE;
+      if(onLine(run.a,ta)&&onLine(run.b,tb)){const lo=Math.max(0,Math.min(ta,tb)),hi=Math.min(1,Math.max(ta,tb));if(hi>=lo)boundaryRanges.push([lo,hi]);}
+    }
+    const boundaryGap=gap(boundaryRanges);
+    const valid=length>0 && horizontalGap<=1e-6 && flushGap<=1e-6;
+    return {valid,status:valid?"PASS" as const:"FAIL" as const,reason:valid?"flush full-width walking interface":horizontalGap>1e-6?"unsupported interface gap":"endpoint elevation discontinuity",horizontalGap,flushGap,boundaryGap,boundaryVerified:boundaryGap<=1e-6,maxElevationDiscontinuity:valid?Math.max(0,...supported.flatMap(s=>s.sourceElevations.map((z,i)=>Math.abs(z-s.connectorElevations[i])))):closestMismatch,segments:supported};
+  } finally {finish();}
+}
 
 export type WalkableAnchor = {
   point: Vec3;

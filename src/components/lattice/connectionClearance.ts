@@ -3,6 +3,7 @@ import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnos
 import type { PlacedTile, PortPair, TileModel, Vec3 } from "./types";
 import { placementWorldZ } from "./types";
 import { transitionMeshes, transitionSections } from "./transitionGeometry";
+import { measureFlushWalkingInterface } from "./surfaceAttachment";
 
 type Triangle = [Vec3,Vec3,Vec3];
 type Bounds = {min:Vec3;max:Vec3};
@@ -150,7 +151,21 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
     const direction=tile.id===pair.tileA?pair.startDirection:pair.endDirection;
     const localEnd=endpoint?localPoint(endpoint,tile,model):null;
     const localDir=endpoint&&direction?sub(localPoint(endpoint.map((v,i)=>v+direction[i]) as Vec3,tile,model),localEnd!):null;
-    const allowed=(p:Vec3)=>!!localEnd&&!!localDir&&Math.abs(dot(sub(p,localEnd),localDir))<=.04&&Math.abs(p[2]-localEnd[2])<=.26;
+    const meshes=endpoint?transitionMeshes(pair):[],endMesh=tile.id===pair.tileA?meshes[0]:meshes.at(-1);
+    const offset=tile.id===pair.tileA?0:(endMesh?.positions.length??12)-12;
+    const seam=endMesh?[Array.from(endMesh.positions.slice(offset,offset+3)),Array.from(endMesh.positions.slice(offset+3,offset+6))] as [Vec3,Vec3]:undefined;
+    const interfaceCheck=seam?measureFlushWalkingInterface(model,tile,seam):undefined;
+    const localSeam=seam?.map(p=>localPoint(p,tile,model));
+    // Only coplanar contact at a proven physical walking boundary is exempt.
+    // Follow its actual cross-slope; never exempt a band penetrating the form.
+    const allowed=(p:Vec3)=>{
+      if(!localEnd||!localDir||!localSeam||!interfaceCheck?.valid||!interfaceCheck.boundaryVerified)return false;
+      if(Math.abs(dot(sub(p,localEnd),localDir))>1e-5)return false;
+      const [a,b]=localSeam,edge=sub(b,a),lengthSquared=edge[0]**2+edge[1]**2;
+      const t=((p[0]-a[0])*edge[0]+(p[1]-a[1])*edge[1])/lengthSquared;
+      const floor=a[2]+edge[2]*t;
+      return t>=-1e-6&&t<=1+1e-6&&p[2]<=floor+1e-6&&p[2]>=floor-.25-1e-6;
+    };
     for(const tri of connectorTriangles()) if(collides(tri.map(p=>localPoint(p,tile,model)) as Triangle,tree,allowed)){failureReason = "source triangle collision";connectionDiagnostic("clearance", failureReason, { pair, blocker: tile, filename: model.filename });return false;}
     // Standing clearance over the walking ribbon, including walls/roof above it.
     for(const section of transitionSections(pair)) for(const side of [-.5,0,.5]) {

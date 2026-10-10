@@ -1,6 +1,5 @@
 import { beginGeometryValidation, geometryRevision } from "./geometryRevision";
-import { confirmedCirculationReports } from "./surfaceAttachment";
-import { acceptCirculationClass, preparePortConnection, portAttachmentMeets } from "./portConnectionValidation";
+import { acceptCirculationClass, preparePortConnection, portAttachmentMeets, validateCirculationConnection } from "./portConnectionValidation";
 import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import type { ConnectionPort, ConnectionReport, PlacedTile, PortCandidate, PortPair, PortRejection, TileModel, TileVariant, Vec3 } from "./types";
 import { LATTICE_FEET, packCell, placementWorldZ } from "./types";
@@ -127,7 +126,8 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
   const find=(id:string):string=>parent.get(id)===id?id:find(parent.get(id)!);
   const join=(a:string,b:string)=>parent.set(find(a),find(b));
   // Only proven source circulation is already an edge. Mere proxy overlap is not circulation.
-  const confirmedReports = confirmedCirculationReports(models, tiles, reports);
+  // Point-only interface reports have no full-width approach evidence. The port gate below can qualify a direct route.
+  const confirmedReports: ConnectionReport[] = [];
   for(const r of confirmedReports) join(r.tileA,r.tileB);
   const componentsBefore=new Set(tiles.map(t=>find(t.id))).size;
   const pairs:PortPair[]=[],used=new Map<string,Array<{offset:number;width:number}>>(),surfaces:ConnectorSurface[]=[];
@@ -146,6 +146,8 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
       if(pathLength(routed.path!)>(tolerances.maxDistance??DEFAULT_PORT_TOLERANCES.maxDistance)*1.4){validationReason="DISTANCE";connectionDiagnostic("port route", "route length", { pair: routed, bend });continue;}
       if (!portAttachmentMeets(routed, models, tiles)) { validationReason = "SURFACE ATTACHMENT"; connectionDiagnostic("port route", "surface attachment", { pair: routed, bend }); continue; }
       if (!acceptCirculationClass(routed)) { validationReason = "SLOPE"; connectionDiagnostic("port route", "slope", { pair: routed, bend }); continue; }
+      const complete=validateCirculationConnection(routed,models,tiles,surfaces);
+      if(complete.reason!=="accepted"){validationReason="CIRCULATION VALIDATION";connectionDiagnostic("port route",complete.reason,{pair:routed,bend,details:complete.details});continue;}
       validationReason = "COLLISION";
       if(routeClear(routed,tiles,models,surfaces)){accepted=routed;break;}
     }

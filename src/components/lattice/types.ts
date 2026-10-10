@@ -153,7 +153,7 @@ export type ConnectionPort = {
   profile?: [Vec3,Vec3];
 };
 export type ConnectionClass = "DIRECT" | "ADAPTIVE" | "VERTICAL";
-export type PortRejection = "SURFACE ATTACHMENT" | "SLOPE" | "DISTANCE" | "ANGLE" | "LATERAL OFFSET" | "ELEVATION" | "WIDTH" | "COLLISION" | "LOW CONFIDENCE" | "NETWORK REDUNDANT" | "PORT IN USE";
+export type PortRejection = "CIRCULATION VALIDATION" | "SURFACE ATTACHMENT" | "SLOPE" | "DISTANCE" | "ANGLE" | "LATERAL OFFSET" | "ELEVATION" | "WIDTH" | "COLLISION" | "LOW CONFIDENCE" | "NETWORK REDUNDANT" | "PORT IN USE";
 export type PortCandidate = { pair: PortPair; accepted: boolean; reason?: PortRejection };
 export type PortPair = {
   tileA: string;

@@ -1,12 +1,12 @@
 import { beginGeometryValidation } from "./geometryRevision";
-import { acceptCirculationClass, preparePortConnection, portAttachmentMeets, switchbackRampPath } from "./portConnectionValidation";
+import { acceptCirculationClass, preparePortConnection, portAttachmentMeets, switchbackRampPath, validateCirculationConnection } from "./portConnectionValidation";
 import { connectionDiagnostic } from "./connectionDiagnostics";
 import type { ConnectionReport, Direction, Mirror, PlacedTile, PortCandidate, PortPair, PortRejection, Rotation, TileModel } from "./types";
 import { portPairClearanceValidated } from "./portMatching";
 import { transitionMeshes, pathLength, transitionPath, circulationProfile, formatCirculation, planRun, maxPlanSlope, ACCESSIBLE_RAMP_SLOPE, type CirculationMode } from "./transitionGeometry";
 import { transitionSurfaceClear } from "./connectionClearance";
 import { findOrganicLinks, sealOrganicGraph, type JoinedStory, type OrganicDiagnostics, type OrganicLink, type OrganicRejection } from "./organicConnections";
-import { confirmedWalkableInterface, fitLoftContact, measureSurfaceGap } from "./surfaceAttachment";
+import { fitLoftContact, measureSurfaceGap } from "./surfaceAttachment";
 import { LATTICE_FEET, oppositeDirection, placementWorldZ, unpackCell } from "./types";
 
 export type ConnectorKind = "bridge" | "plate" | "ramp" | "stair" | "landing" | "vertical-link";
@@ -278,8 +278,16 @@ export function synthesizeConnectors(
   try {
   if (options) {
     const result=synthesizePortConnectors(models,placed,connections,options.portPairs);
-    result.portCandidates=options.candidates;
-    if(options.candidates)result.connectionDiagnostics={candidateCount:options.candidates.length,acceptedCount:result.portPairs!.length,rejectedCount:options.candidates.length-result.portPairs!.length,rejectionCounts:options.rejectionCounts??{},componentsBefore:options.componentsBefore??placed.length,componentsAfter:options.componentsAfter??placed.length};
+    const accepted = new Set(result.portPairs?.map(pair=>JSON.stringify(pair)));
+    result.portCandidates=options.candidates?.map(candidate=>candidate.accepted && !accepted.has(JSON.stringify(candidate.pair))
+      ? {...candidate,accepted:false,reason:"CIRCULATION VALIDATION" as const} : {...candidate});
+    // Synthesis can reject a matched route when earlier emitted connectors occupy its clearance.
+    // Keep diagnostics consistent with the final emitted list without mutating matching results.
+    if(result.portCandidates){
+      const rejectionCounts:Partial<Record<PortRejection,number>>={};
+      for(const candidate of result.portCandidates)if(candidate.reason)rejectionCounts[candidate.reason]=(rejectionCounts[candidate.reason]??0)+1;
+      result.connectionDiagnostics={candidateCount:result.portCandidates.length,acceptedCount:result.portPairs!.length,rejectedCount:result.portCandidates.length-result.portPairs!.length,rejectionCounts,componentsBefore:options.componentsBefore??placed.length,componentsAfter:result.organicDiagnostics?.components??placed.length};
+    }
     return result;
   }
   const byTile = new Map(placed.map((tile) => [tile.id, tile]));
@@ -420,6 +428,8 @@ function synthesizePortConnectors(models: TileModel[], tiles: PlacedTile[], repo
     if (Math.min(pair.startWidth ?? pair.usableWidth, pair.endWidth ?? pair.usableWidth) < 2) { connectionDiagnostic("port synthesis", "width", { pair }); return false; }
     if (surfaces && !portAttachmentMeets(pair, models, tiles)) { connectionDiagnostic("port synthesis", "surface attachment", { pair }); return false; }
     if (!acceptCirculationClass(pair)) { connectionDiagnostic("port synthesis", "slope", { pair }); return false; }
+    const complete=validateCirculationConnection(pair,models,tiles,result.connectors);
+    if(complete.reason!=="accepted"){connectionDiagnostic("port synthesis",complete.reason,{pair,details:complete.details});return false;}
     // Recheck the exact emitted geometry, including connectors accepted earlier in this synthesis.
     if (!transitionSurfaceClear(pair, tiles, models, result.connectors)) { connectionDiagnostic("port synthesis", "collision or clearance", { pair }); return false; }
     const meshes=transitionMeshes(pair),run=planRun(pair.path??[]),slope=Math.abs(pair.rise)/Math.max(run,0.25);
@@ -445,18 +455,7 @@ function synthesizePortConnectors(models: TileModel[], tiles: PlacedTile[], repo
     if (report.interlock !== "PASS" || report.collision === "FAIL" || (report.floor !== "PASS" && report.circulation !== "PASS")) continue;
     const key = report.tileA < report.tileB ? `${report.tileA}|${report.tileB}` : `${report.tileB}|${report.tileA}`;
     if (joinedKeys.has(key)) continue;
-    const tileA = tiles.find((tile) => tile.id === report.tileA);
-    const tileB = tiles.find((tile) => tile.id === report.tileB);
-    const modelA = tileA ? resolveSynthesisModel(models, tileA.id) : undefined;
-    const modelB = tileB ? resolveSynthesisModel(models, tileB.id) : undefined;
-    const confirmed = tileA && tileB && modelA && modelB ? confirmedWalkableInterface(modelA, tileA, modelB, tileB) : { meets: false, elevation: Number.NaN };
-    if (!confirmed.meets) {
-      unresolved.push({ pair: `${report.tileA} ↔ ${report.tileB}`, detail: "Voxel floor or circulation overlap does not meet at a walkable OBJ interface." });
-      continue;
-    }
-    joinedKeys.add(key);
-    joined.push({ tileA: report.tileA, tileB: report.tileB, elevation: confirmed.elevation });
-    result.directInterlocks += 1;
+    unresolved.push({pair:`${report.tileA} ↔ ${report.tileB}`,detail:"Shared-surface contact lacks validated full-width walking approaches; no confirmed graph edge."});
   }
   const organic = findOrganicLinks(models, tiles, joined);
   const accepted: OrganicLink[] = [];
@@ -571,6 +570,8 @@ function appendOrganicLink(result: SynthesisResult, link: OrganicLink, models: T
   if (!acceptCirculationClass(pair)) return rejectLink("invalid circulation", `The path is steeper than a ramp and has no validated stair run. ${formatCirculation(link.rise, plan, profile.slope)}.`);
   if (!fitLoftContact(pair, models, tiles, false)) return rejectLink("missed surface", `Loft ends do not meet walkable surfaces${contactNote(pair, models, tiles)}.`);
   if (!transitionSurfaceClear(pair, tiles, models, result.connectors)) return rejectLink("route collision", "The loft intersects an OBJ or another connection.");
+  const complete=validateCirculationConnection(pair,models,tiles,result.connectors);
+  if(complete.reason!=="accepted")return rejectLink("invalid circulation",complete.reason);
   const run = planRun(pair.path ?? []);
   const slope = Math.abs(pair.rise) / Math.max(run, 0.25);
   const localSlope = maxPlanSlope(pair.path ?? []);
