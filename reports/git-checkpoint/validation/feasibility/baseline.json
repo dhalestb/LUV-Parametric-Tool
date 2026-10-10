@@ -1,0 +1,510 @@
+{
+  "mode": "baseline",
+  "checks": [
+    "original four OBJ/session hashes and single-level fixed placements preserved"
+  ],
+  "originalFixture": {
+    "lattice": {
+      "cellsX": 4,
+      "cellsY": 4,
+      "cellsZ": 1
+    },
+    "status": "REVIEW",
+    "score": -13.011071170282491,
+    "relationshipGeometry": [
+      {
+        "minSectionWidth": 2.02838134765625,
+        "maxWalkingEdgeSlope": 0.16964970801644622,
+        "meshSHA256": "c02416dd0ab591f7d0c78f98a468a86c30d4af05a50bbc838dff04d6bc9ffcbc"
+      },
+      {
+        "minSectionWidth": 1.9481252661783002,
+        "maxWalkingEdgeSlope": 0.3878501313903121,
+        "meshSHA256": "f33c223f3b0f4a1f824071f45e5fdb98bd24c1bb7251e1d786fb61f51a8cf2cc"
+      }
+    ],
+    "relationships": [
+      {
+        "tileA": "mesh-14-7xy9tm",
+        "tileB": "mesh-15-h24ulc",
+        "portA": "E4",
+        "portB": "P4",
+        "from": [
+          9.999996185302734,
+          -3.8605918884277344,
+          1.7307411432266235
+        ],
+        "to": [
+          16.48145294189453,
+          -8.133686065673828,
+          2.248160955278756
+        ],
+        "plan": 7.7632863875541736,
+        "rise": 0.5174198120521325,
+        "distance": 7.780510188740068,
+        "facing": 0.8348856957000375,
+        "widthCompatibility": 0.5434191189245426,
+        "confidence": 0.65,
+        "usableWidth": 2.02838134765625,
+        "startWidth": 2.02838134765625,
+        "endWidth": 3.7326278686523438,
+        "startProfile": [
+          [
+            9.999996185302734,
+            -4.874782562255859,
+            1.7307411432266235
+          ],
+          [
+            9.999996185302734,
+            -2.8464012145996094,
+            1.7307411432266235
+          ]
+        ],
+        "endProfile": [
+          [
+            16.48145294189453,
+            -6.267372131347656,
+            2.248160955278756
+          ],
+          [
+            16.48145294189453,
+            -10,
+            2.248160955278756
+          ]
+        ],
+        "portOffsetA": 0,
+        "portOffsetB": 0,
+        "startDirection": [
+          1,
+          0,
+          0
+        ],
+        "endDirection": [
+          -1,
+          0,
+          0
+        ],
+        "angle": 0,
+        "lateralOffset": 4.273094177246094,
+        "connectionClass": "VERTICAL",
+        "score": 6.9366489379261616,
+        "fallback": true,
+        "path": [
+          [
+            9.999996185302734,
+            -3.8605918884277344,
+            1.7307411432266235
+          ],
+          [
+            10.618186621805048,
+            -3.9680241822263156,
+            1.7777793079586355
+          ],
+          [
+            11.209402969616432,
+            -4.258626949634877,
+            1.8248174726906476
+          ],
+          [
+            11.78320819067053,
+            -4.686282583488739,
+            1.8718556374226596
+          ],
+          [
+            12.347913877549509,
+            -5.206771561711361,
+            1.9188938021546718
+          ],
+          [
+            12.910580253484078,
+            -5.777772447314332,
+            1.9659319668866837
+          ],
+          [
+            13.477016172353492,
+            -6.358861888397385,
+            2.0129701316186956
+          ],
+          [
+            14.051779118685532,
+            -6.911514618148382,
+            2.060008296350708
+          ],
+          [
+            14.638175207656532,
+            -7.399103454843323,
+            2.10704646108272
+          ],
+          [
+            15.23825918509134,
+            -7.786899301846341,
+            2.154084625814732
+          ],
+          [
+            15.85283442746336,
+            -8.042071147609706,
+            2.201122790546744
+          ],
+          [
+            16.48145294189453,
+            -8.133686065673828,
+            2.248160955278756
+          ]
+        ]
+      },
+      {
+        "tileA": "mesh-14-7xy9tm",
+        "tileB": "mesh-6-03znsf",
+        "portA": "organic",
+        "portB": "organic",
+        "from": [
+          3.8605880737304688,
+          9.999996185302734,
+          9.452584266662598
+        ],
+        "to": [
+          10.571971893310547,
+          18.611456871032715,
+          6.666666507720947
+        ],
+        "plan": 10.91787194995409,
+        "rise": -2.7859177589416504,
+        "distance": 11.267708980763604,
+        "facing": 1,
+        "widthCompatibility": 1,
+        "usableWidth": 2.0283737182617188,
+        "confidence": 0.8,
+        "score": 0,
+        "connectionClass": "VERTICAL",
+        "startWidth": 2.0283737182617188,
+        "endWidth": 2.0283737182617188,
+        "startDirection": [
+          0,
+          1,
+          0
+        ],
+        "endDirection": [
+          -1,
+          0,
+          0
+        ],
+        "startProfile": [
+          [
+            4.874774932861328,
+            9.999996185302734,
+            9.452584266662598
+          ],
+          [
+            2.8464012145996094,
+            9.999996185302734,
+            9.452584266662598
+          ]
+        ],
+        "endProfile": [
+          [
+            10.571971893310547,
+            19.625643730163574,
+            6.666666507720947
+          ],
+          [
+            10.571971893310547,
+            17.597270011901855,
+            6.666666507720947
+          ]
+        ],
+        "angle": 0,
+        "lateralOffset": 0,
+        "path": [
+          [
+            3.8605880737304688,
+            9.999996185302734,
+            9.452584266662598
+          ],
+          [
+            3.9053360197075127,
+            10.680353347216302,
+            9.266856416066487
+          ],
+          [
+            4.035317122368479,
+            11.402513577787403,
+            9.081128565470378
+          ],
+          [
+            4.24413727880812,
+            12.153326945253367,
+            8.895400714874267
+          ],
+          [
+            4.525402386121189,
+            12.91964351785152,
+            8.709672864278158
+          ],
+          [
+            4.872718341402439,
+            13.688313363819201,
+            8.523945013682047
+          ],
+          [
+            5.279691041746623,
+            14.446186551393737,
+            8.338217163085938
+          ],
+          [
+            5.739926384248494,
+            15.180113148812463,
+            8.152489312489827
+          ],
+          [
+            6.247030266002805,
+            15.876943224312702,
+            7.966761461893718
+          ],
+          [
+            6.79460858410431,
+            16.523526846131794,
+            7.781033611297607
+          ],
+          [
+            7.3762672356477585,
+            17.106714082507068,
+            7.595305760701498
+          ],
+          [
+            7.985612117727907,
+            17.61335500167585,
+            7.409577910105387
+          ],
+          [
+            8.61624912743951,
+            18.030299671875476,
+            7.223850059509277
+          ],
+          [
+            9.261784161877312,
+            18.344398161343275,
+            7.038122208913167
+          ],
+          [
+            9.915823118136075,
+            18.542500538316578,
+            6.852394358317057
+          ],
+          [
+            10.571971893310547,
+            18.611456871032715,
+            6.666666507720947
+          ]
+        ]
+      }
+    ],
+    "endpointAudit": [],
+    "routeFailureCounts": {
+      "port assessment: DISTANCE": 3528,
+      "port assessment: ANGLE": 339,
+      "port assessment: LATERAL OFFSET": 127,
+      "port assessment: ELEVATION": 30,
+      "cache: geometry content unchanged": 8,
+      "cache: surface gap hit": 4337,
+      "cache: source clearance hit": 1384,
+      "clearance: source triangle collision": 495,
+      "port candidate: COLLISION": 97,
+      "port route: route length": 12,
+      "port route: slope": 21,
+      "port candidate: SLOPE": 9,
+      "clearance: headroom": 19,
+      "port route: surface attachment": 55,
+      "port candidate: SURFACE ATTACHMENT": 11,
+      "port candidate: DISTANCE": 1,
+      "port candidate: network redundant": 6,
+      "organic: feature proximity": 5,
+      "attachment: proximity": 1670,
+      "attachment: no candidate attachment": 81,
+      "attachment: facing": 411,
+      "organic attachment: no landing surface": 252,
+      "organic attachment: invalid circulation": 78,
+      "organic: draft limit": 5,
+      "organic: profiled route deferred to synthesis": 45,
+      "organic: similar attachment pruned": 32,
+      "organic attachment: too far": 98,
+      "organic: pair proximity": 1,
+      "organic synthesis: route collision": 12,
+      "cache: geometry revision changed": 1,
+      "cache: connector tree miss": 1
+    },
+    "meshHashes": [
+      {
+        "code": "O2",
+        "filename": "undulating workspace.obj",
+        "sha256": "5eac71dbbcaaa363259f1688e278ff61bcf38791d9ccf4538f7f17f9bf001bac",
+        "vertices": 8802,
+        "faces": 15487
+      },
+      {
+        "code": "O1",
+        "filename": "void workspace.obj",
+        "sha256": "a6c3916a411ab0e72cc28a83992054e4f5623e84b0c4a32d014a18fe45d5205d",
+        "vertices": 3972,
+        "faces": 5890
+      },
+      {
+        "code": "G1",
+        "filename": "Gathering, Linear.obj",
+        "sha256": "c420eaad9120d0969ebe3b980fb4c01f1d08d5c00e5019b8a01a7f69a0caca24",
+        "vertices": 20865,
+        "faces": 41604
+      },
+      {
+        "code": "L1",
+        "filename": "Lobby, Vertical Void.obj",
+        "sha256": "a1f9c7a20e0cd2b382e94ca75ec70ee4d177bae9ab640b99b3071342a8472e86",
+        "vertices": 14282,
+        "faces": 28528
+      }
+    ],
+    "sessionSHA256": "6172019acf6d7cd88a4af2dca1ff570cd8e751a10fabc39da4efd65b12bc920b",
+    "placements": [
+      {
+        "id": "mesh-14-7xy9tm",
+        "ix": 0,
+        "iy": 0,
+        "iz": 0,
+        "variant": 0
+      },
+      {
+        "id": "mesh-15-h24ulc",
+        "ix": 1,
+        "iy": 0,
+        "iz": 0,
+        "variant": 2
+      },
+      {
+        "id": "mesh-6-03znsf",
+        "ix": 1,
+        "iy": 1,
+        "iz": 0,
+        "variant": 0
+      },
+      {
+        "id": "mesh-5-bva2xh",
+        "ix": 2,
+        "iy": 1,
+        "iz": 0,
+        "variant": 3
+      }
+    ],
+    "filenames": [
+      "undulating workspace.obj",
+      "void workspace.obj",
+      "Gathering, Linear.obj",
+      "Lobby, Vertical Void.obj"
+    ],
+    "trials": [
+      {
+        "cache": "cold",
+        "ms": 3132.6839999999993
+      },
+      {
+        "cache": "warm",
+        "ms": 74.90730000000076
+      },
+      {
+        "cache": "warm",
+        "ms": 68.3202999999994
+      },
+      {
+        "cache": "warm",
+        "ms": 76.1275999999998
+      },
+      {
+        "cache": "warm",
+        "ms": 62.46630000000005
+      },
+      {
+        "cache": "warm",
+        "ms": 58.04900000000089
+      },
+      {
+        "cache": "warm",
+        "ms": 60.950699999999415
+      }
+    ],
+    "acceptedPorts": 1,
+    "connectors": 6,
+    "ramps": 1,
+    "stairs": 1,
+    "components": 2,
+    "rejections": {
+      "DISTANCE": 3529,
+      "ANGLE": 339,
+      "LATERAL OFFSET": 127,
+      "ELEVATION": 30,
+      "COLLISION": 97,
+      "SLOPE": 9,
+      "SURFACE ATTACHMENT": 11,
+      "NETWORK REDUNDANT": 6
+    },
+    "organicRejections": [
+      {
+        "pair": "mesh-14-7xy9tm ↔ mesh-15-h24ulc",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-14-7xy9tm ↔ mesh-15-h24ulc",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-14-7xy9tm ↔ mesh-15-h24ulc",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-14-7xy9tm ↔ mesh-6-03znsf",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-14-7xy9tm ↔ mesh-6-03znsf",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-15-h24ulc ↔ mesh-6-03znsf",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-15-h24ulc ↔ mesh-5-bva2xh",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-6-03znsf ↔ mesh-5-bva2xh",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-6-03znsf ↔ mesh-5-bva2xh",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-6-03znsf ↔ mesh-5-bva2xh",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-6-03znsf ↔ mesh-5-bva2xh",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      },
+      {
+        "pair": "mesh-6-03znsf ↔ mesh-5-bva2xh",
+        "reason": "route collision",
+        "detail": "The loft intersects an OBJ or another connection."
+      }
+    ]
+  }
+}

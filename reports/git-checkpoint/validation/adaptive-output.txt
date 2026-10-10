@@ -1,0 +1,35 @@
+[
+  { code: 'O2', status: 'BLOCKED', reason: 'Not manifold' },
+  { code: 'O1', status: 'BLOCKED', reason: 'Not manifold' },
+  { code: 'G1', status: 'BLOCKED', reason: 'Not manifold' },
+  { code: 'L1', status: 'BLOCKED', reason: 'Not manifold' }
+]
+PASS automatic landing and actual bearing proposal
+PASS supported floor extension and attached landing
+PASS unsupported landing rejected
+PASS invalid bearing rejected
+PASS raised overlay rejected
+PASS support cannot replace original internal access
+PASS adaptation budget rejected
+PASS flush adapted boundary accepted by strict gate
+PASS support retained in effective collision geometry
+PASS confirmed edges only follow full validation
+PASS obstructed throat rejected before adaptation
+PASS localized derived opening and removed material
+PASS opt-in opening earns graph edge only after strict validation
+PASS preserve-original default blocks cutting
+PASS excessive source alteration rejected
+PASS ramp needs climbing travel; flat distance cannot waive slope
+PASS ramp-to-stair alternative requires valid landings
+PASS valid two-flight offset ramp with flat intermediate landing
+PASS automatic extension resolves insufficient original stair landing
+PASS derived connector enters actual synthesis graph after validation
+PASS unsupported stair rejected
+PASS excessive local ramp grade rejected
+PASS separate original, derived, landing, support and circulation categories
+PASS twenty-foot single-level registration preserved
+PASS original synthetic sources preserved after cuts and additions
+PASS in-place derived edit invalidates geometry cache
+(node:67268) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)

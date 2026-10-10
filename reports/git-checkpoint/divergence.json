@@ -1,0 +1,27 @@
+{
+  "branch": "organic-lattice-connections",
+  "head": "e0caff28e420ec7a22d57854b72df725f4b334ec",
+  "production": "40c7a62bf75c15ccd73aa5c4a90f7fc9b449889f",
+  "mergeBase": "07a733393c165d272dde185776deeea9272902e0",
+  "developmentOnly": [
+    "e0caff28e420ec7a22d57854b72df725f4b334ec Checkpoint bounded Stage 2B L1 feasibility study",
+    "abb7f9aa7c2796a805d379d0a3056b27a4982a87 Checkpoint bounded interior approaches and validated connection selection",
+    "6d0b6f8496cb5b08b0a151def3215fcc05dea5ff Checkpoint local material classification correction and validation",
+    "26657ffd752bfce309799155e00a8e9d4c01184d Checkpoint physical surface orientation correction and bounded validation",
+    "5d3c808fb195190b87223766e4d44571d0844b21 Checkpoint Stage 2A bounded alternative routing and diagnostics",
+    "a0cef60c0baaec6847b37404745a003c5110fd52 Checkpoint Phase 1.5 geometry-aware performance stabilization",
+    "6a839db9e88e67fdea0b986a1671814df03f2802 Checkpoint Stage 2 Phase 1 L1 diagnostics and confirmed connectivity",
+    "cd40b20e1d54458a4f57fe90480c73c96499685b Checkpoint Stage 1 OBJ surface attachment and circulation validation"
+  ],
+  "productionOnly": [
+    "40c7a62bf75c15ccd73aa5c4a90f7fc9b449889f Merge pull request #5 from dhalestb/ui-color-production",
+    "54e7199e914b45598d6dbbd10557fda447ed51d9 style: apply global architectural UI color system",
+    "86cec2683493287ef78a43daa90e26a284eeba97 Merge pull request #4 from dhalestb/presentation-mode",
+    "b2ef197c3a9fdae2df3faf8e5a1b29770722b1b3 Merge pull request #3 from dhalestb/dhalestb-patch-1",
+    "4ac8530afd5bba2875acd94c575b3f5fa1aef71c Add CODEOWNERS",
+    "e3c2df47bdd3d38502d9a65a6f102e9b7e3fba4f Let configuration history restore any run without dropping newer ones.",
+    "cdad8e4d6bdb5158f0f2a981e2cdb553325e1f91 Merge pull request #2 from dhalestb/assignment2-lattice",
+    "4fa314b2fa59d29ef2d62b21d5c1ae5b2e124bad Merge pull request #1 from dhalestb/assignment2-lattice"
+  ],
+  "worktrees": "worktree C:/Users/DHale/Documents/Codex/Cursor-APP\nHEAD e0caff28e420ec7a22d57854b72df725f4b334ec\nbranch refs/heads/organic-lattice-connections\n\nworktree C:/Users/DHale/.codex/worktrees/ui-color-production/Cursor-APP\nHEAD 54e7199e914b45598d6dbbd10557fda447ed51d9\nbranch refs/heads/ui-color-production\n\nworktree C:/Users/DHale/.codex/worktrees/ui-global-color-system/Cursor-APP\nHEAD e0caff28e420ec7a22d57854b72df725f4b334ec\nbranch refs/heads/ui-global-color-system"
+}

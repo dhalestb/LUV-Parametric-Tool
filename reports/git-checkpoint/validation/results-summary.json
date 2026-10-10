@@ -1,0 +1,17 @@
+{
+  "integrated": 0,
+  "adaptive": 0,
+  "feasibilityBaseline": 0,
+  "feasibilityCorrected": 0,
+  "descriptors": {
+    "exit": 0,
+    "pass": 24
+  },
+  "lint": 0,
+  "typescript": {
+    "exit": 1,
+    "preExistingErrors": 6
+  },
+  "build": 0,
+  "adaptiveAssertions": 26
+}

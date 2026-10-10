@@ -1,0 +1,60 @@
+
+> d7-letter-grid@0.1.0 build
+> node scripts/patch-next-eisdir.js && next build
+
+[patch-next-eisdir] next-trace-entrypoints-plugin.js already patched
+[patch-next-eisdir] collect-build-traces.js already patched
+[patch-next-eisdir] no changes needed
+   ▲ Next.js 15.5.27
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 5.5s
+   Linting and checking validity of types ...
+
+./src/components/amphitheaterPrototype.ts
+540:48  Warning: 'itemIndex' is defined but never used.  @typescript-eslint/no-unused-vars
+571:29  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+580:27  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+1044:11  Warning: 'nearestPair' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/lattice/distribution.ts
+297:5  Warning: 'neighborCount' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/lattice/LatticeViewport.tsx
+188:9  Warning: The 'visibleMeshes' conditional could make the dependencies of useMemo Hook (at line 200) change on every render. To fix this, wrap the initialization of 'visibleMeshes' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+246:6  Warning: React Hook useMemo has a missing dependency: 'field'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+484:104  Warning: React Hook useImperativeHandle has an unnecessary dependency: 'canvasKey'. Either exclude it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/lattice/search.ts
+444:16  Warning: 'rankAttachments' is defined but never used.  @typescript-eslint/no-unused-vars
+573:16  Warning: 'beamSearch' is defined but never used.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/11) ...
+   Generating static pages (2/11) 
+   Generating static pages (5/11) 
+   Generating static pages (8/11) 
+ ✓ Generating static pages (11/11)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    6.08 kB         117 kB
+├ ○ /_not-found                            995 B         104 kB
+├ ƒ /api/export-volume                     123 B         103 kB
+├ ○ /composition                         65.9 kB         423 kB
+├ ○ /crops                               3.22 kB         114 kB
+├ ○ /evaluations                         15.7 kB         383 kB
+├ ○ /lattice                               57 kB         280 kB
+├ ○ /shapes                              2.25 kB         218 kB
+└ ○ /voids                               2.89 kB         218 kB
++ First Load JS shared by all             103 kB
+  ├ chunks/255-ce8c7c75002f810b.js       46.5 kB
+  ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+  └ other shared chunks (total)          2.28 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

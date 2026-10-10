@@ -1,0 +1,53 @@
+{
+  "identicalStylingDiff": true,
+  "production": [
+    {
+      "path": "src/app/board.css",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/app/globals.css",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/components/AppNav.tsx",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/components/CompositionStudio.tsx",
+      "byteIdenticalToProduction": false
+    },
+    {
+      "path": "src/components/CropEvalGrid.tsx",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/components/CropsPage.tsx",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/components/LetterGrid.tsx",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/components/PrototypeDemonstration.tsx",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/components/ShapesPage.tsx",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/components/VoidsPage.tsx",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/components/evaluations/ArchitecturalEvaluations.tsx",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/components/lattice/LatticeStudio.tsx",
+      "byteIdenticalToProduction": false
+    }
+  ]
+}
