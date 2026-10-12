@@ -245,9 +245,21 @@ export function openVolumeScore(measurement: Pick<OpenVolumeMeasurement, "archit
   );
 }
 
-/** Score architectural openness from an occupied voxel set. Coordinates are in cell units. */
-export function measureOpenVolume(cells: Voxel[]): OpenVolumeMeasurement {
-  if (!cells.length) return emptyMeasurement();
+type OpenCellScan = {
+  occupied: Set<string>;
+  envMin: Voxel;
+  envMax: Voxel;
+  formVolume: number;
+  freeInForm: number;
+  enclosed: number;
+  interstitial: number;
+  free: Voxel[];
+  interstitialCells: Voxel[];
+};
+
+/** Same free-cell walk measureOpenVolume uses. Extra arrays do not change the ratios. */
+function classifyOpenCells(cells: Voxel[]): OpenCellScan | null {
+  if (!cells.length) return null;
   let minX = Infinity;
   let minY = Infinity;
   let minZ = Infinity;
@@ -268,23 +280,47 @@ export function measureOpenVolume(cells: Voxel[]): OpenVolumeMeasurement {
   const formMax: Voxel = [maxX, maxY, maxZ];
   const { min: envMin, max: envMax } = envelopeBounds(formMin, formMax);
   const outside = floodExterior(occupied, envMin, envMax);
-
   const formVolume = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
   let freeInForm = 0;
   let enclosed = 0;
   let interstitial = 0;
+  const free: Voxel[] = [];
+  const interstitialCells: Voxel[] = [];
   for (let x = minX; x <= maxX; x += 1) {
     for (let y = minY; y <= maxY; y += 1) {
       for (let z = minZ; z <= maxZ; z += 1) {
         const key = cellKey(x, y, z);
         if (occupied.has(key)) continue;
         freeInForm += 1;
+        free.push([x, y, z]);
         const exterior = outside.has(key);
         if (!exterior) enclosed += 1;
-        else if (isInterstitial(occupied, x, y, z, formMin, formMax)) interstitial += 1;
+        else if (isInterstitial(occupied, x, y, z, formMin, formMax)) {
+          interstitial += 1;
+          interstitialCells.push([x, y, z]);
+        }
       }
     }
   }
+  return { occupied, envMin, envMax, formVolume, freeInForm, enclosed, interstitial, free, interstitialCells };
+}
+
+/**
+ * Located cells from the Open Volume walk.
+ * `free` is every unoccupied cell inside the occupied bounds (architectural open space).
+ * `interstitial` is the subset that passes the same between-surface test as the score term.
+ */
+export function openVolumeRegions(cells: Voxel[]) {
+  const scan = classifyOpenCells(cells);
+  if (!scan) return { free: [] as Voxel[], interstitial: [] as Voxel[] };
+  return { free: scan.free, interstitial: scan.interstitialCells };
+}
+
+/** Score architectural openness from an occupied voxel set. Coordinates are in cell units. */
+export function measureOpenVolume(cells: Voxel[]): OpenVolumeMeasurement {
+  const scan = classifyOpenCells(cells);
+  if (!scan) return emptyMeasurement();
+  const { occupied, envMin, envMax, formVolume, freeInForm, enclosed, interstitial } = scan;
 
   const rates = AXES.map((axis) => directionPassRate(occupied, envMin, envMax, axis.dx, axis.dy, axis.dz));
   const permeability = rates.reduce((sum, rate) => sum + rate, 0) / rates.length;

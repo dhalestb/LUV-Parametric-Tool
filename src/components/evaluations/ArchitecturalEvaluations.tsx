@@ -20,6 +20,7 @@ import {
   type DescriptorResult,
   type FormDescriptorEvaluation,
 } from "./objDescriptorAnalysis";
+import DescriptorComparison from "./DescriptorComparison";
 
 const buttonStyle = { borderColor: "var(--line)", background: "var(--panel-soft)", color: "var(--ink)" } as const;
 
@@ -118,7 +119,7 @@ function previewStats(mesh: ImportedObj, unit: UnitName, upAxisMode: UpAxisMode)
 }
 
 export default function ArchitecturalEvaluations() {
-  const { hydrated, origin, meshes, assignments, unit, upAxisMode, loadSampleObjs } = useLatticeSource();
+  const { hydrated, origin, meshes, assignments, unit, upAxisMode, loadSampleObjs, geometryPersisted } = useLatticeSource();
   const [models, setModels] = useState<Record<string, TileModel>>({});
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("Waiting for the Lattice source registry…");
@@ -248,6 +249,11 @@ export default function ArchitecturalEvaluations() {
       </header>
 
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>{status}</p>
+      {!geometryPersisted && (
+        <p className="text-[12px]" style={{ color: "var(--muted)" }}>
+          The uploaded meshes are in this browser tab only. They are too large for browser storage, so a refresh clears them. Evaluations does not substitute the bundled sample tiles.
+        </p>
+      )}
 
       <div className="evaluations-layout grid min-h-0 flex-1 gap-3 lg:grid-cols-[280px_minmax(0,1fr)_320px]">
         <aside className="min-h-0 overflow-auto rounded border p-2" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
@@ -428,6 +434,20 @@ export default function ArchitecturalEvaluations() {
           )}
         </aside>
       </div>
+      <DescriptorComparison
+        rows={rows.map((row) => ({
+          slotId: row.slot.id,
+          code: row.slot.code,
+          name: row.slot.name,
+          mesh: row.mesh,
+          result: row.result,
+          model: row.mesh ? models[row.mesh.id] : undefined,
+        }))}
+        descriptorId={explainId}
+        onDescriptor={setExplainId}
+        unit={unit}
+        upAxisMode={upAxisMode}
+      />
     </div>
   );
 }
