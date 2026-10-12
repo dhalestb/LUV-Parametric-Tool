@@ -1,0 +1,563 @@
+{
+  "outcome": "complete",
+  "sourceProvenance": "External directory of the 15 original architectural OBJ files, supplied with --source or LUV_ARCHITECTURAL_OBJS. The files are not stored in this repository.",
+  "readable": 15,
+  "extraObjFiles": [],
+  "files": [
+    {
+      "filename": "Gathering Linear.obj",
+      "bytes": 4166086,
+      "sha256": "9b89c6ff42da8f57c3aa3adeca2855f1dd2b136f29c62e9933c9bf4b0d1309ee",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": null,
+      "vertices": 20865,
+      "faces": 41604,
+      "triangles": 41604,
+      "fileBounds": {
+        "min": [
+          0,
+          0,
+          -20
+        ],
+        "max": [
+          20,
+          20,
+          0
+        ],
+        "size": [
+          20,
+          20,
+          20
+        ]
+      },
+      "boundaryEdges": 264,
+      "nonManifoldEdges": 9,
+      "degenerateTriangles": 0,
+      "classification": "open-boundary+non-manifold",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "Gathering Void Field.obj",
+      "bytes": 680620,
+      "sha256": "3b4201b5555a33f69a142a1383396f0e38e6565eab5d83c9abe9d2f8db204869",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": "G2",
+      "vertices": 3611,
+      "faces": 7138,
+      "triangles": 7138,
+      "fileBounds": {
+        "min": [
+          0,
+          0,
+          -20
+        ],
+        "max": [
+          20,
+          20.19451332092285,
+          0
+        ],
+        "size": [
+          20,
+          20.19451332092285,
+          20
+        ]
+      },
+      "boundaryEdges": 80,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 0,
+      "classification": "open-boundary",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "Gathering, Plate.obj",
+      "bytes": 754913,
+      "sha256": "160e2981dc77b3006af46dfc7b406ddcac8d0d1e1c63f44f0769cf93ed19abbe",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": null,
+      "vertices": 4044,
+      "faces": 7924,
+      "triangles": 7924,
+      "fileBounds": {
+        "min": [
+          0,
+          0,
+          -20
+        ],
+        "max": [
+          20,
+          20,
+          0
+        ],
+        "size": [
+          20,
+          20,
+          20
+        ]
+      },
+      "boundaryEdges": 168,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 0,
+      "classification": "open-boundary",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "Gathering, Room within Volume.obj",
+      "bytes": 2679957,
+      "sha256": "b36e99252c585d728116b10656b81ec246b13dea9072fe5a7a940c4d5a5744fb",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": "G4",
+      "vertices": 15009,
+      "faces": 29854,
+      "triangles": 29854,
+      "fileBounds": {
+        "min": [
+          0,
+          0,
+          -20
+        ],
+        "max": [
+          21.3566951751709,
+          20,
+          0
+        ],
+        "size": [
+          21.3566951751709,
+          20,
+          20
+        ]
+      },
+      "boundaryEdges": 192,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 0,
+      "classification": "open-boundary",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "Gathering, Stepped.obj",
+      "bytes": 2341293,
+      "sha256": "0c17c3bbf21e920f1adb10ce253ff0c23f69ac10c55a6cef6c2bb9b8183ca546",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": null,
+      "vertices": 12783,
+      "faces": 21602,
+      "triangles": 21602,
+      "fileBounds": {
+        "min": [
+          0,
+          0,
+          -20
+        ],
+        "max": [
+          20,
+          20,
+          0
+        ],
+        "size": [
+          20,
+          20,
+          20
+        ]
+      },
+      "boundaryEdges": 4026,
+      "nonManifoldEdges": 25,
+      "degenerateTriangles": 10,
+      "classification": "open-boundary+non-manifold+degenerate",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "Lobby Continuous Hall.obj",
+      "bytes": 393963,
+      "sha256": "05bd0d5b1bb45adacc1a3be8e1dc25a518763d54ff3607e4aeb33fd18000f04a",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": "L3",
+      "vertices": 2110,
+      "faces": 4152,
+      "triangles": 4152,
+      "fileBounds": {
+        "min": [
+          26.80741310119629,
+          0,
+          -7.486072063446045
+        ],
+        "max": [
+          47.40058135986328,
+          20.675838470458984,
+          12.513928413391113
+        ],
+        "size": [
+          20.593168258666992,
+          20.675838470458984,
+          20.000000476837158
+        ]
+      },
+      "boundaryEdges": 64,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 0,
+      "classification": "open-boundary",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "Lobby Vertical Void.obj",
+      "bytes": 2464544,
+      "sha256": "f8e268d71ffeace9cf1002601854fd9457f70fcfba0f80ebe6aa1143a6475ac2",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": "L1",
+      "vertices": 14354,
+      "faces": 28576,
+      "triangles": 28576,
+      "fileBounds": {
+        "min": [
+          26.80741310119629,
+          0,
+          -7.486072063446045
+        ],
+        "max": [
+          46.807411193847656,
+          20.675838470458984,
+          12.513928413391113
+        ],
+        "size": [
+          19.999998092651367,
+          20.675838470458984,
+          20.000000476837158
+        ]
+      },
+      "boundaryEdges": 140,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 0,
+      "classification": "open-boundary",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "Lobby, Ground Field.obj",
+      "bytes": 1287963,
+      "sha256": "079d40f8d35c2e97bff80cb89b9b22e3f4995f4bf14d1e97c68db512df826606",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": "L4",
+      "vertices": 7017,
+      "faces": 11634,
+      "triangles": 11634,
+      "fileBounds": {
+        "min": [
+          0,
+          0,
+          -20.005250930786133
+        ],
+        "max": [
+          20,
+          19.95368003845215,
+          0
+        ],
+        "size": [
+          20,
+          19.95368003845215,
+          20.005250930786133
+        ]
+      },
+      "boundaryEdges": 2046,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 0,
+      "classification": "open-boundary",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "Lobby, Linear.obj",
+      "bytes": 1183726,
+      "sha256": "8b87c8de2b7f1ed046760e2eb7ab3f8ab20eb6b82ccf98ebff9f661a7e2663d9",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": null,
+      "vertices": 6220,
+      "faces": 12266,
+      "triangles": 12266,
+      "fileBounds": {
+        "min": [
+          -6.22327995300293,
+          2.8287699222564697,
+          -14.828381538391113
+        ],
+        "max": [
+          13.776721954345703,
+          22.82876968383789,
+          5.171621799468994
+        ],
+        "size": [
+          20.000001907348633,
+          19.99999976158142,
+          20.000003337860107
+        ]
+      },
+      "boundaryEdges": 194,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 0,
+      "classification": "open-boundary",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "Lobby, Sequential.obj",
+      "bytes": 1456963,
+      "sha256": "28c92a1a5041285f36a34906fb2dc89cd8467f749103f2fed27e80e1ca0a80b2",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": null,
+      "vertices": 7496,
+      "faces": 14911,
+      "triangles": 14911,
+      "fileBounds": {
+        "min": [
+          -4.669439792633057,
+          2.128570079803467,
+          -11.337961196899414
+        ],
+        "max": [
+          15.656245231628418,
+          22.128570556640625,
+          10.227270126342773
+        ],
+        "size": [
+          20.325685024261475,
+          20.000000476837158,
+          21.565231323242188
+        ]
+      },
+      "boundaryEdges": 123,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 0,
+      "classification": "open-boundary",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "workspace cascaded.obj",
+      "bytes": 1304508,
+      "sha256": "2b639c792496e47ae2938b7e7ea36cf502e277f6474208647e6fcc825c696436",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": "O2",
+      "vertices": 7311,
+      "faces": 13331,
+      "triangles": 13384,
+      "fileBounds": {
+        "min": [
+          114.58063507080078,
+          -5.395354563120236e-8,
+          -110.2763671875
+        ],
+        "max": [
+          134.58062744140625,
+          20,
+          -90.2763671875
+        ],
+        "size": [
+          19.99999237060547,
+          20.000000053953546,
+          20
+        ]
+      },
+      "boundaryEdges": 1200,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 224,
+      "classification": "open-boundary+degenerate",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "workspace flat deep-plate.obj",
+      "bytes": 4757564,
+      "sha256": "0be03280bff9635f04e8a41fa4cc587bed215a9e7b97aa624f25f10f9a9d5aef",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": null,
+      "vertices": 25374,
+      "faces": 45806,
+      "triangles": 46362,
+      "fileBounds": {
+        "min": [
+          24.63339614868164,
+          0,
+          -110.27637481689453
+        ],
+        "max": [
+          44.633399963378906,
+          20,
+          -90.2763671875
+        ],
+        "size": [
+          20.000003814697266,
+          20,
+          20.00000762939453
+        ]
+      },
+      "boundaryEdges": 4269,
+      "nonManifoldEdges": 1,
+      "degenerateTriangles": 251,
+      "classification": "open-boundary+non-manifold+degenerate",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "workspace open hall.obj",
+      "bytes": 822021,
+      "sha256": "b8142c17d0346fb323cca7425437e2b000ce9f2fa38b53db1a9dac326ce06cce",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": "O1",
+      "vertices": 4727,
+      "faces": 8091,
+      "triangles": 8276,
+      "fileBounds": {
+        "min": [
+          -4.95697021484375,
+          0,
+          -110.27637481689453
+        ],
+        "max": [
+          15.0430326461792,
+          20,
+          -90.2763671875
+        ],
+        "size": [
+          20.00000286102295,
+          20,
+          20.00000762939453
+        ]
+      },
+      "boundaryEdges": 1172,
+      "nonManifoldEdges": 11,
+      "degenerateTriangles": 108,
+      "classification": "open-boundary+non-manifold+degenerate",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "workspace undulating.obj",
+      "bytes": 1602629,
+      "sha256": "87731c1d40a112104505972793bb7b77c597516d17e7e305e65bb545878e2639",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": "O5",
+      "vertices": 8802,
+      "faces": 15487,
+      "triangles": 15578,
+      "fileBounds": {
+        "min": [
+          85.52510070800781,
+          0,
+          -110.27637481689453
+        ],
+        "max": [
+          105.52510833740234,
+          20,
+          -90.2763671875
+        ],
+        "size": [
+          20.00000762939453,
+          20,
+          20.00000762939453
+        ]
+      },
+      "boundaryEdges": 1932,
+      "nonManifoldEdges": 0,
+      "degenerateTriangles": 189,
+      "classification": "open-boundary+degenerate",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    },
+    {
+      "filename": "workspace void.obj",
+      "bytes": 627197,
+      "sha256": "e2f88136a1e936f19c798eae365e741396e613afee55c5100d0cbcc8d08e70e3",
+      "comments": [
+        "# Rhino"
+      ],
+      "suggestedSlotId": null,
+      "vertices": 3972,
+      "faces": 5890,
+      "triangles": 6141,
+      "fileBounds": {
+        "min": [
+          58.249237060546875,
+          -1.1619794548778373e-7,
+          -110.2763671875
+        ],
+        "max": [
+          78.24923706054688,
+          20,
+          -90.2763671875
+        ],
+        "size": [
+          20,
+          20.000000116197945,
+          20
+        ]
+      },
+      "boundaryEdges": 1787,
+      "nonManifoldEdges": 2,
+      "degenerateTriangles": 12,
+      "classification": "open-boundary+non-manifold+degenerate",
+      "watertight": false,
+      "upAxis": "y",
+      "unit": "Validated: Y-up, 1 file unit = 1 architectural foot. The OBJ comment does not name a unit.",
+      "orientation": "Parser default is Y-up. The file comment is '# Rhino' and does not say z-up or y-up."
+    }
+  ]
+}
