@@ -24,6 +24,13 @@ export function writeJson(key: string, value: unknown): boolean {
   }
 }
 
+/** Above this, the packed vertex buffer is left in memory. Browser storage cannot retain the architectural OBJ set. */
+export function geometryExceedsSessionStore(meshes: Array<{ positions?: ArrayLike<number> }>) {
+  let count = 0;
+  for (const mesh of meshes) count += mesh.positions?.length ?? 0;
+  return count > 200_000;
+}
+
 export function readSlideSignature(value: unknown): string | null {
   if (!value || typeof value !== "object" || !Array.isArray((value as { cells?: unknown }).cells)) return null;
   const slide = value as Record<string, unknown>;
