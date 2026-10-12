@@ -2,13 +2,32 @@ import type { Vec3 } from "./geometryView";
 
 export type EvidenceClass = "verified-geometric" | "documented-qualitative" | "unverified-interpretation" | "unavailable";
 
+export type EvidenceTransform = {
+  /** Coordinates stored on the evidence record, before the viewer transform. */
+  space: "spec-feet";
+  /** How a viewer may place these coordinates on the imported OBJ. Applied once. */
+  viewer: "specFeetToFile-then-tileRootMatrix";
+};
+
+/**
+ * Located evidence the viewer can draw.
+ * Only fields supplied by an evaluator are filled. Empty arrays are not implied geometry.
+ */
 export type EvidenceFeature = {
-  kind: "voxel";
+  kind: "voxel" | "point" | "line" | "region" | "direction" | "relation";
+  /** Source metric name. Drawing this feature must not recompute that metric. */
+  metric?: string;
   cells: Array<[number, number, number]>;
-  /** Spec feet, cell center. */
+  /** Spec feet. Cell centers, point positions, or representative samples. */
   centers: Vec3[];
   cellFeet: number;
   label: string;
+  coordinates?: "spec-feet";
+  transform?: EvidenceTransform;
+  /** Line, direction, or relationship endpoints in spec feet. */
+  segments?: Array<{ a: Vec3; b: Vec3 }>;
+  /** Region loops in spec feet. These are not merged into rooms. */
+  loops?: Vec3[][];
 };
 
 export type EvidenceRecord = {
@@ -103,10 +122,13 @@ export function buildDescriptorEvidence(input: {
   const features: EvidenceFeature[] = canDraw
     ? [{
       kind: "voxel",
+      metric: input.descriptorName,
       cells,
       centers: cells.map((cell) => cellCenter(input.anchor as Vec3, cell, input.cellFeet as number)),
       cellFeet: input.cellFeet as number,
       label: located.label,
+      coordinates: "spec-feet",
+      transform: { space: "spec-feet", viewer: "specFeetToFile-then-tileRootMatrix" },
     }]
     : [];
   const measured = componentText(input.components);
@@ -145,4 +167,120 @@ export function resolveEvidence(record: EvidenceRecord, formId: string, geometry
     overlayAvailable: false,
     explanation: "Overlay unavailable. This evidence belonged to a different form or an older geometry revision, so it was not applied.",
   };
+}
+
+export type SpatialEvidenceCategory = {
+  id: string;
+  metric: string;
+  label: string;
+  kind: EvidenceFeature["kind"] | "none";
+  available: boolean;
+  /** Evaluator cell indices. Empty when this metric has no located geometry. */
+  cells: Array<[number, number, number]>;
+  legend: string;
+  source: string;
+  transform: EvidenceTransform;
+};
+
+const SPEC_TRANSFORM: EvidenceTransform = {
+  space: "spec-feet",
+  viewer: "specFeetToFile-then-tileRootMatrix",
+};
+
+/**
+ * Categories the comparison can draw for one descriptor.
+ * Open Volume categories are the occupied, free, and interstitial rasters already
+ * produced for the score. Other descriptors stay aggregate: their cells are ignored.
+ */
+export function spatialCategoriesForDescriptor(input: {
+  descriptorId: string;
+  descriptorName: string;
+  occupied?: Array<[number, number, number]>;
+  free?: Array<[number, number, number]>;
+  interstitial?: Array<[number, number, number]>;
+}): SpatialEvidenceCategory[] {
+  if (input.descriptorId !== "openVolume") {
+    return [{
+      id: "aggregate",
+      metric: input.descriptorName,
+      label: "Spatial evidence unavailable",
+      kind: "none",
+      available: false,
+      cells: [],
+      legend: `Spatial evidence unavailable. ${input.descriptorName} is stored as aggregate measurements, so no points, cells, lines, or regions are drawn.`,
+      source: "Descriptor components only. Open Volume cells are not reused.",
+      transform: SPEC_TRANSFORM,
+    }];
+  }
+  const occupied = input.occupied ?? [];
+  const free = input.free ?? [];
+  const interstitial = input.interstitial ?? [];
+  return [
+    {
+      id: "interstitial",
+      metric: "Interstitial Space",
+      label: "Interstitial cells",
+      kind: "voxel",
+      available: interstitial.length > 0,
+      cells: interstitial,
+      legend: "Gold marks interstitial raster cells inside the occupied bounds. These are the cells counted by Interstitial Space. They are not confirmed accessible space.",
+      source: "openVolumeRegions interstitial list from the occupied raster already measured for this form.",
+      transform: SPEC_TRANSFORM,
+    },
+    {
+      id: "architectural-open",
+      metric: "Architectural Open Space",
+      label: "Free cells",
+      kind: "voxel",
+      available: free.length > 0,
+      cells: free,
+      legend: "Gold marks every unoccupied cell inside the occupied bounds. These are the cells counted by Architectural Open Space. This set is larger than the interstitial term. They are not confirmed accessible space.",
+      source: "openVolumeRegions free list from the same occupied raster.",
+      transform: SPEC_TRANSFORM,
+    },
+    {
+      id: "occupied",
+      metric: "Occupied raster",
+      label: "Occupied cells",
+      kind: "voxel",
+      available: occupied.length > 0,
+      cells: occupied,
+      legend: "Gold marks the occupied raster cells the evaluator treated as solid. These are not interstitial space and are not confirmed accessible space.",
+      source: "Occupied cell list passed to the Open Volume evaluator.",
+      transform: SPEC_TRANSFORM,
+    },
+    {
+      id: "permeability",
+      metric: "Permeability",
+      label: "Permeability",
+      kind: "none",
+      available: false,
+      cells: [],
+      legend: "Spatial evidence unavailable. Permeability is the mean of six axis pass rates. The evaluator did not return located cells for this term.",
+      source: "Aggregate component only.",
+      transform: SPEC_TRANSFORM,
+    },
+    {
+      id: "low-mass",
+      metric: "Low Mass",
+      label: "Low Mass",
+      kind: "none",
+      available: false,
+      cells: [],
+      legend: "Spatial evidence unavailable. Low Mass is mean 26-neighbor solidity. The evaluator did not return located cells for this term.",
+      source: "Aggregate component only.",
+      transform: SPEC_TRANSFORM,
+    },
+    {
+      id: "enclosed-void",
+      metric: "Enclosed Void",
+      label: "Enclosed void",
+      kind: "none",
+      available: false,
+      cells: [],
+      legend: "Spatial evidence unavailable. Enclosed Void is an aggregate ratio. The evaluator does not export the enclosed cell list, so no overlay is drawn.",
+      source: "Aggregate component only.",
+      transform: SPEC_TRANSFORM,
+    },
+  ];
 }
