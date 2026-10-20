@@ -1,13 +1,18 @@
 import type { ObjFace, TileModel, TileVariant, UpAxis } from "../lattice/types";
 import { fileToSpec, unpackCell } from "../lattice/types";
 import {
-  DESCRIPTOR_ALGORITHM_VERSION,
   measureSpatialDescriptors,
   type MeshTri,
   type SpatialDescriptors,
 } from "./descriptorV2";
+import { DESCRIPTOR_ALGORITHM_VERSION, LEGACY_DESCRIPTOR_ALGORITHM_VERSION, type DescriptorAlgorithmVersion } from "./descriptorVersion";
 import { assignComparativeRanks, DESCRIPTOR_RANK_STORAGE_KEY, type DescriptorRankSnapshot } from "./descriptorRank";
 import { measureOpenVolume, type OpenVolumeMeasurement, type Voxel } from "./openVolume";
+import { CLEARANCE_MIN_AREA, measureSurfaceClearance, rateSurfaceClearance, type SurfaceClearance } from "./openVolumeClearance";
+import type { DescriptorEvidence } from "./v4/evidence";
+import { evaluateV4, type V4Options } from "./v4/evaluateV4";
+
+export { DESCRIPTOR_ALGORITHM_VERSION, LEGACY_DESCRIPTOR_ALGORITHM_VERSION } from "./descriptorVersion";
 
 /** The 12 architectural descriptors required for Part 2 OBJ evaluation. */
 export const ARCH_DESCRIPTORS = [
@@ -40,16 +45,31 @@ export type MetricComponent = {
   weight: number;
   /** This term's points toward the 0–100 score. */
   contribution?: number;
+  /** v4: "unavailable" when the geometry offers no evidence for this term. It is then left out of the score. */
+  status?: "measured" | "unavailable";
+  /** v4: why the term is unavailable. */
+  reason?: string;
+  /** v4 documentation carried with the term. */
+  intent?: string;
+  formula?: string;
+  normalization?: string;
 };
 
 export type DescriptorResult = {
   id: ArchDescriptorId;
   name: string;
-  /** Rounded absolute geometric score, 0–100. */
+  /** Rounded absolute geometric score, 0–100. 0 when unavailable; check `available`. */
   score: number;
-  /** Full-precision absolute geometric score. Ranking uses this, not `score`. */
+  /** Full-precision absolute geometric score. Ranking uses this, not `score`. NaN when unavailable. */
   absoluteScore: number;
   components: MetricComponent[];
+  /** Algorithm that produced this result. */
+  version?: DescriptorAlgorithmVersion;
+  /** False only when processing failed (NaN). A measured 0 is available and ranked. */
+  available?: boolean;
+  unavailableReason?: string;
+  /** v4 evidence: layers, measurements, and component documentation. */
+  evidence?: DescriptorEvidence;
   /** Unique rank in the current set. The highest number is the strongest expression. */
   comparativeRank?: number;
   /** Same value as comparativeRank. Kept so older readers see the new direction. */
@@ -267,7 +287,8 @@ function fromDrafts(drafts: SpatialDescriptors[keyof SpatialDescriptors]): Metri
   })));
 }
 
-function scoreDescriptors(open: OpenVolumeMeasurement, spatial: SpatialDescriptors): DescriptorResult[] {
+function scoreDescriptors(open: OpenVolumeMeasurement, spatial: SpatialDescriptors, clearance?: SurfaceClearance | null): DescriptorResult[] {
+  const rated = clearance ? rateSurfaceClearance(clearance) : null;
   const make = (id: ArchDescriptorId, name: string, components: MetricComponent[]): DescriptorResult => {
     const absoluteScore = absoluteScoreOf(components);
     return {
@@ -280,13 +301,24 @@ function scoreDescriptors(open: OpenVolumeMeasurement, spatial: SpatialDescripto
   };
 
   return [
-    make("openVolume", "Open Volume", withContribution([
-      { name: "Architectural Open Space", raw: open.architecturalOpenSpace / 100, rawUnit: "free cells / occupied bounds", value: open.architecturalOpenSpace, weight: 0.35 },
-      { name: "Permeability", raw: open.permeability / 100, rawUnit: "mean of six axis pass rates", value: open.permeability, weight: 0.3 },
-      { name: "Interstitial Space", raw: open.interstitialOpenSpace / 100, rawUnit: "between-surface free cells / bounds", value: open.interstitialOpenSpace, weight: 0.25 },
-      { name: "Low Mass", raw: open.lowMass / 100, rawUnit: "1 - mean 26-neighbor solidity", value: open.lowMass, weight: 0.1 },
-      { name: "Enclosed Void (informational)", raw: open.enclosedVoidRatio / 100, rawUnit: "enclosed free cells / bounds", value: open.enclosedVoidRatio, weight: 0 },
-    ])),
+    make("openVolume", "Open Volume", rated
+      ? withContribution([
+        {
+          name: "Surface Clearance",
+          raw: rated.raw,
+          rawUnit: "area-weighted share; exterior-open counts as fully open, clearance at or below 5 ft counts as 0, then rises to fully open at 10 ft",
+          value: rated.value,
+          precise: rated.value,
+          weight: 1,
+        },
+      ])
+      : withContribution([
+        { name: "Architectural Open Space", raw: open.architecturalOpenSpace / 100, rawUnit: "free cells / occupied bounds", value: open.architecturalOpenSpace, weight: 0.35 },
+        { name: "Permeability", raw: open.permeability / 100, rawUnit: "mean of six axis pass rates", value: open.permeability, weight: 0.3 },
+        { name: "Interstitial Space", raw: open.interstitialOpenSpace / 100, rawUnit: "between-surface free cells / bounds", value: open.interstitialOpenSpace, weight: 0.25 },
+        { name: "Low Mass", raw: open.lowMass / 100, rawUnit: "1 - mean 26-neighbor solidity", value: open.lowMass, weight: 0.1 },
+        { name: "Enclosed Void (informational)", raw: open.enclosedVoidRatio / 100, rawUnit: "enclosed free cells / bounds", value: open.enclosedVoidRatio, weight: 0 },
+      ])),
     make("convergent", "Convergent", fromDrafts(spatial.convergent)),
     make("sculptural", "Sculptural", fromDrafts(spatial.sculptural)),
     make("visuallyConnected", "Visually Connected", fromDrafts(spatial.visuallyConnected)),
@@ -372,7 +404,7 @@ function geometryKey(cells: Voxel[], triangles: MeshTri[], cellFeet: number, bbo
     mix(Math.round(triangle.normal[2] * 100));
     mix(Math.round(triangle.centroid[0] * 10));
   }
-  return `${DESCRIPTOR_ALGORITHM_VERSION}:${hash >>> 0}`;
+  return `${LEGACY_DESCRIPTOR_ALGORITHM_VERSION}:${hash >>> 0}`;
 }
 
 type CachedEvaluation = Omit<FormDescriptorEvaluation, "slotId" | "category" | "code" | "name" | "status">;
@@ -401,7 +433,97 @@ function cloneEvaluation(evaluation: CachedEvaluation): CachedEvaluation {
   };
 }
 
-export function evaluateTileModel(model: TileModel, source?: DescriptorSource): CachedEvaluation {
+export type EvaluateOptions = {
+  /** "v4.0" (default when source geometry is supplied) or the retained "v3.5" legacy evaluation. */
+  algorithm?: DescriptorAlgorithmVersion;
+  /** v4 eye height for sightline tests, feet. */
+  eyeHeightFeet?: number;
+};
+
+/**
+ * Evaluate a form. v4.0 measures the original surfaces and needs `source`;
+ * without source geometry the legacy v3.5 voxel evaluation is used and marked.
+ */
+export function evaluateTileModel(model: TileModel, source?: DescriptorSource, options: EvaluateOptions = {}): CachedEvaluation {
+  const algorithm = options.algorithm ?? (source ? DESCRIPTOR_ALGORITHM_VERSION : LEGACY_DESCRIPTOR_ALGORITHM_VERSION);
+  if (algorithm === LEGACY_DESCRIPTOR_ALGORITHM_VERSION || !source) return evaluateTileModelLegacy(model, source);
+  return evaluateTileModelV4(model, source, { eyeHeightFeet: options.eyeHeightFeet });
+}
+
+const v4Cache = new Map<string, CachedEvaluation>();
+
+function v4Key(model: TileModel, source: DescriptorSource, options: V4Options) {
+  let hash = 2166136261;
+  const mix = (value: number) => {
+    hash ^= value | 0;
+    hash = Math.imul(hash, 16777619);
+  };
+  const positions = source.positions;
+  mix(positions.length);
+  for (let index = 0; index < positions.length; index += 1) mix(Math.round(positions[index] * 1000));
+  mix(source.faces.length);
+  mix(Math.round(source.unitScale * 1000));
+  mix(source.up === "y" ? 1 : 2);
+  mix(Math.round((options.eyeHeightFeet ?? 0) * 100));
+  return `${DESCRIPTOR_ALGORITHM_VERSION}:${model.id}:${hash >>> 0}`;
+}
+
+/** v4.0 surface-based evaluation. Raw voxel metrics are still reported for the diagnostic panel. */
+export function evaluateTileModelV4(model: TileModel, source: DescriptorSource, options: V4Options = {}): CachedEvaluation {
+  const key = v4Key(model, source, options);
+  const cached = v4Cache.get(key);
+  if (cached) {
+    analysisCacheHits += 1;
+    return cloneEvaluation(cached);
+  }
+  const raw = collectRawMetrics(model);
+  const v4 = evaluateV4(source, model.id, options);
+  const descriptors: DescriptorResult[] = v4.descriptors.map((item) => {
+    const components: MetricComponent[] = item.evidence.components.map((term) => ({
+      name: term.name,
+      value: term.precise === null ? 0 : clamp100(term.precise),
+      precise: term.precise ?? undefined,
+      raw: term.raw ?? undefined,
+      rawUnit: term.units,
+      weight: term.weight,
+      status: term.status,
+      reason: term.reason,
+      intent: term.intent,
+      formula: term.formula,
+      normalization: term.normalization,
+    }));
+    const measured = components.filter((component) => component.status !== "unavailable");
+    const weightSum = measured.reduce((sum, component) => sum + component.weight, 0) || 1;
+    for (const component of components) {
+      component.contribution = component.status === "unavailable" || component.precise === undefined
+        ? 0
+        : Math.round(((component.precise * component.weight) / weightSum) * 10) / 10;
+    }
+    return {
+      id: item.id as ArchDescriptorId,
+      name: item.name,
+      absoluteScore: item.absoluteScore,
+      score: Number.isFinite(item.absoluteScore) ? clamp100(item.absoluteScore) : 0,
+      components,
+      version: DESCRIPTOR_ALGORITHM_VERSION,
+      available: item.available,
+      unavailableReason: item.unavailableReason,
+      evidence: item.evidence,
+    };
+  });
+  const evaluation: CachedEvaluation = {
+    meshId: model.id,
+    filename: model.filename,
+    confidence: confidenceFromRaw(raw),
+    raw,
+    descriptors,
+  };
+  v4Cache.set(key, evaluation);
+  return cloneEvaluation(evaluation);
+}
+
+/** The retained v3.5 evaluation. Formulas, thresholds, and weights are unchanged. */
+export function evaluateTileModelLegacy(model: TileModel, source?: DescriptorSource): CachedEvaluation {
   const raw = collectRawMetrics(model);
   const occupied = (model.variants[0]?.occupied ?? []).map((packed) => unpackCell(packed));
   const triangles = source ? sourceTriangles(source, model.anchor, model.cellFeet) : [];
@@ -412,6 +534,17 @@ export function evaluateTileModel(model: TileModel, source?: DescriptorSource): 
     return cloneEvaluation(cached);
   }
   const open = measureOpenVolume(occupied);
+  const clearance = source
+    ? measureSurfaceClearance({
+      mesh: source,
+      unitScale: source.unitScale,
+      up: source.up,
+      anchor: model.anchor,
+      cellFeet: model.cellFeet,
+      occupied,
+      minArea: CLEARANCE_MIN_AREA,
+    })
+    : null;
   const spatial = measureSpatialDescriptors({
     cells: occupied,
     cellFeet: model.cellFeet,
@@ -424,7 +557,11 @@ export function evaluateTileModel(model: TileModel, source?: DescriptorSource): 
     filename: model.filename,
     confidence: confidenceFromRaw(raw),
     raw,
-    descriptors: scoreDescriptors(open, spatial),
+    descriptors: scoreDescriptors(open, spatial, clearance).map((descriptor) => ({
+      ...descriptor,
+      version: LEGACY_DESCRIPTOR_ALGORITHM_VERSION,
+      available: Number.isFinite(descriptor.absoluteScore),
+    })),
   };
   analysisCache.set(key, evaluation);
   return cloneEvaluation(evaluation);
@@ -442,7 +579,8 @@ export function publishDescriptorRanks(forms: Array<Pick<FormDescriptorEvaluatio
       meshId: form.meshId,
       filename: form.filename,
       descriptors: Object.fromEntries(form.descriptors.map((descriptor) => [descriptor.id, {
-        absoluteScore: descriptor.absoluteScore,
+        // NaN is not valid JSON; unavailable descriptors publish null and no rank.
+        absoluteScore: Number.isFinite(descriptor.absoluteScore) ? descriptor.absoluteScore : null,
         comparativeRank: descriptor.comparativeRank,
       }])),
     })),

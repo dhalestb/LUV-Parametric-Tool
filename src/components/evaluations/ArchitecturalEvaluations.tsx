@@ -17,20 +17,12 @@ import {
   evaluateTileModel,
   publishDescriptorRanks,
   type ArchDescriptorId,
-  type DescriptorResult,
   type FormDescriptorEvaluation,
 } from "./objDescriptorAnalysis";
+import DescriptorComparison from "./DescriptorComparison";
+import { findMatchingFilename } from "./formIdentity";
 
 const buttonStyle = { borderColor: "var(--line)", background: "var(--panel-soft)", color: "var(--ink)" } as const;
-
-function rankPhrase(descriptor: DescriptorResult) {
-  const count = descriptor.cohortSize ?? 0;
-  const rank = descriptor.comparativeRank;
-  if (!rank || !count) return "Analyze the full set to place this form among the others.";
-  if (rank === count) return `Strongest of the ${count} evaluated forms`;
-  if (rank === 1) return `Weakest of the ${count} evaluated forms`;
-  return `Rank ${rank} of ${count}. A higher rank is a stronger expression of this descriptor.`;
-}
 
 function PreviewMesh({ mesh, unit, upAxisMode }: { mesh: ImportedObj; unit: UnitName; upAxisMode: UpAxisMode }) {
   const group = useRef<import("three").Group>(null);
@@ -118,13 +110,40 @@ function previewStats(mesh: ImportedObj, unit: UnitName, upAxisMode: UpAxisMode)
 }
 
 export default function ArchitecturalEvaluations() {
-  const { hydrated, origin, meshes, assignments, unit, upAxisMode, loadSampleObjs } = useLatticeSource();
+  const { hydrated, origin, meshes, assignments, unit, upAxisMode, loadSampleObjs, importObjFiles, setMeshes, setAssignments, geometryPersisted } = useLatticeSource();
+  const uploadRef = useRef<HTMLInputElement>(null);
+  const importRef = useRef(importObjFiles);
+  importRef.current = importObjFiles;
   const [models, setModels] = useState<Record<string, TileModel>>({});
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("Waiting for the Lattice source registry…");
   const [selectedSlotId, setSelectedSlotId] = useState(LATTICE_SLOTS[0]?.id ?? "G1");
   const [explainId, setExplainId] = useState<ArchDescriptorId>("openVolume");
   const [results, setResults] = useState<Record<string, FormDescriptorEvaluation>>({});
+  const [registryRanks, setRegistryRanks] = useState<Record<string, Array<{ filename: string; absoluteScore: number; rank: number; cohortSize: number }>> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/open-volume-registry")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { cohortSize?: number; forms?: Array<{ filename: string; absoluteScore: number; rank: number }>; descriptors?: Array<{ id: string; forms: Array<{ filename: string; absoluteScore: number; rank: number }> }> } | null) => {
+        if (cancelled || !body?.cohortSize) return;
+        const cohortSize = body.cohortSize;
+        const table: Record<string, Array<{ filename: string; absoluteScore: number; rank: number; cohortSize: number }>> = {};
+        for (const descriptor of body.descriptors ?? []) {
+          // Cohort is the official 15-form registry. A measured 0 is ranked.
+          table[descriptor.id] = descriptor.forms.map((form) => ({ ...form, cohortSize }));
+        }
+        if (!table.openVolume && body.forms) {
+          table.openVolume = body.forms.map((form) => ({ ...form, cohortSize }));
+        }
+        if (Object.keys(table).length) setRegistryRanks(table);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const rows = useMemo(() => LATTICE_SLOTS.map((slot) => {
     const mesh = meshes.find((item) => item.id === assignments[slot.id]) ?? null;
@@ -134,6 +153,10 @@ export default function ArchitecturalEvaluations() {
 
   const selected = rows.find((row) => row.slot.id === selectedSlotId) ?? rows[0];
   const explain = selected?.result?.descriptors.find((item) => item.id === explainId) ?? selected?.result?.descriptors[0];
+  const registryRankFor = (descriptorId: string, filename: string | undefined) => (
+    findMatchingFilename(filename, registryRanks?.[descriptorId]) ?? null
+  );
+  const selectedRegistryRank = explain ? registryRankFor(explain.id, selected?.mesh?.filename) : null;
   const stats = selected?.mesh ? sourceStats(selected.mesh, unit, upAxisMode) : null;
   const drawn = selected?.mesh ? previewStats(selected.mesh, unit, upAxisMode) : null;
   const assignedCount = rows.filter((row) => row.mesh).length;
@@ -207,6 +230,51 @@ export default function ArchitecturalEvaluations() {
     }
   }
 
+  async function importOriginals(files: File[]) {
+    setBusy(true);
+    setStatus("Reading OBJ files into the Lattice source registry…");
+    const result = await importObjFiles(files);
+    setResults({});
+    setModels({});
+    setBusy(false);
+    const imported = result.imported ? `Imported ${result.imported} OBJ file${result.imported === 1 ? "" : "s"}.` : "No OBJ files were imported.";
+    const follow = "Press Analyze All Forms. Keep the unit at feet so the recorded Open Volume scores stay comparable.";
+    setStatus([imported, result.note, result.error, follow].filter(Boolean).join(" "));
+  }
+
+  function clearLoadedForms() {
+    setMeshes([]);
+    setAssignments({});
+    setResults({});
+    setModels({});
+    setStatus("Loaded forms cleared. Upload the original OBJ files, then press Analyze All Forms.");
+  }
+
+  async function loadOriginalPair() {
+    setBusy(true);
+    setStatus("Loading Gathering Linear.obj and Lobby Continuous Hall.obj from the local original set…");
+    try {
+      const names = ["Gathering Linear.obj", "Lobby Continuous Hall.obj"];
+      const files: File[] = [];
+      for (const name of names) {
+        const response = await fetch(`/api/review-pair?file=${encodeURIComponent(name)}`);
+        if (!response.ok) throw new Error("The original OBJ directory is not available. Use Upload OBJ files.");
+        files.push(new File([await response.text()], name, { type: "text/plain" }));
+      }
+      setMeshes([]);
+      setAssignments({});
+      setResults({});
+      setModels({});
+      await new Promise((resolve) => window.setTimeout(resolve, 50));
+      const result = await importRef.current(files);
+      setStatus(result.error ?? `Loaded ${result.imported} original OBJ file${result.imported === 1 ? "" : "s"}. Press Analyze All Forms. Unit should stay feet.`);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "The original pair could not be loaded.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function loadSamples() {
     setBusy(true);
     setStatus("Loading sample OBJs into empty Lattice slots…");
@@ -241,6 +309,16 @@ export default function ArchitecturalEvaluations() {
           >
             {busy ? "Working…" : "Analyze All Forms"}
           </button>
+          <button type="button" disabled={busy || !hydrated} className="rounded border px-2.5 py-1 text-[11px]" style={buttonStyle} onClick={() => void loadOriginalPair()}>
+            Load original pair
+          </button>
+          <button type="button" disabled={busy || !hydrated} className="rounded border px-2.5 py-1 text-[11px]" style={buttonStyle} onClick={() => uploadRef.current?.click()}>
+            Upload OBJ files
+          </button>
+          <input ref={uploadRef} type="file" accept=".obj" multiple hidden onChange={(event) => { if (event.target.files) void importOriginals([...event.target.files]); event.target.value = ""; }} />
+          <button type="button" disabled={busy || !hydrated} className="rounded border px-2.5 py-1 text-[11px]" style={buttonStyle} onClick={clearLoadedForms}>
+            Clear loaded forms
+          </button>
           <button type="button" disabled={busy || !hydrated} className="rounded border px-2.5 py-1 text-[11px]" style={buttonStyle} onClick={() => void loadSamples()}>
             Load Sample OBJs
           </button>
@@ -248,6 +326,14 @@ export default function ArchitecturalEvaluations() {
       </header>
 
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>{status}</p>
+      <p className="text-[12px]" style={{ color: "var(--muted)" }}>
+        Unit {unit}. Up axis {upAxisMode}. The recorded Open Volume scores use feet and Y-up.
+      </p>
+      {!geometryPersisted && (
+        <p className="text-[12px]" style={{ color: "var(--muted)" }}>
+          The uploaded meshes are in this browser tab only. They are too large for browser storage, so a refresh clears them. Evaluations does not substitute the bundled sample tiles.
+        </p>
+      )}
 
       <div className="evaluations-layout grid min-h-0 flex-1 gap-3 lg:grid-cols-[280px_minmax(0,1fr)_320px]">
         <aside className="min-h-0 overflow-auto rounded border p-2" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
@@ -328,7 +414,7 @@ export default function ArchitecturalEvaluations() {
           {selected?.result?.status === "ready" && (
             <>
               <p className="text-[11px]" style={{ color: "var(--muted)" }}>
-                Rank 15 is the strongest expression of that descriptor among the current forms. Rank 1 is the weakest. Neither rank is a grade of architectural quality.
+                Every descriptor is ranked across the {registryRanks?.openVolume?.[0]?.cohortSize ?? 15}-form source registry. Rank 1 is the weakest result and the highest rank is the strongest. Open Volume calls those ends the least and most open volume. Neither rank is a grade of architectural quality.
               </p>
               <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 xl:grid-cols-4">
                 {selected.result.descriptors.map((descriptor) => (
@@ -344,10 +430,12 @@ export default function ArchitecturalEvaluations() {
                   >
                     <div style={{ color: "var(--muted)" }}>{descriptor.name}</div>
                     <div className="descriptor-rank text-base font-semibold">
-                      {descriptor.comparativeRank ?? "—"}
-                      {descriptor.cohortSize ? <span className="descriptor-rank-of"> / {descriptor.cohortSize}</span> : null}
+                      {registryRankFor(descriptor.id, selected.mesh?.filename)?.rank ?? (!Number.isFinite(descriptor.absoluteScore) ? "n/a" : registryRanks ? "—" : "…")}
+                      {registryRankFor(descriptor.id, selected.mesh?.filename) ? <span className="descriptor-rank-of"> / {registryRankFor(descriptor.id, selected.mesh?.filename)?.cohortSize}</span> : null}
                     </div>
-                    <div className="descriptor-rank-label text-[10px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Rank</div>
+                    <div className="descriptor-rank-label text-[10px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
+                      Rank · score {Number.isFinite(descriptor.absoluteScore) ? descriptor.absoluteScore.toFixed(1) : "n/a"}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -367,8 +455,10 @@ export default function ArchitecturalEvaluations() {
                       <tr key={row.slot.id}>
                         <td className="px-1 py-1">{row.slot.id}</td>
                         {ARCH_DESCRIPTORS.map((descriptor) => {
-                          const ranked = row.result?.descriptors.find((item) => item.id === descriptor.id);
-                          return <td key={descriptor.id} className="px-1 py-1 text-right">{ranked?.comparativeRank ?? "—"}</td>;
+                          const registryRank = registryRankFor(descriptor.id, row.mesh?.filename);
+                          const local = row.result?.descriptors.find((item) => item.id === descriptor.id);
+                          const shown = registryRank?.rank ?? (local && !Number.isFinite(local.absoluteScore) ? "n/a" : registryRanks ? "—" : "…");
+                          return <td key={descriptor.id} className="px-1 py-1 text-right">{shown}</td>;
                         })}
                       </tr>
                     ))}
@@ -385,19 +475,30 @@ export default function ArchitecturalEvaluations() {
           </div>
           {!selected?.result || !explain ? (
             <p className="mt-3 text-[12px]" style={{ color: "var(--muted)" }}>
-              {selected?.mesh ? "Press Analyze All Forms. Scoring uses a derived voxel model of this source, not the preview mesh." : "Assign a source OBJ in Lattice."}
+              {selected?.mesh ? "Press Analyze All Forms. v4 measures every descriptor on the original surfaces: floor samples, clearances, levels, mesh sightlines, voids, and verified movement routes." : "Assign a source OBJ in Lattice."}
             </p>
           ) : (
             <div className="mt-3 space-y-3">
               <div>
                 <div className="text-[13px] font-semibold uppercase tracking-wide">{explain.name}</div>
-                <div className="mt-2 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Comparative rank</div>
+                <div className="mt-2 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Registry rank</div>
                 <div className="descriptor-rank text-3xl font-semibold" style={{ color: "var(--accent)" }}>
-                  {explain.comparativeRank ?? "—"} / {explain.cohortSize ?? "—"}
+                  {selectedRegistryRank ? `${selectedRegistryRank.rank} / ${selectedRegistryRank.cohortSize}` : (registryRanks ? "—" : "…")}
                 </div>
-                <div className="mt-1 text-[12px]">{rankPhrase(explain)}</div>
-                <div className="mt-3 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Absolute geometric score</div>
-                <div className="text-[18px] font-semibold">{explain.absoluteScore.toFixed(1)} / 100</div>
+                <div className="mt-1 text-[12px]">
+                  {!Number.isFinite(explain.absoluteScore)
+                    ? `Not ranked. ${explain.unavailableReason ?? "The geometry offered no evidence for this descriptor."}`
+                    : selectedRegistryRank
+                      ? (explain.id === "openVolume"
+                        ? `Rank ${selectedRegistryRank.rank} of ${selectedRegistryRank.cohortSize} in the source registry. 1 is the least open volume. ${selectedRegistryRank.cohortSize} is the most.`
+                        : `Rank ${selectedRegistryRank.rank} of ${selectedRegistryRank.cohortSize} in the source registry. 1 is the weakest ${explain.name}. ${selectedRegistryRank.cohortSize} is the strongest.`)
+                      : "Ranking every form in the source registry."}
+                </div>
+                <div className="mt-3 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Absolute score · {explain.version ?? "v3.5"}</div>
+                <div className="text-[18px] font-semibold" data-explain-score={Number.isFinite(explain.absoluteScore) ? explain.absoluteScore.toFixed(2) : "unavailable"}>
+                  {Number.isFinite(explain.absoluteScore) ? explain.absoluteScore.toFixed(1) : "Unavailable"}
+                </div>
+                <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>0–100 from fixed calibration thresholds. The rank is this score's place among all 15 registry forms. A genuine zero is ranked. n/a is reserved for a processing failure.</div>
                 <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>
                   Confidence {selected.result.confidence}
                   {explain.relativePercentile !== undefined ? ` · percentile ${explain.relativePercentile}` : ""}
@@ -409,10 +510,15 @@ export default function ArchitecturalEvaluations() {
                   <li key={component.name} className="text-[12px]">
                     <div className="flex items-center justify-between gap-2">
                       <span style={{ color: "var(--muted)" }}>{component.name}</span>
-                      <span className="font-medium">{component.value}</span>
+                      <span className="font-medium">{component.status === "unavailable" ? "unavailable" : component.value}</span>
                     </div>
                     <div className="text-[10px]" style={{ color: "var(--muted)" }}>
-                      raw {component.raw ?? "—"} {component.rawUnit ?? ""} · weight {Math.round(component.weight * 100)}% · contribution {component.contribution ?? 0}
+                      {component.status === "unavailable"
+                        ? `${component.reason ?? "No evidence."} Left out of the score; remaining weights renormalized.`
+                        : explain.id === "openVolume" && !explain.evidence
+                          ? `raw ${component.raw ?? "—"} ${component.rawUnit ?? ""}. This places the form. It is not the rating.`
+                          : `raw ${typeof component.raw === "number" ? Number(component.raw.toFixed(3)) : "—"} ${component.rawUnit ?? ""} · weight ${Math.round(component.weight * 100)}% · contribution ${component.contribution ?? 0}`}
+                      {component.formula ? ` · ${component.formula}` : ""}
                     </div>
                   </li>
                 ))}
@@ -428,6 +534,21 @@ export default function ArchitecturalEvaluations() {
           )}
         </aside>
       </div>
+      <DescriptorComparison
+        rows={rows.map((row) => ({
+          slotId: row.slot.id,
+          code: row.slot.code,
+          name: row.slot.name,
+          mesh: row.mesh,
+          result: row.result,
+          model: row.mesh ? models[row.mesh.id] : undefined,
+        }))}
+        descriptorId={explainId}
+        onDescriptor={setExplainId}
+        unit={unit}
+        upAxisMode={upAxisMode}
+        registryRanks={registryRanks ?? undefined}
+      />
     </div>
   );
 }
