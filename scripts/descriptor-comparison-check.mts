@@ -254,15 +254,14 @@ check("Y-up file coordinates convert once", () => {
   assert.deepEqual(specFeetToFile([3, 4, 5], "z", 1), [3, 4, 5]);
 });
 
-check("descriptor formula version is unchanged", () => {
-  assert.equal(DESCRIPTOR_ALGORITHM_VERSION, "v3.3");
+check("descriptor version records the surface-clearance rating", () => {
+  assert.equal(DESCRIPTOR_ALGORITHM_VERSION, "v3.5");
   const source = readFileSync(join(project, "src/components/evaluations/objDescriptorAnalysis.ts"), "utf8");
-  assert.match(source, /weight: 0\.35/);
-  assert.match(source, /weight: 0\.3/);
-  assert.match(source, /weight: 0\.25/);
-  assert.match(source, /weight: 0\.1/);
-  const open = readFileSync(join(project, "src/components/evaluations/openVolume.ts"), "utf8");
-  assert.match(open, /0\.35 \* measurement\.architecturalOpenSpace/);
+  assert.match(source, /name: "Surface Clearance"/);
+  assert.match(source, /weight: 1/);
+  const clearance = readFileSync(join(project, "src/components/evaluations/openVolumeClearance.ts"), "utf8");
+  assert.match(clearance, /CLEARANCE_MIN_FEET = 5/);
+  assert.match(clearance, /CLEARANCE_REFERENCE_FEET = 10/);
 });
 
 function crc32(buffer) {

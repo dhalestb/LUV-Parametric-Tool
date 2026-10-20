@@ -177,9 +177,21 @@ export type SpatialEvidenceCategory = {
   available: boolean;
   /** Evaluator cell indices. Empty when this metric has no located geometry. */
   cells: Array<[number, number, number]>;
+  /** Per-cell drawing color. Empty means the viewer uses its category default. */
+  swatches: Array<{ cell: [number, number, number]; color: string }>;
+  /** Axis-pass samples in cell indices. Empty when this metric is not permeability. */
+  rays: Array<{
+    origin: [number, number, number];
+    end: [number, number, number];
+    direction: [number, number, number];
+    passed: boolean;
+    color: string;
+  }>;
   legend: string;
   source: string;
   transform: EvidenceTransform;
+  /** True when the drawing is diagnostic and is not a weighted score term. */
+  diagnostic: boolean;
 };
 
 const SPEC_TRANSFORM: EvidenceTransform = {
@@ -192,49 +204,102 @@ const SPEC_TRANSFORM: EvidenceTransform = {
  * Open Volume categories are the occupied, free, and interstitial rasters already
  * produced for the score. Other descriptors stay aggregate: their cells are ignored.
  */
+const EMPTY_MARKS = {
+  swatches: [] as SpatialEvidenceCategory["swatches"],
+  rays: [] as SpatialEvidenceCategory["rays"],
+  diagnostic: false,
+};
+
 export function spatialCategoriesForDescriptor(input: {
   descriptorId: string;
   descriptorName: string;
   occupied?: Array<[number, number, number]>;
   free?: Array<[number, number, number]>;
   interstitial?: Array<[number, number, number]>;
+  permeabilityRays?: Array<{ origin: [number, number, number]; end: [number, number, number]; direction: [number, number, number]; passed: boolean }>;
+  solidity?: Array<{ cell: [number, number, number]; solidity: number }>;
+  voidComponents?: Array<{ cells: Array<[number, number, number]>; exterior: boolean }>;
+  enclosed?: Array<[number, number, number]>;
+  figure?: {
+    legend: string;
+    swatches: Array<{ cell: [number, number, number]; color: string }>;
+    rays: SpatialEvidenceCategory["rays"];
+  };
 }): SpatialEvidenceCategory[] {
   if (input.descriptorId !== "openVolume") {
+    const figure = input.figure;
     return [{
       id: "aggregate",
       metric: input.descriptorName,
-      label: "Spatial evidence unavailable",
-      kind: "none",
-      available: false,
-      cells: [],
-      legend: `Spatial evidence unavailable. ${input.descriptorName} is stored as aggregate measurements, so no points, cells, lines, or regions are drawn.`,
-      source: "Descriptor components only. Open Volume cells are not reused.",
+      label: input.descriptorName,
+      kind: figure?.rays.length ? "direction" : figure?.swatches.length ? "voxel" : "none",
+      available: true,
+      cells: figure?.swatches.map((mark) => mark.cell) ?? [],
+      swatches: figure?.swatches ?? [],
+      rays: figure?.rays ?? [],
+      diagnostic: false,
+      legend: figure?.legend
+        ?? `The rating is this form’s rank in the source registry. ${input.descriptorName} did not return located marks for this form, so the view shows the form.`,
+      source: "The same occupied cells and walkable links the descriptor scores. The drawing does not change the rank.",
       transform: SPEC_TRANSFORM,
     }];
   }
   const occupied = input.occupied ?? [];
   const free = input.free ?? [];
   const interstitial = input.interstitial ?? [];
+  const rays = input.permeabilityRays ?? [];
+  const solidity = input.solidity ?? [];
+  const meanSolidity = solidity.length
+    ? solidity.reduce((sum, sample) => sum + sample.solidity, 0) / solidity.length
+    : 1;
+  const voids = input.voidComponents ?? [];
+  const enclosed = input.enclosed ?? [];
+  const largestExterior = voids.find((component) => component.exterior) ?? null;
+  const voidSwatches = voids.flatMap((component) => {
+    const color = component === largestExterior ? "#8E7CC3" : component.exterior ? "#4C6B8A" : "#A67C52";
+    return component.cells.map((cell) => ({ cell, color }));
+  });
+  const overallAvailable = free.length > 0 || interstitial.length > 0 || rays.length > 0 || solidity.length > 0;
   return [
+    {
+      id: "overall",
+      metric: "Overall Open Volume",
+      label: "Overall Open Volume",
+      kind: "none" as const,
+      available: overallAvailable,
+      cells: [],
+      swatches: [],
+      rays: [],
+      diagnostic: false,
+      legend: "Overall Open Volume keeps the shaded mesh and shows the measured clearance. The rating is the form’s rank in the source registry. The focused drawing is that measurement, not a combined lattice.",
+      source: "Weighted contributions from the saved components. The focused layer uses that term's existing cells or rays.",
+      transform: SPEC_TRANSFORM,
+    },
     {
       id: "interstitial",
       metric: "Interstitial Space",
-      label: "Interstitial cells",
-      kind: "voxel",
+      label: "Interstitial Space",
+      kind: "voxel" as const,
       available: interstitial.length > 0,
       cells: interstitial,
-      legend: "Gold marks interstitial raster cells inside the occupied bounds. These are the cells counted by Interstitial Space. They are not confirmed accessible space.",
+      swatches: interstitial.map((cell) => ({ cell, color: "#D6AD4F" })),
+      rays: [],
+      diagnostic: false,
+      legend: "Gold marks interstitial raster cells inside the occupied bounds. The score uses this count divided by the occupied-bounds volume, not the raw count. A denser-looking field can still be a lower ratio. These cells are not confirmed accessible space.",
       source: "openVolumeRegions interstitial list from the occupied raster already measured for this form.",
       transform: SPEC_TRANSFORM,
     },
     {
       id: "architectural-open",
       metric: "Architectural Open Space",
-      label: "Free cells",
-      kind: "voxel",
+      label: "Architectural Open Space",
+      kind: "voxel" as const,
       available: free.length > 0,
       cells: free,
-      legend: "Gold marks every unoccupied cell inside the occupied bounds. These are the cells counted by Architectural Open Space. This set is larger than the interstitial term. They are not confirmed accessible space.",
+      swatches: free.map((cell) => ({ cell, color: "#D6AD4F" })),
+      rays: [],
+      diagnostic: false,
+      legend: "Gold fills the measured clearance above each upper surface when that clearance is above 5 ft. That measurement orders the source registry. The rating is the form’s rank, from 1 for the least open volume to the last form for the most. Clearance at or below 5 ft adds nothing, then credit rises to fully open at 10 ft. A short band is exterior-open and counts as fully open. Cyan outlines the supporting surface where the clearance counts. This is not a circulation path.",
       source: "openVolumeRegions free list from the same occupied raster.",
       transform: SPEC_TRANSFORM,
     },
@@ -242,10 +307,13 @@ export function spatialCategoriesForDescriptor(input: {
       id: "occupied",
       metric: "Occupied raster",
       label: "Occupied cells",
-      kind: "voxel",
+      kind: "voxel" as const,
       available: occupied.length > 0,
       cells: occupied,
-      legend: "Gold marks the occupied raster cells the evaluator treated as solid. These are not interstitial space and are not confirmed accessible space.",
+      swatches: occupied.map((cell) => ({ cell, color: "#C8C4BC" })),
+      rays: [],
+      diagnostic: false,
+      legend: "Pale cells mark the occupied raster the evaluator treated as solid. This is the mass the openness ratios are measured against. It is not interstitial space.",
       source: "Occupied cell list passed to the Open Volume evaluator.",
       transform: SPEC_TRANSFORM,
     },
@@ -253,33 +321,73 @@ export function spatialCategoriesForDescriptor(input: {
       id: "permeability",
       metric: "Permeability",
       label: "Permeability",
-      kind: "none",
-      available: false,
+      kind: rays.length ? "direction" as const : "none" as const,
+      available: rays.length > 0,
       cells: [],
-      legend: "Spatial evidence unavailable. Permeability is the mean of six axis pass rates. The evaluator did not return located cells for this term.",
-      source: "Aggregate component only.",
+      swatches: [],
+      rays: rays.map((ray) => ({
+        origin: ray.origin,
+        end: ray.end,
+        direction: ray.direction,
+        passed: ray.passed,
+        color: ray.passed ? "#71BEDA" : "#B9BEC6",
+      })),
+      diagnostic: false,
+      legend: rays.length
+        ? "Solid blue lines are measured rays that crossed the envelope without entering an occupied cell. Dashed gray lines stopped at the first occupied cell, marked in gold. The drawing uses the evaluator's column tests. A clear column is not pedestrian access."
+        : "Spatial evidence unavailable. Permeability is the mean of six axis pass rates. The evaluator did not return the ray list for this term.",
+      source: rays.length ? "directionPassRate samples from the same envelope used by the permeability term." : "Aggregate component only.",
       transform: SPEC_TRANSFORM,
     },
     {
       id: "low-mass",
       metric: "Low Mass",
       label: "Low Mass",
-      kind: "none",
-      available: false,
-      cells: [],
-      legend: "Spatial evidence unavailable. Low Mass is mean 26-neighbor solidity. The evaluator did not return located cells for this term.",
-      source: "Aggregate component only.",
+      kind: solidity.length ? "voxel" as const : "none" as const,
+      available: solidity.length > 0,
+      cells: solidity.map((sample) => sample.cell),
+      swatches: solidity.map((sample) => ({
+        cell: sample.cell,
+        color: sample.solidity < meanSolidity ? "#D6AD4F" : "#6E7C87",
+      })),
+      rays: [],
+      diagnostic: false,
+      legend: solidity.length
+        ? "Gold marks occupied raster cells below the mean 26-neighbor solidity. Slate marks the rest of the display slab. These are evaluator cells, not the imported surface and not physical material density. Low Mass is 1 minus the mean solidity."
+        : "Spatial evidence unavailable. Low Mass is mean 26-neighbor solidity. The evaluator did not return located cells for this term.",
+      source: solidity.length ? "Per-cell 26-neighbor solidity from the occupied raster. The mean is the Low Mass input." : "Aggregate component only.",
       transform: SPEC_TRANSFORM,
     },
     {
       id: "enclosed-void",
       metric: "Enclosed Void",
       label: "Enclosed void",
-      kind: "none",
-      available: false,
-      cells: [],
-      legend: "Spatial evidence unavailable. Enclosed Void is an aggregate ratio. The evaluator does not export the enclosed cell list, so no overlay is drawn.",
-      source: "Aggregate component only.",
+      kind: enclosed.length ? "voxel" as const : "none" as const,
+      available: enclosed.length > 0,
+      cells: enclosed,
+      swatches: enclosed.map((cell) => ({ cell, color: "#A67C52" })),
+      rays: [],
+      diagnostic: true,
+      legend: enclosed.length
+        ? "Brown marks free cells the exterior flood did not reach. Enclosed Void is reported and is not part of the weighted score. It is not confirmed inaccessible to a person."
+        : "Spatial evidence unavailable. Enclosed Void is an aggregate ratio. The evaluator does not export the enclosed cell list, so no overlay is drawn.",
+      source: enclosed.length ? "Free cells inside the occupied bounds that are absent from the exterior flood." : "Aggregate component only.",
+      transform: SPEC_TRANSFORM,
+    },
+    {
+      id: "connected-void",
+      metric: "Connected void diagnostic",
+      label: "Connected void",
+      kind: voidSwatches.length ? "voxel" as const : "none" as const,
+      available: voidSwatches.length > 0,
+      cells: voidSwatches.map((mark) => mark.cell),
+      swatches: voidSwatches,
+      rays: [],
+      diagnostic: true,
+      legend: voidSwatches.length
+        ? "Purple is the largest exterior-connected free component. Blue is other exterior-connected free space. Brown is enclosed. This diagnostic is not added to the Open Volume score and is not verified pedestrian access."
+        : "Spatial evidence unavailable. Connected-void components were not supplied.",
+      source: "6-connected components of the free cells already counted for Architectural Open Space.",
       transform: SPEC_TRANSFORM,
     },
   ];

@@ -4,7 +4,7 @@
  */
 import type { Voxel } from "./openVolume";
 
-export const DESCRIPTOR_ALGORITHM_VERSION = "v3.3";
+export const DESCRIPTOR_ALGORITHM_VERSION = "v3.5";
 
 export type MeshTri = {
   normal: [number, number, number];
@@ -981,7 +981,8 @@ function sculptural(cells: Voxel[], triangles: MeshTri[] | undefined): Draft[] {
   const section = Math.min(1, sectionalVariation(cells) / 0.75);
   const mirror = asymmetry(cells);
   return [
-    { name: "Adjacent Normal Variation", raw: dihedral, rawUnit: "mean dihedral / 60°", value: clamp100(dihedral * 100), weight: 0.3 },
+    // Label corrected in v4 work: adjacentDihedral divides by 90°, not 60°. The number is unchanged.
+    { name: "Adjacent Normal Variation", raw: dihedral, rawUnit: "mean dihedral / 90°", value: clamp100(dihedral * 100), weight: 0.3 },
     { name: "Normal Orientation Entropy", raw: entropy, rawUnit: "Shannon / log(26)", value: clamp100(entropy * 100), weight: 0.25 },
     { name: "Sectional Area Variation", raw: section, rawUnit: "cv of Z sections / 0.75", value: clamp100(section * 100), weight: 0.25 },
     { name: "Plan Asymmetry", raw: mirror, rawUnit: "unmatched mirror cells", value: clamp100(mirror * 100), weight: 0.2 },
@@ -1184,4 +1185,379 @@ export function measureSpatialDescriptors(input: SpatialInput): SpatialDescripto
     monumental: monumental(input, cells),
     luminous: luminous(occupied, walk.list, bounds, input.triangles),
   };
+}
+
+const FIGURE_GOLD = "#D6AD4F";
+const FIGURE_CYAN = "#71BEDA";
+const FIGURE_SLATE = "#B9BEC6";
+
+export type DescriptorFigure = {
+  legend: string;
+  swatches: Array<{ cell: Voxel; color: string }>;
+  rays: Array<{ origin: Voxel; end: Voxel; direction: [number, number, number]; passed: boolean; color: string }>;
+};
+
+function asVoxel(cell: Cell): Voxel {
+  return [cell.x, cell.y, cell.z];
+}
+
+function figureRay(from: Voxel, to: Voxel, passed: boolean, color: string): DescriptorFigure["rays"][number] {
+  return {
+    origin: from,
+    end: to,
+    direction: [Math.sign(to[0] - from[0]), Math.sign(to[1] - from[1]), Math.sign(to[2] - from[2])],
+    passed,
+    color,
+  };
+}
+
+function takeEven<T>(items: T[], count: number) {
+  if (items.length <= count) return items.slice();
+  const picked: T[] = [];
+  for (let index = 0; index < count; index += 1) {
+    picked.push(items[Math.round((index * (items.length - 1)) / (count - 1))]);
+  }
+  return picked;
+}
+
+function plateMembers(cells: Voxel[]) {
+  const byLevel = new Map<number, Voxel[]>();
+  for (const cell of cells) {
+    const row = byLevel.get(cell[2]) ?? [];
+    row.push(cell);
+    byLevel.set(cell[2], row);
+  }
+  const groups: Voxel[][] = [];
+  for (const level of byLevel.values()) {
+    const remaining = new Set(level.map(([x, y]) => `${x},${y}`));
+    const lookup = new Map(level.map((cell) => [`${cell[0]},${cell[1]}`, cell]));
+    for (const start of remaining) {
+      if (!remaining.has(start)) continue;
+      const queue = [start];
+      remaining.delete(start);
+      const group: Voxel[] = [];
+      for (let index = 0; index < queue.length; index += 1) {
+        const cell = lookup.get(queue[index]);
+        if (cell) group.push(cell);
+        const [x, y] = queue[index].split(",").map(Number);
+        for (const [dx, dy] of PLAN) {
+          const next = `${x + dx},${y + dy}`;
+          if (!remaining.has(next)) continue;
+          remaining.delete(next);
+          queue.push(next);
+        }
+      }
+      if (group.length >= 2) groups.push(group);
+    }
+  }
+  return groups.sort((left, right) => right.length - left.length);
+}
+
+/**
+ * Located marks for one descriptor. These are the cells and lines the score already tests.
+ * The drawing does not change the rank.
+ */
+export function descriptorFigures(descriptorId: string, input: SpatialInput): DescriptorFigure {
+  const cells = input.cells;
+  const empty = (legend: string): DescriptorFigure => ({ legend, swatches: [], rays: [] });
+  if (!cells.length) return empty("No occupied cells were measured, so this descriptor has nothing to draw.");
+  const occupied = new Set(cells.map(([x, y, z]) => keyOf(x, y, z)));
+  const bounds = boundsOf(cells);
+  const walk = walkableCells(occupied, bounds);
+  const links = networkLinks(walk.set, occupied, walk.list);
+
+  if (descriptorId === "convergent") {
+    const list = walk.list;
+    const openRoom = new Set<string>();
+    for (const cell of list) {
+      const id = keyOf(cell.x, cell.y, cell.z);
+      if (sameLevelNeighbors(id, links).length >= 3) openRoom.add(id);
+    }
+    const roomSize = new Map<string, number>();
+    const roomSeen = new Set<string>();
+    for (const start of openRoom) {
+      if (roomSeen.has(start)) continue;
+      const queue = [start];
+      roomSeen.add(start);
+      for (let index = 0; index < queue.length; index += 1) {
+        for (const next of sameLevelNeighbors(queue[index], links)) {
+          if (!openRoom.has(next) || roomSeen.has(next)) continue;
+          roomSeen.add(next);
+          queue.push(next);
+        }
+      }
+      for (const id of queue) roomSize.set(id, queue.length);
+    }
+    const pathLike = new Set<string>();
+    for (const cell of list) {
+      const id = keyOf(cell.x, cell.y, cell.z);
+      const neighbors = sameLevelNeighbors(id, links);
+      if (neighbors.length > 2) continue;
+      if (neighbors.some((next) => (roomSize.get(next) ?? 0) >= 6)) continue;
+      pathLike.add(id);
+    }
+    const filtered = new Map([...links].map(([id, next]) => [id, next.filter((item) => pathLike.has(item))]));
+    const entries = [...pathLike].filter((id) => {
+      const cell = parseKey(id);
+      const onEdge = cell.x === bounds.minX || cell.x === bounds.maxX || cell.y === bounds.minY || cell.y === bounds.maxY;
+      return onEdge || (filtered.get(id) ?? []).length <= 1;
+    });
+    const junctions = [...pathLike].filter((id) => (filtered.get(id) ?? []).length >= 3);
+    const targets = junctions.length ? junctions : [...pathLike].filter((id) => !entries.includes(id)).slice(0, 1);
+    let best = targets[0];
+    let bestCount = -1;
+    for (const target of targets) {
+      const seen = reachableFrom([target], filtered);
+      let count = 0;
+      for (const entry of entries) if (seen.has(entry)) count += 1;
+      if (count > bestCount) {
+        bestCount = count;
+        best = target;
+      }
+    }
+    if (!best) return empty("No corridor destination was found. Convergent has no path to draw.");
+    const destination = asVoxel(parseKey(best));
+    const rays: DescriptorFigure["rays"] = [];
+    for (const entry of takeEven(entries, 4)) {
+      const path = shortestPath(entry, best, filtered);
+      if (!path || path.length < 2) continue;
+      const step = Math.max(1, Math.ceil((path.length - 1) / 12));
+      for (let index = step; index < path.length && rays.length < 48; index += step) {
+        rays.push(figureRay(asVoxel(parseKey(path[index - step])), asVoxel(parseKey(path[index])), true, FIGURE_CYAN));
+      }
+    }
+    return {
+      legend: "Cyan lines are measured approaches into the dominant destination. Gold marks that destination. These are the paths Convergent scores.",
+      swatches: [{ cell: destination, color: FIGURE_GOLD }],
+      rays,
+    };
+  }
+
+  if (descriptorId === "centralized") {
+    const center = centroid(cells.map(([x, y, z]) => ({ x, y, z })));
+    const midX = (bounds.minX + bounds.maxX) / 2;
+    const midY = (bounds.minY + bounds.maxY) / 2;
+    let maxRadius = 0;
+    for (const [x, y] of cells) maxRadius = Math.max(maxRadius, Math.hypot(x - center.x, y - center.y));
+    const limit = maxRadius || 1;
+    const swatches = takeEven(cells, 90).map((cell) => ({
+      cell,
+      color: Math.hypot(cell[0] - center.x, cell[1] - center.y) <= limit * 0.5 ? FIGURE_GOLD : FIGURE_SLATE,
+    }));
+    const mass: Voxel = [Math.round(center.x), Math.round(center.y), Math.round(center.z)];
+    const middle: Voxel = [Math.round(midX), Math.round(midY), Math.round((bounds.minZ + bounds.maxZ) / 2)];
+    return {
+      legend: "Gold cells sit inside half the plan radius of the mass center. Slate cells sit outside it. The cyan line runs from the bounds center to the mass center.",
+      swatches,
+      rays: [figureRay(middle, mass, true, FIGURE_CYAN)],
+    };
+  }
+
+  if (descriptorId === "verticallyIntegrated") {
+    const rays: DescriptorFigure["rays"] = [];
+    const swatches: DescriptorFigure["swatches"] = [];
+    for (const cell of takeEven(walk.list, 40)) {
+      const above = walk.set.has(keyOf(cell.x, cell.y, cell.z + 1));
+      const below = walk.set.has(keyOf(cell.x, cell.y, cell.z - 1));
+      if (!above && !below) continue;
+      swatches.push({ cell: asVoxel(cell), color: above && below ? FIGURE_GOLD : FIGURE_CYAN });
+      if (above) rays.push(figureRay(asVoxel(cell), [cell.x, cell.y, cell.z + 1], true, FIGURE_CYAN));
+    }
+    if (!swatches.length) {
+      return {
+        legend: "No walkable cell sits directly above or below another, so Vertically Integrated has no vertical link to draw. The cream form is the mass that was tested.",
+        swatches: [],
+        rays: [],
+      };
+    }
+    return {
+      legend: "Cyan links are walkable cells stacked on the next level. Gold marks a cell with walkable space both above and below. This is the vertical connection Vertically Integrated scores.",
+      swatches: takeEven(swatches, 50),
+      rays: takeEven(rays, 30),
+    };
+  }
+
+  if (descriptorId === "sculptural") {
+    const counts = new Map<number, number>();
+    for (const cell of cells) counts.set(cell[2], (counts.get(cell[2]) ?? 0) + 1);
+    const values = [...counts.values()];
+    const mean = values.reduce((sum, value) => sum + value, 0) / (values.length || 1);
+    const oddLevels = new Set([...counts.entries()].filter(([, count]) => Math.abs(count - mean) > mean * 0.35).map(([level]) => level));
+    const midX = (bounds.minX + bounds.maxX) / 2;
+    const midY = (bounds.minY + bounds.maxY) / 2;
+    const swatches = takeEven(cells, 80).map((cell) => {
+      const mirrorX = Math.round(midX + (midX - cell[0]));
+      const mirrorY = Math.round(midY + (midY - cell[1]));
+      const unmatched = !occupied.has(keyOf(mirrorX, cell[1], cell[2])) || !occupied.has(keyOf(cell[0], mirrorY, cell[2]));
+      return { cell, color: unmatched || oddLevels.has(cell[2]) ? FIGURE_GOLD : FIGURE_SLATE };
+    });
+    return {
+      legend: "Gold marks cells whose mirror is missing or whose floor level is a different size from the average. Those are the plan-asymmetry and section-variation tests in Sculptural. The cream surface carries the normal-variation test.",
+      swatches,
+      rays: [],
+    };
+  }
+
+  if (descriptorId === "visuallyConnected") {
+    const zones = visualZones(walk.list, occupied).slice(0, 8);
+    const swatches = zones.map((zone) => ({ cell: asVoxel(zone.samples[0]), color: FIGURE_GOLD }));
+    const rays: DescriptorFigure["rays"] = [];
+    for (let i = 0; i < zones.length; i += 1) {
+      for (let j = i + 1; j < zones.length && rays.length < 10; j += 1) {
+        const from = zones[i].samples[0];
+        const to = zones[j].samples[0];
+        const hit = rayClear(occupied, from, to);
+        rays.push(figureRay(asVoxel(from), asVoxel(to), hit.clear, hit.clear ? FIGURE_CYAN : FIGURE_SLATE));
+      }
+    }
+    return {
+      legend: "Gold marks zone anchors. Cyan lines are clear sightlines between zones. Slate lines are blocked. This is the zone-to-zone test Visually Connected scores.",
+      swatches,
+      rays,
+    };
+  }
+
+  if (descriptorId === "surreal") {
+    const zs = cells.map((cell) => cell[2]).sort((left, right) => left - right);
+    const mid = zs[Math.floor(zs.length / 2)] ?? bounds.minZ;
+    const lower = cells.filter((cell) => cell[2] <= mid);
+    const upper = cells.filter((cell) => cell[2] > mid);
+    const lowerCenter = centroid(lower.map(([x, y, z]) => ({ x, y, z })));
+    const upperCenter = centroid(upper.map(([x, y, z]) => ({ x, y, z })));
+    const unsupported: Voxel[] = [];
+    for (const [x, y, z] of cells) {
+      if (z <= bounds.minZ) continue;
+      let supported = false;
+      for (let dx = -1; dx <= 1 && !supported; dx += 1) {
+        for (let dy = -1; dy <= 1 && !supported; dy += 1) {
+          for (let below = bounds.minZ; below < z; below += 1) {
+            if (occupied.has(keyOf(x + dx, y + dy, below))) {
+              supported = true;
+              break;
+            }
+          }
+        }
+      }
+      if (!supported) unsupported.push([x, y, z]);
+    }
+    const rays: DescriptorFigure["rays"] = [];
+    if (lower.length && upper.length) {
+      rays.push(figureRay(
+        [Math.round(lowerCenter.x), Math.round(lowerCenter.y), Math.round(lowerCenter.z)],
+        [Math.round(upperCenter.x), Math.round(upperCenter.y), Math.round(upperCenter.z)],
+        true,
+        FIGURE_CYAN,
+      ));
+    }
+    return {
+      legend: "Gold marks upper cells with nothing beneath them. The cyan line joins the lower mass center to the upper mass center. Those are the cantilever and centroid-shift tests in Surreal.",
+      swatches: takeEven(unsupported, 60).map((cell) => ({ cell, color: FIGURE_GOLD })),
+      rays,
+    };
+  }
+
+  if (descriptorId === "hierarchical") {
+    const groups = plateMembers(cells);
+    const colors = [FIGURE_GOLD, FIGURE_CYAN, FIGURE_SLATE];
+    const swatches = groups.slice(0, 3).flatMap((group, index) => takeEven(group, 40).map((cell) => ({ cell, color: colors[index] })));
+    return {
+      legend: "Gold is the largest plate, cyan the next, and slate the third. Hierarchical scores the size difference among these plates.",
+      swatches,
+      rays: [],
+    };
+  }
+
+  if (descriptorId === "sequential") {
+    const { members, edges } = significantZones(walk.list, links);
+    const path = longestSignificantPath(edges, members);
+    const swatches: DescriptorFigure["swatches"] = [];
+    const rays: DescriptorFigure["rays"] = [];
+    const centers = path.map((id) => {
+      const point = centroid(members.get(id) ?? []);
+      return [Math.round(point.x), Math.round(point.y), Math.round(point.z)] as Voxel;
+    });
+    centers.forEach((cell, index) => {
+      swatches.push({ cell, color: index === 0 || index === centers.length - 1 ? FIGURE_GOLD : FIGURE_CYAN });
+      if (index > 0) rays.push(figureRay(centers[index - 1], cell, true, FIGURE_CYAN));
+    });
+    return {
+      legend: "Cyan links the significant zones on the longest path. Gold marks the two ends. Sequential scores the depth and changes along this path.",
+      swatches,
+      rays,
+    };
+  }
+
+  if (descriptorId === "circulationActivated") {
+    const route = routeCells(walk.list, links);
+    const seen = new Set<string>();
+    let largest: string[] = [];
+    for (const start of route) {
+      if (seen.has(start)) continue;
+      const queue = [start];
+      seen.add(start);
+      for (let index = 0; index < queue.length; index += 1) {
+        for (const next of links.get(queue[index]) ?? []) {
+          if (!route.has(next) || seen.has(next)) continue;
+          seen.add(next);
+          queue.push(next);
+        }
+      }
+      if (queue.length > largest.length) largest = queue;
+    }
+    const rays: DescriptorFigure["rays"] = [];
+    const swatches = takeEven(largest, 50).map((id) => {
+      const cell = asVoxel(parseKey(id));
+      const branches = (links.get(id) ?? []).filter((next) => route.has(next));
+      if (branches[0]) rays.push(figureRay(cell, asVoxel(parseKey(branches[0])), true, FIGURE_CYAN));
+      return { cell, color: branches.length >= 3 ? FIGURE_GOLD : FIGURE_CYAN };
+    });
+    return {
+      legend: "Cyan marks the largest connected route. Gold marks a junction on that route. Circulation Activated scores reach, continuity, and junctions on this route.",
+      swatches,
+      rays: takeEven(rays, 40),
+    };
+  }
+
+  if (descriptorId === "monumental") {
+    const feet = input.cellFeet ?? 2;
+    const low: Voxel = [Math.round((bounds.minX + bounds.maxX) / 2), Math.round((bounds.minY + bounds.maxY) / 2), bounds.minZ];
+    const high: Voxel = [low[0], low[1], bounds.maxZ];
+    const corners: Voxel[] = [
+      [bounds.minX, bounds.minY, bounds.minZ],
+      [bounds.maxX, bounds.minY, bounds.minZ],
+      [bounds.maxX, bounds.maxY, bounds.minZ],
+      [bounds.minX, bounds.maxY, bounds.minZ],
+    ];
+    const top = corners.map((cell) => [cell[0], cell[1], bounds.maxZ] as Voxel);
+    const rays = [
+      figureRay(low, high, true, FIGURE_GOLD),
+      ...corners.map((cell, index) => figureRay(cell, corners[(index + 1) % corners.length], true, FIGURE_SLATE)),
+      ...top.map((cell, index) => figureRay(cell, top[(index + 1) % top.length], true, FIGURE_SLATE)),
+      ...corners.map((cell, index) => figureRay(cell, top[index], true, FIGURE_SLATE)),
+    ];
+    const heightFeet = ((bounds.maxZ - bounds.minZ + 1) * feet);
+    return {
+      legend: `The gold line is the measured height, ${heightFeet.toFixed(0)} ft. The slate box is the occupied bounds whose volume and vertical proportion Monumental scores.`,
+      swatches: [],
+      rays,
+    };
+  }
+
+  if (descriptorId === "luminous") {
+    const height = Math.max(1, bounds.maxZ - bounds.minZ + 1);
+    const samples = takeEven(walk.list, 8);
+    const rays = samples.map((cell) => {
+      const from = asVoxel(cell);
+      const to: Voxel = [cell.x, cell.y, cell.z + height + 3];
+      const hit = rayClear(occupied, cell, { x: to[0], y: to[1], z: to[2] });
+      return figureRay(from, to, hit.clear, hit.clear ? FIGURE_CYAN : FIGURE_SLATE);
+    });
+    return {
+      legend: "Cyan rays reach open sky. Slate rays stop in the mass. These are the upward samples Luminous scores.",
+      swatches: samples.map((cell) => ({ cell: asVoxel(cell), color: FIGURE_GOLD })),
+      rays,
+    };
+  }
+
+  return empty("This descriptor has no located drawing.");
 }

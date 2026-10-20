@@ -1,0 +1,4077 @@
+{
+  "version": "v4.1",
+  "formCount": 15,
+  "forms": [
+    {
+      "filename": "Gathering Linear.obj",
+      "vertices": 20865,
+      "faces": 41604,
+      "triangles": 41604,
+      "boundsFeet": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          20,
+          20,
+          20
+        ],
+        "size": [
+          20,
+          20,
+          20
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 1.3353991505674503,
+          "areaFt2": 45,
+          "interiorAreaFt2": 45,
+          "deckAreaFt2": 0,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 40,
+            "openVoid": 3,
+            "exposed": 0,
+            "uncertain": 2
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 6.404511887258312,
+          "areaFt2": 116,
+          "interiorAreaFt2": 111,
+          "deckAreaFt2": 5,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 77,
+            "openVoid": 8,
+            "exposed": 5,
+            "uncertain": 26
+          }
+        },
+        {
+          "id": 2,
+          "elevationFt": 12.967384068764787,
+          "areaFt2": 136,
+          "interiorAreaFt2": 105,
+          "deckAreaFt2": 31,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 11,
+            "openVoid": 29,
+            "exposed": 31,
+            "uncertain": 65
+          }
+        },
+        {
+          "id": 3,
+          "elevationFt": 18.731973560276533,
+          "areaFt2": 145,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 145,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 145,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 2,
+          "areaFt2": 18,
+          "elevationFt": 13.212765226462544,
+          "floorClass": "uncertain"
+        },
+        {
+          "id": 1,
+          "levelId": 2,
+          "areaFt2": 26,
+          "elevationFt": 14.628551010080871,
+          "floorClass": "uncertain"
+        },
+        {
+          "id": 2,
+          "levelId": 3,
+          "areaFt2": 26,
+          "elevationFt": 19.596239265604076,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 3,
+          "levelId": 3,
+          "areaFt2": 23,
+          "elevationFt": 19.93582010660876,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 4,
+          "levelId": 0,
+          "areaFt2": 26,
+          "elevationFt": 1.2952177086159697,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 5,
+          "levelId": 1,
+          "areaFt2": 26,
+          "elevationFt": 7.9618843132592465,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 6,
+          "levelId": 3,
+          "areaFt2": 25,
+          "elevationFt": 17.163349139464234,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 7,
+          "levelId": 3,
+          "areaFt2": 21,
+          "elevationFt": 17.264689668048113,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 8,
+          "levelId": 3,
+          "areaFt2": 20,
+          "elevationFt": 19.871694529825344,
+          "floorClass": "exposed"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 1.3353991505674503,
+          "areaFt2": 5,
+          "upper": false,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "elevationFt": 1.3353991505674503,
+          "areaFt2": 30,
+          "upper": false,
+          "independent": false,
+          "tips": 5
+        },
+        {
+          "id": 2,
+          "levelId": 0,
+          "elevationFt": 1.3353991505674503,
+          "areaFt2": 6,
+          "upper": false,
+          "independent": false,
+          "tips": 4
+        },
+        {
+          "id": 3,
+          "levelId": 0,
+          "elevationFt": 1.3353991505674503,
+          "areaFt2": 4,
+          "upper": false,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 4,
+          "levelId": 1,
+          "elevationFt": 6.404511887258312,
+          "areaFt2": 11,
+          "upper": true,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 5,
+          "levelId": 1,
+          "elevationFt": 6.404511887258312,
+          "areaFt2": 12,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 6,
+          "levelId": 1,
+          "elevationFt": 6.404511887258312,
+          "areaFt2": 15,
+          "upper": true,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 7,
+          "levelId": 1,
+          "elevationFt": 6.404511887258312,
+          "areaFt2": 49,
+          "upper": true,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 8,
+          "levelId": 1,
+          "elevationFt": 6.404511887258312,
+          "areaFt2": 18,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 9,
+          "levelId": 1,
+          "elevationFt": 6.404511887258312,
+          "areaFt2": 6,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        },
+        {
+          "id": 10,
+          "levelId": 2,
+          "elevationFt": 12.967384068764787,
+          "areaFt2": 41,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        },
+        {
+          "id": 11,
+          "levelId": 2,
+          "elevationFt": 12.967384068764787,
+          "areaFt2": 64,
+          "upper": true,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 12,
+          "levelId": 2,
+          "elevationFt": 12.967384068764787,
+          "areaFt2": 14,
+          "upper": true,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 13,
+          "levelId": 2,
+          "elevationFt": 12.967384068764787,
+          "areaFt2": 6,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        },
+        {
+          "id": 14,
+          "levelId": 2,
+          "elevationFt": 12.967384068764787,
+          "areaFt2": 11,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 15,
+          "levelId": 3,
+          "elevationFt": 18.731973560276533,
+          "areaFt2": 49,
+          "upper": true,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 16,
+          "levelId": 3,
+          "elevationFt": 18.731973560276533,
+          "areaFt2": 45,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        },
+        {
+          "id": 17,
+          "levelId": 3,
+          "elevationFt": 18.731973560276533,
+          "areaFt2": 8,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        },
+        {
+          "id": 18,
+          "levelId": 3,
+          "elevationFt": 18.731973560276533,
+          "areaFt2": 30,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 19,
+          "levelId": 3,
+          "elevationFt": 18.731973560276533,
+          "areaFt2": 13,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        },
+        {
+          "lowerLevelId": 1,
+          "upperLevelId": 2
+        },
+        {
+          "lowerLevelId": 2,
+          "upperLevelId": 3
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 22,
+      "potentialInterfaces": 172,
+      "uncertainAreaFt2": 93,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 181,
+      "uncertainNotes": [
+        "93 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 11.647308169800292,
+          "available": true
+        },
+        "convergent": {
+          "score": 3.1782147957774036,
+          "available": true
+        },
+        "sculptural": {
+          "score": 45.84671926052781,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 63.299720054369544,
+          "available": true
+        },
+        "surreal": {
+          "score": 46.111756497729665,
+          "available": true
+        },
+        "monumental": {
+          "score": 25.168136927975123,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 23.445779372757062,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 33.71911585146879,
+          "available": true
+        },
+        "centralized": {
+          "score": 47.498311518482375,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 30.572916666666664,
+          "available": true
+        },
+        "luminous": {
+          "score": 64.88562091503267,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "Gathering Void Field.obj",
+      "vertices": 3611,
+      "faces": 7138,
+      "triangles": 7138,
+      "boundsFeet": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          20,
+          20,
+          20.19451332092285
+        ],
+        "size": [
+          20,
+          20,
+          20.19451332092285
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 10.014655182087012,
+          "areaFt2": 301,
+          "interiorAreaFt2": 143,
+          "deckAreaFt2": 158,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 86,
+            "openVoid": 1,
+            "exposed": 158,
+            "uncertain": 56
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "areaFt2": 75,
+          "elevationFt": 11.262928342344226,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "areaFt2": 75,
+          "elevationFt": 1.2629283340449189,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 2,
+          "levelId": 0,
+          "areaFt2": 43,
+          "elevationFt": 10.1018439571809,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 3,
+          "levelId": 0,
+          "areaFt2": 43,
+          "elevationFt": 20.101843967998967,
+          "floorClass": "exposed"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 10.014655182087012,
+          "areaFt2": 168,
+          "upper": false,
+          "independent": false,
+          "tips": 4
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [],
+      "disconnectedLinks": [],
+      "entries": 89,
+      "potentialInterfaces": 0,
+      "uncertainAreaFt2": 56,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 158,
+      "uncertainNotes": [
+        "56 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 9.455888201022937,
+          "available": true
+        },
+        "convergent": {
+          "score": 55.66086940757476,
+          "available": true
+        },
+        "sculptural": {
+          "score": 66.36948100121015,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 63.116075172544605,
+          "available": true
+        },
+        "surreal": {
+          "score": 71.6274799518933,
+          "available": true
+        },
+        "monumental": {
+          "score": 25.74683508172491,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 11.697175141242939,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 45.49941949773158,
+          "available": true
+        },
+        "centralized": {
+          "score": 41.00012959033871,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 0,
+          "available": true
+        },
+        "luminous": {
+          "score": 70.89409722222223,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "Gathering, Plate.obj",
+      "vertices": 4044,
+      "faces": 7924,
+      "triangles": 7924,
+      "boundsFeet": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          20,
+          20,
+          20
+        ],
+        "size": [
+          20,
+          20,
+          20
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 11.749520652094832,
+          "areaFt2": 243,
+          "interiorAreaFt2": 132,
+          "deckAreaFt2": 111,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 5,
+            "openVoid": 98,
+            "exposed": 111,
+            "uncertain": 29
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "areaFt2": 89,
+          "elevationFt": 17.41088550298602,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "areaFt2": 38,
+          "elevationFt": 10.382024222537039,
+          "floorClass": "openVoid"
+        },
+        {
+          "id": 2,
+          "levelId": 0,
+          "areaFt2": 37,
+          "elevationFt": 3.7308156164715816,
+          "floorClass": "openVoid"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 11.749520652094832,
+          "areaFt2": 230,
+          "upper": false,
+          "independent": false,
+          "tips": 23
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 1,
+      "verifiedLinks": [],
+      "potentialLinks": [],
+      "disconnectedLinks": [],
+      "entries": 92,
+      "potentialInterfaces": 0,
+      "uncertainAreaFt2": 29,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 111,
+      "uncertainNotes": [
+        "29 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 12.134420560268438,
+          "available": true
+        },
+        "convergent": {
+          "score": 68.93243013126589,
+          "available": true
+        },
+        "sculptural": {
+          "score": 56.894875771103386,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 65.71544254816861,
+          "available": true
+        },
+        "surreal": {
+          "score": 73.32975445843475,
+          "available": true
+        },
+        "monumental": {
+          "score": 23.251453177673085,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 28.70818068396533,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 50.1929012345679,
+          "available": true
+        },
+        "centralized": {
+          "score": 39.46100780202706,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 0,
+          "available": true
+        },
+        "luminous": {
+          "score": 68.25,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "Gathering, Room within Volume.obj",
+      "vertices": 15009,
+      "faces": 29854,
+      "triangles": 29854,
+      "boundsFeet": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          21.3566951751709,
+          20,
+          20
+        ],
+        "size": [
+          21.3566951751709,
+          20,
+          20
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 1.1129079184873605,
+          "areaFt2": 266,
+          "interiorAreaFt2": 226,
+          "deckAreaFt2": 40,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 159,
+            "openVoid": 5,
+            "exposed": 40,
+            "uncertain": 62
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "areaFt2": 250,
+          "elevationFt": 1.1620708617020772,
+          "floorClass": "sheltered"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 1.1129079184873605,
+          "areaFt2": 166,
+          "upper": false,
+          "independent": false,
+          "tips": 6
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "elevationFt": 1.1129079184873605,
+          "areaFt2": 5,
+          "upper": false,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 2,
+          "levelId": -1,
+          "elevationFt": 10.21779503150961,
+          "areaFt2": 7,
+          "upper": true,
+          "independent": true,
+          "tips": 1
+        }
+      ],
+      "independentInterfaces": 1,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [],
+      "disconnectedLinks": [],
+      "entries": 23,
+      "potentialInterfaces": 1,
+      "uncertainAreaFt2": 69,
+      "roofLidAreaFt2": 151,
+      "deckAreaFt2": 40,
+      "uncertainNotes": [
+        "69 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume.",
+        "151 ft² of uncovered samples classified as roof caps, not occupiable levels."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 33.047588476431116,
+          "available": true
+        },
+        "convergent": {
+          "score": 95.12017831634446,
+          "available": true
+        },
+        "sculptural": {
+          "score": 51.291340554652066,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 41.43624253268252,
+          "available": true
+        },
+        "surreal": {
+          "score": 38.39886784138593,
+          "available": true
+        },
+        "monumental": {
+          "score": 33.296113501769355,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 0,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 78.6582776385408,
+          "available": true
+        },
+        "centralized": {
+          "score": 34.31877897145096,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 0,
+          "available": true
+        },
+        "luminous": {
+          "score": 69.86928104575163,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "Gathering, Stepped.obj",
+      "vertices": 12783,
+      "faces": 21602,
+      "triangles": 21593,
+      "boundsFeet": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          20,
+          20,
+          20
+        ],
+        "size": [
+          20,
+          20,
+          20
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 2.054949570983232,
+          "areaFt2": 138,
+          "interiorAreaFt2": 81,
+          "deckAreaFt2": 57,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 81,
+            "openVoid": 0,
+            "exposed": 57,
+            "uncertain": 0
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 10.433788480891359,
+          "areaFt2": 136,
+          "interiorAreaFt2": 65,
+          "deckAreaFt2": 71,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 63,
+            "openVoid": 0,
+            "exposed": 71,
+            "uncertain": 2
+          }
+        },
+        {
+          "id": 2,
+          "elevationFt": 18.590442084194173,
+          "areaFt2": 138,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 138,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 138,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 2,
+          "areaFt2": 49,
+          "elevationFt": 18.015916167558494,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "areaFt2": 49,
+          "elevationFt": 1.4804237209622744,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 2,
+          "levelId": 1,
+          "areaFt2": 49,
+          "elevationFt": 9.879343961640682,
+          "floorClass": "exposed"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 2.054949570983232,
+          "areaFt2": 129,
+          "upper": false,
+          "independent": false,
+          "tips": 9
+        },
+        {
+          "id": 1,
+          "levelId": 1,
+          "elevationFt": 10.433788480891359,
+          "areaFt2": 128,
+          "upper": true,
+          "independent": false,
+          "tips": 9
+        },
+        {
+          "id": 2,
+          "levelId": 2,
+          "elevationFt": 18.590442084194173,
+          "areaFt2": 129,
+          "upper": true,
+          "independent": false,
+          "tips": 9
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        },
+        {
+          "lowerLevelId": 1,
+          "upperLevelId": 2
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 52,
+      "potentialInterfaces": 100,
+      "uncertainAreaFt2": 2,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 266,
+      "uncertainNotes": [],
+      "scores": {
+        "openVolume": {
+          "score": 13.728312928983762,
+          "available": true
+        },
+        "convergent": {
+          "score": 11.161004168383636,
+          "available": true
+        },
+        "sculptural": {
+          "score": 65.4180106819594,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 46.5733614976503,
+          "available": true
+        },
+        "surreal": {
+          "score": 70.32968994877673,
+          "available": true
+        },
+        "monumental": {
+          "score": 25.832669475054008,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 15.374806528774451,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 51.6965350268876,
+          "available": true
+        },
+        "centralized": {
+          "score": 44.05956267522547,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 18.977272727272727,
+          "available": true
+        },
+        "luminous": {
+          "score": 77.98611111111111,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "Lobby Continuous Hall.obj",
+      "vertices": 2110,
+      "faces": 4152,
+      "triangles": 4152,
+      "boundsFeet": {
+        "min": [
+          26.80741310119629,
+          -12.513928413391113,
+          0
+        ],
+        "max": [
+          47.40058135986328,
+          7.486072063446045,
+          20.675838470458984
+        ],
+        "size": [
+          20.593168258666992,
+          20.000000476837158,
+          20.675838470458984
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 18.892076330499386,
+          "areaFt2": 135,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 135,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 135,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "areaFt2": 131,
+          "elevationFt": 18.912237105396745,
+          "floorClass": "exposed"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 18.892076330499386,
+          "areaFt2": 92,
+          "upper": false,
+          "independent": false,
+          "tips": 5
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 8,
+      "verifiedLinks": [],
+      "potentialLinks": [],
+      "disconnectedLinks": [],
+      "entries": 22,
+      "potentialInterfaces": 0,
+      "uncertainAreaFt2": 0,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 135,
+      "uncertainNotes": [],
+      "scores": {
+        "openVolume": {
+          "score": 1.5796208475316917,
+          "available": true
+        },
+        "convergent": {
+          "score": 98.85143677024408,
+          "available": true
+        },
+        "sculptural": {
+          "score": 64.24057919367586,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 0,
+          "available": true
+        },
+        "surreal": {
+          "score": 63.545848592397924,
+          "available": true
+        },
+        "monumental": {
+          "score": 25.95769468994465,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 0,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 79.42307692307692,
+          "available": true
+        },
+        "centralized": {
+          "score": 59.7300430641229,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 0,
+          "available": true
+        },
+        "luminous": {
+          "score": 0,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "Lobby Vertical Void.obj",
+      "vertices": 14354,
+      "faces": 28576,
+      "triangles": 28576,
+      "boundsFeet": {
+        "min": [
+          26.80741310119629,
+          -12.513928413391113,
+          0
+        ],
+        "max": [
+          46.807411193847656,
+          7.486072063446045,
+          20.675838470458984
+        ],
+        "size": [
+          19.999998092651367,
+          20.000000476837158,
+          20.675838470458984
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 1.6893882920378591,
+          "areaFt2": 35,
+          "interiorAreaFt2": 26,
+          "deckAreaFt2": 9,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 8,
+            "openVoid": 8,
+            "exposed": 9,
+            "uncertain": 10
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 8.358223622750009,
+          "areaFt2": 205,
+          "interiorAreaFt2": 200,
+          "deckAreaFt2": 5,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 200,
+            "openVoid": 0,
+            "exposed": 5,
+            "uncertain": 0
+          }
+        },
+        {
+          "id": 2,
+          "elevationFt": 20.33715652752724,
+          "areaFt2": 224,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 224,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 224,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 2,
+          "areaFt2": 224,
+          "elevationFt": 20.337156527527245,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 1,
+          "levelId": 1,
+          "areaFt2": 205,
+          "elevationFt": 8.358223622750009,
+          "floorClass": "sheltered"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 1.6893882920378591,
+          "areaFt2": 13,
+          "upper": false,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "elevationFt": 1.6893882920378591,
+          "areaFt2": 15,
+          "upper": false,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 2,
+          "levelId": 0,
+          "elevationFt": 1.6893882920378591,
+          "areaFt2": 5,
+          "upper": false,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 3,
+          "levelId": 1,
+          "elevationFt": 8.358223622750009,
+          "areaFt2": 153,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        },
+        {
+          "id": 4,
+          "levelId": 2,
+          "elevationFt": 20.33715652752724,
+          "areaFt2": 147,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        },
+        {
+          "lowerLevelId": 1,
+          "upperLevelId": 2
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 16,
+      "potentialInterfaces": 31,
+      "uncertainAreaFt2": 10,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 238,
+      "uncertainNotes": [],
+      "scores": {
+        "openVolume": {
+          "score": 16.987981902538408,
+          "available": true
+        },
+        "convergent": {
+          "score": 15,
+          "available": true
+        },
+        "sculptural": {
+          "score": 46.054698317383306,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 45.201691241157064,
+          "available": true
+        },
+        "surreal": {
+          "score": 22.715104571724112,
+          "available": true
+        },
+        "monumental": {
+          "score": 26.23689612992101,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 41.9748362970083,
+          "available": true
+        },
+        "sequential": {
+          "score": 0,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 53.06896551724138,
+          "available": true
+        },
+        "centralized": {
+          "score": 26.02991787378224,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 21.395348837209305,
+          "available": true
+        },
+        "luminous": {
+          "score": 78.53333333333333,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "Lobby, Ground Field.obj",
+      "vertices": 7017,
+      "faces": 11634,
+      "triangles": 11634,
+      "boundsFeet": {
+        "min": [
+          0,
+          0,
+          0
+        ],
+        "max": [
+          20,
+          20.005250930786133,
+          19.95368003845215
+        ],
+        "size": [
+          20,
+          20.005250930786133,
+          19.95368003845215
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 3.429638716574785,
+          "areaFt2": 131,
+          "interiorAreaFt2": 126,
+          "deckAreaFt2": 5,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 67,
+            "openVoid": 26,
+            "exposed": 5,
+            "uncertain": 33
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 9.496786215570733,
+          "areaFt2": 143,
+          "interiorAreaFt2": 121,
+          "deckAreaFt2": 22,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 63,
+            "openVoid": 20,
+            "exposed": 22,
+            "uncertain": 38
+          }
+        },
+        {
+          "id": 2,
+          "elevationFt": 17.155873680583603,
+          "areaFt2": 183,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 183,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 183,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "areaFt2": 42,
+          "elevationFt": 2.7195273774787103,
+          "floorClass": "openVoid"
+        },
+        {
+          "id": 1,
+          "levelId": 1,
+          "areaFt2": 46,
+          "elevationFt": 8.768147325903106,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 2,
+          "levelId": 1,
+          "areaFt2": 35,
+          "elevationFt": 9.356679297896196,
+          "floorClass": "uncertain"
+        },
+        {
+          "id": 3,
+          "levelId": 2,
+          "areaFt2": 52,
+          "elevationFt": 18.494458329182862,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 4,
+          "levelId": 2,
+          "areaFt2": 30,
+          "elevationFt": 17.848935346955376,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 5,
+          "levelId": 2,
+          "areaFt2": 67,
+          "elevationFt": 16.613844670984108,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 6,
+          "levelId": 1,
+          "areaFt2": 30,
+          "elevationFt": 10.322434991336149,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 7,
+          "levelId": 0,
+          "areaFt2": 35,
+          "elevationFt": 3.3325628664229576,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 8,
+          "levelId": 0,
+          "areaFt2": 30,
+          "elevationFt": 4.299672527790974,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 9,
+          "levelId": 2,
+          "areaFt2": 21,
+          "elevationFt": 15.690267453473174,
+          "floorClass": "exposed"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 3.429638716574785,
+          "areaFt2": 38,
+          "upper": false,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "elevationFt": 3.429638716574785,
+          "areaFt2": 75,
+          "upper": false,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 2,
+          "levelId": 0,
+          "elevationFt": 3.429638716574785,
+          "areaFt2": 5,
+          "upper": false,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 3,
+          "levelId": 0,
+          "elevationFt": 3.429638716574785,
+          "areaFt2": 7,
+          "upper": false,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 4,
+          "levelId": 1,
+          "elevationFt": 9.496786215570733,
+          "areaFt2": 43,
+          "upper": true,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 5,
+          "levelId": 1,
+          "elevationFt": 9.496786215570733,
+          "areaFt2": 79,
+          "upper": true,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 6,
+          "levelId": 1,
+          "elevationFt": 9.496786215570733,
+          "areaFt2": 5,
+          "upper": true,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 7,
+          "levelId": 1,
+          "elevationFt": 9.496786215570733,
+          "areaFt2": 7,
+          "upper": true,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 8,
+          "levelId": 2,
+          "elevationFt": 17.155873680583603,
+          "areaFt2": 151,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        },
+        {
+          "id": 9,
+          "levelId": 2,
+          "elevationFt": 17.155873680583603,
+          "areaFt2": 7,
+          "upper": true,
+          "independent": false,
+          "tips": 2
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        },
+        {
+          "lowerLevelId": 1,
+          "upperLevelId": 2
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 28,
+      "potentialInterfaces": 80,
+      "uncertainAreaFt2": 71,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 210,
+      "uncertainNotes": [
+        "71 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 10.577418697868412,
+          "available": true
+        },
+        "convergent": {
+          "score": 14.575138854895439,
+          "available": true
+        },
+        "sculptural": {
+          "score": 51.950582681015774,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 46.46174760936988,
+          "available": true
+        },
+        "surreal": {
+          "score": 56.49227309860099,
+          "available": true
+        },
+        "monumental": {
+          "score": 24.101882047181398,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 26.75867465748013,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 64.5474592001951,
+          "available": true
+        },
+        "centralized": {
+          "score": 43.37011432229957,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 33.67355510752688,
+          "available": true
+        },
+        "luminous": {
+          "score": 63.51608187134503,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "Lobby, Linear.obj",
+      "vertices": 6220,
+      "faces": 12266,
+      "triangles": 12266,
+      "boundsFeet": {
+        "min": [
+          -6.22327995300293,
+          -5.171621799468994,
+          2.8287699222564697
+        ],
+        "max": [
+          13.776721954345703,
+          14.828381538391113,
+          22.82876968383789
+        ],
+        "size": [
+          20.000001907348633,
+          20.000003337860107,
+          19.99999976158142
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 6.329033814561779,
+          "areaFt2": 52,
+          "interiorAreaFt2": 52,
+          "deckAreaFt2": 0,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 13,
+            "openVoid": 29,
+            "exposed": 0,
+            "uncertain": 10
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 12.995700173941268,
+          "areaFt2": 52,
+          "interiorAreaFt2": 51,
+          "deckAreaFt2": 1,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 3,
+            "openVoid": 34,
+            "exposed": 1,
+            "uncertain": 14
+          }
+        },
+        {
+          "id": 2,
+          "elevationFt": 19.79466996220183,
+          "areaFt2": 97,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 97,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 97,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 1,
+          "areaFt2": 33,
+          "elevationFt": 13.13306423446555,
+          "floorClass": "openVoid"
+        },
+        {
+          "id": 1,
+          "levelId": 2,
+          "areaFt2": 56,
+          "elevationFt": 20.11765900876956,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 2,
+          "levelId": 0,
+          "areaFt2": 33,
+          "elevationFt": 6.466398110362789,
+          "floorClass": "openVoid"
+        },
+        {
+          "id": 3,
+          "levelId": 2,
+          "areaFt2": 16,
+          "elevationFt": 19.464811325073242,
+          "floorClass": "exposed"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 6.329033814561779,
+          "areaFt2": 39,
+          "upper": false,
+          "independent": false,
+          "tips": 5
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "elevationFt": 6.329033814561779,
+          "areaFt2": 5,
+          "upper": false,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 2,
+          "levelId": 1,
+          "elevationFt": 12.995700173941268,
+          "areaFt2": 39,
+          "upper": true,
+          "independent": false,
+          "tips": 5
+        },
+        {
+          "id": 3,
+          "levelId": 1,
+          "elevationFt": 12.995700173941268,
+          "areaFt2": 5,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 4,
+          "levelId": 2,
+          "elevationFt": 19.79466996220183,
+          "areaFt2": 88,
+          "upper": true,
+          "independent": false,
+          "tips": 7
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        },
+        {
+          "lowerLevelId": 1,
+          "upperLevelId": 2
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 25,
+      "potentialInterfaces": 62,
+      "uncertainAreaFt2": 24,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 98,
+      "uncertainNotes": [
+        "24 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 9.199943332929877,
+          "available": true
+        },
+        "convergent": {
+          "score": 15,
+          "available": true
+        },
+        "sculptural": {
+          "score": 51.21780901264252,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 33.49468577631693,
+          "available": true
+        },
+        "surreal": {
+          "score": 50.0084269731713,
+          "available": true
+        },
+        "monumental": {
+          "score": 23.02928568014457,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 36.75334666871827,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 56.78606965174129,
+          "available": true
+        },
+        "centralized": {
+          "score": 47.85926996117254,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 30.714285714285715,
+          "available": true
+        },
+        "luminous": {
+          "score": 77.80092592592592,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "Lobby, Sequential.obj",
+      "vertices": 7496,
+      "faces": 14911,
+      "triangles": 14911,
+      "boundsFeet": {
+        "min": [
+          -4.669439792633057,
+          -10.227270126342773,
+          2.128570079803467
+        ],
+        "max": [
+          15.656245231628418,
+          11.337961196899414,
+          22.128570556640625
+        ],
+        "size": [
+          20.325685024261475,
+          21.565231323242188,
+          20.000000476837158
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 2.2609169647645646,
+          "areaFt2": 21,
+          "interiorAreaFt2": 21,
+          "deckAreaFt2": 0,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 21,
+            "openVoid": 0,
+            "exposed": 0,
+            "uncertain": 0
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 7.134870079241892,
+          "areaFt2": 84,
+          "interiorAreaFt2": 83,
+          "deckAreaFt2": 1,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 25,
+            "openVoid": 25,
+            "exposed": 1,
+            "uncertain": 33
+          }
+        },
+        {
+          "id": 2,
+          "elevationFt": 13.859352470738806,
+          "areaFt2": 81,
+          "interiorAreaFt2": 81,
+          "deckAreaFt2": 0,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 24,
+            "openVoid": 36,
+            "exposed": 0,
+            "uncertain": 21
+          }
+        },
+        {
+          "id": 3,
+          "elevationFt": 19.88335790992336,
+          "areaFt2": 108,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 108,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 108,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 1,
+          "areaFt2": 34,
+          "elevationFt": 6.521769902385829,
+          "floorClass": "uncertain"
+        },
+        {
+          "id": 1,
+          "levelId": 2,
+          "areaFt2": 18,
+          "elevationFt": 13.827404933755611,
+          "floorClass": "openVoid"
+        },
+        {
+          "id": 2,
+          "levelId": 3,
+          "areaFt2": 84,
+          "elevationFt": 20.1930942828479,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 3,
+          "levelId": 2,
+          "areaFt2": 23,
+          "elevationFt": 15.597760040857098,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 4,
+          "levelId": 2,
+          "areaFt2": 23,
+          "elevationFt": 13.051614661942025,
+          "floorClass": "openVoid"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 2.2609169647645646,
+          "areaFt2": 7,
+          "upper": false,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "elevationFt": 2.2609169647645646,
+          "areaFt2": 14,
+          "upper": false,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 2,
+          "levelId": 1,
+          "elevationFt": 7.134870079241892,
+          "areaFt2": 33,
+          "upper": true,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 3,
+          "levelId": 1,
+          "elevationFt": 7.134870079241892,
+          "areaFt2": 14,
+          "upper": true,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 4,
+          "levelId": 1,
+          "elevationFt": 7.134870079241892,
+          "areaFt2": 23,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 5,
+          "levelId": 1,
+          "elevationFt": 7.134870079241892,
+          "areaFt2": 8,
+          "upper": true,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 6,
+          "levelId": 2,
+          "elevationFt": 13.859352470738806,
+          "areaFt2": 25,
+          "upper": true,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 7,
+          "levelId": 2,
+          "elevationFt": 13.859352470738806,
+          "areaFt2": 23,
+          "upper": true,
+          "independent": false,
+          "tips": 7
+        },
+        {
+          "id": 8,
+          "levelId": 2,
+          "elevationFt": 13.859352470738806,
+          "areaFt2": 8,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 9,
+          "levelId": 2,
+          "elevationFt": 13.859352470738806,
+          "areaFt2": 25,
+          "upper": true,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 10,
+          "levelId": 3,
+          "elevationFt": 19.88335790992336,
+          "areaFt2": 107,
+          "upper": true,
+          "independent": false,
+          "tips": 7
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        },
+        {
+          "lowerLevelId": 1,
+          "upperLevelId": 2
+        },
+        {
+          "lowerLevelId": 2,
+          "upperLevelId": 3
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 11,
+      "potentialInterfaces": 89,
+      "uncertainAreaFt2": 54,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 109,
+      "uncertainNotes": [
+        "54 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 9.29968052047226,
+          "available": true
+        },
+        "convergent": {
+          "score": 11.797098289714123,
+          "available": true
+        },
+        "sculptural": {
+          "score": 53.37833687556892,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 20.055137093246387,
+          "available": true
+        },
+        "surreal": {
+          "score": 63.23380622276696,
+          "available": true
+        },
+        "monumental": {
+          "score": 20.682142594173442,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 27.857142857142858,
+          "available": true
+        },
+        "sequential": {
+          "score": 0,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 38.22959183673469,
+          "available": true
+        },
+        "centralized": {
+          "score": 46.95379668800295,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 27.1875,
+          "available": true
+        },
+        "luminous": {
+          "score": 53.282828282828284,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "workspace cascaded.obj",
+      "vertices": 7311,
+      "faces": 13331,
+      "triangles": 13164,
+      "boundsFeet": {
+        "min": [
+          114.58063507080078,
+          90.2763671875,
+          -5.395354563120236e-8
+        ],
+        "max": [
+          134.58062744140625,
+          110.2763671875,
+          20
+        ],
+        "size": [
+          19.99999237060547,
+          20,
+          20.000000053953546
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 10.71077079974123,
+          "areaFt2": 494,
+          "interiorAreaFt2": 270,
+          "deckAreaFt2": 224,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 218,
+            "openVoid": 6,
+            "exposed": 224,
+            "uncertain": 46
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "areaFt2": 26,
+          "elevationFt": 6.202744315992172,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "areaFt2": 26,
+          "elevationFt": 19.53607733819223,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 2,
+          "levelId": 0,
+          "areaFt2": 22,
+          "elevationFt": 6.666666507720947,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 3,
+          "levelId": 0,
+          "areaFt2": 23,
+          "elevationFt": 20,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 4,
+          "levelId": 0,
+          "areaFt2": 24,
+          "elevationFt": 0.10699150340503903,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 5,
+          "levelId": 0,
+          "areaFt2": 23,
+          "elevationFt": 13.43428193950814,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 6,
+          "levelId": 0,
+          "areaFt2": 17,
+          "elevationFt": 6.2081883144134276,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 7,
+          "levelId": 0,
+          "areaFt2": 17,
+          "elevationFt": 19.541521445249817,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 8,
+          "levelId": 0,
+          "areaFt2": 16,
+          "elevationFt": 11.403392272773011,
+          "floorClass": "uncertain"
+        },
+        {
+          "id": 9,
+          "levelId": 0,
+          "areaFt2": 16,
+          "elevationFt": 14.86356849168417,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 10,
+          "levelId": 0,
+          "areaFt2": 17,
+          "elevationFt": 12.874855363084635,
+          "floorClass": "uncertain"
+        },
+        {
+          "id": 11,
+          "levelId": 0,
+          "areaFt2": 24,
+          "elevationFt": 6.77365794455277,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 12,
+          "levelId": 0,
+          "areaFt2": 34,
+          "elevationFt": 18.068513991319346,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 13,
+          "levelId": 0,
+          "areaFt2": 23,
+          "elevationFt": 13.333333015441895,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 14,
+          "levelId": 0,
+          "areaFt2": 26,
+          "elevationFt": 12.869411083562595,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 15,
+          "levelId": 0,
+          "areaFt2": 16,
+          "elevationFt": 4.736725313219884,
+          "floorClass": "sheltered"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 10.71077079974123,
+          "areaFt2": 244,
+          "upper": false,
+          "independent": false,
+          "tips": 1
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [],
+      "disconnectedLinks": [],
+      "entries": 120,
+      "potentialInterfaces": 0,
+      "uncertainAreaFt2": 46,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 224,
+      "uncertainNotes": [
+        "46 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 12.907507827189223,
+          "available": true
+        },
+        "convergent": {
+          "score": 54.874907574163274,
+          "available": true
+        },
+        "sculptural": {
+          "score": 50.95817986229258,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 27.322594146690975,
+          "available": true
+        },
+        "surreal": {
+          "score": 51.93431651288714,
+          "available": true
+        },
+        "monumental": {
+          "score": 28.38663217542598,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 8.352156862745101,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 41.0886669445106,
+          "available": true
+        },
+        "centralized": {
+          "score": 36.38107566484062,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 0,
+          "available": true
+        },
+        "luminous": {
+          "score": 40.33653846153846,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "workspace flat deep-plate.obj",
+      "vertices": 25374,
+      "faces": 45806,
+      "triangles": 46131,
+      "boundsFeet": {
+        "min": [
+          24.63339614868164,
+          90.2763671875,
+          0
+        ],
+        "max": [
+          44.633399963378906,
+          110.27637481689453,
+          20
+        ],
+        "size": [
+          20.000003814697266,
+          20.00000762939453,
+          20
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 1.1753537788538757,
+          "areaFt2": 197,
+          "interiorAreaFt2": 173,
+          "deckAreaFt2": 24,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 171,
+            "openVoid": 0,
+            "exposed": 24,
+            "uncertain": 2
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 10.52540856513562,
+          "areaFt2": 197,
+          "interiorAreaFt2": 162,
+          "deckAreaFt2": 35,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 155,
+            "openVoid": 0,
+            "exposed": 35,
+            "uncertain": 7
+          }
+        },
+        {
+          "id": 2,
+          "elevationFt": 19.87607264335609,
+          "areaFt2": 197,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 197,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 197,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "areaFt2": 195,
+          "elevationFt": 1.1868045431525716,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 1,
+          "levelId": 2,
+          "areaFt2": 197,
+          "elevationFt": 19.876072643356085,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 2,
+          "levelId": 1,
+          "areaFt2": 196,
+          "elevationFt": 10.531253516145656,
+          "floorClass": "sheltered"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 1.1753537788538757,
+          "areaFt2": 178,
+          "upper": false,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 1,
+          "levelId": 1,
+          "elevationFt": 10.52540856513562,
+          "areaFt2": 178,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 2,
+          "levelId": 2,
+          "elevationFt": 19.87607264335609,
+          "areaFt2": 178,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        },
+        {
+          "lowerLevelId": 1,
+          "upperLevelId": 2
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 39,
+      "potentialInterfaces": 75,
+      "uncertainAreaFt2": 9,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 256,
+      "uncertainNotes": [],
+      "scores": {
+        "openVolume": {
+          "score": 24.24293140264532,
+          "available": true
+        },
+        "convergent": {
+          "score": 6.610043783310229,
+          "available": true
+        },
+        "sculptural": {
+          "score": 51.60901268117003,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 48.87311613905308,
+          "available": true
+        },
+        "surreal": {
+          "score": 34.82191511469783,
+          "available": true
+        },
+        "monumental": {
+          "score": 26.606201055574953,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 15.000000000000002,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 52.84967981125716,
+          "available": true
+        },
+        "centralized": {
+          "score": 45.219504251677435,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 27.96875,
+          "available": true
+        },
+        "luminous": {
+          "score": 77.62673611111111,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "workspace open hall.obj",
+      "vertices": 4727,
+      "faces": 8091,
+      "triangles": 8169,
+      "boundsFeet": {
+        "min": [
+          -4.95697021484375,
+          90.2763671875,
+          0
+        ],
+        "max": [
+          15.0430326461792,
+          110.27637481689453,
+          20
+        ],
+        "size": [
+          20.00000286102295,
+          20.00000762939453,
+          20
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 0.8459928505905114,
+          "areaFt2": 124,
+          "interiorAreaFt2": 83,
+          "deckAreaFt2": 41,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 47,
+            "openVoid": 4,
+            "exposed": 41,
+            "uncertain": 32
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 10.015726886911088,
+          "areaFt2": 112,
+          "interiorAreaFt2": 58,
+          "deckAreaFt2": 54,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 31,
+            "openVoid": 0,
+            "exposed": 54,
+            "uncertain": 27
+          }
+        },
+        {
+          "id": 2,
+          "elevationFt": 19.095179804821733,
+          "areaFt2": 113,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 113,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 113,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "areaFt2": 111,
+          "elevationFt": 0.9296551985078785,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 1,
+          "levelId": 1,
+          "areaFt2": 111,
+          "elevationFt": 10.00874711089089,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 2,
+          "levelId": 2,
+          "areaFt2": 112,
+          "elevationFt": 19.08826560768324,
+          "floorClass": "exposed"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 0.8459928505905114,
+          "areaFt2": 102,
+          "upper": false,
+          "independent": false,
+          "tips": 5
+        },
+        {
+          "id": 1,
+          "levelId": 1,
+          "elevationFt": 10.015726886911088,
+          "areaFt2": 101,
+          "upper": true,
+          "independent": false,
+          "tips": 5
+        },
+        {
+          "id": 2,
+          "levelId": 2,
+          "elevationFt": 19.095179804821733,
+          "areaFt2": 101,
+          "upper": true,
+          "independent": false,
+          "tips": 5
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        },
+        {
+          "lowerLevelId": 1,
+          "upperLevelId": 2
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 26,
+      "potentialInterfaces": 47,
+      "uncertainAreaFt2": 59,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 208,
+      "uncertainNotes": [
+        "59 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 20.715617516104157,
+          "available": true
+        },
+        "convergent": {
+          "score": 11.975629854093537,
+          "available": true
+        },
+        "sculptural": {
+          "score": 64.8534707812551,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 38.10996010163859,
+          "available": true
+        },
+        "surreal": {
+          "score": 56.45381500380606,
+          "available": true
+        },
+        "monumental": {
+          "score": 26.321152267384615,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 18.991576601962958,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 50.94872254059217,
+          "available": true
+        },
+        "centralized": {
+          "score": 41.34857727277755,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 22.291666666666668,
+          "available": true
+        },
+        "luminous": {
+          "score": 60.85069444444444,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "workspace undulating.obj",
+      "vertices": 8802,
+      "faces": 15487,
+      "triangles": 15393,
+      "boundsFeet": {
+        "min": [
+          85.52510070800781,
+          90.2763671875,
+          0
+        ],
+        "max": [
+          105.52510833740234,
+          110.27637481689453,
+          20
+        ],
+        "size": [
+          20.00000762939453,
+          20.00000762939453,
+          20
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 2.5119909575667485,
+          "areaFt2": 170,
+          "interiorAreaFt2": 123,
+          "deckAreaFt2": 47,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 112,
+            "openVoid": 0,
+            "exposed": 47,
+            "uncertain": 11
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 10.246600424533545,
+          "areaFt2": 170,
+          "interiorAreaFt2": 117,
+          "deckAreaFt2": 53,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 95,
+            "openVoid": 1,
+            "exposed": 53,
+            "uncertain": 21
+          }
+        },
+        {
+          "id": 2,
+          "elevationFt": 18.238885226769074,
+          "areaFt2": 210,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 210,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 210,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "areaFt2": 141,
+          "elevationFt": 2.6121568399452664,
+          "floorClass": "sheltered"
+        },
+        {
+          "id": 1,
+          "levelId": 2,
+          "areaFt2": 187,
+          "elevationFt": 18.344566076114944,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 2,
+          "levelId": 1,
+          "areaFt2": 141,
+          "elevationFt": 10.334000975610996,
+          "floorClass": "sheltered"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 2.5119909575667485,
+          "areaFt2": 133,
+          "upper": false,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 1,
+          "levelId": 1,
+          "elevationFt": 10.246600424533545,
+          "areaFt2": 133,
+          "upper": true,
+          "independent": false,
+          "tips": 2
+        },
+        {
+          "id": 2,
+          "levelId": 2,
+          "elevationFt": 18.238885226769074,
+          "areaFt2": 147,
+          "upper": true,
+          "independent": false,
+          "tips": 4
+        }
+      ],
+      "independentInterfaces": 0,
+      "belowLevelInteriorFt2": 0,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        },
+        {
+          "lowerLevelId": 1,
+          "upperLevelId": 2
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 35,
+      "potentialInterfaces": 72,
+      "uncertainAreaFt2": 32,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 310,
+      "uncertainNotes": [
+        "32 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 9.490775285430079,
+          "available": true
+        },
+        "convergent": {
+          "score": 14.085150594910067,
+          "available": true
+        },
+        "sculptural": {
+          "score": 54.7617302466708,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 28.999075716008157,
+          "available": true
+        },
+        "surreal": {
+          "score": 50.688636396999655,
+          "available": true
+        },
+        "monumental": {
+          "score": 27.03608424569881,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 23.259740259740266,
+          "available": true
+        },
+        "sequential": {
+          "score": 6.25,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 52.75932400932402,
+          "available": true
+        },
+        "centralized": {
+          "score": 49.77098466495834,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 16.660516605166052,
+          "available": true
+        },
+        "luminous": {
+          "score": 67.01646090534979,
+          "available": true
+        }
+      }
+    },
+    {
+      "filename": "workspace void.obj",
+      "vertices": 3972,
+      "faces": 5890,
+      "triangles": 6129,
+      "boundsFeet": {
+        "min": [
+          58.249237060546875,
+          90.2763671875,
+          -1.1619794548778373e-7
+        ],
+        "max": [
+          78.24923706054688,
+          110.2763671875,
+          20
+        ],
+        "size": [
+          20,
+          20,
+          20.000000116197945
+        ]
+      },
+      "levels": [
+        {
+          "id": 0,
+          "elevationFt": 2.3699106246879102,
+          "areaFt2": 50,
+          "interiorAreaFt2": 23,
+          "deckAreaFt2": 27,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 8,
+            "openVoid": 1,
+            "exposed": 27,
+            "uncertain": 14
+          }
+        },
+        {
+          "id": 1,
+          "elevationFt": 15.096091990492972,
+          "areaFt2": 21,
+          "interiorAreaFt2": 0,
+          "deckAreaFt2": 21,
+          "areaByClass": {
+            "obstructed": 0,
+            "sheltered": 0,
+            "openVoid": 0,
+            "exposed": 21,
+            "uncertain": 0
+          }
+        }
+      ],
+      "interiorFloorRegions": [
+        {
+          "id": 0,
+          "levelId": 1,
+          "areaFt2": 18,
+          "elevationFt": 15.053979283199645,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "areaFt2": 18,
+          "elevationFt": 2.2481608390808105,
+          "floorClass": "exposed"
+        },
+        {
+          "id": 2,
+          "levelId": 0,
+          "areaFt2": 18,
+          "elevationFt": 2.2481608390808105,
+          "floorClass": "exposed"
+        }
+      ],
+      "branches": [
+        {
+          "id": 0,
+          "levelId": 0,
+          "elevationFt": 2.3699106246879102,
+          "areaFt2": 20,
+          "upper": false,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 1,
+          "levelId": 0,
+          "elevationFt": 2.3699106246879102,
+          "areaFt2": 26,
+          "upper": false,
+          "independent": false,
+          "tips": 3
+        },
+        {
+          "id": 2,
+          "levelId": 1,
+          "elevationFt": 15.096091990492972,
+          "areaFt2": 18,
+          "upper": true,
+          "independent": false,
+          "tips": 1
+        },
+        {
+          "id": 3,
+          "levelId": -1,
+          "elevationFt": 6.633945280677159,
+          "areaFt2": 9,
+          "upper": true,
+          "independent": true,
+          "tips": 2
+        },
+        {
+          "id": 4,
+          "levelId": -1,
+          "elevationFt": 10.960202942584585,
+          "areaFt2": 6,
+          "upper": true,
+          "independent": true,
+          "tips": 2
+        },
+        {
+          "id": 5,
+          "levelId": -1,
+          "elevationFt": 19.81982152122659,
+          "areaFt2": 13,
+          "upper": true,
+          "independent": true,
+          "tips": 1
+        }
+      ],
+      "independentInterfaces": 3,
+      "belowLevelInteriorFt2": 9,
+      "verifiedLinks": [],
+      "potentialLinks": [
+        {
+          "lowerLevelId": 0,
+          "upperLevelId": 1
+        }
+      ],
+      "disconnectedLinks": [],
+      "entries": 21,
+      "potentialInterfaces": 11,
+      "uncertainAreaFt2": 25,
+      "roofLidAreaFt2": 0,
+      "deckAreaFt2": 48,
+      "uncertainNotes": [
+        "25 ft² of floor has enclosure 0.25–0.5 and is reported, not credited as interior volume."
+      ],
+      "scores": {
+        "openVolume": {
+          "score": 4.855094013080409,
+          "available": true
+        },
+        "convergent": {
+          "score": 60.688617074967674,
+          "available": true
+        },
+        "sculptural": {
+          "score": 65.98630143660903,
+          "available": true
+        },
+        "visuallyConnected": {
+          "score": 43.27965369768307,
+          "available": true
+        },
+        "surreal": {
+          "score": 37.247129615511554,
+          "available": true
+        },
+        "monumental": {
+          "score": 24.7652843273218,
+          "available": true
+        },
+        "hierarchical": {
+          "score": 46.695774647887326,
+          "available": true
+        },
+        "sequential": {
+          "score": 0,
+          "available": true
+        },
+        "circulationActivated": {
+          "score": 50.359691482226694,
+          "available": true
+        },
+        "centralized": {
+          "score": 7.035855743935755,
+          "available": true
+        },
+        "verticallyIntegrated": {
+          "score": 20,
+          "available": true
+        },
+        "luminous": {
+          "score": 58.68055555555556,
+          "available": true
+        }
+      }
+    }
+  ],
+  "ranks": {
+    "openVolume": [
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 1.5796208475316917,
+        "rank": 1
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 4.855094013080409,
+        "rank": 2
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 9.199943332929877,
+        "rank": 3
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 9.29968052047226,
+        "rank": 4
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 9.455888201022937,
+        "rank": 5
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 9.490775285430079,
+        "rank": 6
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 10.577418697868412,
+        "rank": 7
+      },
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 11.647308169800292,
+        "rank": 8
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 12.134420560268438,
+        "rank": 9
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 12.907507827189223,
+        "rank": 10
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 13.728312928983762,
+        "rank": 11
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 16.987981902538408,
+        "rank": 12
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 20.715617516104157,
+        "rank": 13
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 24.24293140264532,
+        "rank": 14
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 33.047588476431116,
+        "rank": 15
+      }
+    ],
+    "convergent": [
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 3.1782147957774036,
+        "rank": 1
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 6.610043783310229,
+        "rank": 2
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 11.161004168383636,
+        "rank": 3
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 11.797098289714123,
+        "rank": 4
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 11.975629854093537,
+        "rank": 5
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 14.085150594910067,
+        "rank": 6
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 14.575138854895439,
+        "rank": 7
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 15,
+        "rank": 8
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 15,
+        "rank": 9
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 54.874907574163274,
+        "rank": 10
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 55.66086940757476,
+        "rank": 11
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 60.688617074967674,
+        "rank": 12
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 68.93243013126589,
+        "rank": 13
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 95.12017831634446,
+        "rank": 14
+      },
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 98.85143677024408,
+        "rank": 15
+      }
+    ],
+    "sculptural": [
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 45.84671926052781,
+        "rank": 1
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 46.054698317383306,
+        "rank": 2
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 50.95817986229258,
+        "rank": 3
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 51.21780901264252,
+        "rank": 4
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 51.291340554652066,
+        "rank": 5
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 51.60901268117003,
+        "rank": 6
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 51.950582681015774,
+        "rank": 7
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 53.37833687556892,
+        "rank": 8
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 54.7617302466708,
+        "rank": 9
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 56.894875771103386,
+        "rank": 10
+      },
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 64.24057919367586,
+        "rank": 11
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 64.8534707812551,
+        "rank": 12
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 65.4180106819594,
+        "rank": 13
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 65.98630143660903,
+        "rank": 14
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 66.36948100121015,
+        "rank": 15
+      }
+    ],
+    "visuallyConnected": [
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 0,
+        "rank": 1
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 20.055137093246387,
+        "rank": 2
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 27.322594146690975,
+        "rank": 3
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 28.999075716008157,
+        "rank": 4
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 33.49468577631693,
+        "rank": 5
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 38.10996010163859,
+        "rank": 6
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 41.43624253268252,
+        "rank": 7
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 43.27965369768307,
+        "rank": 8
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 45.201691241157064,
+        "rank": 9
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 46.46174760936988,
+        "rank": 10
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 46.5733614976503,
+        "rank": 11
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 48.87311613905308,
+        "rank": 12
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 63.116075172544605,
+        "rank": 13
+      },
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 63.299720054369544,
+        "rank": 14
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 65.71544254816861,
+        "rank": 15
+      }
+    ],
+    "surreal": [
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 22.715104571724112,
+        "rank": 1
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 34.82191511469783,
+        "rank": 2
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 37.247129615511554,
+        "rank": 3
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 38.39886784138593,
+        "rank": 4
+      },
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 46.111756497729665,
+        "rank": 5
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 50.0084269731713,
+        "rank": 6
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 50.688636396999655,
+        "rank": 7
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 51.93431651288714,
+        "rank": 8
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 56.45381500380606,
+        "rank": 9
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 56.49227309860099,
+        "rank": 10
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 63.23380622276696,
+        "rank": 11
+      },
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 63.545848592397924,
+        "rank": 12
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 70.32968994877673,
+        "rank": 13
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 71.6274799518933,
+        "rank": 14
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 73.32975445843475,
+        "rank": 15
+      }
+    ],
+    "monumental": [
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 20.682142594173442,
+        "rank": 1
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 23.02928568014457,
+        "rank": 2
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 23.251453177673085,
+        "rank": 3
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 24.101882047181398,
+        "rank": 4
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 24.7652843273218,
+        "rank": 5
+      },
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 25.168136927975123,
+        "rank": 6
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 25.74683508172491,
+        "rank": 7
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 25.832669475054008,
+        "rank": 8
+      },
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 25.95769468994465,
+        "rank": 9
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 26.23689612992101,
+        "rank": 10
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 26.321152267384615,
+        "rank": 11
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 26.606201055574953,
+        "rank": 12
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 27.03608424569881,
+        "rank": 13
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 28.38663217542598,
+        "rank": 14
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 33.296113501769355,
+        "rank": 15
+      }
+    ],
+    "hierarchical": [
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 0,
+        "rank": 1
+      },
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 0,
+        "rank": 2
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 8.352156862745101,
+        "rank": 3
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 11.697175141242939,
+        "rank": 4
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 15.000000000000002,
+        "rank": 5
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 15.374806528774451,
+        "rank": 6
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 18.991576601962958,
+        "rank": 7
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 23.259740259740266,
+        "rank": 8
+      },
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 23.445779372757062,
+        "rank": 9
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 26.75867465748013,
+        "rank": 10
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 27.857142857142858,
+        "rank": 11
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 28.70818068396533,
+        "rank": 12
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 36.75334666871827,
+        "rank": 13
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 41.9748362970083,
+        "rank": 14
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 46.695774647887326,
+        "rank": 15
+      }
+    ],
+    "sequential": [
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 0,
+        "rank": 1
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 0,
+        "rank": 2
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 0,
+        "rank": 3
+      },
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 6.25,
+        "rank": 4
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 6.25,
+        "rank": 5
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 6.25,
+        "rank": 6
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 6.25,
+        "rank": 7
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 6.25,
+        "rank": 8
+      },
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 6.25,
+        "rank": 9
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 6.25,
+        "rank": 10
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 6.25,
+        "rank": 11
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 6.25,
+        "rank": 12
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 6.25,
+        "rank": 13
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 6.25,
+        "rank": 14
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 6.25,
+        "rank": 15
+      }
+    ],
+    "circulationActivated": [
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 33.71911585146879,
+        "rank": 1
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 38.22959183673469,
+        "rank": 2
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 41.0886669445106,
+        "rank": 3
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 45.49941949773158,
+        "rank": 4
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 50.1929012345679,
+        "rank": 5
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 50.359691482226694,
+        "rank": 6
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 50.94872254059217,
+        "rank": 7
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 51.6965350268876,
+        "rank": 8
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 52.75932400932402,
+        "rank": 9
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 52.84967981125716,
+        "rank": 10
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 53.06896551724138,
+        "rank": 11
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 56.78606965174129,
+        "rank": 12
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 64.5474592001951,
+        "rank": 13
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 78.6582776385408,
+        "rank": 14
+      },
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 79.42307692307692,
+        "rank": 15
+      }
+    ],
+    "centralized": [
+      {
+        "filename": "workspace void.obj",
+        "score": 7.035855743935755,
+        "rank": 1
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 26.02991787378224,
+        "rank": 2
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 34.31877897145096,
+        "rank": 3
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 36.38107566484062,
+        "rank": 4
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 39.46100780202706,
+        "rank": 5
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 41.00012959033871,
+        "rank": 6
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 41.34857727277755,
+        "rank": 7
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 43.37011432229957,
+        "rank": 8
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 44.05956267522547,
+        "rank": 9
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 45.219504251677435,
+        "rank": 10
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 46.95379668800295,
+        "rank": 11
+      },
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 47.498311518482375,
+        "rank": 12
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 47.85926996117254,
+        "rank": 13
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 49.77098466495834,
+        "rank": 14
+      },
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 59.7300430641229,
+        "rank": 15
+      }
+    ],
+    "verticallyIntegrated": [
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 0,
+        "rank": 1
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 0,
+        "rank": 2
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 0,
+        "rank": 3
+      },
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 0,
+        "rank": 4
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 0,
+        "rank": 5
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 16.660516605166052,
+        "rank": 6
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 18.977272727272727,
+        "rank": 7
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 20,
+        "rank": 8
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 21.395348837209305,
+        "rank": 9
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 22.291666666666668,
+        "rank": 10
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 27.1875,
+        "rank": 11
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 27.96875,
+        "rank": 12
+      },
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 30.572916666666664,
+        "rank": 13
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 30.714285714285715,
+        "rank": 14
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 33.67355510752688,
+        "rank": 15
+      }
+    ],
+    "luminous": [
+      {
+        "filename": "Lobby Continuous Hall.obj",
+        "score": 0,
+        "rank": 1
+      },
+      {
+        "filename": "workspace cascaded.obj",
+        "score": 40.33653846153846,
+        "rank": 2
+      },
+      {
+        "filename": "Lobby, Sequential.obj",
+        "score": 53.282828282828284,
+        "rank": 3
+      },
+      {
+        "filename": "workspace void.obj",
+        "score": 58.68055555555556,
+        "rank": 4
+      },
+      {
+        "filename": "workspace open hall.obj",
+        "score": 60.85069444444444,
+        "rank": 5
+      },
+      {
+        "filename": "Lobby, Ground Field.obj",
+        "score": 63.51608187134503,
+        "rank": 6
+      },
+      {
+        "filename": "Gathering Linear.obj",
+        "score": 64.88562091503267,
+        "rank": 7
+      },
+      {
+        "filename": "workspace undulating.obj",
+        "score": 67.01646090534979,
+        "rank": 8
+      },
+      {
+        "filename": "Gathering, Plate.obj",
+        "score": 68.25,
+        "rank": 9
+      },
+      {
+        "filename": "Gathering, Room within Volume.obj",
+        "score": 69.86928104575163,
+        "rank": 10
+      },
+      {
+        "filename": "Gathering Void Field.obj",
+        "score": 70.89409722222223,
+        "rank": 11
+      },
+      {
+        "filename": "workspace flat deep-plate.obj",
+        "score": 77.62673611111111,
+        "rank": 12
+      },
+      {
+        "filename": "Lobby, Linear.obj",
+        "score": 77.80092592592592,
+        "rank": 13
+      },
+      {
+        "filename": "Gathering, Stepped.obj",
+        "score": 77.98611111111111,
+        "rank": 14
+      },
+      {
+        "filename": "Lobby Vertical Void.obj",
+        "score": 78.53333333333333,
+        "rank": 15
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "stage": "C",
+  "outcome": "complete",
+  "preview": {
+    "width": 960,
+    "height": 280
+  },
+  "png": {
+    "width": 7407,
+    "height": 2160
+  },
+  "svg": "open-volume-board.svg",
+  "svgVector": true,
+  "note": "SVG is section linework, labels, and gold marks. It does not embed a 3D render."
+}

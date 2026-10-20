@@ -19,7 +19,37 @@ export type BoardLine = {
 
 export type BoardRegion = { points: Array<[number, number]> };
 
-export type ScoreMetric = { name: string; value: number; weight: number };
+export type ScoreMetric = { name: string; value: number; weight: number; unavailable?: boolean };
+
+/** Projected v4 evidence for one panel. Coordinates are board pixels. */
+export type BoardOverlay = {
+  id: string;
+  color: string;
+  alpha: number;
+  dashed?: boolean;
+  polygons: Array<Array<[number, number]>>;
+  lines: Array<{ x1: number; y1: number; x2: number; y2: number }>;
+  points: Array<[number, number]>;
+  labels: Array<{ x: number; y: number; text: string }>;
+};
+
+export type BoardLegendItem = {
+  color: string;
+  label: string;
+  dashed?: boolean;
+  kind: "patch" | "line" | "point";
+};
+
+/**
+ * Annotation sizes in pixels for a given board height. At 2160 px: heading 32,
+ * labels and values 28, secondary 23, swatches 24. They scale with the output
+ * size, not with device pixel ratio.
+ */
+export function annotationSizes(height: number) {
+  const scale = height / 2160;
+  const px = (base: number) => Math.max(9, Math.round(base * scale));
+  return { title: px(36), heading: px(32), label: px(28), value: px(28), secondary: px(23), swatch: px(24) };
+}
 
 export type BoardModel = {
   width: number;
@@ -44,6 +74,14 @@ export type BoardModel = {
   mostRegions?: BoardRegion[];
   leastMetrics?: ScoreMetric[];
   mostMetrics?: ScoreMetric[];
+  /** v4 projected evidence per panel. */
+  leastOverlays?: BoardOverlay[];
+  mostOverlays?: BoardOverlay[];
+  /** Legend generated from the layers actually drawn. Empty when nothing is drawn. */
+  legendItems?: BoardLegendItem[];
+  /** Second score line under each score, e.g. "Absolute score 62.4 · Registry rank 9 of 15". */
+  leastScoreDetail?: string;
+  mostScoreDetail?: string;
   explanation: string;
   legend: string;
   orientation: string;
@@ -51,6 +89,23 @@ export type BoardModel = {
   vectorComplete: boolean;
   limitation: string | null;
 };
+
+/** Map spec-feet points into a panel the same way placeSection does. */
+export function sectionMapper(
+  orientation: SectionOrientation,
+  bounds: MeshBounds,
+  panel: { x: number; y: number; width: number; height: number },
+  feetPerPixel: number,
+) {
+  const [cx, cy] = projectPoint(bounds.center, orientation);
+  return (point: Vec3): [number, number] => {
+    const [px, py] = projectPoint(point, orientation);
+    return [
+      panel.x + panel.width / 2 + (px - cx) / feetPerPixel,
+      panel.y + panel.height / 2 - (py - cy) / feetPerPixel,
+    ];
+  };
+}
 
 export const BOARD_LAYOUT = {
   frameTop: 0.22,
@@ -77,12 +132,15 @@ export type DrawContext = {
   fill(): void;
   fillText(text: string, x: number, y: number): void;
   globalAlpha: number;
+  /** Optional. Browser canvases support dashes; the test rasterizer may not. */
+  setLineDash?(segments: number[]): void;
 };
 
 const GOLD = "#D6AD4F";
 const INK = "#F7F6F5";
 const CYAN = "#1293C2";
 const BLUE = "#71BEDA";
+const GRAY = "#B9BEC6";
 export const GOLD_FILL_ALPHA = 0.16;
 export const GOLD_EDGE_ALPHA = 0.22;
 
@@ -160,12 +218,13 @@ export function boardLabels(board: BoardModel): BoardText[] {
   const { width, height } = board;
   const margin = Math.round(width * 0.03);
   const mid = Math.round(width / 2 + width * 0.015);
-  const title = Math.max(18, Math.round(height * 0.032));
-  const rank = Math.max(16, Math.round(height * 0.018));
-  const name = Math.max(18, Math.round(height * 0.026));
-  const score = Math.max(20, Math.round(height * 0.030));
-  const small = Math.max(14, Math.round(height * 0.015));
-  const body = Math.max(14, Math.round(height * 0.015));
+  const sizes = annotationSizes(height);
+  const title = sizes.title;
+  const rank = sizes.secondary;
+  const name = sizes.label;
+  const score = sizes.heading;
+  const small = sizes.secondary;
+  const body = sizes.secondary;
   const labels: BoardText[] = [
     { text: board.descriptorName, x: margin, y: Math.round(height * 0.046), size: title, fill: INK },
     { text: board.title, x: margin, y: Math.round(height * 0.078), size: small, fill: BLUE },
@@ -176,6 +235,8 @@ export function boardLabels(board: BoardModel): BoardText[] {
     { text: board.mostLabel, x: mid, y: Math.round(height * 0.162), size: name, fill: INK },
     { text: board.mostScore, x: mid, y: Math.round(height * 0.208), size: score, fill: GOLD },
   ];
+  if (board.leastScoreDetail) labels.push({ text: board.leastScoreDetail, x: margin + Math.round(width * 0.12), y: Math.round(height * 0.208), size: sizes.value, fill: INK });
+  if (board.mostScoreDetail) labels.push({ text: board.mostScoreDetail, x: mid + Math.round(width * 0.12), y: Math.round(height * 0.208), size: sizes.value, fill: INK });
   if (board.leastSection) {
     labels.push({ text: board.leastSection, x: margin, y: Math.round(height * 0.692), size: small, fill: BLUE });
   }
@@ -213,8 +274,9 @@ export function boardLabels(board: BoardModel): BoardText[] {
 }
 
 function metricLayout(board: BoardModel) {
-  const size = Math.max(12, Math.round(board.height * 0.014));
-  const barH = Math.max(7, Math.round(board.height * 0.014));
+  const sizes = annotationSizes(board.height);
+  const size = sizes.secondary;
+  const barH = Math.max(7, Math.round(board.height * 0.012));
   const column = board.width * 0.42;
   const labels: BoardText[] = [];
   const bars: Array<{ x: number; y: number; w: number; h: number; fill: string }> = [];
@@ -224,30 +286,88 @@ function metricLayout(board: BoardModel) {
     const barX = origin + column * 0.48;
     const barW = column * 0.2;
     const valueX = origin + column * 0.71;
+    const step = Math.min(0.037, 0.15 / Math.max(1, metrics.length));
     metrics.forEach((metric, index) => {
-      const y = Math.round(board.height * (0.738 + index * 0.037));
+      const y = Math.round(board.height * (0.725 + index * step));
       const points = metric.weight * metric.value;
       labels.push({ text: metric.name, x: nameX, y, size, fill: INK });
       labels.push({
-        text: `${Math.round(metric.value)}  ${Math.round(metric.weight * 100)}%  ${points.toFixed(1)} pts`,
+        text: metric.unavailable ? "unavailable  not scored" : `${Math.round(metric.value)}  ${Math.round(metric.weight * 100)}%  ${points.toFixed(1)} pts`,
         x: valueX,
         y,
         size,
-        fill: GOLD,
+        fill: metric.unavailable ? GRAY : GOLD,
       });
       bars.push({ x: barX, y: y - barH, w: barW, h: barH, fill: "#2A2A2A" });
-      bars.push({
-        x: barX,
-        y: y - barH,
-        w: Math.max(1, barW * Math.max(0, Math.min(100, metric.value)) / 100),
-        h: barH,
-        fill: GOLD,
-      });
+      if (!metric.unavailable) {
+        bars.push({
+          x: barX,
+          y: y - barH,
+          w: Math.max(1, barW * Math.max(0, Math.min(100, metric.value)) / 100),
+          h: barH,
+          fill: GOLD,
+        });
+      }
     });
   };
   write(board.leastMetrics, Math.round(board.width * 0.04));
   write(board.mostMetrics, Math.round(board.width * 0.52));
   return { labels, bars };
+}
+
+/** Legend in the header, right of the form labels, outside the drawing frames. */
+function legendLayout(board: BoardModel) {
+  const items = board.legendItems ?? [];
+  const sizes = annotationSizes(board.height);
+  const x = Math.round(board.width * 0.76);
+  const swatch = sizes.swatch;
+  const rowStep = Math.round(swatch * 1.45);
+  const top = Math.round(board.height * 0.045);
+  const labels: BoardText[] = [];
+  const swatches: Array<{ x: number; y: number; w: number; h: number; color: string; dashed: boolean; kind: BoardLegendItem["kind"] }> = [];
+  if (!items.length) return { labels, swatches };
+  labels.push({ text: "Legend", x, y: top, size: sizes.secondary, fill: BLUE });
+  items.slice(0, 9).forEach((item, index) => {
+    const y = top + rowStep * (index + 1);
+    swatches.push({ x, y: y - swatch * 0.8, w: swatch, h: swatch * 0.8, color: item.color, dashed: Boolean(item.dashed), kind: item.kind });
+    labels.push({ text: item.label, x: x + swatch + Math.round(swatch * 0.5), y, size: sizes.swatch, fill: INK });
+  });
+  return { labels, swatches };
+}
+
+function paintOverlays(ctx: DrawContext, overlays: BoardOverlay[] | undefined, height: number) {
+  if (!overlays?.length) return;
+  const scale = Math.max(0.55, height / 2160);
+  for (const overlay of overlays) {
+    ctx.fillStyle = overlay.color;
+    ctx.strokeStyle = overlay.color;
+    ctx.globalAlpha = overlay.alpha;
+    for (const polygon of overlay.polygons) {
+      if (polygon.length < 3) continue;
+      ctx.beginPath();
+      ctx.moveTo(polygon[0][0], polygon[0][1]);
+      for (let index = 1; index < polygon.length; index += 1) ctx.lineTo(polygon[index][0], polygon[index][1]);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.globalAlpha = Math.min(1, overlay.alpha + 0.5);
+    ctx.lineWidth = 2.2 * scale;
+    ctx.setLineDash?.(overlay.dashed ? [8 * scale, 6 * scale] : []);
+    for (const line of overlay.lines) {
+      ctx.beginPath();
+      ctx.moveTo(line.x1, line.y1);
+      ctx.lineTo(line.x2, line.y2);
+      ctx.stroke();
+    }
+    ctx.setLineDash?.([]);
+    ctx.globalAlpha = 1;
+    const dot = 7 * scale;
+    for (const [x, y] of overlay.points) ctx.fillRect(x - dot / 2, y - dot / 2, dot, dot);
+    const size = annotationSizes(height).secondary;
+    ctx.font = `${size}px Arial, Helvetica, sans-serif`;
+    for (const label of overlay.labels) ctx.fillText(label.text, label.x + dot, label.y - dot);
+  }
+  ctx.globalAlpha = 1;
 }
 
 export function paintComparisonBoard(ctx: DrawContext, board: BoardModel) {
@@ -262,11 +382,30 @@ export function paintComparisonBoard(ctx: DrawContext, board: BoardModel) {
     strokeLines(ctx, board.mostLines.filter((line) => line.role === role && !line.gold), height);
   }
   strokeLines(ctx, [...board.leastLines, ...board.mostLines].filter((line) => line.gold), height);
+  paintOverlays(ctx, board.leastOverlays, height);
+  paintOverlays(ctx, board.mostOverlays, height);
   const metrics = metricLayout(board);
   for (const bar of metrics.bars) {
     ctx.globalAlpha = 1;
     ctx.fillStyle = bar.fill;
     ctx.fillRect(bar.x, bar.y, bar.w, bar.h);
+  }
+  const legend = legendLayout(board);
+  for (const swatch of legend.swatches) {
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = swatch.color;
+    if (swatch.kind === "patch") ctx.fillRect(swatch.x, swatch.y, swatch.w, swatch.h);
+    else if (swatch.kind === "point") ctx.fillRect(swatch.x + swatch.w * 0.3, swatch.y + swatch.h * 0.2, swatch.w * 0.4, swatch.h * 0.6);
+    else {
+      ctx.strokeStyle = swatch.color;
+      ctx.lineWidth = Math.max(1.5, 2.2 * (height / 2160));
+      ctx.setLineDash?.(swatch.dashed ? [6 * (height / 2160), 5 * (height / 2160)] : []);
+      ctx.beginPath();
+      ctx.moveTo(swatch.x, swatch.y + swatch.h / 2);
+      ctx.lineTo(swatch.x + swatch.w, swatch.y + swatch.h / 2);
+      ctx.stroke();
+      ctx.setLineDash?.([]);
+    }
   }
 
   const margin = Math.round(width * 0.03);
@@ -281,11 +420,50 @@ export function paintComparisonBoard(ctx: DrawContext, board: BoardModel) {
   ctx.stroke();
 
   ctx.globalAlpha = 1;
-  for (const label of [...boardLabels(board), ...metrics.labels]) {
+  for (const label of [...boardLabels(board), ...metrics.labels, ...legend.labels]) {
     ctx.fillStyle = label.fill;
     ctx.font = `${label.size}px Arial, Helvetica, sans-serif`;
     ctx.fillText(label.text, label.x, label.y);
   }
+}
+
+function overlayMarkup(overlays: BoardOverlay[] | undefined, height: number) {
+  if (!overlays?.length) return "";
+  const scale = Math.max(0.55, height / 2160);
+  const size = annotationSizes(height).secondary;
+  return overlays.map((overlay) => {
+    const polygons = overlay.polygons
+      .filter((polygon) => polygon.length >= 3)
+      .map((polygon) => `<polygon points="${polygon.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ")}"/>`)
+      .join("");
+    const lines = overlay.lines.map((line) => `M ${line.x1.toFixed(1)} ${line.y1.toFixed(1)} L ${line.x2.toFixed(1)} ${line.y2.toFixed(1)}`).join(" ");
+    const dot = (7 * scale).toFixed(1);
+    const points = overlay.points.map(([x, y]) => `<rect x="${(x - 3.5 * scale).toFixed(1)}" y="${(y - 3.5 * scale).toFixed(1)}" width="${dot}" height="${dot}"/>`).join("");
+    const labels = overlay.labels.map((label) => `<text x="${(label.x + 7 * scale).toFixed(1)}" y="${(label.y - 7 * scale).toFixed(1)}" font-size="${size}" fill="${overlay.color}">${escapeXml(label.text)}</text>`).join("");
+    return `<g id="evidence-${escapeXml(overlay.id)}">
+    <g fill="${overlay.color}" fill-opacity="${overlay.alpha}" stroke="none">${polygons}</g>
+    <g fill="none" stroke="${overlay.color}" stroke-opacity="${Math.min(1, overlay.alpha + 0.5)}" stroke-width="${(2.2 * scale).toFixed(2)}"${overlay.dashed ? ` stroke-dasharray="${(8 * scale).toFixed(1)} ${(6 * scale).toFixed(1)}"` : ""}>${lines ? `<path d="${lines}"/>` : ""}</g>
+    <g fill="${overlay.color}">${points}</g>
+    <g font-family="Arial, Helvetica, sans-serif">${labels}</g>
+  </g>`;
+  }).join("\n  ");
+}
+
+function legendMarkup(board: BoardModel) {
+  const legend = legendLayout(board);
+  if (!legend.labels.length) return "";
+  const scale = board.height / 2160;
+  const swatches = legend.swatches.map((swatch) => {
+    if (swatch.kind === "patch") return `<rect x="${swatch.x}" y="${swatch.y.toFixed(1)}" width="${swatch.w}" height="${swatch.h.toFixed(1)}" fill="${swatch.color}"/>`;
+    if (swatch.kind === "point") return `<rect x="${(swatch.x + swatch.w * 0.3).toFixed(1)}" y="${(swatch.y + swatch.h * 0.2).toFixed(1)}" width="${(swatch.w * 0.4).toFixed(1)}" height="${(swatch.h * 0.6).toFixed(1)}" fill="${swatch.color}"/>`;
+    const y = (swatch.y + swatch.h / 2).toFixed(1);
+    return `<line x1="${swatch.x}" y1="${y}" x2="${swatch.x + swatch.w}" y2="${y}" stroke="${swatch.color}" stroke-width="${Math.max(1.5, 2.2 * scale).toFixed(2)}"${swatch.dashed ? ` stroke-dasharray="${(6 * scale).toFixed(1)} ${(5 * scale).toFixed(1)}"` : ""}/>`;
+  }).join("\n    ");
+  const texts = legend.labels.map((label) => `<text x="${label.x}" y="${label.y}" fill="${label.fill}" font-size="${label.size}">${escapeXml(label.text)}</text>`).join("\n    ");
+  return `<g id="legend" font-family="Arial, Helvetica, sans-serif">
+    ${swatches}
+    ${texts}
+  </g>`;
 }
 
 function uniqueRegionEdges(regions: BoardRegion[]) {
@@ -393,7 +571,7 @@ export function comparisonBoardSvg(board: BoardModel) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${board.width}" height="${board.height}" viewBox="0 0 ${board.width} ${board.height}">
   <title>${escapeXml(board.descriptorName)} comparison</title>
-  <desc>Black board, white section linework, and translucent gold #D6AD4F interstitial raster cells. Cells are not merged and are not claimed as occupiable space. Source OBJ geometry was not modified.</desc>
+  <desc>Black board, white section linework, and translucent evidence overlays in the approved palette (gold #D6AD4F and blues). Overlays are the evaluator's recorded evidence, not a claim of occupiable space. Source OBJ geometry was not modified.</desc>
   <g id="background">
     <rect width="100%" height="100%" fill="#000000"/>
   </g>
@@ -411,6 +589,8 @@ export function comparisonBoardSvg(board: BoardModel) {
   ${lineGroup("most-silhouette", rolePath(board.mostLines, "silhouette"), silhouetteWidth)}
   ${lineGroup("least-section-cut", rolePath(board.leastLines, "cut"), cutWidth)}
   ${lineGroup("most-section-cut", rolePath(board.mostLines, "cut"), cutWidth)}
+  ${overlayMarkup(board.leastOverlays, board.height)}
+  ${overlayMarkup(board.mostOverlays, board.height)}
   <g id="score-components">
     ${bars}
   </g>
@@ -418,6 +598,7 @@ export function comparisonBoardSvg(board: BoardModel) {
     <rect x="${margin}" y="${header}" width="${Math.round(board.width * 0.94)}" height="${frameHeight}"/>
     <line x1="${board.width / 2}" y1="${header}" x2="${board.width / 2}" y2="${header + frameHeight}"/>
   </g>
+  ${legendMarkup(board)}
   <g id="labels" font-family="Arial, Helvetica, sans-serif">
     ${texts.join("\n    ")}
   </g>

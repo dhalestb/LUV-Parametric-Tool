@@ -169,6 +169,13 @@ function isInterstitial(
   return false;
 }
 
+export type PermeabilityRay = {
+  origin: Voxel;
+  end: Voxel;
+  direction: Voxel;
+  passed: boolean;
+};
+
 function directionPassRate(
   occupied: Set<string>,
   min: Voxel,
@@ -176,6 +183,7 @@ function directionPassRate(
   dx: number,
   dy: number,
   dz: number,
+  record?: PermeabilityRay[],
 ) {
   let rays = 0;
   let passed = 0;
@@ -195,18 +203,33 @@ function directionPassRate(
         let cx = x;
         let cy = y;
         let cz = z;
+        let endX = x;
+        let endY = y;
+        let endZ = z;
         let blocked = false;
         while (cx >= min[0] && cy >= min[1] && cz >= min[2] && cx <= max[0] && cy <= max[1] && cz <= max[2]) {
           if (occupied.has(cellKey(cx, cy, cz))) {
             blocked = true;
+            endX = cx;
+            endY = cy;
+            endZ = cz;
             break;
           }
+          endX = cx;
+          endY = cy;
+          endZ = cz;
           cx += dx || 0;
           cy += dy || 0;
           cz += dz || 0;
           if (!dx && !dy && !dz) break;
         }
         if (!blocked) passed += 1;
+        record?.push({
+          origin: [x, y, z],
+          end: [endX, endY, endZ],
+          direction: [dx, dy, dz],
+          passed: !blocked,
+        });
       }
     }
   }
@@ -255,6 +278,8 @@ type OpenCellScan = {
   interstitial: number;
   free: Voxel[];
   interstitialCells: Voxel[];
+  enclosedCells: Voxel[];
+  outside: Set<string>;
 };
 
 /** Same free-cell walk measureOpenVolume uses. Extra arrays do not change the ratios. */
@@ -286,6 +311,7 @@ function classifyOpenCells(cells: Voxel[]): OpenCellScan | null {
   let interstitial = 0;
   const free: Voxel[] = [];
   const interstitialCells: Voxel[] = [];
+  const enclosedCells: Voxel[] = [];
   for (let x = minX; x <= maxX; x += 1) {
     for (let y = minY; y <= maxY; y += 1) {
       for (let z = minZ; z <= maxZ; z += 1) {
@@ -294,7 +320,10 @@ function classifyOpenCells(cells: Voxel[]): OpenCellScan | null {
         freeInForm += 1;
         free.push([x, y, z]);
         const exterior = outside.has(key);
-        if (!exterior) enclosed += 1;
+        if (!exterior) {
+          enclosed += 1;
+          enclosedCells.push([x, y, z]);
+        }
         else if (isInterstitial(occupied, x, y, z, formMin, formMax)) {
           interstitial += 1;
           interstitialCells.push([x, y, z]);
@@ -302,7 +331,7 @@ function classifyOpenCells(cells: Voxel[]): OpenCellScan | null {
       }
     }
   }
-  return { occupied, envMin, envMax, formVolume, freeInForm, enclosed, interstitial, free, interstitialCells };
+  return { occupied, envMin, envMax, formVolume, freeInForm, enclosed, interstitial, free, interstitialCells, enclosedCells, outside };
 }
 
 /**
@@ -341,4 +370,96 @@ export function measureOpenVolume(cells: Voxel[]): OpenVolumeMeasurement {
   };
   measurement.score = openVolumeScore(measurement);
   return measurement;
+}
+
+export type VoidComponent = {
+  cells: Voxel[];
+  /** True when the component touches exterior-connected free space. Not pedestrian access. */
+  exterior: boolean;
+};
+
+export type SoliditySample = {
+  cell: Voxel;
+  /** Share of the 26 neighbors that are also occupied. */
+  solidity: number;
+};
+
+const SIX: Voxel[] = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
+
+function connectedFree(cells: Voxel[], outside: Set<string>): VoidComponent[] {
+  const remaining = new Set(cells.map(([x, y, z]) => cellKey(x, y, z)));
+  const components: VoidComponent[] = [];
+  for (const start of cells) {
+    const startKey = cellKey(start[0], start[1], start[2]);
+    if (!remaining.has(startKey)) continue;
+    remaining.delete(startKey);
+    const queue: Voxel[] = [start];
+    const component: Voxel[] = [start];
+    let exterior = outside.has(startKey);
+    for (let index = 0; index < queue.length; index += 1) {
+      const [x, y, z] = queue[index];
+      for (const [dx, dy, dz] of SIX) {
+        const next: Voxel = [x + dx, y + dy, z + dz];
+        const key = cellKey(next[0], next[1], next[2]);
+        if (!remaining.has(key)) continue;
+        remaining.delete(key);
+        queue.push(next);
+        component.push(next);
+        if (outside.has(key)) exterior = true;
+      }
+    }
+    components.push({ cells: component, exterior });
+  }
+  components.sort((left, right) => right.cells.length - left.cells.length);
+  return components;
+}
+
+function soliditySamples(cells: Voxel[]): SoliditySample[] {
+  const occupied = new Set(cells.map(([x, y, z]) => cellKey(x, y, z)));
+  const offsets: Voxel[] = [];
+  for (let z = -1; z <= 1; z += 1) {
+    for (let y = -1; y <= 1; y += 1) {
+      for (let x = -1; x <= 1; x += 1) {
+        if (x || y || z) offsets.push([x, y, z]);
+      }
+    }
+  }
+  return cells.map((cell) => {
+    let neighbors = 0;
+    for (const [dx, dy, dz] of offsets) {
+      if (occupied.has(cellKey(cell[0] + dx, cell[1] + dy, cell[2] + dz))) neighbors += 1;
+    }
+    return { cell, solidity: neighbors / offsets.length };
+  });
+}
+
+/**
+ * Located Open Volume evidence from the same walks as the score.
+ * The returned score is measureOpenVolume's score. Nothing here is added to it.
+ */
+export function diagnoseOpenVolume(cells: Voxel[]) {
+  const measurement = measureOpenVolume(cells);
+  const scan = classifyOpenCells(cells);
+  if (!scan) {
+    return {
+      measurement,
+      rays: [] as PermeabilityRay[],
+      solidity: [] as SoliditySample[],
+      voids: [] as VoidComponent[],
+      enclosedCells: [] as Voxel[],
+      largestVoidFraction: 0,
+    };
+  }
+  const rays: PermeabilityRay[] = [];
+  for (const axis of AXES) directionPassRate(scan.occupied, scan.envMin, scan.envMax, axis.dx, axis.dy, axis.dz, rays);
+  const voids = connectedFree(scan.free, scan.outside);
+  const largest = voids[0]?.cells.length ?? 0;
+  return {
+    measurement,
+    rays,
+    solidity: soliditySamples(cells),
+    voids,
+    enclosedCells: scan.enclosedCells,
+    largestVoidFraction: scan.free.length ? largest / scan.free.length : 0,
+  };
 }

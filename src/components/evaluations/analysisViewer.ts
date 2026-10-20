@@ -5,8 +5,8 @@ import { normalize, type SectionPlane } from "./meshSection";
 export type AnalysisView = "isometric" | "section-x" | "section-y" | "plan" | "elevation";
 
 export const ANALYSIS_GOLD = "#D6AD4F";
-/** Board fill standard. The opacity control starts here and does not change the score. */
-export const ANALYSIS_OPACITY_STANDARD = 0.16;
+/** Starting overlay opacity. Readable on the cream mesh without covering it. It does not change the score. */
+export const ANALYSIS_OPACITY_STANDARD = 0.5;
 /**
  * Drawn box edge divided by the computational cell edge.
  * The evaluator still counts the full cell.

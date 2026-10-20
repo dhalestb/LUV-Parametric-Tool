@@ -19,7 +19,12 @@ import {
 import { spatialCategoriesForDescriptor } from "../src/components/evaluations/descriptorEvidence.ts";
 import { specFeetToFile } from "../src/components/evaluations/geometryView.ts";
 import { planeFromOrientation, rotatePlane, sectionTriangles, translatePlane } from "../src/components/evaluations/meshSection.ts";
-import { openVolumeRegions } from "../src/components/evaluations/openVolume.ts";
+import { CLEARANCE_MIN_AREA, measureSurfaceClearance, rateSurfaceClearance } from "../src/components/evaluations/openVolumeClearance.ts";
+import { diagnoseOpenVolume, measureOpenVolume, openVolumeRegions } from "../src/components/evaluations/openVolume.ts";
+import { auditPermeability, displaySlab, freeCellShell, samplePermeabilityRays, stridePick } from "../src/components/evaluations/openVolumeDisplay.ts";
+import { evaluateTileModel } from "../src/components/evaluations/objDescriptorAnalysis.ts";
+import { analyzeMesh } from "../src/components/lattice/analyze.ts";
+import { unpackCell } from "../src/components/lattice/types.ts";
 import { buildCompleteFileGeometry, combinedBoundsSpec, IDENTITY_PLACEMENT, tileRootMatrix, triangleCount } from "../src/components/lattice/objFidelity.ts";
 import { parseObj } from "../src/components/lattice/parseObj.ts";
 
@@ -33,6 +38,15 @@ function check(name, fn) {
     process.stdout.write(`FAIL ${name}: ${error instanceof Error ? error.message : error}\n`);
   }
 }
+
+check("a free-space shell is the exact union of the measured cells", () => {
+  const single = freeCellShell([[0, 0, 0]], [0, 0, 0], 2);
+  assert.equal(single.length, 6 * 2 * 3 * 3);
+  const pair = freeCellShell([[0, 0, 0], [1, 0, 0]], [0, 0, 0], 2);
+  assert.equal(pair.length, 10 * 2 * 3 * 3);
+  assert.ok(pair.includes(4));
+  assert.ok(!pair.some((value) => value < 0 || value > 4));
+});
 
 check("matched framing uses the larger form for both panels", () => {
   const frame = matchedFrame([[20, 20, 10], [20, 20, 20]]);
@@ -131,6 +145,56 @@ check("a cell center survives one registration transform and lands on the clip p
   assert.equal(cut.pocheReliable, false);
   assert.equal(before.length, mesh.positions.length);
   for (let index = 0; index < before.length; index += 1) assert.equal(mesh.positions[index], before[index]);
+});
+
+check("a permeability sample stays inside the measured rays", () => {
+  const rays = [
+    { origin: [0, 0, 0], end: [3, 0, 0], direction: [1, 0, 0], passed: true, color: "#7DCEA0" },
+    { origin: [0, 1, 0], end: [1, 1, 0], direction: [1, 0, 0], passed: false, color: "#C47B7B" },
+    { origin: [0, 2, 0], end: [4, 2, 0], direction: [1, 0, 0], passed: true, color: "#7DCEA0" },
+    { origin: [0, 0, 1], end: [0, 0, 4], direction: [0, 0, 1], passed: false, color: "#C47B7B" },
+  ];
+  const once = samplePermeabilityRays(rays, { outcome: "both", directionId: "all", perOutcome: 1 });
+  const twice = samplePermeabilityRays(rays, { outcome: "both", directionId: "all", perOutcome: 1 });
+  assert.deepEqual(once.shown, twice.shown);
+  assert.equal(once.measured, 4);
+  assert.equal(once.measuredPassed, 2);
+  for (const ray of once.shown) assert.ok(rays.some((item) => item.origin.join() === ray.origin.join() && item.passed === ray.passed));
+  assert.ok(once.shown.length < rays.length);
+  assert.deepEqual(stridePick([1, 2, 3, 4, 5], 3), [1, 3, 5]);
+  const slab = displaySlab([{ cell: [0, 0, 0] }, { cell: [0, 0, 5] }, { cell: [0, 0, 6] }], 2, 1, 2);
+  assert.deepEqual(slab.map((item) => item.cell[2]), [5, 6]);
+});
+
+check("open volume diagnostics keep the scored measurement", () => {
+  const cells = [[0, 0, 0], [2, 0, 0], [0, 2, 0], [0, 0, 2]];
+  const measured = measureOpenVolume(cells);
+  const diagnosis = diagnoseOpenVolume(cells);
+  assert.deepEqual(diagnosis.measurement, measured);
+  const groups = new Map();
+  for (const ray of diagnosis.rays) {
+    const key = ray.direction.join(",");
+    const row = groups.get(key) ?? { passed: 0, total: 0 };
+    row.total += 1;
+    if (ray.passed) row.passed += 1;
+    groups.set(key, row);
+  }
+  const rates = [...groups.values()].map((row) => (row.total ? row.passed / row.total : 0));
+  const mean = rates.reduce((sum, rate) => sum + rate, 0) / (rates.length || 1);
+  assert.equal(Math.round(mean * 100), measured.permeability);
+  assert.ok(diagnosis.largestVoidFraction <= 1);
+  const traced = spatialCategoriesForDescriptor({
+    descriptorId: "openVolume",
+    descriptorName: "Open Volume",
+    occupied: cells,
+    permeabilityRays: diagnosis.rays,
+    solidity: diagnosis.solidity,
+    voidComponents: diagnosis.voids,
+    enclosed: diagnosis.enclosedCells,
+  });
+  assert.equal(traced.find((item) => item.id === "permeability").available, diagnosis.rays.length > 0);
+  assert.equal(traced.find((item) => item.id === "connected-void").diagnostic, true);
+  assert.equal(measured.score, measureOpenVolume(cells).score);
 });
 
 check("marker scale is a drawing convention and does not change the cell", () => {
@@ -239,6 +303,57 @@ if (!source) {
       for (let index = 0; index < positions.length; index += 1) assert.equal(positions[index], mesh.positions[index]);
     });
     process.stdout.write(`${filename} section-y segments ${cut.segments.length} poche ${cut.pocheReliable} in ${elapsed.toFixed(1)} ms\n`);
+    const model = analyzeMesh(mesh, null, 1, "y");
+    const occupied = (model.variants[0]?.occupied ?? []).map((packed) => unpackCell(packed));
+    const before = evaluateTileModel(model, { positions: mesh.positions, faces: mesh.faces, up: "y", unitScale: 1 });
+    const diagnosis = diagnoseOpenVolume(occupied);
+    const after = evaluateTileModel(model, { positions: mesh.positions, faces: mesh.faces, up: "y", unitScale: 1 });
+    const openBefore = before.descriptors.find((item) => item.id === "openVolume");
+    const openAfter = after.descriptors.find((item) => item.id === "openVolume");
+    const clearance = measureSurfaceClearance({
+      mesh,
+      unitScale: 1,
+      up: "y",
+      anchor: model.anchor,
+      cellFeet: model.cellFeet,
+      occupied,
+      minArea: CLEARANCE_MIN_AREA,
+    });
+    const rated = rateSurfaceClearance(clearance);
+    check(`${filename} diagnostics do not change the Open Volume score`, () => {
+      assert.equal(openAfter.absoluteScore, openBefore.absoluteScore);
+      assert.ok(Math.abs(openBefore.absoluteScore - rated.value) < 1e-6);
+      const component = openBefore.components.find((item) => item.name === "Surface Clearance");
+      assert.equal(component.weight, 1);
+      assert.ok(Math.abs(component.precise - rated.value) < 1e-6);
+      assert.equal(mesh.positions.length, positions.length);
+    });
+    const passedRays = diagnosis.rays.filter((ray) => ray.passed).length;
+    const displayRays = diagnosis.rays.map((ray) => ({ ...ray, color: ray.passed ? "#7DCEA0" : "#C47B7B" }));
+    const sample = samplePermeabilityRays(displayRays, { outcome: "both", directionId: "all", perOutcome: 1 });
+    check(`${filename} displayed rays are measured tests`, () => {
+      assert.ok(sample.shown.length > 0);
+      assert.ok(sample.shown.length < diagnosis.rays.length);
+      assert.equal(sample.measured, diagnosis.rays.length);
+      assert.equal(sample.measuredPassed, passedRays);
+      for (const ray of sample.shown) {
+        assert.ok(diagnosis.rays.some((item) => item.origin.join() === ray.origin.join() && item.end.join() === ray.end.join() && item.passed === ray.passed));
+      }
+    });
+    const audit = auditPermeability(diagnosis.rays);
+    check(`${filename} permeability audit keeps the measured pass total`, () => {
+      assert.equal(audit.passed, passedRays);
+      assert.equal(audit.total, diagnosis.rays.length);
+      assert.equal(audit.between + audit.around + audit.uncertain, passedRays);
+      const repeated = samplePermeabilityRays(displayRays, { outcome: "both", directionId: "all", perOutcome: 1 });
+      assert.deepEqual(repeated.shown, sample.shown);
+    });
+    process.stdout.write(`${filename} equal-weight ${(audit.equalWeight * 100).toFixed(4)} pooled ${(audit.pooled * 100).toFixed(4)} between ${audit.between} around ${audit.around} uncertain ${audit.uncertain}\n`);
+    for (const direction of audit.directions) {
+      process.stdout.write(`  ${direction.id} ${direction.passed}/${direction.total} rate ${(direction.rate * 100).toFixed(2)} between ${direction.between} around ${direction.around} uncertain ${direction.uncertain}\n`);
+    }
+    const largest = diagnosis.voids[0];
+    process.stdout.write(`${filename} score ${openBefore.absoluteScore} rays ${diagnosis.rays.length} passed ${passedRays} voids ${diagnosis.voids.length} largest ${largest?.cells.length ?? 0} exterior ${Boolean(largest?.exterior)} fraction ${diagnosis.largestVoidFraction.toFixed(3)} enclosed ${diagnosis.enclosedCells.length}\n`);
   }
 }
 

@@ -1,0 +1,46 @@
+{
+  "stage": "B",
+  "outcome": "complete",
+  "sourceIdentity": "synthetic part2 sample tiles, not uploaded OBJs",
+  "least": {
+    "file": "G1-Stepped-Amphitheater.obj",
+    "score": 65.65,
+    "revision": "geom:58272444",
+    "triangles": 60,
+    "segments": 16,
+    "pocheReliable": true,
+    "limitation": null,
+    "bounds": [
+      24,
+      16,
+      4.800000190734863
+    ],
+    "freeCells": 257,
+    "goldOnCut": 58
+  },
+  "most": {
+    "file": "G5-Linear-Edge-Gallery.obj",
+    "score": 71.75000000000001,
+    "revision": "geom:4059259911",
+    "triangles": 60,
+    "segments": 16,
+    "pocheReliable": true,
+    "limitation": null,
+    "bounds": [
+      24,
+      16,
+      12.800000190734863
+    ],
+    "freeCells": 725,
+    "goldOnCut": 162
+  },
+  "physicalScale": {
+    "mode": "physical",
+    "feetPerPixelA": 0.06666666666666667,
+    "feetPerPixelB": 0.06666666666666667,
+    "shared": true,
+    "label": "Matched physical scale. One foot has the same length in both panels."
+  },
+  "plane": "section-y through each form center. Geometric default, not a descriptor-optimal cut.",
+  "positionsUnchanged": true
+}
