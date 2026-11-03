@@ -53,6 +53,52 @@ export function foldEdges(mesh: AnalysisMesh): FoldEdge[] {
   return edges;
 }
 
+/** Faces that touch a measured fold of at least `minDeg`. Display filter only. */
+export function foldAdjoiningTriangles(mesh: AnalysisMesh, edges: FoldEdge[], minDeg = 30): AnalysisTriangle[] {
+  const ids = new Set<number>();
+  for (const edge of edges) {
+    if (edge.angleDeg < minDeg) continue;
+    ids.add(edge.triangleIds[0]);
+    ids.add(edge.triangleIds[1]);
+  }
+  if (!ids.size) return [];
+  return mesh.triangles.filter((triangle) => ids.has(triangle.id));
+}
+
+function recordBoundaryEdge(counts: Map<string, { a: Vec3; b: Vec3; n: number }>, a: Vec3, b: Vec3) {
+  const ka = weldKey(a);
+  const kb = weldKey(b);
+  if (ka === kb) return;
+  const key = ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
+  const recorded = counts.get(key);
+  if (recorded) recorded.n += 1;
+  else counts.set(key, { a, b, n: 1 });
+}
+
+/** Outer edges of a triangle set. Shared interior edges are omitted so clusters read as one outline. */
+export function trianglePatchBoundary(triangles: AnalysisTriangle[]): Array<{ a: Vec3; b: Vec3 }> {
+  const counts = new Map<string, { a: Vec3; b: Vec3; n: number }>();
+  for (const triangle of triangles) {
+    const corners = [triangle.a, triangle.b, triangle.c];
+    for (let index = 0; index < 3; index += 1) recordBoundaryEdge(counts, corners[index], corners[(index + 1) % 3]);
+  }
+  return [...counts.values()].filter((edge) => edge.n === 1).map(({ a, b }) => ({ a, b }));
+}
+
+/** Same cluster outline from a 9-floats-per-triangle patch buffer. */
+export function triangleArrayBoundary(triangles: Float32Array): Array<{ a: Vec3; b: Vec3 }> {
+  const counts = new Map<string, { a: Vec3; b: Vec3; n: number }>();
+  for (let offset = 0; offset + 8 < triangles.length; offset += 9) {
+    const a: Vec3 = [triangles[offset], triangles[offset + 1], triangles[offset + 2]];
+    const b: Vec3 = [triangles[offset + 3], triangles[offset + 4], triangles[offset + 5]];
+    const c: Vec3 = [triangles[offset + 6], triangles[offset + 7], triangles[offset + 8]];
+    recordBoundaryEdge(counts, a, b);
+    recordBoundaryEdge(counts, b, c);
+    recordBoundaryEdge(counts, c, a);
+  }
+  return [...counts.values()].filter((edge) => edge.n === 1).map(({ a, b }) => ({ a, b }));
+}
+
 /** Area-weighted mean dihedral angle in degrees. Null when no shared edges exist. */
 export function meanFoldAngle(edges: FoldEdge[]): number | null {
   let weight = 0;

@@ -2,9 +2,9 @@
  * v4 visibility and light evidence: straight mesh ray tests between real
  * standing positions. No voxel adjacency, no transparency assumption.
  */
-import { distance, horizontalDirections, sub, type TriangleGrid, type Vec3 } from "./geometry";
+import { distance, horizontalDirections, planExitPoint, sub, type TriangleGrid, type Vec3 } from "./geometry";
 import type { CirculationNetwork, NetworkNode } from "./circulation";
-import type { FloorField } from "./surfaces";
+import { isCountedTopDeck, type FloorField } from "./surfaces";
 
 /** Default eye height above the floor surface. Configurable per evaluation. */
 export const EYE_HEIGHT_FEET = 5.5;
@@ -40,12 +40,12 @@ export type VisibilityResult = {
   regionPairsConnected: number;
 };
 
-function viewOrigins(network: CirculationNetwork, field: FloorField, eyeHeight: number): NetworkNode[] {
+function viewOrigins(network: CirculationNetwork, field: FloorField, eyeHeight: number, includeTopDecks = false): NetworkNode[] {
   const stride = Math.max(1, Math.round(VIEW_STRIDE_FEET / field.sampleFeet));
   return network.nodes.filter((node) => {
     const sample = field.samples[node.sampleId];
     if (sample.ix % stride || sample.iy % stride) return false;
-    if (sample.floorClass === "exposed") return false;
+    if (sample.floorClass === "exposed" && !(includeTopDecks && isCountedTopDeck(sample))) return false;
     return sample.clearance === null || sample.clearance > eyeHeight;
   });
 }
@@ -59,8 +59,8 @@ function pickTargets<T>(items: T[], count: number, offset: number): T[] {
 }
 
 /** Same-level sightlines between viewing positions grouped by detected level. */
-export function sameLevelVisibility(network: CirculationNetwork, field: FloorField, grid: TriangleGrid, eyeHeight = EYE_HEIGHT_FEET): VisibilityResult {
-  const origins = viewOrigins(network, field, eyeHeight);
+export function sameLevelVisibility(network: CirculationNetwork, field: FloorField, grid: TriangleGrid, eyeHeight = EYE_HEIGHT_FEET, includeTopDecks = false): VisibilityResult {
+  const origins = viewOrigins(network, field, eyeHeight, includeTopDecks);
   const rays: SightRay[] = [];
   const byLevel = new Map<number, NetworkNode[]>();
   for (const origin of origins) (byLevel.get(origin.levelId) ?? byLevel.set(origin.levelId, []).get(origin.levelId)!).push(origin);
@@ -110,8 +110,8 @@ export function sameLevelVisibility(network: CirculationNetwork, field: FloorFie
 }
 
 /** Sightlines between viewing positions on different levels. */
-export function crossLevelVisibility(network: CirculationNetwork, field: FloorField, grid: TriangleGrid, eyeHeight = EYE_HEIGHT_FEET): VisibilityResult {
-  const origins = viewOrigins(network, field, eyeHeight);
+export function crossLevelVisibility(network: CirculationNetwork, field: FloorField, grid: TriangleGrid, eyeHeight = EYE_HEIGHT_FEET, includeTopDecks = false): VisibilityResult {
+  const origins = viewOrigins(network, field, eyeHeight, includeTopDecks);
   const rays: SightRay[] = [];
   let clearLength = 0;
   const pairKeys = new Set<string>();
@@ -182,18 +182,23 @@ export type LightResult = {
 };
 
 /** Potential natural-light penetration from above and from the sides. */
-export function lightExposure(network: CirculationNetwork, field: FloorField, grid: TriangleGrid): LightResult {
+export function lightExposure(network: CirculationNetwork, field: FloorField, grid: TriangleGrid, includeTopDecks = false): LightResult {
   const stride = Math.max(1, Math.round(VIEW_STRIDE_FEET / field.sampleFeet));
   const probes: LightProbe[] = [];
   let excludedExposed = 0;
   const reach = field.sampleFeet * Math.max(field.gridDims[0], field.gridDims[1]) + 4;
   const verticalReach = reach + 40;
+  const minX = field.gridOrigin[0];
+  const minY = field.gridOrigin[1];
+  const maxX = minX + field.gridDims[0] * field.sampleFeet;
+  const maxY = minY + field.gridDims[1] * field.sampleFeet;
   const overheadDirections: Vec3[] = [[0, 0, 1], ...horizontalDirections(8).map((direction): Vec3 => [direction[0] * Math.SQRT1_2, direction[1] * Math.SQRT1_2, Math.SQRT1_2])];
   const lateralDirections = horizontalDirections(8);
   for (const node of network.nodes) {
     const sample = field.samples[node.sampleId];
     if (sample.ix % stride || sample.iy % stride) continue;
-    if (sample.floorClass === "exposed" || sample.floorClass === "uncertain") {
+    const countedDeck = includeTopDecks && isCountedTopDeck(sample);
+    if ((sample.floorClass === "exposed" || sample.floorClass === "uncertain") && !countedDeck) {
       excludedExposed += 1;
       continue;
     }
@@ -223,7 +228,11 @@ export function lightExposure(network: CirculationNetwork, field: FloorField, gr
         depthCount += 1;
       } else {
         lateralEscaped += 1;
-        escapedRays.push({ a: origin, b: [origin[0] + direction[0] * 6, origin[1] + direction[1] * 6, origin[2]], kind: "lateral" });
+        escapedRays.push({
+          a: origin,
+          b: planExitPoint(origin, direction, minX, minY, maxX, maxY, 6),
+          kind: "lateral",
+        });
       }
     }
     probes.push({

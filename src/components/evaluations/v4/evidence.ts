@@ -36,7 +36,13 @@ export type EvidenceLayer = {
   status: LayerStatus;
   /** Component names this layer supports. Empty when it is context only. */
   components: string[];
-  lineStyle: "solid" | "dashed";
+  lineStyle: "solid" | "dashed" | "dotted";
+  /** Presentation marker. Display only. */
+  pointShape?: "circle" | "square" | "diamond";
+  /** Multiplier on the default sample-dot radius. Display only. */
+  pointScale?: number;
+  /** Presentation emphasis for primary vs secondary elements. Display only. */
+  emphasis?: "primary" | "secondary";
   /** Translucent patches: 9 floats per triangle in spec feet. */
   triangles?: Float32Array;
   /** Thin lines in spec feet. */
@@ -55,6 +61,8 @@ export type EvidenceLayer = {
   dimensions?: Array<{ a: Vec3; b: Vec3; text: string }>;
   /** Opacity hint for patches. */
   opacity?: number;
+  /** Display only: skip triangulation edges and draw the layer's own cluster outline. */
+  hideInternalEdges?: boolean;
 };
 
 export type ComponentEvidence = {

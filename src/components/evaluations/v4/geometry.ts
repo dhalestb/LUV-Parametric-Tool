@@ -353,3 +353,30 @@ export function horizontalDirections(count: number): Vec3[] {
     return [Math.cos(angle), Math.sin(angle), 0];
   });
 }
+
+/**
+ * Horizontal point where a plan ray leaves a padded AABB. Z stays at the origin
+ * so escaped laterals read as side light, not as ticks above the massing.
+ */
+export function planExitPoint(
+  origin: Vec3,
+  direction: Vec3,
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+  pad = 0,
+  minLength = 6,
+): Vec3 {
+  const x0 = minX - pad;
+  const y0 = minY - pad;
+  const x1 = maxX + pad;
+  const y1 = maxY + pad;
+  let t = Infinity;
+  if (direction[0] > 1e-9) t = Math.min(t, (x1 - origin[0]) / direction[0]);
+  if (direction[0] < -1e-9) t = Math.min(t, (x0 - origin[0]) / direction[0]);
+  if (direction[1] > 1e-9) t = Math.min(t, (y1 - origin[1]) / direction[1]);
+  if (direction[1] < -1e-9) t = Math.min(t, (y0 - origin[1]) / direction[1]);
+  if (!Number.isFinite(t) || t < minLength) t = minLength;
+  return [origin[0] + direction[0] * t, origin[1] + direction[1] * t, origin[2]];
+}

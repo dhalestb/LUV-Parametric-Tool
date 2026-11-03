@@ -5,6 +5,7 @@ export const BOARD_PRESETS = [
   { id: "board", label: "Architectural board 7407 × 2160", width: 7407, height: 2160 },
   { id: "uhd", label: "3840 × 2160", width: 3840, height: 2160 },
   { id: "hd", label: "1920 × 1080", width: 1920, height: 1080 },
+  { id: "slide", label: "1284 × 494", width: 1284, height: 494 },
 ] as const;
 
 export type BoardLine = {
@@ -27,6 +28,10 @@ export type BoardOverlay = {
   color: string;
   alpha: number;
   dashed?: boolean;
+  dotted?: boolean;
+  lineScale?: number;
+  pointShape?: "circle" | "square" | "diamond";
+  pointScale?: number;
   polygons: Array<Array<[number, number]>>;
   lines: Array<{ x1: number; y1: number; x2: number; y2: number }>;
   points: Array<[number, number]>;
@@ -37,7 +42,9 @@ export type BoardLegendItem = {
   color: string;
   label: string;
   dashed?: boolean;
+  dotted?: boolean;
   kind: "patch" | "line" | "point";
+  pointShape?: "circle" | "square" | "diamond";
 };
 
 /**
@@ -324,15 +331,39 @@ function legendLayout(board: BoardModel) {
   const rowStep = Math.round(swatch * 1.45);
   const top = Math.round(board.height * 0.045);
   const labels: BoardText[] = [];
-  const swatches: Array<{ x: number; y: number; w: number; h: number; color: string; dashed: boolean; kind: BoardLegendItem["kind"] }> = [];
+  const swatches: Array<{ x: number; y: number; w: number; h: number; color: string; dashed: boolean; kind: BoardLegendItem["kind"]; pointShape?: BoardLegendItem["pointShape"] }> = [];
   if (!items.length) return { labels, swatches };
   labels.push({ text: "Legend", x, y: top, size: sizes.secondary, fill: BLUE });
   items.slice(0, 9).forEach((item, index) => {
     const y = top + rowStep * (index + 1);
-    swatches.push({ x, y: y - swatch * 0.8, w: swatch, h: swatch * 0.8, color: item.color, dashed: Boolean(item.dashed), kind: item.kind });
+    swatches.push({ x, y: y - swatch * 0.8, w: swatch, h: swatch * 0.8, color: item.color, dashed: Boolean(item.dashed), kind: item.kind, pointShape: item.pointShape });
     labels.push({ text: item.label, x: x + swatch + Math.round(swatch * 0.5), y, size: sizes.swatch, fill: INK });
   });
   return { labels, swatches };
+}
+
+function fillMarker(
+  ctx: DrawContext,
+  x: number,
+  y: number,
+  size: number,
+  shape: BoardOverlay["pointShape"] = "circle",
+) {
+  if (shape === "square") {
+    ctx.fillRect(x - size / 2, y - size / 2, size, size);
+    return;
+  }
+  ctx.beginPath();
+  if (shape === "diamond") {
+    ctx.moveTo(x, y - size * 0.65);
+    ctx.lineTo(x + size * 0.55, y);
+    ctx.lineTo(x, y + size * 0.65);
+    ctx.lineTo(x - size * 0.55, y);
+    ctx.closePath();
+  } else {
+    ctx.arc(x, y, size * 0.48, 0, Math.PI * 2);
+  }
+  ctx.fill();
 }
 
 function paintOverlays(ctx: DrawContext, overlays: BoardOverlay[] | undefined, height: number) {
@@ -350,9 +381,9 @@ function paintOverlays(ctx: DrawContext, overlays: BoardOverlay[] | undefined, h
       ctx.closePath();
       ctx.fill();
     }
-    ctx.globalAlpha = Math.min(1, overlay.alpha + 0.5);
-    ctx.lineWidth = 2.2 * scale;
-    ctx.setLineDash?.(overlay.dashed ? [8 * scale, 6 * scale] : []);
+    ctx.globalAlpha = Math.min(1, overlay.alpha + 0.55);
+    ctx.lineWidth = 2.2 * scale * (overlay.lineScale ?? 1);
+    ctx.setLineDash?.(overlay.dotted ? [2.2 * scale, 4 * scale] : overlay.dashed ? [8 * scale, 6 * scale] : []);
     for (const line of overlay.lines) {
       ctx.beginPath();
       ctx.moveTo(line.x1, line.y1);
@@ -361,8 +392,8 @@ function paintOverlays(ctx: DrawContext, overlays: BoardOverlay[] | undefined, h
     }
     ctx.setLineDash?.([]);
     ctx.globalAlpha = 1;
-    const dot = 7 * scale;
-    for (const [x, y] of overlay.points) ctx.fillRect(x - dot / 2, y - dot / 2, dot, dot);
+    const dot = 7 * scale * (overlay.pointScale ?? 1);
+    for (const [x, y] of overlay.points) fillMarker(ctx, x, y, dot, overlay.pointShape);
     const size = annotationSizes(height).secondary;
     ctx.font = `${size}px Arial, Helvetica, sans-serif`;
     for (const label of overlay.labels) ctx.fillText(label.text, label.x + dot, label.y - dot);
@@ -395,7 +426,7 @@ export function paintComparisonBoard(ctx: DrawContext, board: BoardModel) {
     ctx.globalAlpha = 1;
     ctx.fillStyle = swatch.color;
     if (swatch.kind === "patch") ctx.fillRect(swatch.x, swatch.y, swatch.w, swatch.h);
-    else if (swatch.kind === "point") ctx.fillRect(swatch.x + swatch.w * 0.3, swatch.y + swatch.h * 0.2, swatch.w * 0.4, swatch.h * 0.6);
+    else if (swatch.kind === "point") fillMarker(ctx, swatch.x + swatch.w / 2, swatch.y + swatch.h / 2, swatch.w * 0.55, swatch.pointShape);
     else {
       ctx.strokeStyle = swatch.color;
       ctx.lineWidth = Math.max(1.5, 2.2 * (height / 2160));
@@ -437,12 +468,13 @@ function overlayMarkup(overlays: BoardOverlay[] | undefined, height: number) {
       .map((polygon) => `<polygon points="${polygon.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ")}"/>`)
       .join("");
     const lines = overlay.lines.map((line) => `M ${line.x1.toFixed(1)} ${line.y1.toFixed(1)} L ${line.x2.toFixed(1)} ${line.y2.toFixed(1)}`).join(" ");
-    const dot = (7 * scale).toFixed(1);
-    const points = overlay.points.map(([x, y]) => `<rect x="${(x - 3.5 * scale).toFixed(1)}" y="${(y - 3.5 * scale).toFixed(1)}" width="${dot}" height="${dot}"/>`).join("");
+    const dot = 7 * scale * (overlay.pointScale ?? 1);
+    const points = overlay.points.map(([x, y]) => markerMarkup(x, y, dot, overlay.pointShape)).join("");
     const labels = overlay.labels.map((label) => `<text x="${(label.x + 7 * scale).toFixed(1)}" y="${(label.y - 7 * scale).toFixed(1)}" font-size="${size}" fill="${overlay.color}">${escapeXml(label.text)}</text>`).join("");
+    const dash = overlay.dotted ? `${(2.2 * scale).toFixed(1)} ${(4 * scale).toFixed(1)}` : overlay.dashed ? `${(8 * scale).toFixed(1)} ${(6 * scale).toFixed(1)}` : "";
     return `<g id="evidence-${escapeXml(overlay.id)}">
-    <g fill="${overlay.color}" fill-opacity="${overlay.alpha}" stroke="none">${polygons}</g>
-    <g fill="none" stroke="${overlay.color}" stroke-opacity="${Math.min(1, overlay.alpha + 0.5)}" stroke-width="${(2.2 * scale).toFixed(2)}"${overlay.dashed ? ` stroke-dasharray="${(8 * scale).toFixed(1)} ${(6 * scale).toFixed(1)}"` : ""}>${lines ? `<path d="${lines}"/>` : ""}</g>
+    <g fill="${overlay.color}" fill-opacity="${overlay.alpha}" stroke="${overlay.color}" stroke-opacity="${Math.min(1, overlay.alpha + 0.45)}" stroke-width="${(1.4 * scale).toFixed(2)}">${polygons}</g>
+    <g fill="none" stroke="${overlay.color}" stroke-opacity="${Math.min(1, overlay.alpha + 0.5)}" stroke-width="${(2.2 * scale * (overlay.lineScale ?? 1)).toFixed(2)}"${dash ? ` stroke-dasharray="${dash}"` : ""}>${lines ? `<path d="${lines}"/>` : ""}</g>
     <g fill="${overlay.color}">${points}</g>
     <g font-family="Arial, Helvetica, sans-serif">${labels}</g>
   </g>`;
@@ -455,7 +487,7 @@ function legendMarkup(board: BoardModel) {
   const scale = board.height / 2160;
   const swatches = legend.swatches.map((swatch) => {
     if (swatch.kind === "patch") return `<rect x="${swatch.x}" y="${swatch.y.toFixed(1)}" width="${swatch.w}" height="${swatch.h.toFixed(1)}" fill="${swatch.color}"/>`;
-    if (swatch.kind === "point") return `<rect x="${(swatch.x + swatch.w * 0.3).toFixed(1)}" y="${(swatch.y + swatch.h * 0.2).toFixed(1)}" width="${(swatch.w * 0.4).toFixed(1)}" height="${(swatch.h * 0.6).toFixed(1)}" fill="${swatch.color}"/>`;
+    if (swatch.kind === "point") return `<g fill="${swatch.color}">${markerMarkup(swatch.x + swatch.w / 2, swatch.y + swatch.h / 2, swatch.w * 0.55, swatch.pointShape)}</g>`;
     const y = (swatch.y + swatch.h / 2).toFixed(1);
     return `<line x1="${swatch.x}" y1="${y}" x2="${swatch.x + swatch.w}" y2="${y}" stroke="${swatch.color}" stroke-width="${Math.max(1.5, 2.2 * scale).toFixed(2)}"${swatch.dashed ? ` stroke-dasharray="${(6 * scale).toFixed(1)} ${(5 * scale).toFixed(1)}"` : ""}/>`;
   }).join("\n    ");
@@ -515,13 +547,21 @@ function paintRegions(ctx: DrawContext, regions: BoardRegion[], height: number) 
 
 function strokeLines(ctx: DrawContext, lines: BoardLine[], height: number) {
   for (const line of lines) {
-    ctx.strokeStyle = line.gold ? GOLD : INK;
+    ctx.strokeStyle = line.gold ? GOLD : line.role === "cut" ? INK : GRAY;
     ctx.lineWidth = line.gold ? boardLineWidth("silhouette", height) : boardLineWidth(line.role ?? "cut", height);
     ctx.beginPath();
     ctx.moveTo(line.x1, line.y1);
     ctx.lineTo(line.x2, line.y2);
     ctx.stroke();
   }
+}
+
+function markerMarkup(x: number, y: number, size: number, shape: BoardOverlay["pointShape"] = "circle") {
+  if (shape === "square") return `<rect x="${(x - size / 2).toFixed(1)}" y="${(y - size / 2).toFixed(1)}" width="${size.toFixed(1)}" height="${size.toFixed(1)}"/>`;
+  if (shape === "diamond") {
+    return `<polygon points="${x.toFixed(1)},${(y - size * 0.65).toFixed(1)} ${(x + size * 0.55).toFixed(1)},${y.toFixed(1)} ${x.toFixed(1)},${(y + size * 0.65).toFixed(1)} ${(x - size * 0.55).toFixed(1)},${y.toFixed(1)}"/>`;
+  }
+  return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(size * 0.48).toFixed(1)}"/>`;
 }
 
 function escapeXml(value: string) {
@@ -565,13 +605,13 @@ export function comparisonBoardSvg(board: BoardModel) {
   const texts = [...boardLabels(board), ...metrics.labels].map((label) => (
     `<text x="${label.x}" y="${label.y}" fill="${label.fill}" font-family="Arial, Helvetica, sans-serif" font-size="${label.size}">${escapeXml(label.text)}</text>`
   ));
-  const lineGroup = (id: string, d: string, width: string) => (
-    `<g id="${id}" fill="none" stroke="${INK}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round">${d ? `<path d="${d}"/>` : ""}</g>`
+  const lineGroup = (id: string, d: string, width: string, stroke = GRAY) => (
+    `<g id="${id}" fill="none" stroke="${stroke}" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round">${d ? `<path d="${d}"/>` : ""}</g>`
   );
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${board.width}" height="${board.height}" viewBox="0 0 ${board.width} ${board.height}">
   <title>${escapeXml(board.descriptorName)} comparison</title>
-  <desc>Black board, white section linework, and translucent evidence overlays in the approved palette (gold #D6AD4F and blues). Overlays are the evaluator's recorded evidence, not a claim of occupiable space. Source OBJ geometry was not modified.</desc>
+  <desc>Black board, grey ghosted massing, cyan measured surfaces, and yellow verified connections. Overlays are the evaluator's recorded evidence, not a claim of occupiable space. Source OBJ geometry was not modified.</desc>
   <g id="background">
     <rect width="100%" height="100%" fill="#000000"/>
   </g>
@@ -587,8 +627,8 @@ export function comparisonBoardSvg(board: BoardModel) {
   ${lineGroup("most-secondary", rolePath(board.mostLines, "secondary"), secondaryWidth)}
   ${lineGroup("least-silhouette", rolePath(board.leastLines, "silhouette"), silhouetteWidth)}
   ${lineGroup("most-silhouette", rolePath(board.mostLines, "silhouette"), silhouetteWidth)}
-  ${lineGroup("least-section-cut", rolePath(board.leastLines, "cut"), cutWidth)}
-  ${lineGroup("most-section-cut", rolePath(board.mostLines, "cut"), cutWidth)}
+  ${lineGroup("least-section-cut", rolePath(board.leastLines, "cut"), cutWidth, INK)}
+  ${lineGroup("most-section-cut", rolePath(board.mostLines, "cut"), cutWidth, INK)}
   ${overlayMarkup(board.leastOverlays, board.height)}
   ${overlayMarkup(board.mostOverlays, board.height)}
   <g id="score-components">

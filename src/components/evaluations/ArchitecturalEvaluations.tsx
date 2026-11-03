@@ -20,7 +20,6 @@ import {
   type FormDescriptorEvaluation,
 } from "./objDescriptorAnalysis";
 import DescriptorComparison from "./DescriptorComparison";
-import { findMatchingFilename } from "./formIdentity";
 
 const buttonStyle = { borderColor: "var(--line)", background: "var(--panel-soft)", color: "var(--ink)" } as const;
 
@@ -42,7 +41,7 @@ function PreviewMesh({ mesh, unit, upAxisMode }: { mesh: ImportedObj; unit: Unit
   return (
     <group ref={group}>
       <mesh geometry={geometry}>
-        <meshStandardMaterial color="#e8e4dc" roughness={0.72} metalness={0.02} />
+        <meshBasicMaterial color="#e8e4dc" />
       </mesh>
     </group>
   );
@@ -60,12 +59,13 @@ function FormPreview({ mesh, unit, upAxisMode }: { mesh: ImportedObj | null; uni
     <Canvas
       data-board-geometry
       frameloop="demand"
-      dpr={[1, 1.5]}
+      dpr={[1, 1.25]}
       camera={{ position: [48, 36, 48], fov: 40, near: 0.1, far: 4000 }}
+      gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
+      flat
       style={{ width: "100%", height: "100%", minHeight: 240, background: "#0a0a0a" }}
     >
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[40, 80, 30]} intensity={1.15} />
+      <ambientLight intensity={1} />
       <PreviewMesh mesh={mesh} unit={unit} upAxisMode={upAxisMode} />
       <OrbitControls makeDefault target={[0, 8, 0]} enableDamping={false} />
     </Canvas>
@@ -119,31 +119,8 @@ export default function ArchitecturalEvaluations() {
   const [status, setStatus] = useState("Waiting for the Lattice source registry…");
   const [selectedSlotId, setSelectedSlotId] = useState(LATTICE_SLOTS[0]?.id ?? "G1");
   const [explainId, setExplainId] = useState<ArchDescriptorId>("openVolume");
+  const [includeTopDecks, setIncludeTopDecks] = useState(true);
   const [results, setResults] = useState<Record<string, FormDescriptorEvaluation>>({});
-  const [registryRanks, setRegistryRanks] = useState<Record<string, Array<{ filename: string; absoluteScore: number; rank: number; cohortSize: number }>> | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/open-volume-registry")
-      .then((response) => (response.ok ? response.json() : null))
-      .then((body: { cohortSize?: number; forms?: Array<{ filename: string; absoluteScore: number; rank: number }>; descriptors?: Array<{ id: string; forms: Array<{ filename: string; absoluteScore: number; rank: number }> }> } | null) => {
-        if (cancelled || !body?.cohortSize) return;
-        const cohortSize = body.cohortSize;
-        const table: Record<string, Array<{ filename: string; absoluteScore: number; rank: number; cohortSize: number }>> = {};
-        for (const descriptor of body.descriptors ?? []) {
-          // Cohort is the official 15-form registry. A measured 0 is ranked.
-          table[descriptor.id] = descriptor.forms.map((form) => ({ ...form, cohortSize }));
-        }
-        if (!table.openVolume && body.forms) {
-          table.openVolume = body.forms.map((form) => ({ ...form, cohortSize }));
-        }
-        if (Object.keys(table).length) setRegistryRanks(table);
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const rows = useMemo(() => LATTICE_SLOTS.map((slot) => {
     const mesh = meshes.find((item) => item.id === assignments[slot.id]) ?? null;
@@ -151,14 +128,20 @@ export default function ArchitecturalEvaluations() {
     return { slot, mesh, result };
   }), [meshes, assignments, results]);
 
+  const analyzedCount = useMemo(() => rows.filter((row) => row.result?.status === "ready").length, [rows]);
   const selected = rows.find((row) => row.slot.id === selectedSlotId) ?? rows[0];
   const explain = selected?.result?.descriptors.find((item) => item.id === explainId) ?? selected?.result?.descriptors[0];
-  const registryRankFor = (descriptorId: string, filename: string | undefined) => (
-    findMatchingFilename(filename, registryRanks?.[descriptorId]) ?? null
+  const selectedSessionRank = explain?.comparativeRank !== undefined && explain.cohortSize
+    ? { rank: explain.comparativeRank, cohortSize: explain.cohortSize }
+    : null;
+  const stats = useMemo(
+    () => (selected?.mesh ? sourceStats(selected.mesh, unit, upAxisMode) : null),
+    [selected?.mesh, unit, upAxisMode],
   );
-  const selectedRegistryRank = explain ? registryRankFor(explain.id, selected?.mesh?.filename) : null;
-  const stats = selected?.mesh ? sourceStats(selected.mesh, unit, upAxisMode) : null;
-  const drawn = selected?.mesh ? previewStats(selected.mesh, unit, upAxisMode) : null;
+  const drawn = useMemo(
+    () => (selected?.mesh ? previewStats(selected.mesh, unit, upAxisMode) : null),
+    [selected?.mesh, unit, upAxisMode],
+  );
   const assignedCount = rows.filter((row) => row.mesh).length;
   const fidelityRows = useMemo(() => rows.map((row) => {
     if (!row.mesh) return { slot: row.slot, mesh: null as ImportedObj | null, match: false };
@@ -201,7 +184,7 @@ export default function ArchitecturalEvaluations() {
           faces: mesh.faces,
           up,
           unitScale: UNIT_TO_FEET[unit],
-        });
+        }, { includeTopDecks });
         nextModels[mesh.id] = model;
         nextResults[mesh.id] = {
           meshId: mesh.id,
@@ -222,7 +205,7 @@ export default function ArchitecturalEvaluations() {
       publishDescriptorRanks(ranked);
       setModels(nextModels);
       setResults(nextResults);
-      setStatus(`Analyzed ${targets.length} Lattice source OBJ${targets.length === 1 ? "" : "s"} · 12 descriptors each. Unassigned slots were skipped.`);
+      setStatus(`Analyzed ${targets.length} Lattice source OBJ${targets.length === 1 ? "" : "s"} · 12 descriptors each${includeTopDecks ? " · top decks included" : " · official v4.1 (top decks excluded)"}. Unassigned slots were skipped.`);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Analysis failed.");
     } finally {
@@ -254,7 +237,7 @@ export default function ArchitecturalEvaluations() {
     setBusy(true);
     setStatus("Loading Gathering Linear.obj and Lobby Continuous Hall.obj from the local original set…");
     try {
-      const names = ["Gathering Linear.obj", "Lobby Continuous Hall.obj"];
+      const names = ["Gathering Linear.obj", "Lobby, Cont Hall.obj"];
       const files: File[] = [];
       for (const name of names) {
         const response = await fetch(`/api/review-pair?file=${encodeURIComponent(name)}`);
@@ -322,12 +305,25 @@ export default function ArchitecturalEvaluations() {
           <button type="button" disabled={busy || !hydrated} className="rounded border px-2.5 py-1 text-[11px]" style={buttonStyle} onClick={() => void loadSamples()}>
             Load Sample OBJs
           </button>
+          <label className="flex items-center gap-1.5 text-[11px]" style={{ color: "var(--ink)" }}>
+            <input
+              type="checkbox"
+              checked={includeTopDecks}
+              disabled={busy}
+              onChange={(event) => {
+                setIncludeTopDecks(event.target.checked);
+                setResults({});
+                setModels({});
+              }}
+            />
+            Include top decks
+          </label>
         </div>
       </header>
 
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>{status}</p>
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>
-        Unit {unit}. Up axis {upAxisMode}. The recorded Open Volume scores use feet and Y-up.
+        Unit {unit}. Up axis {upAxisMode}. {includeTopDecks ? "Uncovered top decks on a counted level are scored as open-to-sky floor. Roof lids stay excluded. Press Analyze All Forms after changing this." : "Official v4.1: uncovered top decks are excluded from interior Open Volume, visibility, and light. Press Analyze All Forms after changing this."}
       </p>
       {!geometryPersisted && (
         <p className="text-[12px]" style={{ color: "var(--muted)" }}>
@@ -414,7 +410,7 @@ export default function ArchitecturalEvaluations() {
           {selected?.result?.status === "ready" && (
             <>
               <p className="text-[11px]" style={{ color: "var(--muted)" }}>
-                Every descriptor is ranked across the {registryRanks?.openVolume?.[0]?.cohortSize ?? 15}-form source registry. Rank 1 is the weakest result and the highest rank is the strongest. Open Volume calls those ends the least and most open volume. Neither rank is a grade of architectural quality.
+                Every descriptor is ranked across the {analyzedCount} analyzed form{analyzedCount === 1 ? "" : "s"} in this session. Rank 1 is the weakest result and the highest rank is the strongest. Open Volume calls those ends the least and most open volume. Neither rank is a grade of architectural quality.
               </p>
               <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 xl:grid-cols-4">
                 {selected.result.descriptors.map((descriptor) => (
@@ -430,8 +426,8 @@ export default function ArchitecturalEvaluations() {
                   >
                     <div style={{ color: "var(--muted)" }}>{descriptor.name}</div>
                     <div className="descriptor-rank text-base font-semibold">
-                      {registryRankFor(descriptor.id, selected.mesh?.filename)?.rank ?? (!Number.isFinite(descriptor.absoluteScore) ? "n/a" : registryRanks ? "—" : "…")}
-                      {registryRankFor(descriptor.id, selected.mesh?.filename) ? <span className="descriptor-rank-of"> / {registryRankFor(descriptor.id, selected.mesh?.filename)?.cohortSize}</span> : null}
+                      {descriptor.comparativeRank ?? (!Number.isFinite(descriptor.absoluteScore) ? "n/a" : "—")}
+                      {descriptor.comparativeRank !== undefined && descriptor.cohortSize ? <span className="descriptor-rank-of"> / {descriptor.cohortSize}</span> : null}
                     </div>
                     <div className="descriptor-rank-label text-[10px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
                       Rank · score {Number.isFinite(descriptor.absoluteScore) ? descriptor.absoluteScore.toFixed(1) : "n/a"}
@@ -455,9 +451,8 @@ export default function ArchitecturalEvaluations() {
                       <tr key={row.slot.id}>
                         <td className="px-1 py-1">{row.slot.id}</td>
                         {ARCH_DESCRIPTORS.map((descriptor) => {
-                          const registryRank = registryRankFor(descriptor.id, row.mesh?.filename);
                           const local = row.result?.descriptors.find((item) => item.id === descriptor.id);
-                          const shown = registryRank?.rank ?? (local && !Number.isFinite(local.absoluteScore) ? "n/a" : registryRanks ? "—" : "…");
+                          const shown = local?.comparativeRank ?? (local && !Number.isFinite(local.absoluteScore) ? "n/a" : "—");
                           return <td key={descriptor.id} className="px-1 py-1 text-right">{shown}</td>;
                         })}
                       </tr>
@@ -481,24 +476,32 @@ export default function ArchitecturalEvaluations() {
             <div className="mt-3 space-y-3">
               <div>
                 <div className="text-[13px] font-semibold uppercase tracking-wide">{explain.name}</div>
-                <div className="mt-2 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Registry rank</div>
+                <div className="mt-2 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Session rank</div>
                 <div className="descriptor-rank text-3xl font-semibold" style={{ color: "var(--accent)" }}>
-                  {selectedRegistryRank ? `${selectedRegistryRank.rank} / ${selectedRegistryRank.cohortSize}` : (registryRanks ? "—" : "…")}
+                  {selectedSessionRank ? `${selectedSessionRank.rank} / ${selectedSessionRank.cohortSize}` : "—"}
                 </div>
                 <div className="mt-1 text-[12px]">
                   {!Number.isFinite(explain.absoluteScore)
                     ? `Not ranked. ${explain.unavailableReason ?? "The geometry offered no evidence for this descriptor."}`
-                    : selectedRegistryRank
+                    : selectedSessionRank
                       ? (explain.id === "openVolume"
-                        ? `Rank ${selectedRegistryRank.rank} of ${selectedRegistryRank.cohortSize} in the source registry. 1 is the least open volume. ${selectedRegistryRank.cohortSize} is the most.`
-                        : `Rank ${selectedRegistryRank.rank} of ${selectedRegistryRank.cohortSize} in the source registry. 1 is the weakest ${explain.name}. ${selectedRegistryRank.cohortSize} is the strongest.`)
-                      : "Ranking every form in the source registry."}
+                        ? `Rank ${selectedSessionRank.rank} of ${selectedSessionRank.cohortSize} among analyzed forms in this session. 1 is the least open volume. ${selectedSessionRank.cohortSize} is the most.`
+                        : explain.id === "sequential"
+                          ? `Rank ${selectedSessionRank.rank} of ${selectedSessionRank.cohortSize} among analyzed forms in this session. Ranked by verified vertical gain, then higher levels reached. 1 is the least ascent. ${selectedSessionRank.cohortSize} is the most.`
+                        : `Rank ${selectedSessionRank.rank} of ${selectedSessionRank.cohortSize} among analyzed forms in this session. 1 is the weakest ${explain.name}. ${selectedSessionRank.cohortSize} is the strongest.`)
+                      : "Press Analyze All Forms to rank the loaded session forms."}
                 </div>
-                <div className="mt-3 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Absolute score · {explain.version ?? "v3.5"}</div>
+                <div className="mt-3 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>{explain.id === "sequential" ? "Verified vertical gain" : "Absolute score"} · {explain.version ?? "v3.5"}</div>
                 <div className="text-[18px] font-semibold" data-explain-score={Number.isFinite(explain.absoluteScore) ? explain.absoluteScore.toFixed(2) : "unavailable"}>
-                  {Number.isFinite(explain.absoluteScore) ? explain.absoluteScore.toFixed(1) : "Unavailable"}
+                  {Number.isFinite(explain.absoluteScore)
+                    ? (explain.id === "sequential" ? `${explain.absoluteScore.toFixed(1)} ft` : explain.absoluteScore.toFixed(1))
+                    : "Unavailable"}
                 </div>
-                <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>0–100 from fixed calibration thresholds. The rank is this score's place among all 15 registry forms. A genuine zero is ranked. n/a is reserved for a processing failure.</div>
+                <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>
+                  {explain.id === "sequential"
+                    ? "Verified rise above the main entry, in feet. Rank uses this gain first, then higher levels reached. Ties keep both measurements. A form with no verified upward connection is 0. This is not the previous 0–100 Sequential blend."
+                    : "0–100 from fixed calibration thresholds. The rank is this score's place among the analyzed forms in this session. A genuine zero is ranked. n/a is reserved for a processing failure."}
+                </div>
                 <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>
                   Confidence {selected.result.confidence}
                   {explain.relativePercentile !== undefined ? ` · percentile ${explain.relativePercentile}` : ""}
@@ -517,6 +520,8 @@ export default function ArchitecturalEvaluations() {
                         ? `${component.reason ?? "No evidence."} Left out of the score; remaining weights renormalized.`
                         : explain.id === "openVolume" && !explain.evidence
                           ? `raw ${component.raw ?? "—"} ${component.rawUnit ?? ""}. This places the form. It is not the rating.`
+                          : explain.id === "sequential"
+                            ? `raw ${typeof component.raw === "number" ? Number(component.raw.toFixed(3)) : "—"} ${component.rawUnit ?? ""}. ${component.name === "Verified Vertical Gain" ? "Primary rank key." : "Secondary rank key."}`
                           : `raw ${typeof component.raw === "number" ? Number(component.raw.toFixed(3)) : "—"} ${component.rawUnit ?? ""} · weight ${Math.round(component.weight * 100)}% · contribution ${component.contribution ?? 0}`}
                       {component.formula ? ` · ${component.formula}` : ""}
                     </div>
@@ -547,7 +552,6 @@ export default function ArchitecturalEvaluations() {
         onDescriptor={setExplainId}
         unit={unit}
         upAxisMode={upAxisMode}
-        registryRanks={registryRanks ?? undefined}
       />
     </div>
   );

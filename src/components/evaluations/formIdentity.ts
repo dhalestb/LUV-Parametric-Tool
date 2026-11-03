@@ -8,6 +8,11 @@
  */
 const SLOT_PREFIX = /^(g|o|l)\d[\s._-]*/i;
 
+/** Local abbreviations that should match the longer registry tokens. */
+const TOKEN_ALIASES: Record<string, string> = {
+  cont: "continuous",
+};
+
 export function formIdentityKey(filename: string): string {
   const base = filename.replace(/\\/g, "/").split("/").pop() ?? filename;
   const stem = base.replace(/\.obj$/i, "").toLowerCase();
@@ -15,6 +20,7 @@ export function formIdentityKey(filename: string): string {
   const tokens = stripped
     .split(/[^a-z0-9]+/)
     .filter((token) => token.length > 0)
+    .map((token) => TOKEN_ALIASES[token] ?? token)
     .sort();
   return tokens.join(" ");
 }

@@ -131,6 +131,11 @@ export type FloorField = {
 
 export const emptyClassAreas = (): Record<FloorClass, number> => ({ obstructed: 0, sheltered: 0, openVoid: 0, exposed: 0, uncertain: 0 });
 
+/** Uncovered deck on a counted level. Not a roof lid over a lower floor. */
+export function isCountedTopDeck(sample: FloorSample) {
+  return sample.levelId >= 0 && !sample.roofLid && sample.floorClass === "exposed";
+}
+
 /** 0 at or below the 5 ft gate, rising linearly to 1 at 10 ft. Null (nothing above) is 1. */
 export function clearanceCredit(clearance: number | null) {
   if (clearance === null) return 1;

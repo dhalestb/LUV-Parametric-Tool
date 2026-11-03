@@ -13,6 +13,10 @@ describe("formIdentity", () => {
     assert.ok(filenamesMatch("O4 workspace void.obj", "workspace void.obj"));
   });
 
+  it("treats Cont Hall as Continuous Hall", () => {
+    assert.ok(filenamesMatch("Lobby, Cont Hall.obj", "Lobby Continuous Hall.obj"));
+  });
+
   it("does not collapse distinct forms that share one token", () => {
     assert.equal(filenamesMatch("Gathering Linear.obj", "Lobby, Linear.obj"), false);
     assert.equal(filenamesMatch("Lobby Continuous Hall.obj", "workspace open hall.obj"), false);

@@ -1,9 +1,10 @@
 /**
  * v4 descriptor evaluation. Twelve evaluators share one geometric context built
  * from the original OBJ surfaces. Each returns components with intent, formula,
- * units, normalization, weight, raw value, 0–100 term, and the evidence layers
- * that illustrate it. A missing architectural characteristic scores 0 and is
- * still ranked. NaN is reserved for a genuine processing failure.
+ * units, normalization, weight, raw value, 0–100 term (except Sequential Ascent,
+ * which reports verified vertical gain in feet), and the evidence layers that
+ * illustrate it. A missing architectural characteristic scores 0 and is still
+ * ranked. NaN is reserved for a genuine processing failure.
  */
 import { DESCRIPTOR_ALGORITHM_VERSION } from "../descriptorVersion";
 import type { DescriptorSource } from "../objDescriptorAnalysis";
@@ -44,10 +45,12 @@ import {
   triangleArray,
   upperLowerDisplacement,
 } from "./formMeasures";
+import { measureAscent } from "./ascent";
 import { buildAnalysisMesh, distance, TriangleGrid, type AnalysisMesh, type Vec3 } from "./geometry";
 import {
   clearanceCredit,
   clearancePercentile,
+  isCountedTopDeck,
   sampleFloors,
   type FloorField,
   type FloorSample,
@@ -57,6 +60,11 @@ import { analyzeVoids, type VoidResult } from "./voids";
 
 export type V4Options = {
   eyeHeightFeet?: number;
+  /**
+   * Count uncovered top decks (exposed samples on a counted level, not roof
+   * lids) as occupiable open-to-sky floor. Official v4.1 scoring leaves this off.
+   */
+  includeTopDecks?: boolean;
 };
 
 export type V4Context = {
@@ -69,12 +77,13 @@ export type V4Context = {
   voids: VoidResult;
   light: LightResult;
   eyeHeight: number;
+  includeTopDecks: boolean;
 };
 
 export type V4DescriptorResult = {
   id: string;
   name: string;
-  /** Full-precision 0–100 or NaN when unavailable. */
+  /** Full-precision 0–100, Sequential verified gain in feet, or NaN when unavailable. */
   absoluteScore: number;
   available: boolean;
   unavailableReason?: string;
@@ -111,15 +120,16 @@ const ramp = (value: number, lo: number, hi: number) => pct((value - lo) / (hi -
 
 export function buildV4Context(source: DescriptorSource, sourceId: string, options: V4Options = {}): V4Context {
   const eyeHeight = options.eyeHeightFeet ?? EYE_HEIGHT_FEET;
+  const includeTopDecks = Boolean(options.includeTopDecks);
   const mesh = buildAnalysisMesh(source, sourceId);
   const grid = new TriangleGrid(mesh, 2);
   const field = sampleFloors(mesh, grid);
   const network = buildCirculationNetwork(field, grid);
-  const sameLevel = sameLevelVisibility(network, field, grid, eyeHeight);
-  const crossLevel = crossLevelVisibility(network, field, grid, eyeHeight);
+  const sameLevel = sameLevelVisibility(network, field, grid, eyeHeight, includeTopDecks);
+  const crossLevel = crossLevelVisibility(network, field, grid, eyeHeight, includeTopDecks);
   const voids = analyzeVoids(field, grid, mesh.bounds.planDiagonal);
-  const light = lightExposure(network, field, grid);
-  return { mesh, grid, field, network, sameLevel, crossLevel, voids, light, eyeHeight };
+  const light = lightExposure(network, field, grid, includeTopDecks);
+  return { mesh, grid, field, network, sameLevel, crossLevel, voids, light, eyeHeight, includeTopDecks };
 }
 
 type Draft = Omit<ComponentEvidence, "status"> & { status?: ComponentEvidence["status"] };
@@ -179,28 +189,35 @@ function finish(
 
 const samplePatches = (samples: FloorSample[], feet: number) => samples.map((sample) => squarePatch(sample.position, feet));
 
-function clearanceVolume(field: FloorField) {
+function clearanceVolume(field: FloorField, includeTopDecks = false) {
   let volume = 0;
   for (const sample of field.samples) {
     if (sample.floorClass === "sheltered") volume += sample.area * Math.min(VOLUME_CLEAR_CAP_FEET, sample.clearance ?? VOLUME_CLEAR_CAP_FEET);
-    else if (sample.floorClass === "openVoid") volume += sample.area * VOLUME_CLEAR_CAP_FEET;
+    else if (sample.floorClass === "openVoid" || (includeTopDecks && isCountedTopDeck(sample))) volume += sample.area * VOLUME_CLEAR_CAP_FEET;
   }
   return volume;
 }
 
+function scoredInteriorArea(field: FloorField, includeTopDecks: boolean) {
+  return field.interiorArea + (includeTopDecks ? field.samples.filter(isCountedTopDeck).reduce((sum, sample) => sum + sample.area, 0) : 0);
+}
+
 /* ------------------------------------------------------------------ Open Volume */
 function openVolume(ctx: V4Context): V4DescriptorResult {
-  const { field } = ctx;
+  const { field, includeTopDecks } = ctx;
   const feet = field.sampleFeet;
   const sheltered = field.samples.filter((sample) => sample.floorClass === "sheltered");
   const qualifying = sheltered.filter((sample) => clearanceCredit(sample.clearance) > 0);
+  const decks = includeTopDecks ? field.samples.filter(isCountedTopDeck) : [];
   const openVoid = field.samples.filter((sample) => sample.floorClass === "openVoid");
+  const creditedOpen = [...openVoid, ...decks];
   const obstructed = field.samples.filter((sample) => sample.floorClass === "obstructed");
-  const exposed = field.samples.filter((sample) => sample.floorClass === "exposed");
+  const exposed = field.samples.filter((sample) => sample.floorClass === "exposed" && !(includeTopDecks && isCountedTopDeck(sample)));
   const uncertain = field.samples.filter((sample) => sample.floorClass === "uncertain");
-  const interior = field.interiorArea;
+  const interior = scoredInteriorArea(field, includeTopDecks);
   const credit = sheltered.reduce((sum, sample) => sum + sample.area * clearanceCredit(sample.clearance), 0);
-  const volume = clearanceVolume(field);
+  const volume = clearanceVolume(field, includeTopDecks);
+  const openVoidArea = field.areaByClass.openVoid + decks.reduce((sum, sample) => sum + sample.area, 0);
   const components = [
     component({
       name: "Sheltered Clearance Share",
@@ -221,8 +238,8 @@ function openVolume(ctx: V4Context): V4DescriptorResult {
       units: "share",
       normalization: "share × 100",
       weight: 0.25,
-      raw: interior ? field.areaByClass.openVoid / interior : 0,
-      precise: interior ? pct(field.areaByClass.openVoid / interior) : 0,
+      raw: interior ? openVoidArea / interior : 0,
+      precise: interior ? pct(openVoidArea / interior) : 0,
       reason: interior ? undefined : "No interior floor surface found.",
       layerIds: ["ov-void"],
     }),
@@ -248,7 +265,7 @@ function openVolume(ctx: V4Context): V4DescriptorResult {
   const layers: EvidenceLayer[] = [
     patchLayer({ id: "ov-qualifying", label: "Qualifying sheltered clearance > 5 ft (measured)", color: PALETTE.gold, status: "measured", components: ["Sheltered Clearance Share"] }, samplePatches(qualifying, feet)),
     { ...patchLayer({ id: "ov-volume", label: "Translucent clearance volume above qualifying floor (sampled)", color: PALETTE.gold, status: "measured", components: ["Clearance Volume"], opacity: 0.12 }, prisms, 240), kind: "volume", total: qualifying.length },
-    patchLayer({ id: "ov-void", label: "Open void to sky, laterally enclosed (measured)", color: PALETTE.lightBlue, status: "measured", components: ["Open Void Share"] }, samplePatches(openVoid, feet)),
+    patchLayer({ id: "ov-void", label: includeTopDecks ? "Open void and counted top decks (measured)" : "Open void to sky, laterally enclosed (measured)", color: PALETTE.lightBlue, status: "measured", components: ["Open Void Share"] }, samplePatches(creditedOpen, feet)),
     patchLayer({ id: "ov-sheltered-low", label: "Sheltered interior at or below 5 ft credit (measured, no credit)", color: PALETTE.paleAqua, status: "measured", components: [] }, samplePatches(sheltered.filter((sample) => clearanceCredit(sample.clearance) === 0), feet)),
     patchLayer({ id: "ov-uncertain", label: "Uncertain exposure 0.25–0.5 enclosure (reported, not credited)", color: PALETTE.paleAqua, status: "potential", components: [] }, samplePatches(uncertain, feet)),
     patchLayer({ id: "ov-obstructed", label: "Obstructed ≤ 5 ft (excluded)", color: PALETTE.gray, status: "excluded", components: [] }, samplePatches(obstructed, feet)),
@@ -257,7 +274,8 @@ function openVolume(ctx: V4Context): V4DescriptorResult {
   return finish("openVolume", "Open Volume", ctx, "verified-geometric", components, layers, {
     interiorFloorAreaFt2: interior,
     shelteredAreaFt2: field.areaByClass.sheltered,
-    openVoidAreaFt2: field.areaByClass.openVoid,
+    openVoidAreaFt2: openVoidArea,
+    topDeckAreaFt2: decks.reduce((sum, sample) => sum + sample.area, 0),
     obstructedAreaFt2: field.areaByClass.obstructed,
     exposedAreaFt2: field.areaByClass.exposed,
     uncertainAreaFt2: field.areaByClass.uncertain,
@@ -440,11 +458,8 @@ function sculptural(ctx: V4Context): V4DescriptorResult {
     a: [mesh.bounds.min[0], mesh.bounds.min[1] - 1.5, (band.z0 + band.z1) / 2],
     b: [mesh.bounds.min[0] + (band.area / maxBand) * mesh.bounds.size[0], mesh.bounds.min[1] - 1.5, (band.z0 + band.z1) / 2],
   }));
-  const minorityLimit = 6000;
-  const minorityStep = Math.max(1, Math.ceil(minority.triangles.length / minorityLimit));
-  const minoritySampled = minority.triangles.filter((_, index) => index % minorityStep === 0);
   const layers: EvidenceLayer[] = [
-    segmentLayer({ id: "sc-folds", label: `Fold edges ≥ 30° (measured${strongFolds.length > 2500 ? ", sampled" : ""})`, color: PALETTE.gold, status: "measured", components: ["Adjacent Fold Angle"] }, strongFolds.map((edge) => ({ a: edge.a, b: edge.b }))),
+    segmentLayer({ id: "sc-folds", label: `Folds ≥ 30° (${strongFolds.length} edges)`, color: PALETTE.gold, status: "measured", components: ["Adjacent Fold Angle"] }, strongFolds.map((edge) => ({ a: edge.a, b: edge.b })), 8000),
     {
       id: "sc-orientation",
       label: "Minority-orientation surfaces (outside the dominant half of area)",
@@ -453,12 +468,12 @@ function sculptural(ctx: V4Context): V4DescriptorResult {
       status: "measured",
       components: ["Orientation Variety"],
       lineStyle: "solid",
-      triangles: triangleArray(minoritySampled, 0.02),
-      shown: minoritySampled.length,
+      triangles: triangleArray(minority.triangles, 0.02),
+      shown: minority.triangles.length,
       total: minority.triangles.length,
       opacity: 0.45,
     },
-    { ...segmentLayer({ id: "sc-bands", label: "Surface area per 2 ft band (bar length ∝ area)", color: PALETTE.midBlue, status: "measured", components: ["Sectional Variation"] }, bandBars), dimensions: bands.map((band, index) => ({ a: bandBars[index].a, b: bandBars[index].b, text: `${band.area.toFixed(0)} ft²` })) },
+    { ...segmentLayer({ id: "sc-bands", label: "Surface area per 2 ft band (bar length ∝ area)", color: PALETTE.gold, status: "measured", components: ["Sectional Variation"] }, bandBars), dimensions: bands.map((band, index) => ({ a: bandBars[index].a, b: bandBars[index].b, text: `${band.area.toFixed(0)} ft²` })) },
     pointLayer({ id: "sc-mirror", label: `Columns unmatched under ${mirror?.axis ?? "x"} mirror (reference symmetry)`, color: PALETTE.gray, status: "reference", components: ["Mirror Asymmetry"] }, (mirror?.unmatched ?? []).map((item): Vec3 => [item.x, item.y, item.z])),
   ];
   return finish("sculptural", "Sculptural", ctx, "verified-geometric", components, layers, {
@@ -632,7 +647,8 @@ function monumental(ctx: V4Context): V4DescriptorResult {
   const { mesh, field } = ctx;
   const height = mesh.bounds.size[2];
   const maxPlan = Math.max(mesh.bounds.size[0], mesh.bounds.size[1], 0.01);
-  const volume = clearanceVolume(field);
+  const volume = clearanceVolume(field, ctx.includeTopDecks);
+  const interior = scoredInteriorArea(field, ctx.includeTopDecks);
   const largest = field.levels.length ? field.levels.reduce((best, level) => (level.area > best.area ? level : best)) : null;
   const tallest = clearancePercentile(field.samples, 0.95);
   const components = [
@@ -654,9 +670,9 @@ function monumental(ctx: V4Context): V4DescriptorResult {
       units: "ft³",
       normalization: "0 → 0, 10 000 ft³ → 100",
       weight: 0.25,
-      raw: field.interiorArea ? volume : null,
-      precise: field.interiorArea ? ramp(volume, 0, MONUMENTAL_VOLUME_REFERENCE_FT3) : null,
-      reason: field.interiorArea ? undefined : "No interior floor surface.",
+      raw: interior ? volume : null,
+      precise: interior ? ramp(volume, 0, MONUMENTAL_VOLUME_REFERENCE_FT3) : null,
+      reason: interior ? undefined : "No interior floor surface.",
       layerIds: ["mo-volume"],
     }),
     component({
@@ -704,10 +720,15 @@ function monumental(ctx: V4Context): V4DescriptorResult {
     .slice(0, 200);
   const sheltered = field.samples.filter((sample) => sample.floorClass === "sheltered" || sample.floorClass === "openVoid");
   const volumeStep = Math.max(1, Math.ceil(sheltered.length / 200));
-  const volumeBoxes = sheltered.filter((_, index) => index % volumeStep === 0).map((sample) => boxPatch(
-    [sample.position[0] - 0.45, sample.position[1] - 0.45, sample.position[2] + 0.05],
-    [sample.position[0] + 0.45, sample.position[1] + 0.45, sample.position[2] + Math.min(VOLUME_CLEAR_CAP_FEET, sample.clearance ?? VOLUME_CLEAR_CAP_FEET)],
-  ));
+  const volumeBoxes = sheltered.filter((_, index) => index % volumeStep === 0).flatMap((sample) => {
+    const floor = sample.position[2] + 0.05;
+    const top = Math.min(sample.position[2] + Math.min(VOLUME_CLEAR_CAP_FEET, sample.clearance ?? VOLUME_CLEAR_CAP_FEET), max[2]);
+    if (top <= floor) return [];
+    return [boxPatch(
+      [sample.position[0] - 0.45, sample.position[1] - 0.45, floor],
+      [sample.position[0] + 0.45, sample.position[1] + 0.45, top],
+    )];
+  });
   const layers: EvidenceLayer[] = [
     { ...segmentLayer({ id: "mo-height", label: `Height ${height.toFixed(1)} ft (measured)`, color: PALETTE.gold, status: "measured", components: ["Height", "Vertical Dominance"] }, [heightLine]), dimensions: [{ ...heightLine, text: `${height.toFixed(1)} ft` }] },
     { ...segmentLayer({ id: "mo-plan", label: `Plan ${mesh.bounds.size[0].toFixed(1)} × ${mesh.bounds.size[1].toFixed(1)} ft (measured)`, color: PALETTE.cyan, status: "measured", components: ["Vertical Dominance"] }, [planX, planY]), dimensions: [{ ...planX, text: `${mesh.bounds.size[0].toFixed(1)} ft` }, { ...planY, text: `${mesh.bounds.size[1].toFixed(1)} ft` }] },
@@ -814,140 +835,62 @@ function hierarchical(ctx: V4Context): V4DescriptorResult {
   }, notes);
 }
 
-/* ------------------------------------------------------------------- Sequential */
+/* ----------------------------------------------------------- Sequential / Ascent */
 function sequential(ctx: V4Context): V4DescriptorResult {
-  const { network, field } = ctx;
-  const entries = [...network.entries].sort((left, right) => right.nodeIds.length - left.nodeIds.length || left.id - right.id);
-  const largestRegion = [...network.regions].sort((left, right) => right.area - left.area || left.id - right.id)[0];
-  const start = entries[0] ?? (largestRegion
-    ? { id: -1, nodeIds: largestRegion.nodeIds, centroid: largestRegion.centroid, outward: [1, 0, 0] as Vec3, levelId: largestRegion.levelId }
-    : null);
-  const potentialLinks = network.levelLinks.filter((link) => link.status === "potential");
-  const potentialSegments: Segment[] = potentialLinks.map((link) => {
-    const lower = field.levels.find((level) => level.id === link.lowerLevelId)!;
-    const upper = field.levels.find((level) => level.id === link.upperLevelId)!;
-    const anchor = link.anchor ?? lower.centroid;
-    return { a: [anchor[0], anchor[1], lower.elevation], b: [anchor[0], anchor[1], upper.elevation] };
-  });
-  if (!start) {
-    return finish("sequential", "Sequential", ctx, "verified-geometric", [
-      component({ name: "Sequence Length", intent: "Distinct floor regions on the longest verified route.", formula: "n / (n + 3)", units: "regions", normalization: "saturating", weight: 0.25, raw: 0, precise: 0, layerIds: ["sq-path"] }),
-      component({ name: "Transition Quality", intent: "Each region change should alter elevation, direction, scale, or enclosure.", formula: "mean change types / 3", units: "ratio", normalization: "ratio × 100", weight: 0.35, raw: 0, precise: 0, layerIds: ["sq-horizontal"] }),
-      component({ name: "Elevation Progression", intent: "The sequence climbs through the levels that exist.", formula: "(levels visited − 1) / (levels − 1)", units: "levels", normalization: "ratio × 100", weight: 0.15, raw: 0, precise: 0, layerIds: ["sq-vertical"] }),
-      component({ name: "Verified Share", intent: "Vertical moves that are geometrically supported.", formula: "verified / (verified + potential)", units: "share", normalization: "share × 100", weight: 0.25, raw: 0, precise: 0, layerIds: ["sq-potential"] }),
-    ], [
-      segmentLayer({ id: "sq-potential", label: "Potential vertical connection (unverified)", color: PALETTE.gray, status: "potential", components: ["Verified Share"], lineStyle: "dashed" }, potentialSegments),
-    ], { entries: 0 }, ["No occupiable route could start. Sequence is absent (scored 0) and the form is still ranked."]);
-  }
-  const { dist, prev } = shortestPaths(network, start.nodeIds);
-  let farthest = -1;
-  let farthestDist = -1;
-  for (let id = 0; id < network.nodes.length; id += 1) {
-    if (Number.isFinite(dist[id]) && dist[id] > farthestDist) {
-      farthestDist = dist[id];
-      farthest = id;
-    }
-  }
-  const pathIds = farthest >= 0 ? pathTo(prev, farthest) : [];
-  const path = pathIds.map((id) => network.nodes[id].position);
-  // Ordered regions along the path.
-  const events: Array<{ regionId: number; index: number }> = [];
-  for (let index = 0; index < pathIds.length; index += 1) {
-    const regionId = network.nodes[pathIds[index]].regionId;
-    if (regionId < 0) continue;
-    if (!events.length || events[events.length - 1].regionId !== regionId) events.push({ regionId, index });
-  }
-  const heading = (from: number, to: number): Vec3 | null => {
-    const a = path[Math.max(0, Math.min(path.length - 1, from))];
-    const b = path[Math.max(0, Math.min(path.length - 1, to))];
-    if (!a || !b) return null;
-    const d: Vec3 = [b[0] - a[0], b[1] - a[1], 0];
-    const len = Math.hypot(d[0], d[1]);
-    return len > 1e-6 ? [d[0] / len, d[1] / len, 0] : null;
-  };
-  const transitions: Array<{ at: Vec3; vertical: boolean; changes: number; kinds: string[] }> = [];
-  for (let index = 1; index < events.length; index += 1) {
-    const before = network.regions[events[index - 1].regionId];
-    const after = network.regions[events[index].regionId];
-    const kinds: string[] = [];
-    if (before.levelId !== after.levelId) kinds.push("elevation");
-    const h0 = heading(events[index].index - 5, events[index].index - 1);
-    const h1 = heading(events[index].index, events[index].index + 4);
-    if (h0 && h1 && h0[0] * h1[0] + h0[1] * h1[1] < Math.cos(Math.PI / 4)) kinds.push("direction");
-    const clearRatio = Math.max(before.meanClearance, after.meanClearance) / Math.max(0.1, Math.min(before.meanClearance, after.meanClearance));
-    const areaRatio = Math.max(before.area, after.area) / Math.max(1, Math.min(before.area, after.area));
-    if (clearRatio >= 1.5 || areaRatio >= 2) kinds.push("scale");
-    if (before.floorClass !== after.floorClass) kinds.push("enclosure");
-    transitions.push({ at: path[events[index].index], vertical: before.levelId !== after.levelId, changes: Math.min(3, kinds.length), kinds });
-  }
-  const n = events.length;
-  const quality = transitions.length ? transitions.reduce((sum, item) => sum + item.changes / 3, 0) / transitions.length : 0;
-  const visitedLevels = new Set(events.map((event) => network.regions[event.regionId].levelId));
-  const levelCount = field.levels.length;
-  const verticalVerified = transitions.filter((item) => item.vertical).length;
-  const relevantPotential = potentialLinks.filter((link) => visitedLevels.has(link.lowerLevelId) || visitedLevels.has(link.upperLevelId)).length;
+  const ascent = measureAscent(ctx.network, ctx.field);
+  const notes = [...ascent.notes];
+  if (!ascent.gainFeet && !notes.length) notes.push("No verified upward connection from the main entry. Ascent is 0 and the form is still ranked.");
   const components = [
     component({
-      name: "Sequence Length",
-      intent: "Number of distinct floor regions entered along the longest verified route from the main entry.",
-      formula: "n / (n + 3), n = regions in order",
-      units: "regions",
-      normalization: "saturating: 1 → 25, 3 → 50, 9 → 75",
-      weight: 0.25,
-      raw: n,
-      precise: pct(n / (n + 3)),
-      layerIds: ["sq-path", "sq-events"],
+      name: "Verified Vertical Gain",
+      intent: "How far the verified route rises above the main entry on supported walking surfaces.",
+      formula: "destination walking Z − main-entry walking Z; 0 when no supported upward route",
+      units: "ft",
+      normalization: "reported in feet; not a 0–100 term",
+      weight: 1,
+      raw: ascent.gainFeet,
+      precise: 0,
+      layerIds: ["sq-path", "sq-arrows", "sq-metrics"],
     }),
     component({
-      name: "Transition Quality",
-      intent: "Each region change should alter elevation, direction, scale, or enclosure.",
-      formula: "mean over transitions of min(3, change types) / 3; 0 when there is no transition",
-      units: "ratio",
-      normalization: "ratio × 100",
-      weight: 0.35,
-      raw: quality,
-      precise: pct(quality),
-      layerIds: ["sq-horizontal", "sq-vertical"],
-    }),
-    component({
-      name: "Elevation Progression",
-      intent: "The sequence climbs through the levels that exist.",
-      formula: "(levels visited − 1) / (levels − 1), verified route only",
+      name: "Higher Levels Reached",
+      intent: "Distinct detected floors above the entry that the displayed route actually visits.",
+      formula: "count of detected floors on the route with elevation above the entry level",
       units: "levels",
-      normalization: "ratio × 100",
-      weight: 0.15,
-      raw: levelCount >= 2 ? Math.max(0, visitedLevels.size - 1) : 0,
-      precise: levelCount >= 2 ? pct((visitedLevels.size - 1) / (levelCount - 1)) : 0,
-      layerIds: ["sq-path", "sq-vertical"],
-    }),
-    component({
-      name: "Verified Share",
-      intent: "Vertical moves in the sequence are geometrically supported rather than assumed.",
-      formula: "verified vertical transitions / (verified + potential links touching visited levels)",
-      units: "share",
-      normalization: "share × 100; unavailable when the sequence has no vertical move to verify",
-      weight: 0.25,
-      raw: verticalVerified + relevantPotential ? verticalVerified / (verticalVerified + relevantPotential) : 0,
-      precise: verticalVerified + relevantPotential ? pct(verticalVerified / (verticalVerified + relevantPotential)) : 0,
-      layerIds: ["sq-vertical", "sq-potential"],
+      normalization: "reported as a count; secondary rank key only",
+      weight: 0.5,
+      raw: ascent.higherLevelsReached,
+      precise: 0,
+      layerIds: ["sq-stages"],
     }),
   ];
   const layers: EvidenceLayer[] = [
-    polylineLayer({ id: "sq-path", label: `Verified sequence route ${farthestDist > 0 ? farthestDist.toFixed(0) + " ft" : ""}`.trim(), color: PALETTE.cyan, status: "verified", components: ["Sequence Length"] }, path.length >= 2 ? [path] : []),
-    arrowLayer({ id: "sq-direction", label: "Route direction", color: PALETTE.cyan, status: "verified", components: ["Sequence Length"] }, path.length >= 2 ? [{ a: path[Math.max(0, path.length - 4)], b: path[path.length - 1] }] : []),
-    pointLayer({ id: "sq-events", label: `Sequence events: regions entered in order (${n})`, color: PALETTE.gold, status: "measured", components: ["Sequence Length"] }, events.map((event) => path[event.index]), events.map((_, index) => String(index + 1))),
-    pointLayer({ id: "sq-horizontal", label: "Horizontal transition (measured)", color: PALETTE.paleAqua, status: "measured", components: ["Transition Quality"] }, transitions.filter((item) => !item.vertical).map((item) => item.at), transitions.filter((item) => !item.vertical).map((item) => item.kinds.join("/") || "none")),
-    pointLayer({ id: "sq-vertical", label: "Vertical transition (verified)", color: PALETTE.lightBlue, status: "verified", components: ["Transition Quality", "Elevation Progression", "Verified Share"] }, transitions.filter((item) => item.vertical).map((item) => item.at), transitions.filter((item) => item.vertical).map((item) => item.kinds.join("/"))),
-    segmentLayer({ id: "sq-potential", label: `Potential vertical connection, unverified (${potentialLinks.length})`, color: PALETTE.gray, status: "potential", components: ["Verified Share"], lineStyle: "dashed" }, potentialSegments),
+    polylineLayer({ id: "sq-path", label: "Verified ascent route", color: PALETTE.gold, status: "verified", components: ["Verified Vertical Gain"] }, ascent.path.length >= 2 ? [ascent.path] : []),
+    arrowLayer({ id: "sq-arrows", label: "Route progression", color: PALETTE.gold, status: "verified", components: ["Verified Vertical Gain"] }, ascent.riseArrows),
+    pointLayer(
+      { id: "sq-stages", label: "Entry, landings, and arrival", color: PALETTE.cyan, status: "verified", components: ["Higher Levels Reached"] },
+      ascent.stages.map((stage) => stage.position),
+      ascent.stages.map((stage) => `${stage.index} ${stage.kind}`),
+    ),
+    segmentLayer({ id: "sq-descent", label: "Necessary descent", color: PALETTE.gray, status: "excluded", components: [], lineStyle: "dotted" }, ascent.descentSegments),
+    {
+      ...segmentLayer({ id: "sq-metrics", label: "Vertical gain and higher levels", color: PALETTE.gold, status: "measured", components: ["Verified Vertical Gain"] }, ascent.metrics.map((item) => ({ a: item.a, b: item.b }))),
+      dimensions: [
+        ...ascent.metrics,
+        ...(ascent.riseLabel ? [ascent.riseLabel] : []),
+      ],
+    },
   ];
-  return finish("sequential", "Sequential", ctx, "verified-geometric", components, layers, {
-    regionsInSequence: n,
-    transitions: transitions.length,
-    verticalTransitions: verticalVerified,
-    potentialLinks: potentialLinks.length,
-    routeLengthFt: farthestDist > 0 ? farthestDist : 0,
-    levelsVisited: visitedLevels.size,
-  }, []);
+  const result = finish("sequential", "Sequential", ctx, "verified-geometric", components, layers, {
+    verifiedVerticalGainFt: Number(ascent.gainFeet.toFixed(3)),
+    higherLevelsReached: ascent.higherLevelsReached,
+    pathNodes: ascent.pathNodeIds.length,
+    hasDescent: ascent.hasDescent ? 1 : 0,
+    destinationLevelId: ascent.destinationLevelId >= 0 ? ascent.destinationLevelId : null,
+    entryLevelId: ascent.entry?.levelId ?? null,
+  }, notes);
+  result.absoluteScore = ascent.gainFeet;
+  return result;
 }
 
 /* -------------------------------------------------------- Circulation Activated */
@@ -1191,7 +1134,7 @@ function centralized(ctx: V4Context): V4DescriptorResult {
       total: radial.inner.length,
       opacity: 0.4,
     },
-    patchLayer({ id: "ce-inner-clear", label: "Central clear floor inside the ellipse (measured)", color: PALETTE.paleAqua, status: "measured", components: ["Inner Clearance Dominance"] }, samplePatches(innerClear, field.sampleFeet)),
+    patchLayer({ id: "ce-inner-clear", label: "Central clear floor inside the ellipse (measured)", color: PALETTE.lightBlue, status: "measured", components: ["Inner Clearance Dominance"] }, samplePatches(innerClear, field.sampleFeet)),
     { ...segmentLayer({ id: "ce-center", label: mass ? `Measured mass centre, offset ${(massOffset ?? 0).toFixed(1)} ft from bounding centre` : "Measured mass centre", color: PALETTE.cyan, status: "measured", components: ["Mass Centre Concentration", "Occupiable Centrality"] }, mass ? [{ a: [center[0], center[1], mesh.bounds.min[2] + 0.05], b: [mass[0], mass[1], mesh.bounds.min[2] + 0.05] }] : []), points: mass ? [[mass[0], mass[1], mesh.bounds.min[2] + 0.05]] : [] },
     segmentLayer({ id: "ce-guides", label: "Half-radius ellipse guides from the bounding centre (reference)", color: PALETTE.gray, status: "reference", components: ["Radial Concentration"] }, guides),
   ];

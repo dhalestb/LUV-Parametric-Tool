@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import AnalysisViewport, { createCameraBus } from "./AnalysisViewport";
 import { ARCH_DESCRIPTORS } from "./objDescriptorAnalysis";
-import { findMatchingFilename } from "./formIdentity";
 import type { ArchDescriptorId, FormDescriptorEvaluation } from "./objDescriptorAnalysis";
 import type { ImportedObj, TileModel, UpAxis, UpAxisMode, UnitName } from "../lattice/types";
 import { fileToSpec, resolvedUp, UNIT_TO_FEET, unpackCell } from "../lattice/types";
@@ -11,6 +10,8 @@ import { combinedBoundsSpec, triangleCount } from "../lattice/objFidelity";
 import { annotationSizes, BOARD_LAYOUT, BOARD_PRESETS, boardLineWidth, comparisonBoardSvg, paintComparisonBoard, paintGoldRegions, placeSection, sectionMapper, type BoardModel, type BoardRegion, type DrawContext, type ScoreMetric } from "./comparisonBoard";
 import { legendFromLayers, legendKind, projectLayers } from "./boardEvidence";
 import type { BoardOverlay } from "./comparisonBoard";
+import { ARROW_OPACITY_STANDARD, ARROW_WIDTH_STANDARD, GRAPHIC, VOLUME_OPACITY_STANDARD } from "./graphicStyle";
+import { presentLayers, presentationEmptyNote } from "./presentEvidence";
 import type { EvidenceLayer } from "./v4/evidence";
 import { selectDescriptorExtremes, type ComparedForm } from "./comparisonSelection";
 import { buildDescriptorEvidence, cellCenter, geometryContentRevision, resolveEvidence, spatialCategoriesForDescriptor, type SpatialEvidenceCategory } from "./descriptorEvidence";
@@ -181,8 +182,17 @@ function EvidenceLegend({
               style={{ borderColor: off ? "#B9BEC6" : layer.color, background: off ? "transparent" : kind === "patch" ? layer.color : "transparent", opacity: off ? 0.5 : 1 }}
               onClick={() => onToggle(layer.id)}
             >
-              {kind === "line" && <span className="block h-0 w-[16px]" style={{ borderTop: `2px ${layer.lineStyle === "dashed" ? "dashed" : "solid"} ${layer.color}` }} />}
-              {kind === "point" && <span className="block h-[6px] w-[6px]" style={{ background: layer.color }} />}
+              {kind === "line" && <span className="block h-0 w-[16px]" style={{ borderTop: `2px ${layer.lineStyle === "dotted" ? "dotted" : layer.lineStyle === "dashed" ? "dashed" : "solid"} ${layer.color}` }} />}
+              {kind === "point" && (
+                <span
+                  className="block h-[7px] w-[7px]"
+                  style={{
+                    background: layer.color,
+                    transform: layer.pointShape === "diamond" ? "rotate(45deg)" : undefined,
+                    borderRadius: layer.pointShape === "circle" || !layer.pointShape ? "50%" : 0,
+                  }}
+                />
+              )}
             </button>
             <span style={{ opacity: off ? 0.5 : 1 }}>
               {layer.label}{sampled}
@@ -208,7 +218,7 @@ function SectionCanvas({ lines, regions, overlays = [], label }: { lines: BoardM
     ctx.fillRect(0, 0, 640, 360);
     paintGoldRegions(browserDrawContext(ctx), regions, 360);
     for (const role of ["secondary", "silhouette", "cut"] as const) {
-      ctx.strokeStyle = "#F7F6F5";
+      ctx.strokeStyle = role === "cut" ? GRAPHIC.colors.massingFill : GRAPHIC.colors.massingEdge;
       ctx.lineWidth = boardLineWidth(role, 360);
       ctx.lineJoin = role === "cut" ? "miter" : "round";
       ctx.lineCap = role === "cut" ? "butt" : "round";
@@ -329,21 +339,25 @@ export default function DescriptorComparison({
   onDescriptor,
   unit,
   upAxisMode,
-  registryRanks,
 }: {
   rows: ComparisonRow[];
   descriptorId: ArchDescriptorId;
   onDescriptor: (id: ArchDescriptorId) => void;
   unit: UnitName;
   upAxisMode: UpAxisMode;
-  registryRanks?: Record<string, Array<{ filename: string; absoluteScore?: number; rank: number; cohortSize: number }>>;
 }) {
   const [view, setView] = useState<AnalysisView | "technical">("isometric");
   const [viewReset, setViewReset] = useState(0);
   const [scaleMode, setScaleMode] = useState<"physical" | "fit">("physical");
   const [showAnalysis, setShowAnalysis] = useState(true);
+  const [showNumbers, setShowNumbers] = useState(true);
+  const [showFills, setShowFills] = useState(true);
+  const [showEdges, setShowEdges] = useState(true);
   const [analysisOnly, setAnalysisOnly] = useState(false);
   const [opacity, setOpacity] = useState(ANALYSIS_OPACITY_STANDARD);
+  const [arrowOpacity, setArrowOpacity] = useState(ARROW_OPACITY_STANDARD);
+  const [volumeOpacity, setVolumeOpacity] = useState(VOLUME_OPACITY_STANDARD);
+  const [arrowWidth, setArrowWidth] = useState(ARROW_WIDTH_STANDARD);
   useEffect(() => {
     setOpacity((value) => (value < 0.35 ? ANALYSIS_OPACITY_STANDARD : value));
   }, []);
@@ -380,6 +394,9 @@ export default function DescriptorComparison({
   const [hiddenLayers, setHiddenLayers] = useState<Record<string, string[]>>({});
   /** v4 component focus: show only layers that support this component. */
   const [componentFocus, setComponentFocus] = useState<string>("all");
+  const [seatOnPlate, setSeatOnPlate] = useState(false);
+  const [showBlockedRays, setShowBlockedRays] = useState(false);
+  const [mergeFaces, setMergeFaces] = useState(false);
   useEffect(() => {
     setComponentFocus("all");
   }, [descriptorId]);
@@ -403,6 +420,9 @@ export default function DescriptorComparison({
       filename: row.mesh?.filename ?? "",
       geometryRevision: revision,
       absoluteScore: descriptor?.absoluteScore ?? null,
+      rankSecondary: descriptorId === "sequential"
+        ? (descriptor?.components.find((item) => item.name === "Higher Levels Reached")?.raw ?? 0)
+        : null,
       circulationFeasible: null,
       eligible: Boolean(row.mesh && row.result?.status === "ready" && descriptor && Number.isFinite(descriptor.absoluteScore)),
       ineligibleReason: !row.mesh
@@ -559,7 +579,7 @@ export default function DescriptorComparison({
     const feet = side === "least" ? fitted.feetPerPixelA : fitted.feetPerPixelB;
     const placed = placeSection(profile, silhouette, polygons, plane.orientation, data.bounds, { x: 0, y: 0, width, height }, feet, secondary);
     const map = sectionMapper(plane.orientation, data.bounds, { x: 0, y: 0, width, height }, feet);
-    const overlays = projectLayers(v4Layers(data), map, plane.orientation === "plan" ? null : plane);
+    const overlays = projectLayers(v4Layers(data), map, plane.orientation === "plan" ? null : plane, { showLabels: showNumbers, showFills, showEdges, arrowOpacity, volumeOpacity, arrowWidth });
     return { ...placed, cut, plane, goldCount: gold.length, overlays };
   }
 
@@ -636,9 +656,8 @@ export default function DescriptorComparison({
   /** v4 evidence layers for a form, after component focus and user toggles. */
   function v4Layers(data: NonNullable<typeof least>, applyHidden = true): EvidenceLayer[] {
     const all = data.item.descriptor?.evidence?.layers ?? [];
-    return all.filter((layer) => {
+    return presentLayers(all, descriptorId, { componentFocus, seatOnPlate, showBlocked: showBlockedRays, mergeFaces }).filter((layer) => {
       if (applyHidden && hiddenSet.has(layer.id)) return false;
-      if (componentFocus !== "all" && !layer.components.includes(componentFocus)) return false;
       return layer.total > 0 || (layer.dimensions?.length ?? 0) > 0;
     });
   }
@@ -717,21 +736,28 @@ export default function DescriptorComparison({
     const metrics = (descriptor: NonNullable<typeof least>["item"]["descriptor"]): ScoreMetric[] => (
       descriptor?.components.filter((component) => component.weight > 0).map((component) => ({
         name: component.name,
-        value: component.value,
+        value: descriptorId === "sequential" ? (component.raw ?? component.value) : component.value,
         weight: component.weight,
         unavailable: component.status === "unavailable",
       })) ?? []
     );
-    const rankText = (filename: string | undefined) => {
-      const rank = findMatchingFilename(filename, registryRanks?.[descriptorId]);
-      return rank ? `${rank.rank} of ${rank.cohortSize}` : null;
-    };
-    const scoreText = (descriptor: NonNullable<typeof least>["item"]["descriptor"]) => (
-      descriptor && Number.isFinite(descriptor.absoluteScore) ? descriptor.absoluteScore.toFixed(1) : "unavailable"
+    const rankText = (descriptor: NonNullable<typeof least>["item"]["descriptor"]) => (
+      descriptor?.comparativeRank !== undefined && descriptor.cohortSize
+        ? `${descriptor.comparativeRank} of ${descriptor.cohortSize}`
+        : null
     );
+    const scoreText = (descriptor: NonNullable<typeof least>["item"]["descriptor"]) => (
+      descriptor && Number.isFinite(descriptor.absoluteScore)
+        ? (descriptorId === "sequential" ? `${descriptor.absoluteScore.toFixed(1)} ft` : descriptor.absoluteScore.toFixed(1))
+        : "unavailable"
+    );
+    const higherLevelsText = (descriptor: NonNullable<typeof least>["item"]["descriptor"]) => {
+      const raw = descriptor?.components.find((item) => item.name === "Higher Levels Reached")?.raw;
+      return Number.isFinite(raw) ? `${raw} higher levels` : null;
+    };
     const dy = height * BOARD_LAYOUT.panelTop;
-    const leastRank = rankText(least.item.row.mesh?.filename);
-    const mostRank = rankText(most.item.row.mesh?.filename);
+    const leastRank = rankText(least.item.descriptor);
+    const mostRank = rankText(most.item.descriptor);
     const compared = `${selection.note} Least is ${least.item.row.mesh?.filename ?? "the lower form"} at ${leastRank ?? scoreText(least.item.descriptor)}. Most is ${most.item.row.mesh?.filename ?? "the higher form"} at ${mostRank ?? scoreText(most.item.descriptor)}.`;
     const panelWidth = width * BOARD_LAYOUT.panelWidth;
     const panelHeight = height * BOARD_LAYOUT.panelHeight;
@@ -741,7 +767,7 @@ export default function DescriptorComparison({
       const fitted = comparisonScale(least.bounds.size, most.bounds.size, scaleMode, { width: panelWidth, height: panelHeight });
       const feet = side === "least" ? fitted.feetPerPixelA : fitted.feetPerPixelB;
       const map = sectionMapper(plane.orientation, data.bounds, { x: left, y: dy, width: panelWidth, height: panelHeight }, feet);
-      return projectLayers(v4Layers(data), map, plane.orientation === "plan" ? null : plane);
+      return projectLayers(v4Layers(data), map, plane.orientation === "plan" ? null : plane, { showLabels: showNumbers, showFills, showEdges, arrowOpacity, volumeOpacity, arrowWidth });
     };
     const leastOverlays = overlaysFor("least", least, width * BOARD_LAYOUT.left);
     const mostOverlays = overlaysFor("most", most, width * BOARD_LAYOUT.right);
@@ -749,8 +775,10 @@ export default function DescriptorComparison({
     const legendItems = usesV4 ? legendFromLayers(drawnLayers) : undefined;
     const v4Notes = usesV4 ? [
       `Overlays are the v4 evaluator's recorded evidence in spec feet. ${orientation === "plan" ? "Plan shows every drawn layer." : "Sections show evidence within 6 ft of the cut."}`,
-      "Labels state measured, potential, verified, or excluded. Dashed lines are potential or obstructed; solid lines are measured or verified.",
-      "Absolute score is 0–100 from fixed calibration. Registry rank is the form's place among the 15 source OBJs. A missing characteristic scores 0 and is ranked. NaN is reserved for a processing failure.",
+      "Grey is the original massing. Cyan is measured surfaces, volumes, and positions. Yellow is verified routes, sightlines, and measurement directions. Dashed grey is a reference; dotted grey is potential.",
+      descriptorId === "sequential"
+        ? "Sequential Ascent reports verified vertical gain in feet from the main entry, then higher levels reached. It is not the previous 0–100 Sequential blend. A form with no verified upward connection is 0 and is ranked. Ties keep both measurements."
+        : "Absolute score is 0–100 from fixed calibration. Session rank is the form's place among the analyzed forms in this session. A missing characteristic scores 0 and is ranked. NaN is reserved for a processing failure.",
       "Shared architectural scale. Rank is not circulation feasibility.",
     ] : undefined;
     return {
@@ -760,12 +788,20 @@ export default function DescriptorComparison({
       title: "Lowest and highest scored forms for this descriptor",
       leastLabel: `${least.item.row.code}  ${least.item.row.mesh?.filename ?? ""}`,
       mostLabel: `${most.item.row.code}  ${most.item.row.mesh?.filename ?? ""}`,
-      leastScore: usesV4 ? `Score ${scoreText(least.item.descriptor)}` : (leastRank ?? scoreText(least.item.descriptor)),
-      mostScore: usesV4 ? `Score ${scoreText(most.item.descriptor)}` : (mostRank ?? scoreText(most.item.descriptor)),
-      leastScoreDetail: usesV4 ? `Registry rank ${leastRank ?? "pending"}` : undefined,
-      mostScoreDetail: usesV4 ? `Registry rank ${mostRank ?? "pending"}` : undefined,
-      leastHeading: descriptorId === "openVolume" ? "Lowest Open Volume Score." : usesV4 ? `Lowest ${descriptorName} score.` : undefined,
-      mostHeading: descriptorId === "openVolume" ? "Highest Open Volume Score." : usesV4 ? `Highest ${descriptorName} score.` : undefined,
+      leastScore: usesV4 ? `${descriptorId === "sequential" ? "Gain" : "Score"} ${scoreText(least.item.descriptor)}` : (leastRank ?? scoreText(least.item.descriptor)),
+      mostScore: usesV4 ? `${descriptorId === "sequential" ? "Gain" : "Score"} ${scoreText(most.item.descriptor)}` : (mostRank ?? scoreText(most.item.descriptor)),
+      leastScoreDetail: usesV4
+        ? (descriptorId === "sequential"
+          ? `${higherLevelsText(least.item.descriptor) ?? "0 higher levels"} · rank ${leastRank ?? "pending"}`
+          : `Session rank ${leastRank ?? "pending"}`)
+        : undefined,
+      mostScoreDetail: usesV4
+        ? (descriptorId === "sequential"
+          ? `${higherLevelsText(most.item.descriptor) ?? "0 higher levels"} · rank ${mostRank ?? "pending"}`
+          : `Session rank ${mostRank ?? "pending"}`)
+        : undefined,
+      leastHeading: descriptorId === "openVolume" ? "Lowest Open Volume Score." : descriptorId === "sequential" ? "Least verified ascent." : usesV4 ? `Lowest ${descriptorName} score.` : undefined,
+      mostHeading: descriptorId === "openVolume" ? "Highest Open Volume Score." : descriptorId === "sequential" ? "Most verified ascent." : usesV4 ? `Highest ${descriptorName} score.` : undefined,
       leastSection: descriptorId === "openVolume" || usesV4 ? sectionCaption(orientation, controlsFor("least").offset) : undefined,
       mostSection: descriptorId === "openVolume" || usesV4 ? sectionCaption(orientation, controlsFor("most").offset) : undefined,
       notes: usesV4 ? v4Notes : descriptorId === "openVolume" ? [
@@ -815,10 +851,10 @@ export default function DescriptorComparison({
     setOrientation("section-y");
   }
 
-  const rankingResolved = Boolean(registryRanks?.[descriptorId]?.length);
+  const rankingResolved = prepared.some((item) => item.descriptor?.comparativeRank !== undefined);
   function exportBlocked() {
     if (!rankingResolved) {
-      setExportNote("Registry ranking is still resolving. Export waits until every rank is known.");
+      setExportNote("Session ranking is not ready. Press Analyze All Forms, then export.");
       return true;
     }
     return false;
@@ -920,7 +956,7 @@ export default function DescriptorComparison({
     if (focus === "architectural-open" && diagramMode === "presentation") {
       const study = boundaryStudies[data === least ? "least" : "most"];
       const clearance = data.item.descriptor?.components.find((item) => item.name === "Surface Clearance");
-      const clearanceBit = clearance ? `Ordering measurement ${clearance.value}. The registry rank above is the rating.` : "";
+      const clearanceBit = clearance ? `Ordering measurement ${clearance.value}. The session rank above is the rating.` : "";
       return study ? `${clearanceBit} ${clearanceNote(study.clearance)}` : clearanceBit;
     }
     if (focus === "architectural-open") return `Diagnostic cells: ${markerCount} of ${free} rectangular-box cells. This inspection is not the Open Volume rating.`;
@@ -936,8 +972,10 @@ export default function DescriptorComparison({
     const layers = data && showAnalysis && !v4 ? openSpaceLayers(data, side) : null;
     const evidenceLayers = data && showAnalysis && v4 ? v4Layers(data) : [];
     const legendLayers = data && v4 ? v4Layers(data, false) : [];
-    const registryRank = findMatchingFilename(data?.item.row.mesh?.filename, registryRanks?.[descriptorId]);
     const descriptor = data?.item.descriptor;
+    const sessionRank = descriptor?.comparativeRank !== undefined && descriptor.cohortSize
+      ? { rank: descriptor.comparativeRank, cohortSize: descriptor.cohortSize }
+      : null;
     const available = descriptor ? Number.isFinite(descriptor.absoluteScore) : false;
     return (
       <div className="flex min-h-[420px] flex-col gap-2 rounded border p-2" style={{ borderColor: "var(--line)", background: "#000" }} data-analysis-panel={side}>
@@ -951,26 +989,42 @@ export default function DescriptorComparison({
             </div>
             <div className="flex flex-wrap items-end gap-4">
               <div>
-                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>Absolute score</div>
+                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{descriptorId === "sequential" ? "Verified vertical gain" : "Absolute score"}</div>
                 <div className="text-[28px] font-semibold leading-none" style={{ color: "#F7F6F5" }} data-absolute-score={available ? data.item.descriptor.absoluteScore.toFixed(2) : "unavailable"}>
-                  {available ? data.item.descriptor.absoluteScore.toFixed(1) : "Unavailable"}
+                  {available
+                    ? (descriptorId === "sequential" ? `${data.item.descriptor.absoluteScore.toFixed(1)} ft` : data.item.descriptor.absoluteScore.toFixed(1))
+                    : "Unavailable"}
                 </div>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>Registry rank</div>
-                <div className="text-[28px] font-semibold leading-none" style={{ color: "#F7F6F5" }} data-registry-rank={registryRank ? `${registryRank.rank}/${registryRank.cohortSize}` : available ? "pending" : "unavailable"}>
-                  {registryRank ? `${registryRank.rank} of ${registryRank.cohortSize}` : available ? "Ranking…" : "Not ranked"}
+                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{descriptorId === "sequential" ? "Higher levels reached" : "Session rank"}</div>
+                <div className="text-[28px] font-semibold leading-none" style={{ color: "#F7F6F5" }} data-registry-rank={sessionRank ? `${sessionRank.rank}/${sessionRank.cohortSize}` : available ? "pending" : "unavailable"}>
+                  {descriptorId === "sequential"
+                    ? `${data.item.descriptor.components.find((item) => item.name === "Higher Levels Reached")?.raw ?? 0}`
+                    : sessionRank ? `${sessionRank.rank} of ${sessionRank.cohortSize}` : available ? "Ranking…" : "Not ranked"}
                 </div>
               </div>
+              {descriptorId === "sequential" && (
+                <div>
+                  <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>Session rank</div>
+                  <div className="text-[28px] font-semibold leading-none" style={{ color: "#F7F6F5" }}>
+                    {sessionRank ? `${sessionRank.rank} of ${sessionRank.cohortSize}` : available ? "Ranking…" : "Not ranked"}
+                  </div>
+                </div>
+              )}
             </div>
             <p className="text-[11px]" style={{ color: "#F7F6F5" }}>
               {!available
                 ? (data.item.descriptor.unavailableReason ?? "The geometry offered no evidence for this descriptor.")
-                : registryRank
-                  ? (descriptorId === "openVolume"
-                    ? `Score is 0–100 from fixed calibration. 1 is the least open volume in the ${registryRank.cohortSize}-form source registry. ${registryRank.cohortSize} is the most.`
-                    : `Score is 0–100 from fixed calibration. 1 is the weakest ${descriptorName} in the ${registryRank.cohortSize}-form source registry. ${registryRank.cohortSize} is the strongest.`)
-                  : "Score is 0–100 from fixed calibration. Rank is the form’s place among every OBJ in the lattice source registry."}
+                : descriptorId === "sequential"
+                  ? (sessionRank
+                    ? `Ranked by verified vertical gain, then higher levels reached. 1 is the least ascent among the ${sessionRank.cohortSize} analyzed forms. ${sessionRank.cohortSize} is the most. Ties keep both measurements.`
+                    : "Ranked by verified vertical gain, then higher levels reached. A form with no verified upward connection is 0.")
+                  : sessionRank
+                    ? (descriptorId === "openVolume"
+                      ? `Score is 0–100 from fixed calibration. 1 is the least open volume among the ${sessionRank.cohortSize} analyzed forms in this session. ${sessionRank.cohortSize} is the most.`
+                      : `Score is 0–100 from fixed calibration. 1 is the weakest ${descriptorName} among the ${sessionRank.cohortSize} analyzed forms in this session. ${sessionRank.cohortSize} is the strongest.`)
+                    : "Score is 0–100 from fixed calibration. Rank is the form’s place among the analyzed forms in this session."}
             </p>
             {focusId() === "architectural-open" && diagramMode === "presentation" && !v4 && (
               <p className="text-[11px]" style={{ color: "#D6AD4F" }}>
@@ -996,9 +1050,9 @@ export default function DescriptorComparison({
                   bus={cameraBus}
                   showMesh={!(analysisOnly && showAnalysis)}
                   markers={showAnalysis && !v4 ? categoryMarkers(data, side) : []}
-                  evidenceRays={showAnalysis && !v4 ? categoryRays(data, side) : []}
+                  evidenceRays={showAnalysis && showEdges && !v4 ? categoryRays(data, side) : []}
                   layers={evidenceLayers}
-                  fieldCells={layers?.field ?? null}
+                  fieldCells={showFills ? (layers?.field ?? null) : null}
                   fieldAnchor={layers?.anchor ?? null}
                   fieldOpacity={layers?.volumes ? 0.34 : 0.28}
                   shellCells={layers?.shell ?? null}
@@ -1010,9 +1064,15 @@ export default function DescriptorComparison({
                   guideSegments={layers?.guides ?? []}
                   guideColor={layers?.guideColor}
                   dimensionSegments={layers?.dimensions ?? []}
-                  volumeTriangles={layers?.volumes ?? null}
+                  volumeTriangles={showFills ? (layers?.volumes ?? null) : null}
                   discardedNormal={clip?.normal ?? null}
                   label={`${side} ${descriptorName} ${view}`}
+                  showMeasurementText={v4 && showNumbers}
+                  showFills={showFills}
+                  showEdges={showEdges}
+                  arrowOpacity={arrowOpacity}
+                  volumeOpacity={volumeOpacity}
+                  arrowWidth={arrowWidth}
                 />
               )}
             </div>
@@ -1027,7 +1087,7 @@ export default function DescriptorComparison({
               <>
                 <div className="text-[10px] uppercase tracking-wide" style={{ color: "#71BEDA" }}>Legend · drawn layers</div>
                 <EvidenceLegend layers={legendLayers} hidden={hiddenSet} onToggle={toggleLayer} side={side} />
-                {!legendLayers.length && <p className="text-[10px]" style={{ color: "#B9BEC6" }}>No evidence layer is drawn for this component focus.</p>}
+                {!legendLayers.length && <p className="text-[10px]" style={{ color: "#B9BEC6" }}>{presentationEmptyNote(descriptorId, evidenceLayers) ?? "No evidence layer is drawn for this component focus."}</p>}
               </>
             )}
             {descriptorId !== "openVolume" && !v4 && (
@@ -1045,7 +1105,7 @@ export default function DescriptorComparison({
                       ? `unavailable · ${component.reason ?? "no evidence"}`
                       : descriptorId === "openVolume" && !v4
                         ? `clearance ${component.value}`
-                        : `${component.value} · weight ${Math.round(component.weight * 100)}% · ${component.contribution ?? 0} pts`}
+                        : `${component.value} · ${Math.round(component.weight * 100)}% → ${component.contribution ?? 0} pts`}
                   </span>
                 </li>
               ))}
@@ -1106,18 +1166,29 @@ export default function DescriptorComparison({
     }
     const sizes = annotationSizes(height);
     const margin = Math.round(width * 0.03);
+    const slideLayout = width === 1284 && height === 494;
     ctx.fillStyle = "#000000";
     ctx.fillRect(0, 0, width, height);
-    const panelTop = Math.round(height * 0.22);
-    const panelHeight = Math.round(height * 0.56);
-    const panelWidth = Math.round(width * 0.44);
-    const lefts = [Math.round(width * 0.04), Math.round(width * 0.52)];
+    // 1284×494: leave a gap under the score line, then fill to ~1/4" (24px @ 96dpi) above the bottom.
+    const bottomPad = slideLayout ? 24 : 0;
+    const panelTop = slideLayout ? Math.round(height * 0.20) : Math.round(height * 0.22);
+    const panelHeight = slideLayout
+      ? Math.max(1, height - bottomPad - panelTop)
+      : Math.round(height * 0.56);
+    const panelWidth = slideLayout ? Math.round(width * 0.46) : Math.round(width * 0.44);
+    const lefts = slideLayout
+      ? [Math.round(width * 0.03), Math.round(width * 0.51)]
+      : [Math.round(width * 0.04), Math.round(width * 0.52)];
     sources.forEach((source, index) => {
       if (!source) return;
       const ratio = Math.min(panelWidth / source.width, panelHeight / source.height);
       const drawW = source.width * ratio;
       const drawH = source.height * ratio;
-      ctx.drawImage(source, lefts[index] + (panelWidth - drawW) / 2, panelTop + (panelHeight - drawH) / 2, drawW, drawH);
+      const x = lefts[index] + (panelWidth - drawW) / 2;
+      const y = slideLayout
+        ? panelTop + panelHeight - drawH // bottom-align to the 1/4" margin
+        : panelTop + (panelHeight - drawH) / 2;
+      ctx.drawImage(source, x, y, drawW, drawH);
     });
     const sides: Array<[NonNullable<typeof least> | null, number]> = [[least, lefts[0]], [most, lefts[1]]];
     ctx.fillStyle = "#F7F6F5";
@@ -1125,14 +1196,16 @@ export default function DescriptorComparison({
     ctx.fillText(`${descriptorName} · ${view}`, margin, Math.round(height * 0.05));
     for (const [data, x] of sides) {
       if (!data) continue;
-      const rank = registryRanks?.[descriptorId]?.find((item) => item.filename === data.item.row.mesh?.filename);
+      const rank = data.item.descriptor?.comparativeRank !== undefined && data.item.descriptor.cohortSize
+        ? `${data.item.descriptor.comparativeRank} of ${data.item.descriptor.cohortSize}`
+        : null;
       const score = data.item.descriptor && Number.isFinite(data.item.descriptor.absoluteScore) ? data.item.descriptor.absoluteScore.toFixed(1) : "unavailable";
       ctx.fillStyle = GOLD;
       ctx.font = `${sizes.heading}px Arial, Helvetica, sans-serif`;
       ctx.fillText(data.item.row.mesh?.filename ?? "", x, Math.round(height * 0.11));
       ctx.fillStyle = "#F7F6F5";
       ctx.font = `${sizes.value}px Arial, Helvetica, sans-serif`;
-      ctx.fillText(`Absolute score ${score} · Registry rank ${rank ? `${rank.rank} of ${rank.cohortSize}` : "pending"}`, x, Math.round(height * 0.16));
+      ctx.fillText(`Absolute score ${score} · Session rank ${rank ?? "pending"}`, x, Math.round(height * 0.16));
     }
     const legendLayers = [...(least ? v4Layers(least) : []), ...(most ? v4Layers(most) : [])];
     const legendItems = legendFromLayers(legendLayers);
@@ -1148,10 +1221,27 @@ export default function DescriptorComparison({
         ctx.fillStyle = item.color;
         ctx.strokeStyle = item.color;
         if (item.kind === "patch") ctx.fillRect(x, y - sizes.swatch * 0.8, sizes.swatch, sizes.swatch * 0.8);
-        else if (item.kind === "point") ctx.fillRect(x + sizes.swatch * 0.3, y - sizes.swatch * 0.65, sizes.swatch * 0.4, sizes.swatch * 0.5);
+        else if (item.kind === "point") {
+          const cx = x + sizes.swatch * 0.5;
+          const cy = y - sizes.swatch * 0.35;
+          const r = sizes.swatch * 0.28;
+          ctx.beginPath();
+          if (item.pointShape === "square") ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+          else if (item.pointShape === "diamond") {
+            ctx.moveTo(cx, cy - r);
+            ctx.lineTo(cx + r, cy);
+            ctx.lineTo(cx, cy + r);
+            ctx.lineTo(cx - r, cy);
+            ctx.closePath();
+            ctx.fill();
+          } else {
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
         else {
           ctx.lineWidth = Math.max(1.5, 2.2 * (height / 2160));
-          ctx.setLineDash(item.dashed ? [6 * (height / 2160), 5 * (height / 2160)] : []);
+          ctx.setLineDash(item.dotted ? [2 * (height / 2160), 4 * (height / 2160)] : item.dashed ? [6 * (height / 2160), 5 * (height / 2160)] : []);
           ctx.beginPath();
           ctx.moveTo(x, y - sizes.swatch * 0.4);
           ctx.lineTo(x + sizes.swatch, y - sizes.swatch * 0.4);
@@ -1163,9 +1253,6 @@ export default function DescriptorComparison({
         ctx.fillText(item.label, x + sizes.swatch * 1.5, y);
       });
     }
-    ctx.fillStyle = "#71BEDA";
-    ctx.font = `${sizes.secondary}px Arial, Helvetica, sans-serif`;
-    ctx.fillText(`${selection.note} Absolute score is 0–100 from fixed calibration; rank is the place among the 15 source OBJs. Source OBJ geometry was not modified.`, margin, Math.round(height * 0.86));
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
     if (!blob) {
       setExportNote("3D PNG encoding failed. No file was saved.");
@@ -1205,6 +1292,11 @@ export default function DescriptorComparison({
       <p className="mt-2 text-[11px]" style={{ color: "#71BEDA" }}>
         Circulation feasibility is not part of this score. A high Monumental or Sculptural result can still fail a circulation constraint.
       </p>
+      {usesV4 && (
+        <p className="mt-2 text-[11px]" style={{ color: "#B9BEC6" }}>
+          Grey is the original massing. Cyan is measured surfaces, volumes, and positions. Yellow is verified routes, sightlines, and measurement directions. {descriptorId === "convergent" ? "Connected entries are light-blue dots. The destination is a larger cyan dot." : "Squares mark entries, circles mark samples, diamonds mark destinations."} Scores and ranks are unchanged.
+        </p>
+      )}
       <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
         <span style={{ color: "var(--muted)" }}>View</span>
         {([
@@ -1221,12 +1313,34 @@ export default function DescriptorComparison({
       <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
         <span style={{ color: "var(--muted)" }}>Analysis</span>
         <button type="button" aria-pressed={showAnalysis} className="rounded border px-2 py-1" style={{ borderColor: "var(--line)" }} onClick={() => setShowAnalysis((value) => !value)}>{showAnalysis ? "On" : "Off"}</button>
+        <button type="button" aria-pressed={showNumbers} className="rounded border px-2 py-1" style={{ borderColor: showNumbers ? "var(--accent)" : "var(--line)" }} disabled={!showAnalysis} onClick={() => setShowNumbers((value) => !value)}>{showNumbers ? "Numbers on" : "Numbers off"}</button>
+        <button type="button" aria-pressed={showFills} className="rounded border px-2 py-1" style={{ borderColor: showFills ? "var(--accent)" : "var(--line)" }} disabled={!showAnalysis} onClick={() => setShowFills((value) => !value)}>{showFills ? "Fills on" : "Fills off"}</button>
+        <button type="button" aria-pressed={showEdges} className="rounded border px-2 py-1" style={{ borderColor: showEdges ? "var(--accent)" : "var(--line)" }} disabled={!showAnalysis} onClick={() => setShowEdges((value) => !value)}>{showEdges ? "Edges on" : "Edges off"}</button>
+        <button type="button" aria-pressed={mergeFaces} className="rounded border px-2 py-1" style={{ borderColor: mergeFaces ? "var(--accent)" : "var(--line)" }} disabled={!showAnalysis} onClick={() => setMergeFaces((value) => !value)}>{mergeFaces ? "Merged faces" : "All faces"}</button>
+        {(descriptorId === "luminous" || descriptorId === "visuallyConnected") && (
+          <button type="button" aria-pressed={seatOnPlate} className="rounded border px-2 py-1" style={{ borderColor: seatOnPlate ? "var(--accent)" : "var(--line)" }} disabled={!showAnalysis} onClick={() => setSeatOnPlate((value) => !value)}>{seatOnPlate ? "On plate" : "Above plate"}</button>
+        )}
+        {descriptorId === "luminous" && (
+          <button type="button" aria-pressed={showBlockedRays} className="rounded border px-2 py-1" style={{ borderColor: showBlockedRays ? "var(--accent)" : "var(--line)" }} disabled={!showAnalysis} onClick={() => setShowBlockedRays((value) => !value)}>{showBlockedRays ? "Blocked rays on" : "Blocked rays off"}</button>
+        )}
         <button type="button" aria-pressed={analysisOnly} className="rounded border px-2 py-1" style={{ borderColor: "var(--line)" }} disabled={!showAnalysis || view === "technical"} onClick={() => setAnalysisOnly((value) => !value)}>{analysisOnly ? "Analysis only" : "Form and analysis"}</button>
         <label>
           Opacity {opacity.toFixed(2)}
           <input className="ml-2 align-middle" type="range" min={0.35} max={0.9} step={0.01} value={opacity} onChange={(event) => setOpacity(Number(event.target.value))} />
         </label>
-        <button type="button" className="rounded border px-2 py-1" style={{ borderColor: "var(--line)" }} onClick={() => setOpacity(ANALYSIS_OPACITY_STANDARD)}>Standard opacity</button>
+        <label>
+          Arrows {arrowOpacity.toFixed(2)}
+          <input className="ml-2 align-middle" type="range" min={0.05} max={1} step={0.01} value={arrowOpacity} disabled={!showAnalysis} onChange={(event) => setArrowOpacity(Number(event.target.value))} />
+        </label>
+        <label>
+          Volume {volumeOpacity.toFixed(2)}
+          <input className="ml-2 align-middle" type="range" min={0.05} max={1} step={0.01} value={volumeOpacity} disabled={!showAnalysis} onChange={(event) => setVolumeOpacity(Number(event.target.value))} />
+        </label>
+        <label>
+          Width {arrowWidth.toFixed(2)}
+          <input className="ml-2 align-middle" type="range" min={0.25} max={3} step={0.05} value={arrowWidth} disabled={!showAnalysis} onChange={(event) => setArrowWidth(Number(event.target.value))} />
+        </label>
+        <button type="button" className="rounded border px-2 py-1" style={{ borderColor: "var(--line)" }} onClick={() => { setOpacity(ANALYSIS_OPACITY_STANDARD); setArrowOpacity(ARROW_OPACITY_STANDARD); setVolumeOpacity(VOLUME_OPACITY_STANDARD); setArrowWidth(ARROW_WIDTH_STANDARD); }}>Standard opacity</button>
         {usesV4 ? (
           <label>
             Component layers
@@ -1299,7 +1413,7 @@ export default function DescriptorComparison({
           ] as const).map(([id, label]) => (
             <button key={id} type="button" aria-pressed={evidenceFocus === id} className="rounded border px-2 py-1" style={{ borderColor: evidenceFocus === id ? "var(--accent)" : "var(--line)" }} onClick={() => setEvidenceFocus(id)}>{label}</button>
           ))}
-          {largestGap && <span style={{ color: "#D6AD4F" }}>{descriptorId === "openVolume" ? "The two forms are ordered by measured clearance. The rating above is each form’s place in the source registry." : `Largest weighted difference: ${largestGap.name} (${largestGap.gap >= 0 ? "+" : ""}${largestGap.gap.toFixed(1)} points)`}</span>}
+          {largestGap && <span style={{ color: "#D6AD4F" }}>{descriptorId === "openVolume" && !usesV4 ? "The two forms are ordered by measured clearance. The rating above is each form’s place among the analyzed session forms." : `Largest weighted difference: ${largestGap.name} (${largestGap.gap >= 0 ? "+" : ""}${largestGap.gap.toFixed(1)} points)`}</span>}
         </div>
       )}
       {openFocus && focusedMetric === "architectural-open" && (
@@ -1307,13 +1421,13 @@ export default function DescriptorComparison({
           <span style={{ color: "var(--muted)" }}>Diagram</span>
           <button type="button" aria-pressed={diagramMode === "presentation"} className="rounded border px-2 py-1" style={{ borderColor: diagramMode === "presentation" ? "var(--accent)" : "var(--line)" }} onClick={() => setDiagramMode("presentation")}>Architectural</button>
           <button type="button" aria-pressed={diagramMode === "diagnostic"} className="rounded border px-2 py-1" style={{ borderColor: diagramMode === "diagnostic" ? "var(--accent)" : "var(--line)" }} onClick={() => setDiagramMode("diagnostic")}>Diagnostic cells</button>
-          <span style={{ color: "#B9BEC6" }}>The cream mesh is the imported form. Gold fills the clearance that places the form in the registry.</span>
+          <span style={{ color: "#B9BEC6" }}>The cream mesh is the imported form. Gold fills the clearance that places the form in the session ranking.</span>
         </div>
       )}
       {openFocus && contributionRows.length > 0 && (
         <p className="mt-2 text-[11px]" style={{ color: "#F7F6F5" }}>
           {descriptorId === "openVolume"
-            ? "Measured clearance orders these two forms. Their ratings are the registry ranks above."
+            ? "Measured clearance orders these two forms. Their ratings are the session ranks above."
             : contributionRows.map((row) => `${row.name} ${row.left} / ${row.right} (weighted ${row.leftWeight.toFixed(1)} / ${row.rightWeight.toFixed(1)})`).join(" · ")}
         </p>
       )}
@@ -1337,7 +1451,7 @@ export default function DescriptorComparison({
       )}
       <p className="mt-2 text-[11px]" style={{ color: "var(--muted)" }}>
         {usesV4
-          ? "Evidence layers are the v4 evaluator's recorded measurements on the original surfaces. Each legend entry is a drawn layer; toggle it or focus one component."
+          ? "Presentation layers restyle the evaluator's recorded measurements. Grey is the massing, cyan is measured space, yellow is verified connection. Toggle a layer or focus one component; the score does not change."
           : openFocus && categoryId === "overall" ? `Overall comparison. Focused evidence: ${focusedMetric === "permeability" ? "Permeability" : focusedMetric === "architectural-open" ? "Surface clearance" : focusedMetric === "interstitial" ? "Interstitial Space" : "Low Mass"}.` : descriptorId === "openVolume" ? "One measurement is drawn." : "Gold and cyan mark the measurements that place this rank."} The mesh stays the reference. Moving a cut or hiding a layer does not recalculate the score.
       </p>
       <details className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>

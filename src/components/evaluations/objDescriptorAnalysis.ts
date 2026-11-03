@@ -438,6 +438,8 @@ export type EvaluateOptions = {
   algorithm?: DescriptorAlgorithmVersion;
   /** v4 eye height for sightline tests, feet. */
   eyeHeightFeet?: number;
+  /** Include counted uncovered top decks in Open Volume, visibility, and light. */
+  includeTopDecks?: boolean;
 };
 
 /**
@@ -447,7 +449,7 @@ export type EvaluateOptions = {
 export function evaluateTileModel(model: TileModel, source?: DescriptorSource, options: EvaluateOptions = {}): CachedEvaluation {
   const algorithm = options.algorithm ?? (source ? DESCRIPTOR_ALGORITHM_VERSION : LEGACY_DESCRIPTOR_ALGORITHM_VERSION);
   if (algorithm === LEGACY_DESCRIPTOR_ALGORITHM_VERSION || !source) return evaluateTileModelLegacy(model, source);
-  return evaluateTileModelV4(model, source, { eyeHeightFeet: options.eyeHeightFeet });
+  return evaluateTileModelV4(model, source, { eyeHeightFeet: options.eyeHeightFeet, includeTopDecks: options.includeTopDecks });
 }
 
 const v4Cache = new Map<string, CachedEvaluation>();
@@ -465,6 +467,7 @@ function v4Key(model: TileModel, source: DescriptorSource, options: V4Options) {
   mix(Math.round(source.unitScale * 1000));
   mix(source.up === "y" ? 1 : 2);
   mix(Math.round((options.eyeHeightFeet ?? 0) * 100));
+  mix(options.includeTopDecks ? 1 : 0);
   return `${DESCRIPTOR_ALGORITHM_VERSION}:${model.id}:${hash >>> 0}`;
 }
 

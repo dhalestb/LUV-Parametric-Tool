@@ -115,6 +115,18 @@ function twoRooms(height = 12, size = 30) {
   return m.source();
 }
 
+/** Walkable stair: ground, 0.7 ft treads, upper landing. Adjacent plates only — no invented overlap. */
+function steppedAscent() {
+  const m = new MeshBuilder();
+  m.plate(0, 0, 20, 0, 16);
+  for (let step = 1; step <= 12; step += 1) {
+    const x0 = 20 + (step - 1) * 3;
+    m.plate(step * 0.7, x0, x0 + 3, 4, 12);
+  }
+  m.plate(8.4, 56, 76, 0, 16);
+  return m.source();
+}
+
 /** Two disconnected 12 × 12 slabs 20 ft apart. No connecting floor. */
 function disconnectedPlates() {
   const m = new MeshBuilder();
@@ -196,8 +208,8 @@ function term(evaluation: ReturnType<typeof evaluateV4>, id: string, name: strin
 }
 
 describe("v4 version constants", () => {
-  it("publishes v4.1 and keeps v3.5 as the legacy constant", () => {
-    assert.equal(DESCRIPTOR_ALGORITHM_VERSION, "v4.1");
+  it("publishes v4.3.0 and keeps v3.5 as the legacy constant", () => {
+    assert.equal(DESCRIPTOR_ALGORITHM_VERSION, "v4.3.0");
     assert.equal(LEGACY_DESCRIPTOR_ALGORITHM_VERSION, "v3.5");
   });
 });
@@ -295,10 +307,10 @@ describe("v4 descriptor behaviour on fixtures", () => {
   const stackedEval = evaluateV4(stacked(), "stacked");
 
   it("reports twelve descriptors with the v4 version and a source hash", () => {
-    assert.equal(hall.version, "v4.1");
+    assert.equal(hall.version, "v4.3.0");
     assert.equal(hall.descriptors.length, 12);
     assert.match(hall.sourceHash, /^[0-9a-f]{8}$/);
-    for (const item of hall.descriptors) assert.equal(item.evidence.version, "v4.1");
+    for (const item of hall.descriptors) assert.equal(item.evidence.version, "v4.3.0");
   });
 
   it("scores Open Volume high for a 14 ft clear hall and reports a bare slab as having no interior", () => {
@@ -314,6 +326,13 @@ describe("v4 descriptor behaviour on fixtures", () => {
     const lowOpen = descriptor(low, "openVolume");
     assert.ok(lowOpen.available);
     assert.ok(lowOpen.absoluteScore > 0 && lowOpen.absoluteScore < hallOpen.absoluteScore, `low ${lowOpen.absoluteScore} vs hall ${hallOpen.absoluteScore}`);
+  });
+
+  it("credits a counted top deck when includeTopDecks is on", () => {
+    const included = evaluateV4(openSlab(), "slab-decks", { includeTopDecks: true });
+    const open = descriptor(included, "openVolume");
+    assert.ok(open.absoluteScore > 0, `expected credited deck volume, got ${open.absoluteScore}`);
+    assert.equal(descriptor(slab, "openVolume").absoluteScore, 0);
   });
 
   it("scores a missing characteristic as 0 and still ranks the form", () => {
@@ -334,6 +353,20 @@ describe("v4 descriptor behaviour on fixtures", () => {
     const convergent = descriptor(door, "convergent");
     assert.ok(convergent.available);
     assert.ok(Number.isFinite(convergent.absoluteScore));
+  });
+
+  it("scores Sequential as verified ascent, not stacked plates or a 0–100 blend", () => {
+    const stair = evaluateV4(steppedAscent(), "stair-ascent");
+    const stairSeq = descriptor(stair, "sequential");
+    const slabSeq = descriptor(slab, "sequential");
+    const stackedSeq = descriptor(stackedEval, "sequential");
+    assert.ok(stairSeq.absoluteScore > 6, `walkable stair should gain above the entry, got ${stairSeq.absoluteScore}`);
+    assert.equal(slabSeq.absoluteScore, 0);
+    assert.equal(stackedSeq.absoluteScore, 0, "stacked plates without a supported route are not ascent");
+    assert.equal(term(stair, "sequential", "Verified Vertical Gain").raw, stairSeq.absoluteScore);
+    assert.ok(stairSeq.evidence.layers.some((layer) => layer.id === "sq-path"));
+    assert.ok(stairSeq.evidence.layers.some((layer) => layer.id === "sq-stages"));
+    assert.ok(!stairSeq.evidence.layers.some((layer) => layer.id === "sq-layers"));
   });
 
   it("gives a closed box measured-zero light, not unavailable", () => {
@@ -393,6 +426,12 @@ describe("v4 descriptor behaviour on fixtures", () => {
       }
       if (!weight) {
         assert.equal(item.absoluteScore, 0);
+        continue;
+      }
+      if (item.id === "sequential") {
+        const gain = item.evidence.components.find((component) => component.name === "Verified Vertical Gain");
+        assert.equal(item.absoluteScore, gain?.raw ?? 0);
+        assert.ok(item.absoluteScore >= 0);
         continue;
       }
       const reconstructed = measured.reduce((sum, component) => sum + (component.precise as number) * component.weight, 0) / weight;

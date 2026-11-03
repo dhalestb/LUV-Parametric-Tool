@@ -14,14 +14,43 @@ import {
   type AnalysisView,
   type ClipPlane,
 } from "./analysisViewer";
+import { GRAPHIC, isGoldArrow, isGoldPath, isVolumeOverlay } from "./graphicStyle";
 import { specFeetToFile, type Vec3 } from "./geometryView";
+import { architecturalEdges, type Triangle } from "./meshSection";
 import { freeCellShell } from "./openVolumeDisplay";
 import type { Segment } from "./meshSection";
 import type { EvidenceLayer } from "./v4/evidence";
 
-/** Radius of evidence polylines and arrows in feet. Thin on purpose. */
-const LAYER_TUBE_FEET = 0.16;
-const LAYER_POINT_FEET = 0.42;
+/** Analysis tubes are 2–3× the massing edge weight. */
+const LAYER_TUBE_FEET = GRAPHIC.line.analysisFeet;
+
+function fileTriangles(geometry: THREE.BufferGeometry): Triangle[] {
+  const position = geometry.getAttribute("position");
+  if (!position) return [];
+  const index = geometry.getIndex();
+  const read = (at: number): Vec3 => [position.getX(at), position.getY(at), position.getZ(at)];
+  const triangles: Triangle[] = [];
+  if (index) {
+    for (let step = 0; step + 2 < index.count; step += 3) {
+      triangles.push({ a: read(index.getX(step)), b: read(index.getX(step + 1)), c: read(index.getX(step + 2)) });
+    }
+    return triangles;
+  }
+  for (let step = 0; step + 2 < position.count; step += 3) {
+    triangles.push({ a: read(step), b: read(step + 1), c: read(step + 2) });
+  }
+  return triangles;
+}
+
+function edgeGeometry(segments: Segment[]): THREE.BufferGeometry {
+  const positions: number[] = [];
+  for (const segment of segments) {
+    positions.push(segment.a[0], segment.a[1], segment.a[2], segment.b[0], segment.b[1], segment.b[2]);
+  }
+  const next = new THREE.BufferGeometry();
+  next.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  return next;
+}
 
 function textSprite(text: string, color: string, feet: number): { sprite: THREE.Sprite; dispose: () => void } | null {
   if (typeof document === "undefined") return null;
@@ -59,7 +88,7 @@ function textSprite(text: string, color: string, feet: number): { sprite: THREE.
 function tubeGeometry(points: THREE.Vector3[][], radius: number): THREE.BufferGeometry | null {
   const positions: number[] = [];
   const yAxis = new THREE.Vector3(0, 1, 0);
-  const unit = new THREE.CylinderGeometry(radius, radius, 1, 5, 1, true);
+  const unit = new THREE.CylinderGeometry(radius, radius, 1, 3, 1, true);
   const unitPositions = unit.getAttribute("position") as THREE.BufferAttribute;
   const index = unit.getIndex();
   const vertex = new THREE.Vector3();
@@ -186,6 +215,7 @@ function CameraRig({
   useEffect(() => {
     const orbit = controls as OrbitBinding | null;
     if (!orbit?.addEventListener) return;
+    let frame = 0;
     const publish = () => {
       if (!sync || bus.applying) return;
       bus.pose = {
@@ -194,7 +224,11 @@ function CameraRig({
         zoom: camera.zoom,
       };
       bus.source = panelId;
-      bus.listeners.forEach((listener) => listener(panelId));
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        bus.listeners.forEach((listener) => listener(panelId));
+      });
     };
     const apply = (source: string) => {
       if (!sync || source === panelId || !bus.pose) return;
@@ -210,6 +244,7 @@ function CameraRig({
     orbit.addEventListener("change", publish);
     bus.listeners.add(apply);
     return () => {
+      if (frame) cancelAnimationFrame(frame);
       orbit.removeEventListener("change", publish);
       bus.listeners.delete(apply);
     };
@@ -254,6 +289,11 @@ function AnalyticalMesh({
   volumeTriangles,
   layers,
   showMeasurementText = false,
+  showFills = true,
+  showEdges = true,
+  arrowOpacity = 1,
+  volumeOpacity = 1,
+  arrowWidth = 1,
 }: {
   mesh: ImportedObj;
   unitScale: number;
@@ -277,22 +317,29 @@ function AnalyticalMesh({
   volumeTriangles: Float32Array | null;
   layers: EvidenceLayer[];
   showMeasurementText: boolean;
+  showFills: boolean;
+  showEdges: boolean;
+  arrowOpacity: number;
+  volumeOpacity: number;
+  arrowWidth: number;
 }) {
   const group = useRef<THREE.Group>(null);
   const markerAnchor = useRef<THREE.Group>(null);
   const layerAnchor = useRef<THREE.Group>(null);
   const geometry = useMemo(() => buildCompleteFileGeometry(mesh), [mesh]);
   const clipPlane = useMemo(() => new THREE.Plane(), []);
-  const meshMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: "#F7F6F5",
-    roughness: 0.72,
-    metalness: 0.02,
-    side: THREE.FrontSide,
+  const meshMaterial = useMemo(() => new THREE.MeshBasicMaterial({
+    color: GRAPHIC.colors.massingFill,
+    transparent: true,
+    opacity: GRAPHIC.massing.opacity,
+    depthWrite: false,
+    side: THREE.DoubleSide,
   }), []);
-  const fieldMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+  const massingEdges = useMemo(() => architecturalEdges(fileTriangles(geometry)), [geometry]);
+  const silhouetteGeometry = useMemo(() => edgeGeometry(massingEdges.silhouette), [massingEdges]);
+  const creaseGeometry = useMemo(() => edgeGeometry(massingEdges.secondary), [massingEdges]);
+  const fieldMaterial = useMemo(() => new THREE.MeshBasicMaterial({
     color: "#D6AD4F",
-    roughness: 0.58,
-    metalness: 0.04,
     transparent: true,
     opacity: 0.42,
     side: THREE.DoubleSide,
@@ -312,19 +359,15 @@ function AnalyticalMesh({
     polygonOffsetFactor: -2,
     polygonOffsetUnits: -2,
   }), []);
-  const shellMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+  const shellMaterial = useMemo(() => new THREE.MeshBasicMaterial({
     color: "#71BEDA",
-    roughness: 0.4,
-    metalness: 0,
     transparent: true,
     opacity: 0.22,
     side: THREE.DoubleSide,
     depthWrite: false,
   }), []);
-  const contextMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+  const contextMaterial = useMemo(() => new THREE.MeshBasicMaterial({
     color: "#0E6F92",
-    roughness: 0.7,
-    metalness: 0,
     transparent: true,
     opacity: 0.18,
     side: THREE.DoubleSide,
@@ -381,6 +424,8 @@ function AnalyticalMesh({
   }, [unitScale, up, volumeTriangles]);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
+  useEffect(() => () => silhouetteGeometry.dispose(), [silhouetteGeometry]);
+  useEffect(() => () => creaseGeometry.dispose(), [creaseGeometry]);
   useEffect(() => () => cutGeometry.dispose(), [cutGeometry]);
   useEffect(() => () => guideGeometry.dispose(), [guideGeometry]);
   useEffect(() => () => dimensionGeometry.dispose(), [dimensionGeometry]);
@@ -405,20 +450,15 @@ function AnalyticalMesh({
   }, [mesh, unitScale, upAxisMode]);
 
   useEffect(() => {
-    const field = Boolean(fieldCells?.length);
-    const showVolume = Boolean(volumeTriangles?.length) || layers.length > 0;
-    const revealInterior = showVolume;
-    const ghost = revealInterior || (field && !clip);
-    const revealMarkers = !clip && markers.length > 0 && !field && !showVolume;
-    meshMaterial.transparent = ghost || revealMarkers;
-    meshMaterial.opacity = revealInterior ? (clip ? 0.62 : 0.78) : ghost ? 0.9 : 1;
-    meshMaterial.depthWrite = !revealInterior && !ghost && !revealMarkers;
-    meshMaterial.side = clip || revealInterior ? THREE.DoubleSide : THREE.FrontSide;
+    meshMaterial.transparent = true;
+    meshMaterial.opacity = GRAPHIC.massing.opacity;
+    meshMaterial.depthWrite = false;
+    meshMaterial.side = THREE.DoubleSide;
     const gold = fieldOpacity ?? (clip ? 0.55 : 0.42);
     const sectionFloor = fieldOpacity != null && fieldOpacity < 0.25 ? fieldOpacity : 0.5;
-    fieldMaterial.opacity = clip ? Math.max(gold, sectionFloor) : gold;
+    fieldMaterial.opacity = (clip ? Math.max(gold, sectionFloor) : gold) * volumeOpacity;
     fieldMaterial.depthWrite = false;
-    volumeMaterial.opacity = fieldOpacity ?? 0.38;
+    volumeMaterial.opacity = (fieldOpacity ?? 0.38) * volumeOpacity;
     volumeMaterial.transparent = true;
     volumeMaterial.alphaHash = false;
     volumeMaterial.depthWrite = false;
@@ -438,7 +478,7 @@ function AnalyticalMesh({
     meshMaterial.needsUpdate = true;
     fieldMaterial.needsUpdate = true;
     volumeMaterial.needsUpdate = true;
-  }, [clip, clipPlane, contextMaterial, fieldCells, fieldMaterial, fieldOpacity, layers.length, markers.length, meshMaterial, shellMaterial, volumeMaterial, volumeTriangles]);
+  }, [clip, clipPlane, contextMaterial, fieldCells, fieldMaterial, fieldOpacity, layers.length, markers.length, meshMaterial, shellMaterial, volumeMaterial, volumeOpacity, volumeTriangles]);
 
   // v4 evidence layers: patches, lines, polylines, arrows, points, and dimension text, all in spec feet.
   useEffect(() => {
@@ -449,46 +489,91 @@ function AnalyticalMesh({
     const toFile = (point: Vec3) => new THREE.Vector3(...specFeetToFile(point, up, unitScale));
     const clippingPlanes = clip ? [clipPlane] : [];
     const feet = 1 / (unitScale || 1);
-    const sphere = new THREE.SphereGeometry(LAYER_POINT_FEET * feet, 12, 10);
-    const cone = new THREE.ConeGeometry(LAYER_TUBE_FEET * 3.2 * feet, LAYER_TUBE_FEET * 9 * feet, 10);
-    disposers.push(() => sphere.dispose(), () => cone.dispose());
+    const sphere = new THREE.SphereGeometry(GRAPHIC.marker.sample * feet, 8, 6);
+    const cube = new THREE.BoxGeometry(GRAPHIC.marker.entry * feet * 1.6, GRAPHIC.marker.entry * feet * 1.6, GRAPHIC.marker.entry * feet * 1.6);
+    const diamond = new THREE.OctahedronGeometry(GRAPHIC.marker.destination * feet, 0);
+    const cone = new THREE.ConeGeometry(LAYER_TUBE_FEET * 3.2 * feet, LAYER_TUBE_FEET * 9 * feet, 6);
+    const instanceMatrix = new THREE.Matrix4();
+    const instanceScale = new THREE.Vector3();
+    const instanceQuat = new THREE.Quaternion();
+    disposers.push(() => sphere.dispose(), () => cube.dispose(), () => diamond.dispose(), () => cone.dispose());
+    const markerGeometry = (shape: EvidenceLayer["pointShape"]) => (shape === "square" ? cube : shape === "diamond" ? diamond : sphere);
     const yAxis = new THREE.Vector3(0, 1, 0);
+    const pathWidth = (layer: EvidenceLayer) => (isGoldPath(layer) ? arrowWidth : 1);
+    const scaleOpacity = (layer: EvidenceLayer, base: number) => (
+      isVolumeOverlay(layer) ? base * volumeOpacity : isGoldArrow(layer) ? base * arrowOpacity : base
+    );
     layers.forEach((layer, order) => {
       const renderOrder = 4 + order;
-      if ((layer.kind === "patch" || layer.kind === "volume") && layer.triangles?.length) {
-        const positions = new Float32Array(layer.triangles.length);
-        for (let index = 0; index < layer.triangles.length; index += 3) {
-          const file = specFeetToFile([layer.triangles[index], layer.triangles[index + 1], layer.triangles[index + 2]], up, unitScale);
+      const hasPatch = (layer.kind === "patch" || layer.kind === "volume") && !!layer.triangles?.length;
+      const needFill = hasPatch && showFills;
+      const needMeshEdges = hasPatch && showEdges && !layer.hideInternalEdges;
+      const clearVolume = layer.id === "ce-inner-clear";
+      const lightBlueFill = clearVolume || layer.id === "mo-level";
+      if (needFill || needMeshEdges) {
+        const positions = new Float32Array(layer.triangles!.length);
+        for (let index = 0; index < layer.triangles!.length; index += 3) {
+          const file = specFeetToFile([layer.triangles![index], layer.triangles![index + 1], layer.triangles![index + 2]], up, unitScale);
           positions[index] = file[0];
           positions[index + 1] = file[1];
           positions[index + 2] = file[2];
         }
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-        const material = new THREE.MeshBasicMaterial({
+        geometry.computeVertexNormals();
+        if (needFill) {
+          const material = new THREE.MeshBasicMaterial({
+            color: lightBlueFill ? "#71BEDA" : layer.color,
+            transparent: true,
+            opacity: scaleOpacity(layer, clearVolume ? 0.85 : layer.opacity ?? (layer.kind === "volume" ? 0.14 : 0.55)),
+            side: THREE.DoubleSide,
+            depthWrite: false,
+            depthTest: !clearVolume,
+            polygonOffset: true,
+            polygonOffsetFactor: -2,
+            polygonOffsetUnits: -2,
+            clippingPlanes,
+          });
+          const patch = new THREE.Mesh(geometry, material);
+          patch.frustumCulled = false;
+          patch.renderOrder = renderOrder;
+          anchor.add(patch);
+          disposers.push(() => material.dispose());
+        }
+        if (needMeshEdges) {
+          const outline = new THREE.EdgesGeometry(geometry, 1);
+          const outlineMaterial = new THREE.LineBasicMaterial({
+            color: lightBlueFill ? "#71BEDA" : layer.color,
+            transparent: true,
+            opacity: scaleOpacity(layer, layer.emphasis === "primary" ? 0.95 : 0.72),
+            depthTest: false,
+            clippingPlanes,
+          });
+          const boundary = new THREE.LineSegments(outline, outlineMaterial);
+          boundary.frustumCulled = false;
+          boundary.renderOrder = renderOrder + 1;
+          anchor.add(boundary);
+          disposers.push(() => outline.dispose(), () => outlineMaterial.dispose());
+        }
+        disposers.push(() => geometry.dispose());
+      }
+      const lineMaterial = () => layer.lineStyle === "solid"
+        ? new THREE.LineBasicMaterial({ color: layer.color, depthTest: false, transparent: true, opacity: scaleOpacity(layer, 0.95), linewidth: 2, clippingPlanes })
+        : new THREE.LineDashedMaterial({
           color: layer.color,
+          dashSize: (layer.lineStyle === "dotted" ? 0.16 : 0.55) * feet,
+          gapSize: (layer.lineStyle === "dotted" ? 0.22 : 0.32) * feet,
+          depthTest: false,
           transparent: true,
-          opacity: layer.opacity ?? (layer.kind === "volume" ? 0.14 : 0.55),
-          side: THREE.DoubleSide,
-          depthWrite: false,
-          polygonOffset: true,
-          polygonOffsetFactor: -2,
-          polygonOffsetUnits: -2,
+          opacity: scaleOpacity(layer, layer.lineStyle === "dotted" ? 0.55 : 0.72),
           clippingPlanes,
         });
-        const patch = new THREE.Mesh(geometry, material);
-        patch.frustumCulled = false;
-        patch.renderOrder = renderOrder;
-        anchor.add(patch);
-        disposers.push(() => geometry.dispose(), () => material.dispose());
-      }
-      const lineMaterial = () => layer.lineStyle === "dashed"
-        ? new THREE.LineDashedMaterial({ color: layer.color, dashSize: 0.5 * feet, gapSize: 0.3 * feet, depthTest: false, transparent: true, opacity: 0.9, clippingPlanes })
-        : new THREE.LineBasicMaterial({ color: layer.color, depthTest: false, transparent: true, opacity: 0.95, clippingPlanes });
       const segmentPairs: Array<[Vec3, Vec3]> = [];
-      for (const segment of layer.segments ?? []) segmentPairs.push([segment.a, segment.b]);
-      if (showMeasurementText) {
-        for (const dimension of layer.dimensions ?? []) if (dimension.a !== dimension.b) segmentPairs.push([dimension.a, dimension.b]);
+      if (showEdges) {
+        for (const segment of layer.segments ?? []) segmentPairs.push([segment.a, segment.b]);
+        if (showMeasurementText) {
+          for (const dimension of layer.dimensions ?? []) if (dimension.a !== dimension.b) segmentPairs.push([dimension.a, dimension.b]);
+        }
       }
       if (segmentPairs.length) {
         const positions: number[] = [];
@@ -501,19 +586,21 @@ function AnalyticalMesh({
         geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
         const material = lineMaterial();
         const lines = new THREE.LineSegments(geometry, material);
-        if (layer.lineStyle === "dashed") lines.computeLineDistances();
+        if (layer.lineStyle !== "solid") lines.computeLineDistances();
         lines.frustumCulled = false;
         lines.renderOrder = renderOrder;
         anchor.add(lines);
         disposers.push(() => geometry.dispose(), () => material.dispose());
       }
       const tubes: THREE.Vector3[][] = [];
-      for (const polyline of layer.polylines ?? []) tubes.push(polyline.map(toFile));
-      for (const arrow of layer.arrows ?? []) tubes.push([toFile(arrow.a), toFile(arrow.b)]);
+      if (showEdges) {
+        for (const polyline of layer.polylines ?? []) tubes.push(polyline.map(toFile));
+        for (const arrow of layer.arrows ?? []) tubes.push([toFile(arrow.a), toFile(arrow.b)]);
+      }
       if (tubes.length) {
-        const geometry = tubeGeometry(tubes, LAYER_TUBE_FEET * feet);
+        const geometry = tubeGeometry(tubes, LAYER_TUBE_FEET * feet * pathWidth(layer));
         if (geometry) {
-          const material = new THREE.MeshBasicMaterial({ color: layer.color, depthTest: false, transparent: true, opacity: layer.status === "potential" ? 0.6 : 0.95, clippingPlanes });
+          const material = new THREE.MeshBasicMaterial({ color: layer.color, depthTest: false, transparent: true, opacity: scaleOpacity(layer, layer.status === "potential" ? 0.6 : 0.95), clippingPlanes });
           const tube = new THREE.Mesh(geometry, material);
           tube.frustumCulled = false;
           tube.renderOrder = renderOrder + 1;
@@ -521,9 +608,11 @@ function AnalyticalMesh({
           disposers.push(() => geometry.dispose(), () => material.dispose());
         }
       }
-      if (layer.arrows?.length) {
-        const material = new THREE.MeshBasicMaterial({ color: layer.color, depthTest: false, clippingPlanes });
+      if (showEdges && layer.arrows?.length) {
+        const material = new THREE.MeshBasicMaterial({ color: layer.color, depthTest: false, transparent: true, opacity: scaleOpacity(layer, 0.95), clippingPlanes });
         disposers.push(() => material.dispose());
+        const width = pathWidth(layer);
+        const poses: Array<{ position: THREE.Vector3; quaternion: THREE.Quaternion }> = [];
         for (const arrow of layer.arrows) {
           const start = toFile(arrow.a);
           const end = toFile(arrow.b);
@@ -531,33 +620,47 @@ function AnalyticalMesh({
           const length = delta.length();
           if (length < 1e-4) continue;
           const direction = delta.multiplyScalar(1 / length);
-          const head = new THREE.Mesh(cone, material);
-          head.quaternion.setFromUnitVectors(yAxis, direction);
-          head.position.copy(end).sub(direction.clone().multiplyScalar(LAYER_TUBE_FEET * 4.5 * feet));
-          head.frustumCulled = false;
-          head.renderOrder = renderOrder + 2;
-          anchor.add(head);
+          poses.push({
+            position: end.clone().sub(direction.clone().multiplyScalar(LAYER_TUBE_FEET * 4.5 * feet * width)),
+            quaternion: new THREE.Quaternion().setFromUnitVectors(yAxis, direction),
+          });
+        }
+        if (poses.length) {
+          const heads = new THREE.InstancedMesh(cone, material, poses.length);
+          instanceScale.setScalar(width);
+          poses.forEach((pose, index) => {
+            instanceMatrix.compose(pose.position, pose.quaternion, instanceScale);
+            heads.setMatrixAt(index, instanceMatrix);
+          });
+          heads.instanceMatrix.needsUpdate = true;
+          heads.frustumCulled = false;
+          heads.renderOrder = renderOrder + 2;
+          anchor.add(heads);
         }
       }
       if (layer.points?.length) {
         const material = new THREE.MeshBasicMaterial({ color: layer.color, depthTest: false, transparent: true, opacity: 0.95, clippingPlanes });
         disposers.push(() => material.dispose());
+        const dots = new THREE.InstancedMesh(markerGeometry(layer.pointShape), material, layer.points.length);
+        const markerScale = layer.pointScale ?? 1;
+        instanceScale.set(markerScale, markerScale, markerScale);
         layer.points.forEach((point, index) => {
-          const dot = new THREE.Mesh(sphere, material);
-          dot.position.copy(toFile(point));
-          dot.frustumCulled = false;
-          dot.renderOrder = renderOrder + 2;
-          anchor.add(dot);
+          instanceMatrix.compose(toFile(point), instanceQuat.identity(), instanceScale);
+          dots.setMatrixAt(index, instanceMatrix);
           const label = showMeasurementText ? layer.pointLabels?.[index] : undefined;
           if (label && index < 80) {
             const made = textSprite(label, layer.color, 1.6 * feet);
             if (made) {
-              made.sprite.position.copy(dot.position).add(new THREE.Vector3(0, 1.1 * feet, 0));
+              made.sprite.position.copy(toFile(point)).add(new THREE.Vector3(0, 1.1 * feet, 0));
               anchor.add(made.sprite);
               disposers.push(made.dispose);
             }
           }
         });
+        dots.instanceMatrix.needsUpdate = true;
+        dots.frustumCulled = false;
+        dots.renderOrder = renderOrder + 2;
+        anchor.add(dots);
       }
       for (const dimension of showMeasurementText ? (layer.dimensions ?? []).slice(0, 40) : []) {
         const made = textSprite(dimension.text, layer.color, 1.6 * feet);
@@ -572,7 +675,7 @@ function AnalyticalMesh({
     return () => {
       for (const dispose of disposers) dispose();
     };
-  }, [clip, clipPlane, invalidate, layers, showMeasurementText, unitScale, up]);
+  }, [arrowOpacity, arrowWidth, clip, clipPlane, invalidate, layers, showEdges, showFills, showMeasurementText, unitScale, up, volumeOpacity]);
 
   const markerSize = (cellFeet / (unitScale || 1)) * ANALYSIS_MARKER_SCALE;
   const markerGeometry = useMemo(() => new THREE.BoxGeometry(markerSize, markerSize, markerSize), [markerSize]);
@@ -713,14 +816,24 @@ function AnalyticalMesh({
       {contextGeometry && <mesh geometry={contextGeometry} material={contextMaterial} renderOrder={1} />}
       {envelopeGeometry && <mesh geometry={envelopeGeometry} material={shellMaterial} renderOrder={1} />}
       {fieldGeometry && <mesh geometry={fieldGeometry} material={fieldMaterial} renderOrder={2} />}
-      {showMesh && <mesh geometry={geometry} material={meshMaterial} renderOrder={3} />}
+      {showMesh && <mesh geometry={geometry} material={meshMaterial} renderOrder={2} />}
+      {showMesh && silhouetteGeometry.attributes.position.count > 0 && (
+        <lineSegments geometry={silhouetteGeometry} renderOrder={3}>
+          <lineBasicMaterial color={GRAPHIC.colors.massingEdge} transparent opacity={GRAPHIC.massing.silhouetteOpacity} depthTest={false} clippingPlanes={clip ? [clipPlane] : []} />
+        </lineSegments>
+      )}
+      {showMesh && creaseGeometry.attributes.position.count > 0 && (
+        <lineSegments geometry={creaseGeometry} renderOrder={3}>
+          <lineBasicMaterial color={GRAPHIC.colors.massingEdge} transparent opacity={GRAPHIC.massing.creaseOpacity} depthTest={false} clippingPlanes={clip ? [clipPlane] : []} />
+        </lineSegments>
+      )}
       {volumeGeometry && <mesh geometry={volumeGeometry} material={volumeMaterial} renderOrder={4} />}
       <group ref={markerAnchor} renderOrder={2} />
       <group ref={rayAnchor} renderOrder={3} />
       <group ref={layerAnchor} renderOrder={4} />
       {cutSegments.length > 0 && (
         <lineSegments geometry={cutGeometry} renderOrder={3}>
-          <lineBasicMaterial color="#F7F6F5" />
+          <lineBasicMaterial color={GRAPHIC.colors.massingFill} />
         </lineSegments>
       )}
       {guideSegments.length > 0 && (
@@ -778,6 +891,11 @@ export default function AnalysisViewport({
   discardedNormal,
   label,
   showMeasurementText = false,
+  showFills = true,
+  showEdges = true,
+  arrowOpacity = 1,
+  volumeOpacity = 1,
+  arrowWidth = 1,
 }: {
   mesh: ImportedObj;
   unitScale: number;
@@ -813,12 +931,20 @@ export default function AnalysisViewport({
   label: string;
   /** Entry ids, sequence numbers, and dimension text. Off for the default 3D views. */
   showMeasurementText?: boolean;
+  showFills?: boolean;
+  showEdges?: boolean;
+  arrowOpacity?: number;
+  volumeOpacity?: number;
+  arrowWidth?: number;
 }) {
   const preset = presetCamera(view, fit, aimY, discardedNormal ?? undefined);
   return (
     <Canvas
       key={`${view}:${clip ? "clip" : "full"}`}
       frameloop="demand"
+      dpr={[1, 1.25]}
+      performance={{ min: 0.5, debounce: 200 }}
+      flat
       orthographic={preset.projection === "orthographic"}
       camera={{
         position: preset.position,
@@ -827,7 +953,13 @@ export default function AnalysisViewport({
         far: 8000,
         zoom: 1,
       }}
-      gl={{ localClippingEnabled: true, preserveDrawingBuffer: true }}
+      gl={{
+        alpha: false,
+        antialias: true,
+        powerPreference: "high-performance",
+        localClippingEnabled: true,
+        preserveDrawingBuffer: true,
+      }}
       aria-label={label}
       style={{ width: "100%", height: "100%", minHeight: 360, background: "#000" }}
     >
@@ -842,8 +974,7 @@ export default function AnalysisViewport({
         bus={bus}
         discardedNormal={viewUsesClip(view) ? discardedNormal : null}
       />
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[40, 80, 30]} intensity={1.15} />
+      <ambientLight intensity={1} />
       <AnalyticalMesh
         mesh={mesh}
         unitScale={unitScale}
@@ -867,9 +998,14 @@ export default function AnalysisViewport({
         volumeTriangles={volumeTriangles}
         layers={layers}
         showMeasurementText={showMeasurementText}
+        showFills={showFills}
+        showEdges={showEdges}
+        arrowOpacity={arrowOpacity}
+        volumeOpacity={volumeOpacity}
+        arrowWidth={arrowWidth}
       />
       <OrbitControls makeDefault target={preset.target} enableDamping={false} />
-      <Redraw token={`${showMesh}:${opacity}:${markers.length}:${fieldCells?.length ?? 0}:${shellCells?.length ?? 0}:${contextCells?.length ?? 0}:${guideSegments.length}:${dimensionSegments.length}:${volumeTriangles?.length ?? 0}:${layers.map((layer) => layer.id).join("|")}:${guideColor}:${fieldOpacity ?? ""}:${cutSegments.length}:${clip?.constant ?? "none"}:${clip?.normal.join(",") ?? ""}`} />
+      <Redraw token={`${showMesh}:${opacity}:${markers.length}:${fieldCells?.length ?? 0}:${shellCells?.length ?? 0}:${contextCells?.length ?? 0}:${guideSegments.length}:${dimensionSegments.length}:${volumeTriangles?.length ?? 0}:${layers.map((layer) => layer.id).join("|")}:${guideColor}:${fieldOpacity ?? ""}:${cutSegments.length}:${clip?.constant ?? "none"}:${clip?.normal.join(",") ?? ""}:${showMeasurementText}:${showFills}:${showEdges}:${arrowOpacity}:${volumeOpacity}:${arrowWidth}`} />
     </Canvas>
   );
 }

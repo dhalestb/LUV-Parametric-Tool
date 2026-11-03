@@ -1,12 +1,33 @@
 import { readdir, readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { DESCRIPTOR_ALGORITHM_VERSION, LEGACY_DESCRIPTOR_ALGORITHM_VERSION } from "../components/evaluations/descriptorVersion";
 import { evaluateTileModel, evaluateTileModelLegacy } from "../components/evaluations/objDescriptorAnalysis";
 import { analyzeMesh } from "../components/lattice/analyze";
 import { parseObj } from "../components/lattice/parseObj";
 
 /** The original 15 lattice source OBJs. They stay outside the repository. */
-export const REGISTRY_DIRECTORY = "C:\\Users\\DHale\\.codex\\worktrees\\organic-surface-integration\\Cursor-APP\\local-test-data\\architectural-objs";
+export const REGISTRY_DIRECTORY = "C:\\design 7\\assignment 2\\obj files";
+
+/** Category folders that together make the 15-form source registry. */
+const REGISTRY_RELATIVE_DIRS = [
+  "gathering",
+  "lobbies",
+  "workspaces\\v2\\original forms",
+];
+
+async function listRegistryObjFiles(): Promise<Array<{ filename: string; path: string }>> {
+  const files: Array<{ filename: string; path: string }> = [];
+  for (const relative of REGISTRY_RELATIVE_DIRS) {
+    const directory = join(REGISTRY_DIRECTORY, relative);
+    const names = (await readdir(directory))
+      .filter((name) => name.toLowerCase().endsWith(".obj"))
+      .sort((left, right) => left.localeCompare(right));
+    for (const name of names) {
+      files.push({ filename: basename(name), path: join(directory, name) });
+    }
+  }
+  return files;
+}
 
 export type RegistryOpenVolumeForm = {
   filename: string;
@@ -70,9 +91,7 @@ function rankBuckets(byDescriptor: Map<string, Bucket>): RegistryDescriptorRanks
 }
 
 async function scoreRegistry(): Promise<RegistryOpenVolume> {
-  const names = (await readdir(REGISTRY_DIRECTORY))
-    .filter((name) => name.toLowerCase().endsWith(".obj"))
-    .sort((left, right) => left.localeCompare(right));
+  const files = await listRegistryObjFiles();
   const current = new Map<string, Bucket>();
   const legacy = new Map<string, Bucket>();
   const collect = (map: Map<string, Bucket>, filename: string, descriptors: Array<{ id: string; name: string; absoluteScore: number; unavailableReason?: string }>) => {
@@ -83,18 +102,18 @@ async function scoreRegistry(): Promise<RegistryOpenVolume> {
       map.set(descriptor.id, bucket);
     }
   };
-  for (const filename of names) {
-    const text = await readFile(join(REGISTRY_DIRECTORY, filename), "utf8");
-    const mesh = parseObj(text, filename);
+  for (const file of files) {
+    const text = await readFile(file.path, "utf8");
+    const mesh = parseObj(text, file.filename);
     const model = analyzeMesh(mesh, null, 1, "y");
     const source = { positions: mesh.positions, faces: mesh.faces, up: "y" as const, unitScale: 1 };
-    collect(current, filename, evaluateTileModel(model, source).descriptors);
-    collect(legacy, filename, evaluateTileModelLegacy(model, source).descriptors);
+    collect(current, file.filename, evaluateTileModel(model, source).descriptors);
+    collect(legacy, file.filename, evaluateTileModelLegacy(model, source).descriptors);
   }
   const descriptors = rankBuckets(current);
   return {
     version: DESCRIPTOR_ALGORITHM_VERSION,
-    cohortSize: names.length,
+    cohortSize: files.length,
     direction: "1 is the weakest result in the source registry. The highest rank is the strongest. A measured 0 is ranked. Only a geometry-processing failure is listed as unavailable.",
     forms: descriptors.find((descriptor) => descriptor.id === "openVolume")?.forms ?? [],
     descriptors,
