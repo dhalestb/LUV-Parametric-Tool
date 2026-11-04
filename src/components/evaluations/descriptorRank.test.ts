@@ -88,6 +88,24 @@ describe("comparative ranks", () => {
     assert.equal(computes, 3);
   });
 
+  it("ranks Sequential by verified gain, then higher levels, and reports ties", () => {
+    const forms = [
+      { formId: "A", descriptors: [{ id: "sequential", absoluteScore: 8, components: [{ name: "Verified Vertical Gain", raw: 8, weight: 1 }, { name: "Higher Levels Reached", raw: 0, weight: 0.5 }] }] },
+      { formId: "B", descriptors: [{ id: "sequential", absoluteScore: 12, components: [{ name: "Verified Vertical Gain", raw: 12, weight: 1 }, { name: "Higher Levels Reached", raw: 1, weight: 0.5 }] }] },
+      { formId: "C", descriptors: [{ id: "sequential", absoluteScore: 8, components: [{ name: "Verified Vertical Gain", raw: 8, weight: 1 }, { name: "Higher Levels Reached", raw: 2, weight: 0.5 }] }] },
+      { formId: "D", descriptors: [{ id: "sequential", absoluteScore: 8, components: [{ name: "Verified Vertical Gain", raw: 8, weight: 1 }, { name: "Higher Levels Reached", raw: 2, weight: 0.5 }] }] },
+    ];
+    assignComparativeRanks(forms);
+    const rank = Object.fromEntries(forms.map((item) => [item.formId, item.descriptors[0]]));
+    assert.equal(rank.A.comparativeRank, 1);
+    assert.equal(rank.C.comparativeRank, 2);
+    assert.equal(rank.D.comparativeRank, 3);
+    assert.equal(rank.B.comparativeRank, 4);
+    assert.equal(rank.C.tieBreakUsed, true);
+    assert.equal(rank.D.tieBreakUsed, true);
+    assert.equal(rank.B.tieBreakUsed, false);
+  });
+
   it("is deterministic", () => {
     const once = [form("L1", [3.2, 8]), form("G1", [9.1, 1]), form("O3", [9.1, 4])];
     const twice = [form("O3", [9.1, 4]), form("L1", [3.2, 8]), form("G1", [9.1, 1])];

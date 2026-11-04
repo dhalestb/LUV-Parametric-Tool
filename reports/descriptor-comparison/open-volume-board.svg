@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="7407" height="2160" viewBox="0 0 7407 2160">
+  <title>Open Volume comparison</title>
+  <desc>Black board, white section linework, and translucent gold #D6AD4F interstitial raster cells. Cells are not merged and are not claimed as occupiable space. Source OBJ geometry was not modified.</desc>
+  <g id="background">
+    <rect width="100%" height="100%" fill="#000000"/>
+  </g>
+  <g id="least-open-volume">
+    <g fill="#D6AD4F" fill-opacity="0.16" stroke="none"></g>
+    <g fill="none" stroke="#D6AD4F" stroke-opacity="0.22" stroke-width="1.15"><path fill="none" d=""/></g>
+  </g>
+  <g id="most-open-volume">
+    <g fill="#D6AD4F" fill-opacity="0.16" stroke="none"></g>
+    <g fill="none" stroke="#D6AD4F" stroke-opacity="0.22" stroke-width="1.15"><path fill="none" d=""/></g>
+  </g>
+  <g id="least-secondary" fill="none" stroke="#F7F6F5" stroke-width="0.90" stroke-linecap="round" stroke-linejoin="round"></g>
+  <g id="most-secondary" fill="none" stroke="#F7F6F5" stroke-width="0.90" stroke-linecap="round" stroke-linejoin="round"></g>
+  <g id="least-silhouette" fill="none" stroke="#F7F6F5" stroke-width="2.50" stroke-linecap="round" stroke-linejoin="round"></g>
+  <g id="most-silhouette" fill="none" stroke="#F7F6F5" stroke-width="2.50" stroke-linecap="round" stroke-linejoin="round"></g>
+  <g id="least-section-cut" fill="none" stroke="#F7F6F5" stroke-width="10.00" stroke-linecap="round" stroke-linejoin="round"></g>
+  <g id="most-section-cut" fill="none" stroke="#F7F6F5" stroke-width="10.00" stroke-linecap="round" stroke-linejoin="round"></g>
+  <g id="score-components">
+    
+  </g>
+  <g id="frame" fill="none" stroke="#1293C2" stroke-width="5.29">
+    <rect x="222" y="475" width="6963" height="950"/>
+    <line x1="3703.5" y1="475" x2="3703.5" y2="1425"/>
+  </g>
+  <g id="labels" font-family="Arial, Helvetica, sans-serif">
+    <text x="222" y="99" fill="#F7F6F5" font-family="Arial, Helvetica, sans-serif" font-size="69">Open Volume</text>
+    <text x="222" y="168" fill="#71BEDA" font-family="Arial, Helvetica, sans-serif" font-size="32">G1-Stepped-Amphitheater.obj / G5-Linear-Edge-Gallery.obj</text>
+    <text x="222" y="259" fill="#D6AD4F" font-family="Arial, Helvetica, sans-serif" font-size="39">Least viable</text>
+    <text x="222" y="350" fill="#F7F6F5" font-family="Arial, Helvetica, sans-serif" font-size="56">G1-Stepped-Amphitheater.obj</text>
+    <text x="222" y="449" fill="#D6AD4F" font-family="Arial, Helvetica, sans-serif" font-size="65">65.7</text>
+    <text x="3815" y="259" fill="#D6AD4F" font-family="Arial, Helvetica, sans-serif" font-size="39">Most viable</text>
+    <text x="3815" y="350" fill="#F7F6F5" font-family="Arial, Helvetica, sans-serif" font-size="56">G5-Linear-Edge-Gallery.obj</text>
+    <text x="3815" y="449" fill="#D6AD4F" font-family="Arial, Helvetica, sans-serif" font-size="65">71.8</text>
+    <text x="222" y="1955" fill="#F7F6F5" font-family="Arial, Helvetica, sans-serif" font-size="32">Actual Open Volume scores from evaluateTileModel. Least G1-Stepped-Amphitheater.obj 65.7. Most G5-Linear-Edge-Gallery.obj 71.8. Free cells 257 and 725.</text>
+    <text x="222" y="2078" fill="#71BEDA" font-family="Arial, Helvetica, sans-serif" font-size="32">Gold marks verified Open Volume cells that meet this section plane.  section-y geometric mid-span  Sample OBJ section, spec feet. Synthetic tiles, not uploaded OBJs.</text>
+  </g>
+</svg>

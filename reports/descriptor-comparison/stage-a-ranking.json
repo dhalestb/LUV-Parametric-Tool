@@ -1,0 +1,173 @@
+{
+  "stage": "A",
+  "outcome": "complete",
+  "population": "public/part2-samples",
+  "sourceIdentity": "BLOCKED for uploaded architectural OBJs. These files are the repository sample tiles, each marked 'sample tile for Part 2'. Scores are the real evaluateTileModel results for that population.",
+  "descriptor": "openVolume",
+  "least": {
+    "formId": "G1",
+    "slotId": "G1",
+    "meshId": "mesh-1-ydllbl",
+    "filename": "G1-Stepped-Amphitheater.obj",
+    "geometryRevision": "geom:58272444",
+    "absoluteScore": 65.65,
+    "circulationFeasible": null,
+    "eligible": true
+  },
+  "most": {
+    "formId": "G5",
+    "slotId": "G5",
+    "meshId": "mesh-5-dtd7ew",
+    "filename": "G5-Linear-Edge-Gallery.obj",
+    "geometryRevision": "geom:4059259911",
+    "absoluteScore": 71.75000000000001,
+    "circulationFeasible": null,
+    "eligible": true
+  },
+  "leastTies": [
+    "G1",
+    "O1"
+  ],
+  "mostTies": [
+    "G5",
+    "O5"
+  ],
+  "note": "Compared 15 eligible forms. Ties keep the same score. The form with the lowest id is shown, and the other tied forms are listed. Descriptor viability is not circulation feasibility.",
+  "forms": [
+    {
+      "file": "G1-Stepped-Amphitheater.obj",
+      "formId": "G1",
+      "meshId": "mesh-1-ydllbl",
+      "revision": "geom:58272444",
+      "sha256": "7668371cc1fa1b6d1486655c2887db8b3bdf00062837a5161ac80f35b17accdc",
+      "absoluteScore": 65.65,
+      "triangles": 60
+    },
+    {
+      "file": "O1-Open-Hall-Workspace.obj",
+      "formId": "O1",
+      "meshId": "mesh-11-imy7l8",
+      "revision": "geom:3718881433",
+      "sha256": "04a30f18084227a7c6214dd8d77ff771f2eb59b9106fd64c4ba780f085d7eda1",
+      "absoluteScore": 65.65,
+      "triangles": 72
+    },
+    {
+      "file": "G2-Void-Field-Gathering.obj",
+      "formId": "G2",
+      "meshId": "mesh-2-s0jknk",
+      "revision": "geom:2187116616",
+      "sha256": "9efcbc23147283bf5f89b524c8cf84e063a2f756be1c511eb6550b6d3f83f5c7",
+      "absoluteScore": 68.60000000000001,
+      "triangles": 60
+    },
+    {
+      "file": "O2-Cascaded---Terraced-Plates.obj",
+      "formId": "O2",
+      "meshId": "mesh-12-it6wpf",
+      "revision": "geom:462117200",
+      "sha256": "43b0a5d067a36d0bb11f00b9036733fe5dd3e589763ab8b7e0bf6b8ed8c673b0",
+      "absoluteScore": 68.60000000000001,
+      "triangles": 72
+    },
+    {
+      "file": "G3-Inserted-Horizontal-Plate.obj",
+      "formId": "G3",
+      "meshId": "mesh-3-kb82kt",
+      "revision": "geom:617065979",
+      "sha256": "7a0ddde8441cefbcdd188caea484fa45eb50526691986f4bfbf61d673c78e286",
+      "absoluteScore": 69.75000000000001,
+      "triangles": 60
+    },
+    {
+      "file": "O3-Flat-Deep-Plan-Plate.obj",
+      "formId": "O3",
+      "meshId": "mesh-13-7jm69q",
+      "revision": "geom:3073627811",
+      "sha256": "437785a232375eae840680f78b5b4e0565b208ced542ab384292aa1326efc006",
+      "absoluteScore": 69.75000000000001,
+      "triangles": 72
+    },
+    {
+      "file": "L1-Vertical-Void-Lobby.obj",
+      "formId": "L1",
+      "meshId": "mesh-6-pqyoxs",
+      "revision": "geom:776055120",
+      "sha256": "45a57bc6c24b9911d01482fb27e0e7688769fd95f7ccc17daeea062711f58f24",
+      "absoluteScore": 70.25000000000001,
+      "triangles": 72
+    },
+    {
+      "file": "L4-Topographic---Ground-Field-Lobby.obj",
+      "formId": "L4",
+      "meshId": "mesh-9-mcl7py",
+      "revision": "geom:1202036314",
+      "sha256": "70d2d58b2d816c6a5fec5672c5fc3f2d4ed7dd7c5a9df4b1ce0598c7b9d81a23",
+      "absoluteScore": 70.25000000000001,
+      "triangles": 72
+    },
+    {
+      "file": "G4-Contained-Room-Within-Volume.obj",
+      "formId": "G4",
+      "meshId": "mesh-4-1qbek7",
+      "revision": "geom:57690883",
+      "sha256": "2d793d8d4a9312c223e050af6e89028c0f223de89e99a3a9babb7640cc83b2c6",
+      "absoluteScore": 70.95000000000002,
+      "triangles": 60
+    },
+    {
+      "file": "O4-Void-Edge-Workspace.obj",
+      "formId": "O4",
+      "meshId": "mesh-14-4bkdbx",
+      "revision": "geom:2507089850",
+      "sha256": "b4e8ee3db28e5a6067a803cc7a64dd979c70cb31c123b99ab254caa1d5798298",
+      "absoluteScore": 70.95000000000002,
+      "triangles": 72
+    },
+    {
+      "file": "L2-Compressed-Sequential-Lobby.obj",
+      "formId": "L2",
+      "meshId": "mesh-7-tqim7k",
+      "revision": "geom:4048382877",
+      "sha256": "dd44d967686fc5acfb54169cfd5b50a876d0872e01c242342b50f7bf56096481",
+      "absoluteScore": 71.00000000000001,
+      "triangles": 72
+    },
+    {
+      "file": "L3-Continuous-Hall-Lobby.obj",
+      "formId": "L3",
+      "meshId": "mesh-8-f5wt6p",
+      "revision": "geom:1258143562",
+      "sha256": "05acb5439da9d99ccdd0b2d6eb20dcbe9751b3d366a1ce2c9ee72d47711ae85a",
+      "absoluteScore": 71.00000000000001,
+      "triangles": 72
+    },
+    {
+      "file": "L5-Linear-Gallery-Lobby.obj",
+      "formId": "L5",
+      "meshId": "mesh-10-6bcywq",
+      "revision": "geom:2935034942",
+      "sha256": "af6e7471357408459bdff6162fe50e83eb24af87eb53f92dc0a8c5e665f1b134",
+      "absoluteScore": 71.25000000000001,
+      "triangles": 72
+    },
+    {
+      "file": "G5-Linear-Edge-Gallery.obj",
+      "formId": "G5",
+      "meshId": "mesh-5-dtd7ew",
+      "revision": "geom:4059259911",
+      "sha256": "eb2272dcd9f8f7d8fd5e3e5088bea2732ca9df0f1b9b17ce71eabb65ab4a54f1",
+      "absoluteScore": 71.75000000000001,
+      "triangles": 60
+    },
+    {
+      "file": "O5-Folded---Undulating-Work-Surface.obj",
+      "formId": "O5",
+      "meshId": "mesh-15-5hhbo8",
+      "revision": "geom:3121558140",
+      "sha256": "94eaedbfe453f08c19a19982df2953f7f9ccc1e9a28e76da829f13e625bb36f9",
+      "absoluteScore": 71.75000000000001,
+      "triangles": 72
+    }
+  ]
+}

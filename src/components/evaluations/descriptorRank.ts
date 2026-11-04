@@ -6,7 +6,8 @@ export type DescriptorRankSnapshot = {
     slotId: string;
     meshId: string;
     filename: string;
-    descriptors: Record<string, { absoluteScore: number; comparativeRank?: number }>;
+    /** absoluteScore is null when the descriptor was unavailable for that form (v4). */
+    descriptors: Record<string, { absoluteScore: number | null; comparativeRank?: number }>;
   }>;
 };
 
@@ -28,27 +29,38 @@ export type RankDescriptor = {
 };
 
 /**
- * Unique comparative ranks. 15 is the strongest expression in the current set.
+ * Unique comparative ranks. The highest rank is the strongest expression in the current set.
  * Order: full-precision absolute score, then raw components by descending weight,
  * then stable form id. The absolute score is never changed to break a tie.
+ * A measured 0 is ranked. Forms whose score is not finite (processing failure)
+ * receive no rank and do not count toward the cohort for that descriptor.
  */
 export function assignComparativeRanks<T extends { formId: string; descriptors: RankDescriptor[] }>(forms: T[]) {
-  const count = forms.length;
-  if (!count) return forms;
+  if (!forms.length) return forms;
   const ids = forms[0].descriptors.map((descriptor) => descriptor.id);
   for (const id of ids) {
-    const rows = forms.map((form, index) => {
+    const rows = forms.flatMap((form, index) => {
       const descriptor = form.descriptors.find((item) => item.id === id);
-      const components = [...(descriptor?.components ?? [])]
+      if (!descriptor) return [];
+      if (!Number.isFinite(descriptor.absoluteScore)) {
+        descriptor.comparativeRank = undefined;
+        descriptor.relativeRank = undefined;
+        descriptor.relativePercentile = undefined;
+        descriptor.cohortSize = undefined;
+        descriptor.tieBreakUsed = undefined;
+        return [];
+      }
+      const components = [...descriptor.components]
         .filter((component) => component.weight > 0)
         .sort((left, right) => right.weight - left.weight || left.name.localeCompare(right.name));
-      return {
+      return [{
         index,
         formId: form.formId,
-        absolute: descriptor?.absoluteScore ?? 0,
+        absolute: descriptor.absoluteScore,
         components,
-      };
+      }];
     });
+    const count = rows.length;
     rows.sort((left, right) => {
       if (left.absolute !== right.absolute) return left.absolute - right.absolute;
       const limit = Math.max(left.components.length, right.components.length);

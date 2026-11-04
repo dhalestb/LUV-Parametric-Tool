@@ -34,7 +34,7 @@ import { synthesizeConnectors } from "./connectionSynthesis";
 import { matchAssemblyPorts } from "./portMatching";
 import { DEFAULT_DISTRIBUTION_PREFS } from "./distribution";
 import { LATTICE_SLOTS, slotById } from "./slots";
-import { LATTICE_SESSION_KEY, readJson, writeJson } from "../browserSession";
+import { geometryExceedsSessionStore, LATTICE_SESSION_KEY, readJson, writeJson } from "../browserSession";
 import { DESCRIPTOR_RANK_STORAGE_KEY, type DescriptorRankSnapshot } from "../evaluations/descriptorRank";
 import { useLatticeSource } from "./latticeSource";
 import {
@@ -176,6 +176,7 @@ export default function LatticeStudio() {
     upAxisMode,
     setUpAxisMode,
     importObjFiles,
+    geometryPersisted,
   } = useLatticeSource();
   const [field, setField] = useState<LatticeField>(DEFAULT_LATTICE_FIELD);
   const [placements, setPlacements] = useState<Record<string, Placement>>({});
@@ -347,9 +348,10 @@ export default function LatticeStudio() {
 
   useEffect(() => {
     if (!sessionReady || !sourceHydrated) return;
+    const retainGeometry = !geometryExceedsSessionStore(meshes);
     const payload: LatticeSession = {
       version: 1,
-      meshes: meshes.map(packMesh),
+      meshes: retainGeometry ? meshes.map(packMesh) : [],
       assignments,
       unit,
       upAxisMode,
@@ -481,7 +483,7 @@ export default function LatticeStudio() {
       setStatus(result.error ?? "Choose OBJ files.");
       return;
     }
-    setStatus(`Imported ${result.imported} OBJ file${result.imported === 1 ? "" : "s"}.${result.error ? ` ${result.error}` : ""}`);
+    setStatus(`Imported ${result.imported} OBJ file${result.imported === 1 ? "" : "s"}.${result.note ? ` ${result.note}` : ""}${result.error ? ` ${result.error}` : ""}`);
   }
 
   function removeMesh(meshId: string) {
@@ -945,7 +947,7 @@ export default function LatticeStudio() {
               upAxisMode={upAxisMode}
               showLattice={showLattice}
             />
-            <p className="absolute bottom-3 left-3 right-3 text-[10px]" style={{ color: "var(--muted)" }}>{status}</p>
+            <p className="absolute bottom-3 left-3 right-3 text-[10px]" style={{ color: "var(--muted)" }}>{status}{geometryPersisted ? "" : " Uploaded geometry stays in this tab; a refresh clears it."}</p>
           </main>
           <aside className="overflow-auto border-l p-3 text-[10px]" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>
             {fReport ? (
@@ -1225,7 +1227,7 @@ export default function LatticeStudio() {
                 </div>
               </div>
             )}
-            <p className="text-[10px]" style={{ color: "var(--muted)" }}>{status}</p>
+            <p className="text-[10px]" style={{ color: "var(--muted)" }}>{status}{geometryPersisted ? "" : " Uploaded geometry stays in this tab; a refresh clears it."}</p>
           </div>
         </main>
         <aside className="overflow-auto border-l p-3 text-[10px]" style={{ borderColor: "var(--line)", background: "var(--panel-background)" }}>

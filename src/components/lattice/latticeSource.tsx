@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
-import { LATTICE_SESSION_KEY, readJson, writeJson } from "../browserSession";
+import { geometryExceedsSessionStore, LATTICE_SESSION_KEY, readJson, writeJson } from "../browserSession";
+import { assignImportedMeshes } from "./importAssignment";
 import { parseObj } from "./parseObj";
 import { LATTICE_SLOTS } from "./slots";
 import type { ImportedObj, UpAxisMode, UnitName } from "./types";
@@ -34,7 +35,9 @@ type LatticeSourceValue = {
   setAssignments: Dispatch<SetStateAction<Record<string, string | null>>>;
   setUnit: Dispatch<SetStateAction<UnitName>>;
   setUpAxisMode: Dispatch<SetStateAction<UpAxisMode>>;
-  importObjFiles: (files: File[]) => Promise<{ imported: number; error?: string }>;
+  importObjFiles: (files: File[]) => Promise<{ imported: number; error?: string; note?: string }>;
+  /** False when the current meshes are too large for browser storage and exist only in this tab. */
+  geometryPersisted: boolean;
   /** Explicit fallback. Fills only unassigned slots; never replaces an active Lattice assignment. */
   loadSampleObjs: () => Promise<{ loaded: number; error?: string }>;
 };
@@ -60,6 +63,7 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
   const [assignments, setAssignments] = useState<Record<string, string | null>>({});
   const [unit, setUnit] = useState<UnitName>("feet");
   const [upAxisMode, setUpAxisMode] = useState<UpAxisMode>("auto");
+  const [geometryPersisted, setGeometryPersisted] = useState(true);
 
   useEffect(() => {
     try {
@@ -80,14 +84,17 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
     if (!hydrated) return;
     const handle = window.setTimeout(() => {
       const previous = readJson<Record<string, unknown>>(LATTICE_SESSION_KEY) ?? { version: 1 };
-      writeJson(LATTICE_SESSION_KEY, {
+      const retainGeometry = !geometryExceedsSessionStore(meshes);
+      const saved = writeJson(LATTICE_SESSION_KEY, {
         ...previous,
         version: 1,
-        meshes: meshes.map(packMesh),
+        meshes: retainGeometry ? meshes.map(packMesh) : [],
+        geometryOmitted: !retainGeometry,
         assignments,
         unit,
         upAxisMode,
       });
+      setGeometryPersisted(retainGeometry && saved);
     }, 200);
     return () => window.clearTimeout(handle);
   }, [hydrated, meshes, assignments, unit, upAxisMode]);
@@ -105,16 +112,21 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
       catch (error) { errors.push(error instanceof Error ? error.message : file.name); }
     }
     setMeshes((current) => [...current, ...parsed].slice(0, MAX_IMPORTS));
-    setAssignments((current) => {
-      const next = { ...current };
-      for (const mesh of parsed) {
-        if (mesh.suggestedSlotId && !next[mesh.suggestedSlotId]) next[mesh.suggestedSlotId] = mesh.id;
-      }
-      return next;
-    });
+    const assigned = assignImportedMeshes(assignments, parsed.map((mesh) => ({
+      id: mesh.id,
+      filename: mesh.filename,
+      suggestedSlotId: mesh.suggestedSlotId,
+    })));
+    setAssignments(assigned.assignments);
     setOrigin("user");
-    return { imported: parsed.length, error: errors[0] };
-  }, [meshes.length]);
+    const notes = [
+      errors[0],
+      assigned.filledEmptySlots.length
+        ? `Filename keywords missed ${assigned.filledEmptySlots.length} file${assigned.filledEmptySlots.length === 1 ? "" : "s"}; they filled empty Lattice slots (${assigned.filledEmptySlots.join("; ")}).`
+        : "",
+    ].filter(Boolean);
+    return { imported: parsed.length, error: notes[0], note: notes.slice(1).join(" ") || undefined };
+  }, [assignments, meshes.length]);
 
   const loadSampleObjs = useCallback(async () => {
     const openSlots = LATTICE_SLOTS.filter((slot) => !assignments[slot.id]);
@@ -153,7 +165,8 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
     setUpAxisMode,
     importObjFiles,
     loadSampleObjs,
-  }), [hydrated, origin, meshes, assignments, unit, upAxisMode, importObjFiles, loadSampleObjs]);
+    geometryPersisted,
+  }), [hydrated, origin, meshes, assignments, unit, upAxisMode, importObjFiles, loadSampleObjs, geometryPersisted]);
 
   return <LatticeSourceContext.Provider value={value}>{children}</LatticeSourceContext.Provider>;
 }

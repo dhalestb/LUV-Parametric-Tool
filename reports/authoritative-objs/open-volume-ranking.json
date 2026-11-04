@@ -1,0 +1,898 @@
+{
+  "outcome": "complete",
+  "population": "authoritative local architectural OBJs",
+  "sourceProvenance": "External directory of the 15 original architectural OBJ files, supplied with --source or LUV_ARCHITECTURAL_OBJS. The files are not stored in this repository.",
+  "algorithm": "v3.3",
+  "unitScale": 1,
+  "unitNote": "Validated architectural interpretation: Y-up, with 1 file unit representing 1 architectural foot. The OBJ comment does not name a unit.",
+  "upAxis": "Validated Y-up. Recorded per file in mesh-inventory.json.",
+  "circulation": "Not evaluated. circulationFeasible is null. Descriptor rank is not a circulation result.",
+  "sampleScoresDiscarded": "65.65 and 71.75 are public/part2-samples results and are not used here.",
+  "reproducibility": [
+    {
+      "filename": "Gathering Linear.obj",
+      "first": 37.50000000000001,
+      "second": 37.50000000000001,
+      "match": true
+    },
+    {
+      "filename": "Gathering Void Field.obj",
+      "first": 61.45,
+      "second": 61.45,
+      "match": true
+    },
+    {
+      "filename": "Gathering, Plate.obj",
+      "first": 50.70000000000001,
+      "second": 50.70000000000001,
+      "match": true
+    },
+    {
+      "filename": "Gathering, Room within Volume.obj",
+      "first": 54.65000000000001,
+      "second": 54.65000000000001,
+      "match": true
+    },
+    {
+      "filename": "Gathering, Stepped.obj",
+      "first": 60.300000000000004,
+      "second": 60.300000000000004,
+      "match": true
+    },
+    {
+      "filename": "Lobby Continuous Hall.obj",
+      "first": 67.30000000000001,
+      "second": 67.30000000000001,
+      "match": true
+    },
+    {
+      "filename": "Lobby Vertical Void.obj",
+      "first": 52.650000000000006,
+      "second": 52.650000000000006,
+      "match": true
+    },
+    {
+      "filename": "Lobby, Ground Field.obj",
+      "first": 47.00000000000001,
+      "second": 47.00000000000001,
+      "match": true
+    },
+    {
+      "filename": "Lobby, Linear.obj",
+      "first": 52,
+      "second": 52,
+      "match": true
+    },
+    {
+      "filename": "Lobby, Sequential.obj",
+      "first": 50.400000000000006,
+      "second": 50.400000000000006,
+      "match": true
+    },
+    {
+      "filename": "workspace cascaded.obj",
+      "first": 40.00000000000001,
+      "second": 40.00000000000001,
+      "match": true
+    },
+    {
+      "filename": "workspace flat deep-plate.obj",
+      "first": 57.50000000000001,
+      "second": 57.50000000000001,
+      "match": true
+    },
+    {
+      "filename": "workspace open hall.obj",
+      "first": 63.70000000000001,
+      "second": 63.70000000000001,
+      "match": true
+    },
+    {
+      "filename": "workspace undulating.obj",
+      "first": 54.650000000000006,
+      "second": 54.650000000000006,
+      "match": true
+    },
+    {
+      "filename": "workspace void.obj",
+      "first": 62.1,
+      "second": 62.1,
+      "match": true
+    }
+  ],
+  "least": {
+    "formId": "Gathering Linear.obj",
+    "slotId": "Gathering Linear.obj",
+    "meshId": "mesh-16-2mmq9i",
+    "filename": "Gathering Linear.obj",
+    "geometryRevision": "geom:2478382987",
+    "absoluteScore": 37.50000000000001,
+    "circulationFeasible": null,
+    "eligible": true
+  },
+  "most": {
+    "formId": "Lobby Continuous Hall.obj",
+    "slotId": "Lobby Continuous Hall.obj",
+    "meshId": "mesh-21-bwpv21",
+    "filename": "Lobby Continuous Hall.obj",
+    "geometryRevision": "geom:909331623",
+    "absoluteScore": 67.30000000000001,
+    "circulationFeasible": null,
+    "eligible": true
+  },
+  "leastTies": [
+    "Gathering Linear.obj"
+  ],
+  "mostTies": [
+    "Lobby Continuous Hall.obj"
+  ],
+  "note": "Compared 15 eligible forms. Descriptor viability is not circulation feasibility.",
+  "unavailable": [],
+  "ranking": [
+    {
+      "comparativeRank": 1,
+      "filename": "Gathering Linear.obj",
+      "absoluteScore": 37.50000000000001,
+      "roundedScore": 38,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 674,
+      "freeCells": 657,
+      "interstitialCells": 647,
+      "specBoundsFeet": {
+        "x": 20,
+        "y": 20,
+        "z": 20
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 49,
+          "raw": 0.49,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 13,
+          "raw": 0.13,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 49,
+          "raw": 0.49,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 42,
+          "raw": 0.42,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:2478382987",
+      "sha256": "9b89c6ff42da8f57c3aa3adeca2855f1dd2b136f29c62e9933c9bf4b0d1309ee",
+      "meshId": "mesh-16-2mmq9i"
+    },
+    {
+      "comparativeRank": 2,
+      "filename": "workspace cascaded.obj",
+      "absoluteScore": 40.00000000000001,
+      "roundedScore": 40,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 560,
+      "freeCells": 650,
+      "interstitialCells": 609,
+      "specBoundsFeet": {
+        "x": 19.99999237060547,
+        "y": 20,
+        "z": 20.000000053953546
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 54,
+          "raw": 0.54,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 16,
+          "raw": 0.16,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 50,
+          "raw": 0.5,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 38,
+          "raw": 0.38,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 1,
+          "raw": 0.01,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:512572491",
+      "sha256": "2b639c792496e47ae2938b7e7ea36cf502e277f6474208647e6fcc825c696436",
+      "meshId": "mesh-26-4j3y8g"
+    },
+    {
+      "comparativeRank": 3,
+      "filename": "Lobby, Ground Field.obj",
+      "absoluteScore": 47.00000000000001,
+      "roundedScore": 47,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 474,
+      "freeCells": 846,
+      "interstitialCells": 771,
+      "specBoundsFeet": {
+        "x": 20,
+        "y": 20.005250930786133,
+        "z": 19.95368003845215
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 64,
+          "raw": 0.64,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 20,
+          "raw": 0.2,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 58,
+          "raw": 0.58,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 41,
+          "raw": 0.41,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:1111434802",
+      "sha256": "079d40f8d35c2e97bff80cb89b9b22e3f4995f4bf14d1e97c68db512df826606",
+      "meshId": "mesh-23-abfisi"
+    },
+    {
+      "comparativeRank": 4,
+      "filename": "Lobby, Sequential.obj",
+      "absoluteScore": 50.400000000000006,
+      "roundedScore": 50,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 493,
+      "freeCells": 1091,
+      "interstitialCells": 961,
+      "specBoundsFeet": {
+        "x": 20.325685024261475,
+        "y": 21.565231323242188,
+        "z": 20.000000476837158
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 69,
+          "raw": 0.69,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 22,
+          "raw": 0.22,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 61,
+          "raw": 0.61,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 44,
+          "raw": 0.44,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 3,
+          "raw": 0.03,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:3019315763",
+      "sha256": "28c92a1a5041285f36a34906fb2dc89cd8467f749103f2fed27e80e1ca0a80b2",
+      "meshId": "mesh-25-w6p2le"
+    },
+    {
+      "comparativeRank": 5,
+      "filename": "Gathering, Plate.obj",
+      "absoluteScore": 50.70000000000001,
+      "roundedScore": 51,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 410,
+      "freeCells": 921,
+      "interstitialCells": 834,
+      "specBoundsFeet": {
+        "x": 20,
+        "y": 20,
+        "z": 20
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 69,
+          "raw": 0.69,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 21,
+          "raw": 0.21,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 63,
+          "raw": 0.63,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 45,
+          "raw": 0.45,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 1,
+          "raw": 0.01,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:254169009",
+      "sha256": "160e2981dc77b3006af46dfc7b406ddcac8d0d1e1c63f44f0769cf93ed19abbe",
+      "meshId": "mesh-18-sye4a3"
+    },
+    {
+      "comparativeRank": 6,
+      "filename": "Lobby, Linear.obj",
+      "absoluteScore": 52,
+      "roundedScore": 52,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 423,
+      "freeCells": 1017,
+      "interstitialCells": 846,
+      "specBoundsFeet": {
+        "x": 20.000001907348633,
+        "y": 20.000003337860107,
+        "z": 19.99999976158142
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 71,
+          "raw": 0.71,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 27,
+          "raw": 0.27,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 59,
+          "raw": 0.59,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 43,
+          "raw": 0.43,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 1,
+          "raw": 0.01,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:4198871239",
+      "sha256": "8b87c8de2b7f1ed046760e2eb7ab3f8ab20eb6b82ccf98ebff9f661a7e2663d9",
+      "meshId": "mesh-24-txsqeq"
+    },
+    {
+      "comparativeRank": 7,
+      "filename": "Lobby Vertical Void.obj",
+      "absoluteScore": 52.650000000000006,
+      "roundedScore": 53,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 475,
+      "freeCells": 845,
+      "interstitialCells": 778,
+      "specBoundsFeet": {
+        "x": 19.999998092651367,
+        "y": 20.000000476837158,
+        "z": 20.675838470458984
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 64,
+          "raw": 0.64,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 37,
+          "raw": 0.37,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 59,
+          "raw": 0.59,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 44,
+          "raw": 0.44,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:1530161747",
+      "sha256": "f8e268d71ffeace9cf1002601854fd9457f70fcfba0f80ebe6aa1143a6475ac2",
+      "meshId": "mesh-22-bauw5c"
+    },
+    {
+      "comparativeRank": 8,
+      "filename": "workspace undulating.obj",
+      "absoluteScore": 54.650000000000006,
+      "roundedScore": 55,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 439,
+      "freeCells": 1145,
+      "interstitialCells": 972,
+      "specBoundsFeet": {
+        "x": 20.00000762939453,
+        "y": 20.00000762939453,
+        "z": 20
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 72,
+          "raw": 0.72,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 33,
+          "raw": 0.33,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 61,
+          "raw": 0.61,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 43,
+          "raw": 0.43,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 1,
+          "raw": 0.01,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:4078385115",
+      "sha256": "87731c1d40a112104505972793bb7b77c597516d17e7e305e65bb545878e2639",
+      "meshId": "mesh-29-03f7j3"
+    },
+    {
+      "comparativeRank": 9,
+      "filename": "Gathering, Room within Volume.obj",
+      "absoluteScore": 54.65000000000001,
+      "roundedScore": 55,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 430,
+      "freeCells": 1022,
+      "interstitialCells": 978,
+      "specBoundsFeet": {
+        "x": 21.3566951751709,
+        "y": 20,
+        "z": 20
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 70,
+          "raw": 0.7,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 27,
+          "raw": 0.27,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 67,
+          "raw": 0.67,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 53,
+          "raw": 0.53,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:4220199269",
+      "sha256": "b36e99252c585d728116b10656b81ec246b13dea9072fe5a7a940c4d5a5744fb",
+      "meshId": "mesh-19-l4rhpm"
+    },
+    {
+      "comparativeRank": 10,
+      "filename": "workspace flat deep-plate.obj",
+      "absoluteScore": 57.50000000000001,
+      "roundedScore": 58,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 436,
+      "freeCells": 1148,
+      "interstitialCells": 1081,
+      "specBoundsFeet": {
+        "x": 20.000003814697266,
+        "y": 20.00000762939453,
+        "z": 20
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 72,
+          "raw": 0.72,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 32,
+          "raw": 0.32,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 68,
+          "raw": 0.68,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 57,
+          "raw": 0.57,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:3490322845",
+      "sha256": "0be03280bff9635f04e8a41fa4cc587bed215a9e7b97aa624f25f10f9a9d5aef",
+      "meshId": "mesh-27-lwexq0"
+    },
+    {
+      "comparativeRank": 11,
+      "filename": "Gathering, Stepped.obj",
+      "absoluteScore": 60.300000000000004,
+      "roundedScore": 60,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 322,
+      "freeCells": 1009,
+      "interstitialCells": 928,
+      "specBoundsFeet": {
+        "x": 20,
+        "y": 20,
+        "z": 20
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 76,
+          "raw": 0.76,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 37,
+          "raw": 0.37,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 70,
+          "raw": 0.7,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 51,
+          "raw": 0.51,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:1522429399",
+      "sha256": "0c17c3bbf21e920f1adb10ce253ff0c23f69ac10c55a6cef6c2bb9b8183ca546",
+      "meshId": "mesh-20-6gsqs3"
+    },
+    {
+      "comparativeRank": 12,
+      "filename": "Gathering Void Field.obj",
+      "absoluteScore": 61.45,
+      "roundedScore": 61,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 264,
+      "freeCells": 1067,
+      "interstitialCells": 922,
+      "specBoundsFeet": {
+        "x": 20,
+        "y": 20,
+        "z": 20.19451332092285
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 80,
+          "raw": 0.8,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 36,
+          "raw": 0.36,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 69,
+          "raw": 0.69,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 54,
+          "raw": 0.54,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:4224306991",
+      "sha256": "3b4201b5555a33f69a142a1383396f0e38e6565eab5d83c9abe9d2f8db204869",
+      "meshId": "mesh-17-73u5fb"
+    },
+    {
+      "comparativeRank": 13,
+      "filename": "workspace void.obj",
+      "absoluteScore": 62.1,
+      "roundedScore": 62,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 231,
+      "freeCells": 1100,
+      "interstitialCells": 764,
+      "specBoundsFeet": {
+        "x": 20,
+        "y": 20,
+        "z": 20.000000116197945
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 83,
+          "raw": 0.83,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 46,
+          "raw": 0.46,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 57,
+          "raw": 0.57,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 50,
+          "raw": 0.5,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:881989811",
+      "sha256": "e2f88136a1e936f19c798eae365e741396e613afee55c5100d0cbcc8d08e70e3",
+      "meshId": "mesh-30-qflgh6"
+    },
+    {
+      "comparativeRank": 14,
+      "filename": "workspace open hall.obj",
+      "absoluteScore": 63.70000000000001,
+      "roundedScore": 64,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 285,
+      "freeCells": 1299,
+      "interstitialCells": 1136,
+      "specBoundsFeet": {
+        "x": 20.00000286102295,
+        "y": 20.00000762939453,
+        "z": 20
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 82,
+          "raw": 0.82,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 34,
+          "raw": 0.34,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 72,
+          "raw": 0.72,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 68,
+          "raw": 0.68,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:2987395242",
+      "sha256": "b8142c17d0346fb323cca7425437e2b000ce9f2fa38b53db1a9dac326ce06cce",
+      "meshId": "mesh-28-7xbqde"
+    },
+    {
+      "comparativeRank": 15,
+      "filename": "Lobby Continuous Hall.obj",
+      "absoluteScore": 67.30000000000001,
+      "roundedScore": 67,
+      "tieBreakUsed": false,
+      "cellFeet": 2,
+      "occupiedCells": 200,
+      "freeCells": 1384,
+      "interstitialCells": 906,
+      "specBoundsFeet": {
+        "x": 20.593168258666992,
+        "y": 20.000000476837158,
+        "z": 20.675838470458984
+      },
+      "components": [
+        {
+          "name": "Architectural Open Space",
+          "value": 87,
+          "raw": 0.87,
+          "weight": 0.35
+        },
+        {
+          "name": "Permeability",
+          "value": 60,
+          "raw": 0.6,
+          "weight": 0.3
+        },
+        {
+          "name": "Interstitial Space",
+          "value": 57,
+          "raw": 0.57,
+          "weight": 0.25
+        },
+        {
+          "name": "Low Mass",
+          "value": 46,
+          "raw": 0.46,
+          "weight": 0.1
+        },
+        {
+          "name": "Enclosed Void (informational)",
+          "value": 0,
+          "raw": 0,
+          "weight": 0
+        }
+      ],
+      "revision": "geom:909331623",
+      "sha256": "05bd0d5b1bb45adacc1a3be8e1dc25a518763d54ff3607e4aeb33fd18000f04a",
+      "meshId": "mesh-21-bwpv21"
+    }
+  ]
+}

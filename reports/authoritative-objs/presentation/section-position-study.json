@@ -1,0 +1,511 @@
+{
+  "presentation": {
+    "least": {
+      "filename": "Gathering Linear.obj",
+      "section": "Y",
+      "offsetFeet": -4,
+      "rawCutSegments": 365,
+      "drawnCutSegments": 129,
+      "goldCells": 128
+    },
+    "most": {
+      "filename": "Lobby Continuous Hall.obj",
+      "section": "Y",
+      "offsetFeet": 0,
+      "rawCutSegments": 150,
+      "drawnCutSegments": 55,
+      "goldCells": 165
+    },
+    "feetPerPixel": 0.02333616080187244,
+    "scoresRecalculated": false
+  },
+  "defaultPlane": "section-y through each geometric center remains the evaluator default. The presentation board uses Y −4 ft for Gathering Linear and the center cut for Lobby Continuous Hall.",
+  "recommendation": "Gathering Linear.obj: the Y -4 ft cut keeps a readable profile (51% of the center boundary segments) and similar interstitial grouping. It is the more informative section. Gold-cell count was not the selector. Lobby Continuous Hall.obj: keep the center cut. The Y -8 ft cut keeps 33% of the center cut's boundary segments, so it grazes the form. Gold-cell count is not the reason. The presentation board uses Gathering Linear at Y −4 ft and Lobby Continuous Hall at the center cut. Scores were not recalculated.",
+  "criteria": "A candidate is more informative only when it keeps at least 40% of the center cut's boundary segments and does not break interstitial grouping by more than 8 points. The larger gold-cell count is reported and is not the selector.",
+  "scale": {
+    "feetPerPixel": 0.02333616080187244,
+    "shared": true,
+    "studyFeetPerPixel": 0.04202406193182721
+  },
+  "simplification": {
+    "toleranceFeet": 0.02,
+    "least": {
+      "chains": 16,
+      "maxDeviationFeet": 0.019899233852779193,
+      "droppedPoints": 266,
+      "endpointsKept": true,
+      "toleranceFeet": 0.02
+    },
+    "most": {
+      "chains": 3,
+      "maxDeviationFeet": 0.01871101968925907,
+      "droppedPoints": 46,
+      "endpointsKept": true,
+      "toleranceFeet": 0.02
+    },
+    "meaning": "Dropped points lie within the tolerance of the remaining cut line. Chain endpoints are kept. Source faces are unchanged."
+  },
+  "drawing": {
+    "least": {
+      "rawCutSegments": 722,
+      "drawnCutSegments": 273,
+      "silhouetteSegments": 414,
+      "secondarySegments": 841,
+      "goldCells": 106,
+      "continuity": 0.9905660377358491
+    },
+    "most": {
+      "rawCutSegments": 150,
+      "drawnCutSegments": 55,
+      "silhouetteSegments": 29,
+      "secondarySegments": 281,
+      "goldCells": 165,
+      "continuity": 1
+    },
+    "leastCandidate": {
+      "offsetFeet": -4,
+      "rawCutSegments": 365,
+      "drawnCutSegments": 129,
+      "goldCells": 128,
+      "profileShare": 0.5055401662049861,
+      "continuity": 1
+    },
+    "mostCandidate": {
+      "offsetFeet": -8,
+      "rawCutSegments": 50,
+      "drawnCutSegments": 23,
+      "goldCells": 177,
+      "profileShare": 0.3333333333333333,
+      "continuity": 1
+    }
+  },
+  "metrics": {
+    "least": [
+      {
+        "name": "Architectural Open Space",
+        "value": 49,
+        "weight": 0.35
+      },
+      {
+        "name": "Permeability",
+        "value": 13,
+        "weight": 0.3
+      },
+      {
+        "name": "Interstitial Space",
+        "value": 49,
+        "weight": 0.25
+      },
+      {
+        "name": "Low Mass",
+        "value": 42,
+        "weight": 0.1
+      }
+    ],
+    "most": [
+      {
+        "name": "Architectural Open Space",
+        "value": 87,
+        "weight": 0.35
+      },
+      {
+        "name": "Permeability",
+        "value": 60,
+        "weight": 0.3
+      },
+      {
+        "name": "Interstitial Space",
+        "value": 57,
+        "weight": 0.25
+      },
+      {
+        "name": "Low Mass",
+        "value": 46,
+        "weight": 0.1
+      }
+    ]
+  },
+  "scoresUnchanged": true,
+  "forms": [
+    {
+      "filename": "Gathering Linear.obj",
+      "interstitialCells": 647,
+      "centerCut": {
+        "orientation": "section-y",
+        "offsetFeet": 0,
+        "segments": 722,
+        "goldCells": 106
+      },
+      "strongestSectionY": {
+        "orientation": "section-y",
+        "offsetFeet": -4,
+        "segments": 365,
+        "goldCells": 128
+      },
+      "interstitialCentroid": [
+        12.032457496136013,
+        12.119010819165378,
+        12.02627511591963
+      ],
+      "centroidOffsetFromCenter": [
+        2.032457496136013,
+        2.1190108191653785,
+        2.0262751159196295
+      ],
+      "samples": [
+        {
+          "orientation": "section-y",
+          "offsetFeet": -8,
+          "segments": 1334,
+          "goldCells": 78
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": -6,
+          "segments": 649,
+          "goldCells": 111
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": -4,
+          "segments": 365,
+          "goldCells": 128
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": -2,
+          "segments": 1049,
+          "goldCells": 103
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 0,
+          "segments": 722,
+          "goldCells": 106
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 2,
+          "segments": 612,
+          "goldCells": 124
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 4,
+          "segments": 405,
+          "goldCells": 119
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 6,
+          "segments": 1109,
+          "goldCells": 91
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 8,
+          "segments": 836,
+          "goldCells": 113
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": -8,
+          "segments": 1138,
+          "goldCells": 97
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": -6,
+          "segments": 800,
+          "goldCells": 107
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": -4,
+          "segments": 246,
+          "goldCells": 127
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": -2,
+          "segments": 1050,
+          "goldCells": 92
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 0,
+          "segments": 1099,
+          "goldCells": 81
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 2,
+          "segments": 637,
+          "goldCells": 108
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 4,
+          "segments": 412,
+          "goldCells": 119
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 6,
+          "segments": 1138,
+          "goldCells": 98
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 8,
+          "segments": 772,
+          "goldCells": 114
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": -8,
+          "segments": 394,
+          "goldCells": 102
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": -6,
+          "segments": 186,
+          "goldCells": 128
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": -4,
+          "segments": 394,
+          "goldCells": 109
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": -2,
+          "segments": 375,
+          "goldCells": 88
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 0,
+          "segments": 516,
+          "goldCells": 114
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 2,
+          "segments": 162,
+          "goldCells": 93
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 4,
+          "segments": 575,
+          "goldCells": 82
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 6,
+          "segments": 281,
+          "goldCells": 113
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 8,
+          "segments": 284,
+          "goldCells": 136
+        }
+      ]
+    },
+    {
+      "filename": "Lobby Continuous Hall.obj",
+      "interstitialCells": 906,
+      "centerCut": {
+        "orientation": "section-y",
+        "offsetFeet": 0,
+        "segments": 150,
+        "goldCells": 165
+      },
+      "strongestSectionY": {
+        "orientation": "section-y",
+        "offsetFeet": -8,
+        "segments": 50,
+        "goldCells": 177
+      },
+      "interstitialCentroid": [
+        36.50355572942603,
+        -3.202669896826839,
+        11.7439293598234
+      ],
+      "centroidOffsetFromCenter": [
+        -0.6004415011037523,
+        -0.6887417218543046,
+        1.406010124593907
+      ],
+      "samples": [
+        {
+          "orientation": "section-y",
+          "offsetFeet": -8,
+          "segments": 50,
+          "goldCells": 177
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": -6,
+          "segments": 61,
+          "goldCells": 170
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": -4,
+          "segments": 265,
+          "goldCells": 158
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": -2,
+          "segments": 337,
+          "goldCells": 157
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 0,
+          "segments": 150,
+          "goldCells": 165
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 2,
+          "segments": 66,
+          "goldCells": 175
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 4,
+          "segments": 59,
+          "goldCells": 176
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 6,
+          "segments": 16,
+          "goldCells": 158
+        },
+        {
+          "orientation": "section-y",
+          "offsetFeet": 8,
+          "segments": 18,
+          "goldCells": 122
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": -8,
+          "segments": 53,
+          "goldCells": 173
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": -6,
+          "segments": 59,
+          "goldCells": 174
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": -4,
+          "segments": 187,
+          "goldCells": 162
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": -2,
+          "segments": 319,
+          "goldCells": 159
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 0,
+          "segments": 229,
+          "goldCells": 161
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 2,
+          "segments": 63,
+          "goldCells": 169
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 4,
+          "segments": 59,
+          "goldCells": 173
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 6,
+          "segments": 12,
+          "goldCells": 158
+        },
+        {
+          "orientation": "section-x",
+          "offsetFeet": 8,
+          "segments": 16,
+          "goldCells": 130
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": -8,
+          "segments": 36,
+          "goldCells": 54
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": -6,
+          "segments": 52,
+          "goldCells": 65
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": -4,
+          "segments": 56,
+          "goldCells": 87
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": -2,
+          "segments": 44,
+          "goldCells": 102
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 0,
+          "segments": 42,
+          "goldCells": 111
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 2,
+          "segments": 52,
+          "goldCells": 101
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 4,
+          "segments": 38,
+          "goldCells": 93
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 6,
+          "segments": 37,
+          "goldCells": 82
+        },
+        {
+          "orientation": "plan",
+          "offsetFeet": 8,
+          "segments": 279,
+          "goldCells": 84
+        }
+      ]
+    }
+  ]
+}
