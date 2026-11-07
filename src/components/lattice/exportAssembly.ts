@@ -4,6 +4,7 @@ import { connectorsToObj } from "./connectionSynthesis";
 import { slotById } from "./slots";
 import type { ImportedObj, LatticeField, Placement, TileModel, UpAxisMode } from "./types";
 import { DEFAULT_LATTICE_FIELD, fileToSpec, LATTICE_FEET, resolvedUp, unpackCell } from "./types";
+import { worldFromLocal } from "./surfaceAttachment";
 
 function latticeOf(placement: Placement): [number, number, number] {
   return [placement.ix * LATTICE_FEET, placement.iy * LATTICE_FEET, placement.iz * LATTICE_FEET + (placement.zLift ?? 0)];
@@ -17,13 +18,22 @@ export function assembledObj(
   upAxisMode: UpAxisMode = "auto",
   connectors: GeneratedConnector[] = [],
 ) {
-  const lines = ["# LUV Part 2 assembled aggregation", "# Units: feet; Z-up for Rhino", "# Source meshes are transformed only. Vertices are not remeshed.", "o assembly"];
+  const lines = ["# LUV Part 2 assembled aggregation", "# Units: feet; Z-up for Rhino", "# Original uploads remain immutable; explicitly identified derived working copies may replace displayed instances.", "o assembly"];
   let vertexOffset = 1;
   let normalOffset = 1;
   for (const mesh of meshes) {
     const placement = placements[mesh.id];
     const model = models.find((item) => item.id === mesh.id) ?? models.find((item) => item.id === mesh.id.split("::")[0]);
     if (!placement || !model) continue;
+    if(model.featureAdaptation&&model.connectionSurface){
+      const variant=model.variants.findIndex(v=>v.rotation===placement.rotation&&v.mirror===placement.mirror);
+      if(variant<0)throw new Error("Missing derived placement transform");
+      const tile={id:model.id,ix:placement.ix,iy:placement.iy,iz:placement.iz,zLift:placement.zLift,variant},surface=model.connectionSurface;
+      lines.push(`# Separate derived working geometry; original upload unchanged; feature ${model.featureAdaptation.featureId}`,`g derived_working_${model.id.replace(/[^a-zA-Z0-9_-]/g,"_")}`);
+      for(let i=0;i<surface.positions.length;i+=3){const p=worldFromLocal(Array.from(surface.positions.slice(i,i+3)) as [number,number,number],tile,model);lines.push(`v ${p.join(" ")}`);}
+      for(let i=0;i<surface.triangles.length;i+=3){const f=surface.triangles.slice(i,i+3);if(placement.mirror!=="none")[f[1],f[2]]=[f[2],f[1]];lines.push(`f ${f.map(v=>v+vertexOffset).join(" ")}`);}
+      vertexOffset+=surface.positions.length/3;continue;
+    }
     const lattice = latticeOf(placement);
     const anchor = model.anchor;
     const up = resolvedUp(mesh.upAxis, upAxisMode);
@@ -61,7 +71,7 @@ export function assembledObj(
     for (const connector of connectors) {
       lines.push(`g connector_${connector.kind}_${connector.id.replace(/[^a-zA-Z0-9_-]+/g, "_")}`);
       for (let index = 0; index < connector.positions.length; index += 3) {
-        lines.push(`v ${connector.positions[index].toFixed(5)} ${connector.positions[index + 1].toFixed(5)} ${connector.positions[index + 2].toFixed(5)}`);
+        lines.push(`v ${connector.positions[index]} ${connector.positions[index + 1]} ${connector.positions[index + 2]}`);
       }
       for (let index = 0; index < connector.indices.length; index += 3) {
         lines.push(`f ${connector.indices[index] + vertexOffset} ${connector.indices[index + 1] + vertexOffset} ${connector.indices[index + 2] + vertexOffset}`);
@@ -89,6 +99,7 @@ export function assemblyManifest(meshes: ImportedObj[], placements: Record<strin
       const slot = slotById(placement.slotId);
       return [{
         sourceFilename: mesh.filename,
+        derivedFeatureReconstruction:model.featureAdaptation??null,
         typology: slot ? `${slot.code} ${slot.name}` : null,
         category: slot?.category ?? null,
         translation: latticeOf(placement),

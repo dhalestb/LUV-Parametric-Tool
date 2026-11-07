@@ -15,6 +15,7 @@ import {
 } from "./objFidelity";
 import type { CameraMode, ColorMode, ConnectionReport, ContinuityOverlay, DiagnosticMode, ImportedObj, LatticeField, Placement, PortCandidate, PortPair, TileModel, UpAxisMode } from "./types";
 import { LATTICE_FEET, placementWorldZ } from "./types";
+import { worldFromLocal } from "./surfaceAttachment";
 
 export type LatticeViewportHandle = { capture: () => string };
 
@@ -34,6 +35,9 @@ type Props = {
   showGeneratedConnectors?: boolean;
   showOriginalTiles?: boolean;
   connectors?: GeneratedConnector[];
+  architecturalMarkers?:Array<{id:string;point:[number,number,number];direction:[number,number,number];role:string;connected:boolean}>;
+  /** Derived working copies, already in architectural coordinates. */
+  workingModels?:TileModel[];
   cameraMode: CameraMode;
   diagnostic: DiagnosticMode;
   continuityOverlay?: ContinuityOverlay;
@@ -151,10 +155,24 @@ function FidelityInstance({
   );
 }
 
+function WorkingForm({model,placement}:{model:TileModel;placement:Placement}){
+  const geometry=useMemo(()=>{const g=new THREE.BufferGeometry(),surface=model.connectionSurface!,variant=model.variants.findIndex(v=>v.rotation===placement.rotation&&v.mirror===placement.mirror);
+    const positions=new Float32Array(surface.positions.length),tile={id:model.id,ix:placement.ix,iy:placement.iy,iz:placement.iz,zLift:placement.zLift,variant};
+    for(let i=0;i<positions.length;i+=3){const p=worldFromLocal(Array.from(surface.positions.slice(i,i+3)) as [number,number,number],tile,model);positions.set([p[0],p[2],p[1]],i);}
+    const indices=surface.triangles.slice();
+    // Architectural Z-up to display Y-up reverses handedness; instance mirror
+    // reverses it once more. Normals are derived only for this rendering copy.
+    if(placement.mirror==="none")for(let i=0;i<indices.length;i+=3)[indices[i+1],indices[i+2]]=[indices[i+2],indices[i+1]];
+    g.setAttribute("position",new THREE.BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();return g;
+  },[model,placement]);
+  useEffect(()=>()=>geometry.dispose(),[geometry]);
+  return <mesh geometry={geometry}><meshStandardMaterial color="#B9BEC6" side={THREE.DoubleSide}/></mesh>;
+}
+
 function Scene({
   meshes, models, placements, unitScale, upAxisMode, field, colorMode, showLattice, showConnections,
   showGeneratedConnectors = true, showOriginalTiles = true, showConnectionPorts = false, portPairs, portCandidates, connectors = [], cameraMode, diagnostic,
-  continuityOverlay = "all", presentation, selectedId, connections, onSelect, fidelityMesh = null,
+  continuityOverlay = "all", presentation, selectedId, connections, onSelect, fidelityMesh = null, architecturalMarkers=[],workingModels=[],
 }: Props) {
   const { camera, invalidate } = useThree();
   const fidelityMode = diagnostic === "obj-fidelity" && !!fidelityMesh;
@@ -389,6 +407,7 @@ function Scene({
       <directionalLight position={[40, 80, 30]} intensity={1.1} />
 
       {showOriginalTiles && visibleMeshes.map((mesh, index) => {
+        if(!fidelityMode&&!spread&&workingModels.some(m=>m.id===mesh.id))return null;
         const placement = placements[mesh.id] ?? IDENTITY_PLACEMENT(mesh.id);
         const model = modelById.get(mesh.id) ?? modelById.get(geometryKey(mesh.id));
         const slot = slotById(placement.slotId ?? model?.slotId ?? null);
@@ -431,6 +450,12 @@ function Scene({
         );
       })}
 
+      {showOriginalTiles&&!fidelityMode&&!spread&&workingModels.map(model=>placements[model.id]?<WorkingForm key={model.id} model={model} placement={placements[model.id]}/>:null)}
+      {!fidelityMode&&!spread&&!presentation&&architecturalMarkers.map(marker=>{
+        const p:[number,number,number]=[marker.point[0],marker.point[2]+.5,marker.point[1]],end:[number,number,number]=[p[0]+marker.direction[0]*3,p[1],p[2]+marker.direction[1]*3];
+        const color=marker.role==="projecting branch"?"#D6AD4F":"#71BEDA";
+        return <group key={marker.id}><Line points={[p,end]} color={color} lineWidth={1}/><Html occlude position={p} zIndexRange={[4,0]} style={{fontSize:10,color,whiteSpace:"nowrap",background:"#000000d9",padding:3}}>{marker.role} candidate · {marker.connected?"selected interface":"unconnected / unverified"}</Html></group>;
+      })}
       {!fidelityMode && !spread && showConnectionPorts && models.flatMap(model => {
         const placement = placements[model.id];
         if (!placement) return [];

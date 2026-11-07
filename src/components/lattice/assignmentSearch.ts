@@ -17,6 +17,10 @@ import type {
   TileModel,
 } from "./types";
 import { clampLatticeCells, LATTICE_FEET, MIRRORS, ROTATIONS, placementWorldZ, variantIndex } from "./types";
+import { orderAssignmentCandidates, uniqueAssignmentCandidates, confirmedBranchRelationships, assignmentInterfacePriority } from "./assignmentGuidance";
+import { beginGeometryValidation } from "./geometryRevision";
+import { generateFeatureConnections } from "./featureConnections";
+import { DEFAULT_CONNECTION_FEATURE_POLICY, type ConnectionFeaturePolicy } from "./connectionFeatures";
 
 export type AssemblyTestMode = "catalog" | "copies-2" | "copies-3" | "copies-4" | "copies-8" | "global-field";
 
@@ -52,6 +56,8 @@ export type AssignmentResult = {
   status: "PASS" | "REVIEW" | "FAIL";
   summary: string;
   formIds: string[];
+  searchEvidence?:{guided:boolean;generated:number;evaluated:number;omitted:number;incomplete:boolean;stopReason?:string;candidateLimit:number;millisecondsLimit:number;duplicates?:number;stageStops?:string[];firstConnectionMs?:number;detailedRoutes?:number;cheapRejections?:number};
+  execution?:{environment:"browser module worker";reusedSourceGeometries:number};
 };
 
 export type CatalogRow = {
@@ -86,7 +92,16 @@ export function mappingStatus(models: TileModel[]) {
   return { mapped, total: required.length, missing, complete: missing.length === 0, bySlot };
 }
 
-type Hooks = { cancelled: () => boolean; onProgress: (message: string, percent?: number) => void };
+export type AssignmentSearchOptions={guided:boolean;perStage:number;candidates:number;milliseconds:number;stopOnConnected?:boolean;featurePolicy?:ConnectionFeaturePolicy};
+export const DEFAULT_ASSIGNMENT_SEARCH_OPTIONS:AssignmentSearchOptions={guided:true,perStage:8,candidates:64,milliseconds:120000,stopOnConnected:true,featurePolicy:DEFAULT_CONNECTION_FEATURE_POLICY};
+type Hooks = { cancelled: () => boolean; onProgress: (message: string, percent?: number) => void;
+  onEvaluation?:(tiles:PlacedTile[],synthesis:SynthesisResult)=>void };
+type SearchControl={options:AssignmentSearchOptions;started:number;generated:number;evaluated:number;stopReason?:string;duplicates:number;stageStops:string[];firstConnectionMs?:number;detailedRoutes:number;cheapRejections:number};
+function stopped(control?:SearchControl){if(!control)return false;
+  if(control.evaluated>=control.options.candidates)control.stopReason="candidate budget";
+  if(performance.now()-control.started>=control.options.milliseconds)control.stopReason="wall-time budget";
+  return !!control.stopReason;
+}
 
 function categoryOf(model: TileModel): LatticeSlot["category"] | "Unknown" {
   return slotById(model.slotId)?.category ?? "Unknown";
@@ -208,7 +223,9 @@ function evaluateAssignment(instances: TileModel[], tiles: PlacedTile[], collect
   const finishTiming = startConnectionTiming("search candidate evaluation");
   try {
   const evaled = evaluateAssembly(instances, tiles);
-  const portMatches = matchAssemblyPorts(instances, tiles, evaled.connections, {}, collectDiagnostics);
+  // Construction is part of feasibility for EVERY evaluated arrangement, not
+  // a different algorithm applied only after selecting the winning placement.
+  const portMatches = matchAssemblyPorts(instances, tiles, evaled.connections, {}, collectDiagnostics,instances.some(m=>m.sourceResponsiveExtensions));
   const parent = new Map(tiles.map(tile => [tile.id, tile.id]));
   const find = (id: string): string => parent.get(id) === id ? id : find(parent.get(id)!);
   for (const edge of [...portMatches.confirmedReports, ...portMatches.pairs]) {
@@ -219,6 +236,31 @@ function evaluateAssignment(instances: TileModel[], tiles: PlacedTile[], collect
   return {evaled, portMatches};
 
   } finally { finishTiming(); }
+}
+
+function evaluateCandidate(instances:TileModel[],tiles:PlacedTile[]){
+  const finish=beginGeometryValidation();
+  try {
+    if(tiles.length===2&&instances.every(m=>m.sourceResponsiveExtensions&&m.connectionFeaturePolicy)){
+      const portMatches=generateFeatureConnections(instances,tiles,{policy:instances[0].connectionFeaturePolicy,pairs:8,adaptations:4,milliseconds:10000});
+      const workingModels=portMatches.workingModels,evaled=evaluateAssembly(workingModels,tiles);
+      evaled.components=portMatches.componentsAfter;
+      evaled.parts={...evaled.parts,connectivity:Math.max(0,tiles.length-evaled.components)};
+      const synthesis=synthesizeConnectors(workingModels,tiles,evaled.connections,{...portMatches,portPairs:portMatches.pairs,networkOnly:true});
+      synthesis.featureDiagnostics=portMatches.featureDiagnostics;
+      return {evaled,portMatches,synthesis,workingModels};
+    }
+    const evaluated=evaluateAssignment(instances,tiles);
+    const synthesis=synthesizeConnectors(instances,tiles,evaluated.evaled.connections,{portPairs:evaluated.portMatches.pairs,...evaluated.portMatches});
+    return {...evaluated,synthesis,workingModels:instances};
+  } finally {finish();}
+}
+type CandidateEvaluation=ReturnType<typeof evaluateCandidate>;
+function recordEvaluation(control:SearchControl|undefined,evaluation:CandidateEvaluation){
+  if(!control)return;
+  control.detailedRoutes+=evaluation.portMatches.detailedRoutes;
+  control.cheapRejections+=evaluation.portMatches.cheapRejections;
+  if(control.firstConnectionMs===undefined&&evaluation.synthesis.connectors.length)control.firstConnectionMs=performance.now()-control.started;
 }
 
 function scoreObjective(evaled: ReturnType<typeof evaluateAssembly>, synthesis: SynthesisResult, objective: AssignmentObjective, variationBoost: number, portScore = 0) {
@@ -324,9 +366,12 @@ function finalize(
   tested: number,
   started: number,
   variationBoost: number,
+  evaluated?:CandidateEvaluation,
 ): AssignmentResult {
-  const {evaled, portMatches} = evaluateAssignment(instances, tiles, true);
-  const synthesis = synthesizeConnectors(instances, tiles, evaled.connections, {portPairs: portMatches.pairs, ...portMatches});
+  // Retain the exact validated meshes from the selected state. No second
+  // generation pass after the search budget, and no cross-obstacle cache reuse.
+  const {evaled,portMatches,synthesis,workingModels}=evaluated??evaluateCandidate(instances,tiles);
+  instances=workingModels;
   const typologyRetention = typologyRetentionScore(instances, evaled, synthesis);
   const primaryPreserved = Math.max(0, 100 - synthesis.connectorCost * 4);
   const uniqueForms = new Set(forms.map((model) => model.id)).size;
@@ -443,14 +488,17 @@ function candidateWorldZs(
   return [...out].filter((z) => Number.isFinite(z) && z >= 0);
 }
 
-async function searchMixedPair(forms: TileModel[], field: LatticeField, hooks: Hooks) {
+async function searchMixedPair(forms: TileModel[], field: LatticeField, hooks: Hooks, control?:SearchControl) {
   const instances = materializeInstances(forms.slice(0, 2));
   const a = instances[0];
   const b = instances[1];
   const aSource = sourceIdOf(a.id);
   const bSource = sourceIdOf(b.id);
   let tested = 0;
-  let best: { tiles: PlacedTile[]; score: number; variation: number; components:number; collisions:number } | null = null;
+  type PairState = { tiles: PlacedTile[]; score: number; variation: number; components:number; collisions:number; branchQuality:number; opportunityQuality:number; evaluated:CandidateEvaluation };
+  let best: PairState | null = null;
+  const alternatives:PairState[]=[];
+  const jobs:Array<{tiles:PlacedTile[];sameBay:boolean;va:number;vb:number}>=[];
   const originIx = Math.min(1, Math.max(0, field.cellsX - 1));
   const originIy = Math.min(1, Math.max(0, field.cellsY - 1));
   const origin: PlacedTile = { id: a.id, variant: 0, ix: originIx, iy: originIy, iz: 0, zLift: 0 };
@@ -476,37 +524,53 @@ async function searchMixedPair(forms: TileModel[], field: LatticeField, hooks: H
         if (field.cellsZ > 1 && worldZ + tileHeight(b) > maxFieldZ(field) + LATTICE_FEET) continue;
         for (let vb = 0; vb < vbLimit; vb += 1) {
           if (hooks.cancelled()) throw new Error("cancelled");
-          tested += 1;
-          if(tested%2===0){hooks.onProgress(`2-form search · ${tested} candidates`,Math.min(90,Math.round(tested/800*90)));await new Promise(resolve=>setTimeout(resolve,0));}
           const tiles: PlacedTile[] = [
             { ...origin, variant: va },
             { id: b.id, variant: vb, ix: target.ix, iy: target.iy, iz, zLift },
           ];
-          const {evaled, portMatches} = evaluateAssignment(instances, tiles);
-          const synthesis = synthesizeConnectors(instances, tiles, evaled.connections, {portPairs: portMatches.pairs, ...portMatches});
+          jobs.push({tiles,sameBay:target.sameBay,va,vb});
+        }
+      }
+    }
+  }
+  const uniqueJobs=uniqueAssignmentCandidates(jobs,instances);
+  if(control){control.generated+=uniqueJobs.length;control.duplicates+=jobs.length-uniqueJobs.length;}
+  const finish=beginGeometryValidation();let selected:typeof jobs;
+  try{selected=orderAssignmentCandidates(uniqueJobs,instances,control?Math.min(control.options.perStage,control.options.candidates-control.evaluated):uniqueJobs.length,control?.options.guided??false);}finally{finish();}
+  if(control&&selected.length<uniqueJobs.length)control.stageStops.push("initial pair shortlist limit");
+  const stageDeadline=control?control.started+control.options.milliseconds/Math.max(1,forms.length-1):Infinity;
+  for(const {tiles,sameBay,va,vb}of selected){
+          if(hooks.cancelled())throw new Error("cancelled");if(stopped(control))break;
+          if(best&&performance.now()>=stageDeadline){control?.stageStops.push("initial pair time share");break;}
+          tested++;if(control)control.evaluated++;
+          hooks.onProgress(`2-form search · ${tested}/${selected.length} selected candidates · ${uniqueJobs.length-selected.length} unique budget omissions`,Math.min(90,Math.round(tested/Math.max(1,selected.length)*30)));
+          await new Promise(resolve=>setTimeout(resolve,0));
+          const evaluated=evaluateCandidate(instances,tiles),{evaled,portMatches,synthesis}=evaluated;
+          recordEvaluation(control,evaluated);
+          hooks.onEvaluation?.(tiles,synthesis);
           const differentCategory = categoryOf(forms[0]) !== categoryOf(forms[1]) ? 2 : 0;
-          const stackBonus = target.sameBay ? 0.2 : 2;
+          const stackBonus = sameBay ? 0.2 : 2;
           const variation = differentCategory + stackBonus + (va !== vb ? 0.3 : 0);
           const components = graphComponents(synthesis, evaled.components);
           const score = scoreObjective(evaled, synthesis, "balanced", variation, portMatches.score);
           const collisions = destructiveCollisions(evaled.connections);
-          if (!best || collisions < best.collisions || (collisions === best.collisions && (components < best.components || (components === best.components && score > best.score)))) best = { tiles, score, variation, components, collisions };
-        }
-      }
-    }
-    if (tested % 40 === 0) {
-      hooks.onProgress(`2-form search · ${tested} candidates`, Math.min(90, Math.round((tested / 800) * 90)));
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    }
+          const branchQuality=control?.options.guided?confirmedBranchRelationships(instances,tiles,synthesis.portPairs??[]):0;
+          const opportunityQuality=control?.options.guided?assignmentInterfacePriority(instances,tiles):0;
+          const state={tiles,score,variation,components,collisions,branchQuality,opportunityQuality,evaluated};
+          alternatives.push(state);
+          if (!best || collisions < best.collisions || (collisions === best.collisions && (components < best.components || (components === best.components && (branchQuality>best.branchQuality||(branchQuality===best.branchQuality&&(opportunityQuality>best.opportunityQuality||(opportunityQuality===best.opportunityQuality&&score > best.score)))))))) best = state;
+          if(forms.length===2&&control?.options.stopOnConnected&&components===1&&collisions===0){control.stopReason="first validated connected arrangement";break;}
   }
   connectionDiagnostic("search", "initial pair pruning", { tested, retained: best ? 1 : 0, forms: forms.map(model => ({ id: model.id, filename: model.filename })), winner: best?.tiles });
-  return { instances, best, tested };
+  alternatives.sort((a,b)=>a.collisions-b.collisions||a.components-b.components||b.branchQuality-a.branchQuality||b.opportunityQuality-a.opportunityQuality||b.score-a.score);
+  return { instances, best, tested,alternatives:alternatives.slice(0,4) };
 }
 
 async function growMixedAssembly(
   forms: TileModel[],
   field: LatticeField,
   hooks: Hooks,
+  control?:SearchControl,
 ) {
   const targetCount = forms.length;
   const instances = materializeInstances(forms);
@@ -519,7 +583,7 @@ async function growMixedAssembly(
     };
   }
 
-  const pair = await searchMixedPair(forms, field, hooks);
+  const pair = await searchMixedPair(forms, field, hooks,control);
   if (!pair.best) {
     return {
       instances,
@@ -529,12 +593,14 @@ async function growMixedAssembly(
     };
   }
 
-  let beam: Array<{ tiles: PlacedTile[]; score: number; variation: number; components:number; collisions:number }> = [pair.best];
+  let beam = pair.alternatives;
   let tested = pair.tested;
   const planOffsets: Array<[number, number]> = [[1, 0], [-1, 0], [0, 1], [0, -1]];
 
   while (beam[0] && beam[0].tiles.length < targetCount) {
+    if(stopped(control))break;
     const nextBeam: typeof beam = [];
+    const jobs:Array<{tiles:PlacedTile[];variation:number}>=[];
     const nextIndex = beam[0].tiles.length;
     connectionDiagnostic("search", "growth ordering and beam limit", { nextIndex, order: instances.map(model => ({ id: model.id, filename: model.filename })), availableStates: beam.length, expandedStates: Math.min(6, beam.length) });
     const nextModel = instances[nextIndex];
@@ -569,24 +635,35 @@ async function growMixedAssembly(
             if (tooClose) continue;
             for (let variant = 0; variant < Math.min(nextModel.variants.length, 12); variant += 1) {
               if (hooks.cancelled()) throw new Error("cancelled");
-              tested += 1;
-              if(tested%2===0){hooks.onProgress(`${targetCount}-form grow · ${tested} candidates`,Math.min(95,20+nextIndex*12));await new Promise(resolve=>setTimeout(resolve,0));}
               const tiles = [...state.tiles, { id: nextModel.id, variant, ix: target.ix, iy: target.iy, iz, zLift }];
-              const active = instances.slice(0, tiles.length);
-              const {evaled, portMatches} = evaluateAssignment(active, tiles);
-              const synthesis = synthesizeConnectors(active, tiles, evaled.connections, {portPairs: portMatches.pairs, ...portMatches});
               const categories = new Set(forms.slice(0, tiles.length).map((model) => categoryOf(model))).size;
               const stackBonus = target.sameBay ? 0.2 : 2;
               const variation = state.variation + categories + stackBonus;
-              const components = graphComponents(synthesis, evaled.components);
-              const score = scoreObjective(evaled, synthesis, "balanced", variation, portMatches.score);
-              nextBeam.push({ tiles, score, variation, components, collisions: destructiveCollisions(evaled.connections) });
+              jobs.push({tiles,variation});
             }
           }
         }
       }
     }
-    nextBeam.sort((a,b)=>a.collisions-b.collisions || a.components-b.components || b.score-a.score);
+    const active=instances.slice(0,nextIndex+1),finish=beginGeometryValidation();let selected:typeof jobs;
+    const uniqueJobs=uniqueAssignmentCandidates(jobs,active);
+    if(control){control.generated+=uniqueJobs.length;control.duplicates+=jobs.length-uniqueJobs.length;}
+    try{selected=orderAssignmentCandidates(uniqueJobs,active,control?Math.min(control.options.perStage,control.options.candidates-control.evaluated):uniqueJobs.length,control?.options.guided??false);}finally{finish();}
+    if(control&&selected.length<uniqueJobs.length)control.stageStops.push(`${nextIndex+1}-form shortlist limit`);
+    const stageDeadline=control?performance.now()+Math.max(0,control.options.milliseconds-(performance.now()-control.started))/Math.max(1,targetCount-nextIndex):Infinity;
+    for(const {tiles,variation}of selected){
+      if(hooks.cancelled())throw new Error("cancelled");if(stopped(control))break;
+      if(nextBeam.length&&performance.now()>=stageDeadline){control?.stageStops.push(`${nextIndex+1}-form time share`);break;}
+      tested++;if(control)control.evaluated++;
+      hooks.onProgress(`${targetCount}-form grow · ${tiles.length} forms · ${tested} candidates · ${uniqueJobs.length-selected.length} unique stage budget omissions`,Math.min(95,20+nextIndex*20));
+      await new Promise(resolve=>setTimeout(resolve,0));
+      const evaluated=evaluateCandidate(active,tiles),{evaled,portMatches,synthesis}=evaluated;
+      recordEvaluation(control,evaluated);
+      hooks.onEvaluation?.(tiles,synthesis);
+      nextBeam.push({tiles,variation,components:graphComponents(synthesis,evaled.components),score:scoreObjective(evaled,synthesis,"balanced",variation,portMatches.score),collisions:destructiveCollisions(evaled.connections),branchQuality:control?.options.guided?confirmedBranchRelationships(active,tiles,synthesis.portPairs??[]):0,opportunityQuality:control?.options.guided?assignmentInterfacePriority(active,tiles):0,evaluated});
+      if(tiles.length===targetCount&&control?.options.stopOnConnected&&graphComponents(synthesis,evaled.components)===1&&destructiveCollisions(evaled.connections)===0){control.stopReason="first validated connected arrangement";break;}
+    }
+    nextBeam.sort((a,b)=>a.collisions-b.collisions || a.components-b.components || b.branchQuality-a.branchQuality || b.opportunityQuality-a.opportunityQuality || b.score-a.score);
     const unique: typeof nextBeam = [];
     const seen = new Set<string>();
     for (const item of nextBeam) {
@@ -606,7 +683,7 @@ async function growMixedAssembly(
   }
 
   const bestTiles = (beam[0]?.tiles ?? []).slice(0, targetCount);
-  return { instances, tiles: bestTiles, tested, variation: beam[0]?.variation ?? 0 };
+  return { instances, tiles: bestTiles, tested, variation: beam[0]?.variation ?? 0,evaluated:beam[0]?.evaluated };
 }
 
 export async function searchAssignmentCopies(
@@ -617,8 +694,11 @@ export async function searchAssignmentCopies(
   fieldOverride?: LatticeField,
   seeds: TileModel[] = [],
   eligibleAssignedSourceIds: ReadonlySet<string> = new Set(pool.filter(model => !model.id.includes("::")).map(model => model.id)),
+  options?:AssignmentSearchOptions,
 ): Promise<AssignmentResult> {
   const started = performance.now();
+  if(options&&(!Number.isInteger(options.perStage)||options.perStage<2||options.perStage>256||!Number.isInteger(options.candidates)||options.candidates<2||options.candidates>2048||!Number.isFinite(options.milliseconds)||options.milliseconds<1000||options.milliseconds>300000))throw new Error("Invalid bounded assignment search budget");
+  const control:SearchControl|undefined=options?{options,started,generated:0,evaluated:0,duplicates:0,stageStops:[],detailedRoutes:0,cheapRejections:0}:undefined;
   const defaults = assignmentFieldForCopies(Math.max(2, copyCount));
   const field: LatticeField = fieldOverride
     ? {
@@ -634,12 +714,22 @@ export async function searchAssignmentCopies(
     hooks.onProgress("Need at least 2 distinct mapped forms", 100);
   }
 
-  const forms = selectDistinctForms(eligiblePool, copyCount, seeds);
+  const forms = selectDistinctForms(eligiblePool, copyCount, seeds).map(m=>({...m,connectionFeaturePolicy:copyCount===2?options?.featurePolicy:undefined}));
   hooks.onProgress(`Selecting ${copyCount} distinct forms · ${formLabel(forms)}`, 5);
-  const grown = await growMixedAssembly(forms, field, hooks);
+  const grown = await growMixedAssembly(forms, field, hooks,control);
   assertEligibleAssignmentSources(grown.tiles, grown.instances, eligibleAssignedSourceIds);
   hooks.onProgress(`${copyCount}-form complete`, 100);
-  return finalize(mode, copyCount, field, forms, grown.instances, grown.tiles, grown.tested, started, grown.variation);
+  const active=grown.instances.filter(m=>grown.tiles.some(t=>t.id===m.id));
+  if(hooks.cancelled())throw new Error("cancelled");
+  const result=finalize(mode, copyCount, field, forms, active, grown.tiles, grown.tested, started, grown.variation,grown.evaluated);
+  if(control){const omitted=Math.max(0,control.generated-control.evaluated);
+    if(!control.stopReason && omitted>0)stopped(control);
+    const stopReason=control.stopReason??(control.stageStops.some(reason=>reason.endsWith("time share"))?"per-stage time share":control.stageStops.length?"per-stage shortlist limit":"candidate space exhausted");
+    result.searchEvidence={guided:options!.guided,generated:control.generated,evaluated:control.evaluated,omitted,incomplete:omitted>0||!!control.stopReason,stopReason,candidateLimit:options!.candidates,millisecondsLimit:options!.milliseconds,duplicates:control.duplicates,stageStops:control.stageStops,firstConnectionMs:control.firstConnectionMs,detailedRoutes:control.detailedRoutes,cheapRejections:control.cheapRejections};
+    result.summary+=` · bounded search ${control.evaluated}/${control.generated} unique · ${omitted} untested · ${stopReason}`;
+    if(!result.synthesis.connectors.length&&result.components>1&&result.searchEvidence.incomplete)result.summary+=" · No connection found within the search budget";
+  }
+  return result;
 }
 
 export async function runCatalogTest(models: TileModel[], hooks: Hooks): Promise<CatalogRow[]> {

@@ -8,6 +8,7 @@ import { routeAlternatives } from "./alternativeRouting";
 import { geometryRevision } from "./geometryRevision";
 import type { ConnectorSurface } from "./connectionClearance";
 import { surfaceOrientation } from "./surfaceOrientation";
+import { preciseKernelCopy } from "./extensionReconstruction";
 
 export type AdaptationMode = "Preserve Original" | "Allow Derived Adaptation";
 export type AdaptationLimits = { extentFeet:number; removedCubicFeet:number; landingSquareFeet:number; connectorFeet:number; supports:number; triangles:number; candidates:number };
@@ -124,8 +125,12 @@ export function deriveAdaptedAssembly(api:ManifoldToplevel,models:TileModel[],ti
     // Validate the complete obstruction scene rather than silently omitting a bad solid.
     for(const tile of tiles){const model=models.find(m=>m.id===tile.id);if(!model)return fail("missing source model");solids.set(tile.id,retain(solidOf(api,model,tile)));}
     const existingSolids=existing.map(surface=>{
-      const mesh=new api.Mesh({numProp:3,vertProperties:surface.positions.slice(),triVerts:Uint32Array.from(surface.indices)});mesh.merge();
-      return retain(new api.Manifold(mesh));
+      const mesh=new api.Mesh({numProp:3,vertProperties:Float32Array.from(surface.positions),triVerts:Uint32Array.from(surface.indices)});mesh.merge();
+      const rounded=new api.Manifold(mesh);
+      if(surface.positions instanceof Float32Array)return retain(rounded);
+      // Restore the actual derived coordinates after the kernel's Float32
+      // interchange step; never validate a rounded substitute for that mesh.
+      try{return retain(preciseKernelCopy(rounded,surface.positions));}finally{rounded.delete();}
     });
     for(const proposal of proposals){
       const model=models.find(m=>m.id===proposal.sourceId),tile=tiles.find(t=>t.id===proposal.sourceId),source=solids.get(proposal.sourceId);

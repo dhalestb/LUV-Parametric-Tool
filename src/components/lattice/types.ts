@@ -108,6 +108,9 @@ export type ObjFace = { vertices: number[]; normals: number[] | null };
 export type ObjGroup = { name: string; faceStart: number; faceCount: number };
 
 export type ImportedObj = {
+  /** Optional immutable uploaded bytes and their hash; legacy imports cannot recover original bytes. */
+  originalObjBytes?: Uint8Array;
+  sourceSHA256?: string;
   id: string;
   filename: string;
   positions: Float32Array;
@@ -135,6 +138,9 @@ export type Placement = {
 };
 
 export type Vec3 = [number, number, number];
+/** Derived geometry can retain authoritative cap-plane precision. Imported OBJ
+ * storage and the legacy generator remain unchanged. GPU buffers are copies. */
+export type DerivedPositions = Float32Array | Float64Array;
 export type ConnectionPortType = "BRANCH_END" | "PLATFORM_EDGE" | "LANDING_EDGE" | "PASSAGE_END" | "CIRCULATION_END" | "EXPOSED_WALKABLE_EDGE";
 export type ConnectionPort = {
   id: string;
@@ -156,6 +162,7 @@ export type ConnectionClass = "DIRECT" | "ADAPTIVE" | "VERTICAL";
 export type PortRejection = "CIRCULATION VALIDATION" | "SURFACE ATTACHMENT" | "SLOPE" | "DISTANCE" | "ANGLE" | "LATERAL OFFSET" | "ELEVATION" | "WIDTH" | "COLLISION" | "LOW CONFIDENCE" | "NETWORK REDUNDANT" | "PORT IN USE";
 export type PortCandidate = { pair: PortPair; accepted: boolean; reason?: PortRejection };
 export type PortPair = {
+  featureConnection?:{source:string;target:string;sourceFeature:string;targetFeature:string};
   tileA: string;
   tileB: string;
   portA: string;
@@ -181,6 +188,8 @@ export type PortPair = {
   fallback?: boolean;
   startProfile?: [Vec3,Vec3];
   endProfile?: [Vec3,Vec3];
+  /** Measured derived construction; source vertices and faces remain immutable. */
+  extension?: import("./sourceResponsiveExtension").ExtensionEvidence;
   portOffsetA?: number;
   portOffsetB?: number;
 };
@@ -228,6 +237,12 @@ export type TileModel = {
   variants: TileVariant[];
   /** Read-only anchored source surface for assignment connector clearance; never rendered. */
   connectionSurface?: { positions: Float32Array; triangles: number[] };
+  /** Production opt-in; historical regression fixtures retain their original generator. */
+  sourceResponsiveExtensions?: boolean;
+  /** Separate derived working copy only; original imported model has no record. */
+  branchAdaptation?:import("./branchAdaptation").BranchProvenance;
+  featureAdaptation?:import("./featureAdaptation").FeatureAdaptationProvenance;
+  connectionFeaturePolicy?:import("./connectionFeatures").ConnectionFeaturePolicy;
 };
 
 export type ConnectionReport = {

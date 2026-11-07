@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "node scripts/patch-next-eisdir.js && next build",
+    "dev": "node scripts/prepare-geometry-runtime.cjs && next dev",
+    "build": "node scripts/prepare-geometry-runtime.cjs && node scripts/patch-next-eisdir.js && next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "node scripts/patch-next-eisdir.js"

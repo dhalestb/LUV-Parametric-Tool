@@ -5,6 +5,10 @@ import type { ConnectionPort, ConnectionReport, PlacedTile, PortCandidate, PortP
 import { LATTICE_FEET, packCell, placementWorldZ } from "./types";
 import { transitionPath, transitionMeshes, pathLength, circulationProfile } from "./transitionGeometry";
 import { transitionSurfaceClear, type ConnectorSurface } from "./connectionClearance";
+import { evaluateAlternativeRoutes } from "./alternativeRouting";
+import { architecturalInterface } from "./architecturalSurfaces";
+import { branchSectionAnchors } from "./branchAdaptation";
+import { sideAdjacentRegistration } from "./adjacentConnections";
 
 export const DEFAULT_PORT_TOLERANCES = Object.freeze({maxDistance:20,maxLateralOffset:12,maxAngularDeviation:115,maxElevation:8,maxDirectElevation:.5,maxDirectSlope:.125,minUsableWidth:2,minConfidence:.55,directDistance:4,directLateralOffset:2,directAngle:35,minCompatibilityScore:4});
 export type PortTolerances = { [K in keyof typeof DEFAULT_PORT_TOLERANCES]: number };
@@ -91,12 +95,14 @@ function routeClear(pair:PortPair,tiles:PlacedTile[],models:TileModel[],existing
   for(let i=1;i<path.length;i++) if(!portRouteClear(path[i-1],path[i],Math.max(pair.startWidth??pair.usableWidth,pair.endWidth??pair.usableWidth),proxyTiles,proxyModels,[]))return false;
   return transitionSurfaceClear(pair,tiles,models,existing);
 }
-export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports:ConnectionReport[]=[],tolerances:Partial<PortTolerances>={},collectDiagnostics=true) {
+export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports:ConnectionReport[]=[],tolerances:Partial<PortTolerances>={},collectDiagnostics=true,adjacentConstruction=false) {
   const finishGeometry = beginGeometryValidation();
   try {
   const finishTiming = startConnectionTiming("candidate generation");
   try {
   const candidates:PortCandidate[]=[],byId=new Map(models.map(m=>[m.id,m]));
+  let detailedRoutes=0;
+  let assessedPairs=0,cheapRejections=0;
   for(let i=0;i<tiles.length;i++)for(let j=i+1;j<tiles.length;j++) {
     const a=tiles[i],b=tiles[j];
     const ma=byId.get(a.id)??byId.get(a.id.split("::")[0]),mb=byId.get(b.id)??byId.get(b.id.split("::")[0]);
@@ -105,19 +111,21 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
     const collision=reports.some(r=>((r.tileA===a.id&&r.tileB===b.id)||(r.tileB===a.id&&r.tileA===b.id))&&r.collision==="FAIL");
     if(!collectDiagnostics&&collision)continue;
     for(const pa of ma.variants[a.variant].ports??[])for(const pb of mb.variants[b.variant].ports??[]) {
+      assessedPairs++;
       if(!collectDiagnostics) {
         const from=worldPortPosition(a,pa),to=worldPortPosition(b,pb),maxDistance=tolerances.maxDistance??DEFAULT_PORT_TOLERANCES.maxDistance;
         const na=Math.hypot(pa.outwardDirection[0],pa.outwardDirection[1])||1,nb=Math.hypot(pb.outwardDirection[0],pb.outwardDirection[1])||1;
         const opposition=-(pa.outwardDirection[0]*pb.outwardDirection[0]+pa.outwardDirection[1]*pb.outwardDirection[1])/(na*nb);
-        if(opposition+1e-10<Math.cos(Math.max(0,Math.min(180,tolerances.maxAngularDeviation??DEFAULT_PORT_TOLERANCES.maxAngularDeviation))*Math.PI/180))continue;
-        if(Math.min(pa.usableWidth,pb.usableWidth)<(tolerances.minUsableWidth??DEFAULT_PORT_TOLERANCES.minUsableWidth)||Math.min(pa.confidence,pb.confidence)<(tolerances.minConfidence??DEFAULT_PORT_TOLERANCES.minConfidence))continue;
+        if(opposition+1e-10<Math.cos(Math.max(0,Math.min(180,tolerances.maxAngularDeviation??DEFAULT_PORT_TOLERANCES.maxAngularDeviation))*Math.PI/180)){cheapRejections++;continue;}
+        if(Math.min(pa.usableWidth,pb.usableWidth)<(tolerances.minUsableWidth??DEFAULT_PORT_TOLERANCES.minUsableWidth)||Math.min(pa.confidence,pb.confidence)<(tolerances.minConfidence??DEFAULT_PORT_TOLERANCES.minConfidence)){cheapRejections++;continue;}
         const halfA=pa.profile?pa.usableWidth*.5:0,halfB=pb.profile?pb.usableWidth*.5:0;
         // Opening centers can slide only along their source edges, not in every direction.
-        if(Math.abs(to[0]-from[0])>maxDistance+1e-8+Math.abs(pa.outwardDirection[1]/na)*halfA+Math.abs(pb.outwardDirection[1]/nb)*halfB||Math.abs(to[1]-from[1])>maxDistance+1e-8+Math.abs(pa.outwardDirection[0]/na)*halfA+Math.abs(pb.outwardDirection[0]/nb)*halfB)continue;
+        if(Math.abs(to[0]-from[0])>maxDistance+1e-8+Math.abs(pa.outwardDirection[1]/na)*halfA+Math.abs(pb.outwardDirection[1]/nb)*halfB||Math.abs(to[1]-from[1])>maxDistance+1e-8+Math.abs(pa.outwardDirection[0]/na)*halfA+Math.abs(pb.outwardDirection[0]/nb)*halfB){cheapRejections++;continue;}
         const reach=halfA+halfB;
-        if(from.reduce((sum,v,i)=>sum+(v-to[i])**2,0)>(maxDistance+reach)**2)continue;
+        if(from.reduce((sum,v,i)=>sum+(v-to[i])**2,0)>(maxDistance+reach)**2){cheapRejections++;continue;}
       }
       const {pair,reason}=assessPortPair(pa,a,pb,b,tolerances);
+      if(reason)cheapRejections++;
       if(!collectDiagnostics&&reason)continue;
       candidates.push({pair,accepted:false,reason:reason??(collision?"COLLISION":undefined)});
     }
@@ -146,6 +154,7 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
       if(pathLength(routed.path!)>(tolerances.maxDistance??DEFAULT_PORT_TOLERANCES.maxDistance)*1.4){validationReason="DISTANCE";connectionDiagnostic("port route", "route length", { pair: routed, bend });continue;}
       if (!portAttachmentMeets(routed, models, tiles)) { validationReason = "SURFACE ATTACHMENT"; connectionDiagnostic("port route", "surface attachment", { pair: routed, bend }); continue; }
       if (!acceptCirculationClass(routed)) { validationReason = "SLOPE"; connectionDiagnostic("port route", "slope", { pair: routed, bend }); continue; }
+      detailedRoutes++;
       const complete=validateCirculationConnection(routed,models,tiles,surfaces);
       if(complete.reason!=="accepted"){validationReason="CIRCULATION VALIDATION";connectionDiagnostic("port route",complete.reason,{pair:routed,bend,details:complete.details});continue;}
       validationReason = "COLLISION";
@@ -155,10 +164,39 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
     validatedPairs.set(accepted,{models,tiles,geometry:JSON.stringify(accepted),placements:JSON.stringify(tiles),sources:modelRevisions(models)});candidate.pair=accepted;candidate.accepted=true;pairs.push(accepted);
     for(const [key,offset,width] of [[ka,accepted.portOffsetA??0,accepted.startWidth??accepted.usableWidth],[kb,accepted.portOffsetB??0,accepted.endWidth??accepted.usableWidth]] as const){const spans=used.get(key)??[];spans.push({offset,width});used.set(key,spans);}join(pair.tileA,pair.tileB);surfaces.push(...transitionMeshes(accepted).map(mesh=>({...mesh,portPair:accepted})));
   }
+  // Final assignment verification has a separate bounded construction pass.
+  // Early straight-span/angle/offset rejection cannot suppress an adjacent
+  // source-responsive relationship. Cheap placement scoring stays unchanged.
+  const constructionDiagnostics:Array<{source:string;target:string;routes:number;counts:Record<string,number>;approachRejections:unknown[]}> = [];
+  let constructedRoutes=0;
+  if(adjacentConstruction)for(let i=0;i<tiles.length;i++)for(let j=i+1;j<tiles.length;j++){
+    const a=tiles[i],b=tiles[j],ma=byId.get(a.id)??byId.get(a.id.split("::")[0]),mb=byId.get(b.id)??byId.get(b.id.split("::")[0]);
+    if(constructedRoutes>=64||find(a.id)===find(b.id)||!sideAdjacentRegistration(a,b)
+      ||!ma?.sourceResponsiveExtensions||!mb?.sourceResponsiveExtensions||!ma.connectionSurface||!mb.connectionSurface)continue;
+    // Local aliases preserve source arrays and transforms while allowing the
+    // route discovery API to resolve distinct placement instances exactly.
+    const routeModels=tiles.flatMap(t=>{const m=byId.get(t.id)??byId.get(t.id.split("::")[0]);return m?[{...m,id:t.id}]:[];});
+    const evaluated=evaluateAlternativeRoutes(routeModels,tiles,a.id,b.id,surfaces,
+      {attachments:16,pairs:2,routes:Math.min(16,64-constructedRoutes),maxSpan:50,maxRun:72},{
+        additionalAnchors:(m,t)=>branchSectionAnchors(m,t,16),
+        interfaceRank:(m,t,anchor)=>architecturalInterface(m,t,anchor.point)?.role==="projecting branch"?10:0,
+      });
+    constructedRoutes+=evaluated.outcomes.length;
+    constructionDiagnostics.push({source:a.id,target:b.id,routes:evaluated.outcomes.length,counts:evaluated.counts,approachRejections:evaluated.approachRejections});
+    for(const outcome of evaluated.outcomes)connectionDiagnostic("adjacent construction",outcome.reason,{pair:outcome.pair,route:outcome.route,details:outcome.details});
+    const accepted=evaluated.accepted[0];if(!accepted)continue;
+    const pair=accepted.pair;
+    // Recheck the exact chosen path/material against the original scene and
+    // already accepted connectors. No graph insertion on a mere surface touch.
+    if(validateCirculationConnection(pair,models,tiles,surfaces,{maxRun:72}).reason!=="accepted")continue;
+    validatedPairs.set(pair,{models,tiles,geometry:JSON.stringify(pair),placements:JSON.stringify(tiles),sources:modelRevisions(models)});
+    pairs.push(pair);candidates.push({pair,accepted:true});join(a.id,b.id);
+    surfaces.push(...transitionMeshes(pair).map(mesh=>({...mesh,portPair:pair})));
+  }
   const componentsAfter=new Set(tiles.map(t=>find(t.id))).size,connectivityBonus=(componentsBefore-componentsAfter)*5;
   const rejectionCounts:Partial<Record<PortRejection,number>>={};
   for(const c of candidates)if(c.reason)rejectionCounts[c.reason]=(rejectionCounts[c.reason]??0)+1;
-  return {pairs,candidates,confirmedReports,componentsBefore,componentsAfter,rejectionCounts,score:pairs.reduce((sum,p)=>sum+p.score,0)+connectivityBonus,multiConnectionBonus:connectivityBonus};
+  return {pairs,candidates,confirmedReports,componentsBefore,componentsAfter,rejectionCounts,constructionDiagnostics,assessedPairs,cheapRejections,detailedRoutes:detailedRoutes+constructedRoutes,score:pairs.reduce((sum,p)=>sum+p.score,0)+connectivityBonus,multiConnectionBonus:connectivityBonus};
 
   } finally { finishTiming(); }
 

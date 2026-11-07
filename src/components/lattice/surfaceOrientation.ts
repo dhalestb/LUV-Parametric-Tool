@@ -2,7 +2,7 @@ import { geometryRevision } from "./geometryRevision";
 import { materialSideIndex, type MaterialInterval } from "./materialSideEvidence";
 import type { Vec3 } from "./types";
 
-export type SourceSurface = { positions: Float32Array; triangles: number[] };
+export type SourceSurface = { positions: import("./types").DerivedPositions; triangles: number[] };
 export type OrientedTriangle = { points: [Vec3, Vec3, Vec3]; rawNormal: Vec3; normalZ: number; area: number; component: number; region: number; localMaterial?: { accepted: boolean; reason: string; samples: MaterialInterval[] } };
 export type OrientationComponent = { triangles: number[]; boundaryEdges: number; inconsistentEdges: number; volume: number; sign: number; witnesses: number; uncertainty: string | null };
 const cache = new WeakMap<object, ReturnType<typeof build>>();

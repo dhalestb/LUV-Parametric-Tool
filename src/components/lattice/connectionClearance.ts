@@ -3,12 +3,14 @@ import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnos
 import type { PlacedTile, PortPair, TileModel, Vec3 } from "./types";
 import { placementWorldZ } from "./types";
 import { transitionMeshes, transitionSections } from "./transitionGeometry";
-import { measureFlushWalkingInterface } from "./surfaceAttachment";
+import { measureFlushWalkingInterface, worldFromLocal } from "./surfaceAttachment";
+import { pointOnContact } from "./extensionReconstruction";
+import { requiresSourceResponsiveExtension, resolveSourceResponsiveExtension } from "./sourceResponsiveExtension";
 
 type Triangle = [Vec3,Vec3,Vec3];
 type Bounds = {min:Vec3;max:Vec3};
 type Node = Bounds & {left?:Node;right?:Node;triangles?:Triangle[];closed?:boolean};
-export type ConnectorSurface = {positions:Float32Array;indices:number[];portPair?:PortPair};
+export type ConnectorSurface = {positions:import("./types").DerivedPositions;indices:number[];portPair?:PortPair};
 const cache=new WeakMap<object,Node>();
 const sourceClearanceCache=new WeakMap<object,Map<string,{ clear: boolean; reason?: string }>>();
 const sub=(a:Vec3,b:Vec3)=>a.map((v,i)=>v-b[i]) as Vec3;
@@ -73,9 +75,22 @@ function closedSurface(triangles:Triangle[]) {
   for(const tri of triangles)for(let i=0;i<3;i++){const edge=[key(tri[i]),key(tri[(i+1)%3])].sort().join('|');edges.set(edge,(edges.get(edge)??0)+1);}
   return edges.size>0&&[...edges.values()].every(n=>n===2);
 }
-function collides(tri:Triangle,node:Node,allowed:(p:Vec3)=>boolean,box=bounds([tri])):boolean {
+/** Certify an extrapolated hit outside either actual triangle. This is only
+ * used for reconstructed interfaces with independently verified source faces.
+ * The small arithmetic bound is not a geometric contact tolerance. */
+export function extrapolatedInterfaceHit(p:Vec3,a:Triangle,b:Triangle):boolean {
+  return [a,b].some(t=>p.some((value,k)=>{
+    const values=t.map(q=>q[k]),min=Math.min(...values),max=Math.max(...values);
+    const roundoff=64*Number.EPSILON*Math.max(1,Math.abs(value),...values.map(Math.abs));
+    return value<min-roundoff||value>max+roundoff;
+  }));
+}
+function triangleEdges(t:Triangle):string[] {
+  return t.map((p,i)=>[p.join(','),t[(i+1)%3].join(',')].sort().join('|'));
+}
+function collides(tri:Triangle,node:Node,allowed:(p:Vec3,source?:Triangle)=>boolean,box=bounds([tri])):boolean {
   if(!overlaps(box,node)) return false;
-  return node.triangles?node.triangles.some(other=>intersects(tri,other,allowed)):
+  return node.triangles?node.triangles.some(other=>intersects(tri,other,p=>allowed(p,other))):
     collides(tri,node.left!,allowed,box)||collides(tri,node.right!,allowed,box);
 }
 function localPoint(p:Vec3,tile:PlacedTile,model:TileModel):Vec3 {
@@ -127,6 +142,11 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
   try {
   const finishTiming = startConnectionTiming("collision and clearance");
   try {
+  if(requiresSourceResponsiveExtension(pair,models)) {
+    delete pair.extension;
+    const material=resolveSourceResponsiveExtension(pair,models,tiles);
+    if(!material.valid){connectionDiagnostic("clearance","source-responsive material interface",{pair,reason:material.reason});return false;}
+  }
   let tris: Triangle[] | undefined;
   const connectorTriangles = () => tris ??= transitionMeshes(pair).flatMap(trianglesOf);
   for(const tile of tiles) {
@@ -142,7 +162,8 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
     const canonical=(p:Vec3)=>p;
     const localDirection=(d:Vec3|undefined)=>d?canonical(sub(localPoint(pair.from.map((v,i)=>v+d[i]) as Vec3,tile,model),localPoint(pair.from,tile,model))):undefined;
     const signature=JSON.stringify({role:tile.id===pair.tileA?'A':tile.id===pair.tileB?'B':'obstacle',from:canonical(localPoint(pair.from,tile,model)),to:canonical(localPoint(pair.to,tile,model)),path:pair.path?.map(p=>canonical(localPoint(p,tile,model))),startDirection:localDirection(pair.startDirection),endDirection:localDirection(pair.endDirection),startWidth:pair.startWidth,endWidth:pair.endWidth,width:pair.usableWidth,startProfile:pair.startProfile?.map(p=>canonical(localPoint(p,tile,model))),endProfile:pair.endProfile?.map(p=>canonical(localPoint(p,tile,model))),class:pair.connectionClass,angle:pair.angle,lateralOffset:pair.lateralOffset,rise:pair.rise,plan:pair.plan});
-    const previous=checks.get(signature);
+    const constructionSignature=signature+JSON.stringify(pair.extension??null);
+    const previous=checks.get(constructionSignature);
     if(previous!==undefined){connectionDiagnostic("cache", "source clearance hit");if(!previous.clear){connectionDiagnostic("clearance", previous.reason ?? "source collision or clearance", { pair, blocker: tile, filename: model.filename, cached: true });return false;}continue;}
     connectionDiagnostic("cache", "source clearance miss");
     let failureReason: string | undefined;
@@ -159,14 +180,41 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
     // Only coplanar contact at a proven physical walking boundary is exempt.
     // Follow its actual cross-slope; never exempt a band penetrating the form.
     const allowed=(p:Vec3)=>{
+      if(pair.extension?.reconstruction?.status==="PASS") {
+        const world=worldFromLocal(p,tile,model);
+        return !!pair.extension.contacts?.some(contact=>contact.sourceId===tile.id&&pointOnContact(world,contact.triangle));
+      }
       if(!localEnd||!localDir||!localSeam||!interfaceCheck?.valid||!interfaceCheck.boundaryVerified)return false;
       if(Math.abs(dot(sub(p,localEnd),localDir))>1e-5)return false;
       const [a,b]=localSeam,edge=sub(b,a),lengthSquared=edge[0]**2+edge[1]**2;
       const t=((p[0]-a[0])*edge[0]+(p[1]-a[1])*edge[1])/lengthSquared;
       const floor=a[2]+edge[2]*t;
-      return t>=-1e-6&&t<=1+1e-6&&p[2]<=floor+1e-6&&p[2]>=floor-.25-1e-6;
+      // Contact is confined to the same verified boundary plane. A deeper
+      // source-responsive cap does not permit overlap anywhere along the route.
+      const bottomSeam=endMesh?[Array.from(endMesh.positions.slice(offset+6,offset+9)),Array.from(endMesh.positions.slice(offset+9,offset+12))].map(q=>localPoint(q as Vec3,tile,model)):undefined;
+      const underside=pair.extension&&bottomSeam?bottomSeam[0][2]+(bottomSeam[1][2]-bottomSeam[0][2])*t:floor-.25;
+      return t>=-1e-6&&t<=1+1e-6&&p[2]<=floor+1e-6&&p[2]>=underside-1e-6;
     };
-    for(const tri of connectorTriangles()) if(collides(tri.map(p=>localPoint(p,tile,model)) as Triangle,tree,allowed)){failureReason = "source triangle collision";connectionDiagnostic("clearance", failureReason, { pair, blocker: tile, filename: model.filename });return false;}
+    const verifiedSourceFaces=new Set<string>();
+    const verifiedSourceEdges=new Set<string>();
+    if(pair.extension?.reconstruction?.status==="PASS")for(const contact of pair.extension.contacts??[]){
+      if(contact.sourceId!==tile.id)continue;
+      for(const face of contact.sourceTriangles??[contact.sourceTriangle]){
+        const indices=surface.triangles.slice(face*3,face*3+3);
+        if(indices.length===3){
+          const triangle=indices.map(i=>Array.from(surface.positions.slice(i*3,i*3+3)) as Vec3) as Triangle;
+          verifiedSourceFaces.add(triangle.flat().join(','));
+          triangleEdges(triangle).forEach(edge=>verifiedSourceEdges.add(edge));
+        }
+      }
+    }
+    for(const tri of connectorTriangles()) {
+      const localTriangle=tri.map(p=>localPoint(p,tile,model)) as Triangle;
+      // Include the neighboring original face on the exact same interface edge.
+      // This still exempts only a hit certified outside an actual triangle.
+      const interfaceContact=(p:Vec3,source?:Triangle)=>allowed(p)||!!(source&&(verifiedSourceFaces.has(source.flat().join(','))||triangleEdges(source).some(edge=>verifiedSourceEdges.has(edge)))&&extrapolatedInterfaceHit(p,localTriangle,source));
+      if(collides(localTriangle,tree,interfaceContact)){failureReason = "source triangle collision";connectionDiagnostic("clearance", failureReason, { pair, blocker: tile, filename: model.filename });return false;}
+    }
     // Standing clearance over the walking ribbon, including walls/roof above it.
     for(const section of transitionSections(pair)) for(const side of [-.5,0,.5]) {
       const p=section.center.map((v,i)=>v+section.side[i]*section.width*side) as Vec3;
@@ -189,7 +237,7 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
     };
     const clear=clearSource();
     if(checks.size>=2000)checks.delete(checks.keys().next().value!);
-    checks.set(signature,{ clear, reason: failureReason });
+    checks.set(constructionSignature,{ clear, reason: failureReason });
     if(!clear)return false;
   }
   for(const mesh of existing) {
@@ -215,4 +263,90 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
   } finally { finishTiming(); }
 
   } finally { finishGeometry(); }
+}
+
+/** Independent exact triangle audit for new local additions. Returns the first
+ * original/generated face witness. The caller must justify every contact point;
+ * this does not change existing connector collision behavior or tolerances. */
+export function auditGeneratedSurface(surface:ConnectorSurface,models:TileModel[],tiles:PlacedTile[],allowed:(point:Vec3,sourceId:string)=>boolean=()=>false,verifiedPair?:PortPair) {
+  const generated=trianglesOf(surface);
+  let extrapolatedHits=0;
+  for(const tile of tiles){const model=models.find(m=>m.id===tile.id);if(!model?.connectionSurface)return {clear:false,reason:"missing obstruction geometry",sourceId:tile.id};
+    const source=trianglesOf({positions:model.connectionSurface.positions,indices:model.connectionSurface.triangles});
+    const boxes=source.map(t=>bounds([t]));
+    const verifiedFaces=new Set<number>(),verifiedEdges=new Set<string>();
+    if(verifiedPair?.extension?.reconstruction?.status==="PASS")for(const c of verifiedPair.extension.contacts??[]){
+      if(c.sourceId!==tile.id)continue;
+      for(const face of c.sourceTriangles??[c.sourceTriangle])if(source[face]){
+        verifiedFaces.add(face);triangleEdges(source[face]).forEach(edge=>verifiedEdges.add(edge));
+      }
+    }
+    for(const [generatedFace,world]of generated.entries()){const triangle=world.map(p=>localPoint(p,tile,model)) as Triangle,box=bounds([triangle]);
+      let rejectedPoint:Vec3|undefined;
+      for(const [sourceFace,other]of source.entries())if(overlaps(box,boxes[sourceFace])&&intersects(triangle,other,p=>{
+        const v=model.variants[tile.variant],a=v.rotation*Math.PI/180,x=v.mirror==="x"?-p[0]:p[0],y=v.mirror==="y"?-p[1]:p[1];
+        const worldPoint:Vec3=[x*Math.cos(a)-y*Math.sin(a)+tile.ix*20,x*Math.sin(a)+y*Math.cos(a)+tile.iy*20,p[2]+placementWorldZ(tile)];
+        const verified=verifiedFaces.has(sourceFace)||triangleEdges(other).some(edge=>verifiedEdges.has(edge));
+        const extrapolated=!!verified&&extrapolatedInterfaceHit(p,triangle,other);
+        if(extrapolated)extrapolatedHits++;
+        const accepted=allowed(worldPoint,tile.id)||extrapolated;
+        if(!accepted)rejectedPoint=worldPoint;
+        return accepted;
+      }))return {clear:false,reason:"triangle intersection",sourceId:tile.id,sourceFace,generatedFace,originalTriangle:other,generatedTriangle:world,rejectedPoint,extrapolatedHits};
+    }
+  }
+  return {clear:true,reason:"no prohibited triangle intersection",extrapolatedHits};
+}
+
+/** Independent self-intersection gate on the actual derived coordinates.
+ * Only shared topological vertices/edges qualify as ordinary mesh contact. */
+export function auditDerivedSelfIntersections(surface:ConnectorSurface) {
+  // BVH construction sorts its input; preserve the face-to-index correspondence.
+  const triangles=trianglesOf(surface),tree=build(triangles.slice());
+  const identities=new Map(triangles.map((t,i)=>[t,i]));
+  for(const [face,triangle]of triangles.entries()){
+    const box=bounds([triangle]);
+    const visit=(node:Node):{faceA:number;faceB:number;triangleA:Triangle;triangleB:Triangle;shared:Vec3[]}|null=>{
+      if(!overlaps(box,node))return null;
+      if(node.triangles){
+        for(const other of node.triangles){
+          const second=identities.get(other)!;if(second<=face)continue;
+          const indices=surface.indices.slice(face*3,face*3+3),otherIndices=surface.indices.slice(second*3,second*3+3);
+          const shared=indices.filter(i=>otherIndices.includes(i)).map(i=>Array.from(surface.positions.slice(i*3,i*3+3)) as Vec3);
+          if(shared.length===2){
+            const a=cross(sub(triangle[1],triangle[0]),sub(triangle[2],triangle[0])),b=cross(sub(other[1],other[0]),sub(other[2],other[0]));
+            // Distinct planes intersect only on their common edge. Consistently
+            // oriented coplanar neighbors occupy opposite sides of that edge.
+            if(Math.hypot(...cross(a,b))>1e-12*Math.hypot(...a)*Math.hypot(...b)||dot(a,b)>=0)continue;
+          }
+          const containsActualPoint=(p:Vec3,t:Triangle)=>{
+            const a=sub(t[1],t[0]),b=sub(t[2],t[0]),v=sub(p,t[0]),n=cross(a,b),length=Math.hypot(...n);
+            if(!length||Math.abs(dot(v,n))/length>1e-12)return false;
+            const drop=n.map(Math.abs).indexOf(Math.max(...n.map(Math.abs))),axes=[0,1,2].filter(k=>k!==drop),x=axes[0],y=axes[1];
+            const d=a[x]*b[y]-a[y]*b[x];if(!d)return false;
+            const u=(v[x]*b[y]-v[y]*b[x])/d,w=(a[x]*v[y]-a[y]*v[x])/d,roundoff=128*Number.EPSILON;
+            return u>=-roundoff&&w>=-roundoff&&u+w<=1+roundoff;
+          };
+          const allowed=(p:Vec3)=>{
+            // The existing obstruction test conservatively extends segments.
+            // For mesh self-contact, an extrapolated hit outside either actual
+            // triangle is not a physical intersection. Source collision rules
+            // below/above are intentionally unchanged.
+            if(!containsActualPoint(p,triangle)||!containsActualPoint(p,other))return true;
+            if(shared.length===1)return Math.hypot(...sub(p,shared[0]))<=1e-7;
+            if(shared.length!==2)return false;
+            const edge=sub(shared[1],shared[0]),length=dot(edge,edge);
+            const t=dot(sub(p,shared[0]),edge)/length;
+            const closest=shared[0].map((v,k)=>v+Math.max(0,Math.min(1,t))*edge[k]) as Vec3;
+            return Math.hypot(...sub(p,closest))<=1e-7;
+          };
+          if(intersects(triangle,other,allowed))return {faceA:face,faceB:second,triangleA:triangle,triangleB:other,shared};
+        }
+        return null;
+      }
+      return visit(node.left!)??visit(node.right!);
+    };
+    const witness=visit(tree);if(witness)return {clear:false,...witness};
+  }
+  return {clear:true};
 }

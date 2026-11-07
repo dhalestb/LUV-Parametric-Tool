@@ -207,7 +207,7 @@ function scaledSpec(mesh: ImportedObj, scale: number, up: UpAxis) {
   return out;
 }
 
-function rasterize(mesh: ImportedObj, scale: number, cellFeet: number, up: UpAxis, surface: SourceSurface) {
+function rasterize(mesh: ImportedObj, scale: number, cellFeet: number, up: UpAxis, surface: SourceSurface, registrationAnchor?: Vec3) {
   const orientation = surfaceOrientation(surface);
   const cells = new Map<number, MutableCell>();
   // Preserve sample bounds solely to locate ports on the original surfaces within each voxel.
@@ -237,7 +237,7 @@ function rasterize(mesh: ImportedObj, scale: number, cellFeet: number, up: UpAxi
     cy += y;
     cz += z;
   }
-  const anchor: [number, number, number] = [(minX + maxX) / 2, (minY + maxY) / 2, minZ];
+  const anchor: [number, number, number] = registrationAnchor ? [...registrationAnchor] : [(minX + maxX) / 2, (minY + maxY) / 2, minZ];
   let horizontalArea = 0;
   let verticalArea = 0;
   const mark = (x: number, y: number, z: number, floor: boolean, vertical: boolean) => {
@@ -349,7 +349,7 @@ function variantFromBase(
   };
 }
 
-export function analyzeMesh(mesh: ImportedObj, slotId: string | null, unitScale: number, up: UpAxis, forcedCell?: number): TileModel {
+export function analyzeMesh(mesh: ImportedObj, slotId: string | null, unitScale: number, up: UpAxis, forcedCell?: number, registrationAnchor?: Vec3): TileModel {
   const spanEstimate = () => {
     let minX = Infinity;
     let minY = Infinity;
@@ -374,13 +374,16 @@ export function analyzeMesh(mesh: ImportedObj, slotId: string | null, unitScale:
   let cellFeet = forcedCell ?? CELL_FEET;
   if (!forcedCell && spanEstimate() / cellFeet > 80) cellFeet = 4;
   const rootBounds = combinedBoundsSpec(mesh, unitScale, up);
+  // Only an explicit derived working copy can retain its source registration
+  // datum after local adaptation. Ordinary uploads keep their existing anchor.
+  if (registrationAnchor) rootBounds.anchor = [...registrationAnchor];
   const connectionPositions = scaledSpec(mesh, unitScale, up);
   for (let i=0;i<connectionPositions.length;i++) connectionPositions[i] -= rootBounds.anchor[i%3];
   const connectionSurface = {positions: connectionPositions, triangles: mesh.faces.flatMap(faceTriangles).flat()};
-  let raster = rasterize(mesh, unitScale, cellFeet, up, connectionSurface);
+  let raster = rasterize(mesh, unitScale, cellFeet, up, connectionSurface,registrationAnchor);
   if (!forcedCell && raster.cells.size > 12000 && cellFeet < 4) {
     cellFeet = 4;
-    raster = rasterize(mesh, unitScale, cellFeet, up, connectionSurface);
+    raster = rasterize(mesh, unitScale, cellFeet, up, connectionSurface,registrationAnchor);
   }
   const baseOccupied: number[] = [];
   const baseFloor: number[] = [];

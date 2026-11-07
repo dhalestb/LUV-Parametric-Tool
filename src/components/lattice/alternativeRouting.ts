@@ -7,8 +7,8 @@ import { switchbackRampPath, validateCirculationConnection } from "./portConnect
 import { ACCESSIBLE_RAMP_SLOPE, planRun, transitionPath, transitionMeshes } from "./transitionGeometry";
 import { discoverInteriorApproaches, type ApproachAnchor, type QualifiedApproach } from "./interiorApproaches";
 
-export type RoutingBudget = { attachments: number; pairs: number; routes: number; maxSpan: number; maxRun: number };
-export const DEFAULT_ROUTING_BUDGET: RoutingBudget = { attachments: 64, pairs: 96, routes: 768, maxSpan: 50, maxRun: 72 };
+export type RoutingBudget = { attachments: number; pairs: number; routes: number; maxSpan: number; maxRun: number; legacyFixedFootprint?:boolean };
+export const DEFAULT_ROUTING_BUDGET: RoutingBudget = { attachments: 64, pairs: 96, routes: 768, maxSpan: 50, maxRun: 72,legacyFixedFootprint:true };
 type Anchor = ReturnType<typeof enumerateWalkableAttachments>["anchors"][number];
 const distance = (a: Vec3, b: Vec3) => Math.hypot(a[0]-b[0],a[1]-b[1]);
 
@@ -81,7 +81,7 @@ export function evaluateQualifiedInteriorRoutes(models:TileModel[],tiles:PlacedT
 
 /** No global search/UI integration: explicitly evaluate one requested relationship. */
 export function evaluateAlternativeRoutes(models: TileModel[], tiles: PlacedTile[], sourceId: string, targetId: string,
-  existing: ConnectorSurface[], budget: RoutingBudget = DEFAULT_ROUTING_BUDGET, focus?: { targetAnchors: Anchor[] }) {
+  existing: ConnectorSurface[], budget: RoutingBudget = DEFAULT_ROUTING_BUDGET, focus?: { targetAnchors?: Anchor[]; rank?:(a:Anchor,b:Anchor)=>number; pairFilter?:(a:Anchor,b:Anchor)=>boolean; interfaceRank?:(model:TileModel,tile:PlacedTile,anchor:Anchor)=>number; interfaceFilter?:(model:TileModel,tile:PlacedTile,anchor:Anchor)=>boolean; additionalAnchors?:(model:TileModel,tile:PlacedTile)=>Anchor[] }) {
   if (!Number.isInteger(budget.pairs) || budget.pairs < 1 || budget.pairs > 512 || !Number.isInteger(budget.routes) || budget.routes < 1 || budget.routes > 4608
     || !Number.isFinite(budget.maxSpan) || budget.maxSpan <= 0 || budget.maxSpan > 60 || !Number.isFinite(budget.maxRun) || budget.maxRun <= 0 || budget.maxRun > 96) throw new Error("Invalid bounded routing budget");
   const finish = beginGeometryValidation(), started = performance.now();
@@ -89,27 +89,66 @@ export function evaluateAlternativeRoutes(models: TileModel[], tiles: PlacedTile
     const source = tiles.find(t=>t.id===sourceId), target = tiles.find(t=>t.id===targetId);
     const ma = models.find(m=>m.id===sourceId), mb = models.find(m=>m.id===targetId);
     if (!source || !target || !ma?.connectionSurface || !mb?.connectionSurface || sourceId===targetId) throw new Error("Two distinct placed OBJ surfaces are required");
-    const a = enumerateWalkableAttachments(ma,source,budget.attachments), b = enumerateWalkableAttachments(mb,target,budget.attachments);
-    if(focus) {
+    const a = enumerateWalkableAttachments(ma,source,focus?.interfaceRank?256:budget.attachments), b = enumerateWalkableAttachments(mb,target,focus?.interfaceRank?256:budget.attachments);
+    if(focus?.additionalAnchors)for(const [model,tile,collection]of [[ma,source,a],[mb,target,b]] as const){const extra=focus.additionalAnchors(model,tile);if(extra.length>budget.attachments)throw new Error("Additional physical section budget");collection.anchors.unshift(...extra);collection.available+=extra.length;}
+    if(focus?.interfaceFilter)for(const [model,tile,collection] of [[ma,source,a],[mb,target,b]] as const){
+      const retained=collection.anchors.filter(anchor=>focus.interfaceFilter!(model,tile,anchor));
+      collection.omitted+=collection.anchors.length-retained.length;collection.anchors=retained;
+    }
+    if(focus?.interfaceRank)for(const [model,tile,collection]of [[ma,source,a],[mb,target,b]] as const){
+      const diverse=collection.anchors.slice();
+      collection.anchors.sort((x,y)=>focus.interfaceRank!(model,tile,y)-focus.interfaceRank!(model,tile,x)||x.id.localeCompare(y.id));
+      const selected=collection.anchors.slice(0,Math.ceil(budget.attachments/2)),seen=new Set(selected);
+      for(const anchor of diverse)if(selected.length<budget.attachments&&!seen.has(anchor)){selected.push(anchor);seen.add(anchor);}
+      collection.omitted+=Math.max(0,collection.anchors.length-selected.length);collection.anchors=selected;
+    }
+    if(focus?.targetAnchors) {
       if(focus.targetAnchors.length>budget.attachments)throw new Error("Focused anchors exceed attachment budget");
       b.anchors=focus.targetAnchors;
+    }
+    // Spend the source-responsive route budget on physically qualified openings,
+    // rather than accepting an edge normal as proof of a usable interior floor.
+    const approachRejections: Array<{sourceId:string;reason:string;count:number}> = [];
+    const interfaceAssessments:Array<{sourceId:string;point:Vec3;width:number;stage:string;reason:string}>=[];
+    if(ma.sourceResponsiveExtensions || mb.sourceResponsiveExtensions) {
+      for(const [model,tile,collection] of [[ma,source,a],[mb,target,b]] as const) {
+        const discovery=discoverInteriorApproaches(model,tile,models,tiles,existing,{windows:budget.attachments,anchors:collection.anchors});
+        if(focus?.interfaceRank)for(const o of discovery.outcomes)interfaceAssessments.push({sourceId:tile.id,point:o.anchor.point,width:o.anchor.width,stage:o.stage,reason:o.reason});
+        collection.anchors=discovery.qualified.map(q=>q.anchor);
+        const counts=new Map<string,number>();
+        for(const outcome of discovery.outcomes)if(outcome.stage!=="QUALIFIED_WALKING_OPENING")counts.set(outcome.reason,(counts.get(outcome.reason)??0)+1);
+        for(const [reason,count]of counts)approachRejections.push({sourceId:tile.id,reason,count});
+      }
     }
     const generationStart = performance.now();
     const candidates: Array<{ a: Anchor; b: Anchor; rank: number }> = [];
     let distanceRejected = 0;
     for (const aa of a.anchors) for (const bb of b.anchors) {
+      if(focus?.pairFilter&&!focus.pairFilter(aa,bb))continue;
       const span = distance(aa.point,bb.point);
       if (span < .75 || span > budget.maxSpan) { distanceRejected++; continue; }
       const toward = [(bb.point[0]-aa.point[0])/span,(bb.point[1]-aa.point[1])/span];
       const facing = toward[0]*(aa.outward[0]-bb.outward[0])+toward[1]*(aa.outward[1]-bb.outward[1]);
-      candidates.push({ a:aa,b:bb,rank: Math.abs(bb.point[2]-aa.point[2])*3 - facing*8 + span*.1 });
+      candidates.push({ a:aa,b:bb,rank: Math.abs(bb.point[2]-aa.point[2])*3 - facing*8 + span*.1+(focus?.rank?.(aa,bb)??0) });
     }
     candidates.sort((x,y)=>x.rank-y.rank);
     // Each source region gets a turn; the budget cannot be consumed by one preferred source end.
     const sourceQueues=a.anchors.map(anchor=>candidates.filter(c=>c.a===anchor)),targetQueues=b.anchors.map(anchor=>candidates.filter(c=>c.b===anchor));
-    const queues = focus ? [...targetQueues,...sourceQueues] : [...sourceQueues,...targetQueues];
+    const queues = focus?.targetAnchors ? [...targetQueues,...sourceQueues] : [...sourceQueues,...targetQueues];
+    if(focus?.rank)queues.sort((x,y)=>(x[0]?.rank??Infinity)-(y[0]?.rank??Infinity));
     const selected: typeof candidates = [];
     const chosen=new Set<typeof candidates[number]>();
+    if(ma.sourceResponsiveExtensions || mb.sourceResponsiveExtensions) {
+      // Reserve half of the bounded budget for mutually facing openings.
+      // Retain the region-diverse queue for the other half; detours are still
+      // evaluated and omitted candidates remain explicitly counted below.
+      for(const candidate of candidates) {
+        const dx=candidate.b.point[0]-candidate.a.point[0],dy=candidate.b.point[1]-candidate.a.point[1];
+        if(dx*candidate.a.outward[0]+dy*candidate.a.outward[1]<=0 || dx*candidate.b.outward[0]+dy*candidate.b.outward[1]>=0)continue;
+        selected.push(candidate);chosen.add(candidate);
+        if(selected.length>=Math.ceil(budget.pairs/2))break;
+      }
+    }
     for(let i=0; selected.length<budget.pairs && queues.some(q=>q[i]);i++) for(const q of queues) if(q[i] && !chosen.has(q[i]) && selected.length<budget.pairs) { selected.push(q[i]);chosen.add(q[i]); }
     let generationMs = performance.now()-generationStart + (generationStart-started), validationMs = 0;
     const counts: Record<string,number> = {}, cache: Record<string,number> = {};
@@ -134,10 +173,10 @@ export function evaluateAlternativeRoutes(models: TileModel[], tiles: PlacedTile
       if(outcomes.length>=budget.routes) break;
     }
     return { source:{id:sourceId,filename:ma.filename,placement:source},target:{id:targetId,filename:mb.filename,placement:target},budget,
-      attachments:{source:{runs:a.runs,available:a.available,retained:a.anchors.length,omitted:a.omitted},target:{runs:b.runs,available:b.available,retained:b.anchors.length,omitted:b.omitted}},
+      attachments:{source:{runs:a.runs,available:a.available,retained:a.anchors.length,omitted:a.omitted},target:{runs:b.runs,available:b.available,retained:b.anchors.length,omitted:b.omitted}},interfaceAssessments,
       pairs:{withinDistance:candidates.length,distanceRejected,selected:selected.length,omitted:Math.max(0,candidates.length-selected.length)},
       coverage:{sourceWindows:new Set(outcomes.map(o=>o.pair.portA)).size,targetWindows:new Set(outcomes.map(o=>o.pair.portB)).size},
-      counts,cache,outcomes,accepted,timing:{generationMs,validationMs,totalMs:performance.now()-started},
+      counts,cache,outcomes,accepted,approachRejections,timing:{generationMs,validationMs,totalMs:performance.now()-started},
       internalContinuity:"unverified" as const, accessibility:"not code-compliance verification" as const };
   } finally { finish(); }
 }
@@ -156,13 +195,40 @@ export function routeAlternatives(original: PortPair) {
     ["left bridge alignment",transitionPath(original,8)], ["right bridge alignment",transitionPath(original,-8)],
     ["left switchback",switchbackRampPath(original.from,original.to,8)], ["right switchback",switchbackRampPath(original.from,original.to,-8)],
   ];
+  // Flat endpoint landings follow each measured opening independently. The
+  // climbing run is confined to the middle curve: flat approach distance must
+  // never be credited as ramp run. Different headings are construction inputs,
+  // not a requirement that the two original edges oppose one another.
+  for(const bend of [0,4,-4,8,-8]) {
+    const path=landingTransitionPath(original,bend);
+    if(path)definitions.push([`endpoint landings ${bend}`,path]);
+  }
   return definitions.map(([name,path])=>{
     path[0]=original.from;path[path.length-1]=original.to;
     return {name,pair:{...original,path,startProfile:original.startProfile?.map(p=>[...p]) as [Vec3,Vec3],endProfile:original.endProfile?.map(p=>[...p]) as [Vec3,Vec3]}};
   });
 }
 
+export function landingTransitionPath(pair:PortPair,bend=0):Vec3[]|null {
+  if(!pair.startDirection||!pair.endDirection)return null;
+  const width=Math.max(pair.startWidth??pair.usableWidth,pair.endWidth??pair.usableWidth);
+  const depth=Math.max(3,width),normalize=(d:Vec3):Vec3|null=>{
+    const n=Math.hypot(d[0],d[1]);return n>1e-8?[d[0]/n,d[1]/n,0]:null;
+  };
+  const a=normalize(pair.startDirection),b=normalize(pair.endDirection);if(!a||!b)return null;
+  const from=pair.from.map((v,k)=>v+a[k]*depth) as Vec3,to=pair.to.map((v,k)=>v+b[k]*depth) as Vec3;
+  if(distance(from,to)<.1)return null;
+  const middle=transitionPath({...pair,from,to,startDirection:a,endDirection:b},bend);
+  // Sample the complete landing footprint for section/collision validation.
+  const steps=Math.ceil(depth/.5),start:Vec3[]=[],end:Vec3[]=[];
+  for(let i=0;i<steps;i++)start.push(pair.from.map((v,k)=>v+a[k]*depth*i/steps) as Vec3);
+  for(let i=1;i<=steps;i++)end.push(to.map((v,k)=>v-b[k]*depth*i/steps) as Vec3);
+  return [...start,...middle,...end];
+}
+
 /** Opt-in routing retains its bounded footprint and run policy; circulation checks are shared. */
 export function validateAlternative(pair: PortPair,models: TileModel[],tiles: PlacedTile[],existing: ConnectorSurface[],budget: RoutingBudget, routeName = "") {
-  return validateCirculationConnection(pair,models,tiles,existing,{maxRun:budget.maxRun,fixedFootprint:true,routeName});
+  // The old 4x4 diagnostic footprint is opt-in. Production registration fields
+  // can be 7x3, 8x8, etc.; all source/connector collision checks still apply.
+  return validateCirculationConnection(pair,models,tiles,existing,{maxRun:budget.maxRun,fixedFootprint:budget.legacyFixedFootprint??false,routeName});
 }

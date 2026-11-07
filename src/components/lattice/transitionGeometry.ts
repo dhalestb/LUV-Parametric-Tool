@@ -1,7 +1,7 @@
 import { startConnectionTiming } from "./connectionDiagnostics";
 import type { PortPair, Vec3 } from "./types";
 
-export type TransitionSection = { center: Vec3; side: Vec3; width: number };
+export type TransitionSection = { center: Vec3; side: Vec3; width: number; thickness?: [number,number] };
 
 /** Walkable ramp: 1 ft of rise needs 12 ft of run. Steeper than this is not a smooth ramp. */
 export const ACCESSIBLE_RAMP_SLOPE = 1 / 12;
@@ -61,6 +61,21 @@ export function formatCirculation(rise: number, run: number, slope: number) {
 export function planRun(path: Vec3[]) {
   return path.slice(1).reduce((sum, point, index) => sum + Math.hypot(point[0] - path[index][0], point[1] - path[index][1]), 0);
 }
+function walkingStepRuns(pair:PortPair,path:Vec3[]){
+  if(path.length<2)return [];
+  const sections=transitionSections(pair,path);
+  return path.slice(1).map((point,i)=>{
+    const travel=[Math.hypot(point[0]-path[i][0],point[1]-path[i][1])];
+    for(const sign of [-1,1]){
+      const a=sections[i],b=sections[i+1];travel.push(Math.hypot(b.center[0]+sign*b.side[0]*b.width/2-a.center[0]-sign*a.side[0]*a.width/2,b.center[1]+sign*b.side[1]*b.width/2-a.center[1]-sign*a.side[1]*a.width/2));
+    }
+    return Math.min(...travel);
+  });
+}
+/** Run available to BOTH walking edges and the centerline, segment by segment. */
+export function walkingPlanRun(pair:PortPair,path=pair.path??transitionPath(pair)){
+  return walkingStepRuns(pair,path).reduce((sum,d)=>sum+d,0);
+}
 
 /** Steepest horizontal segment. Sub-foot samples are ignored so a smooth curve is not read as a step. */
 export function maxPlanSlope(path: Vec3[]) {
@@ -90,10 +105,11 @@ export function transitionPath(pair: PortPair, bend = 0): Vec3[] {
   }
   // Elevation follows actual horizontal travel, rather than Bezier parameter speed.
   // This avoids steep short segments at otherwise shallow ramp ends.
-  const run=planRun(points);
+  const increments=pair.featureConnection?walkingStepRuns(pair,points):points.slice(1).map((p,i)=>Math.hypot(p[0]-points[i][0],p[1]-points[i][1]));
+  const run=increments.reduce((sum,d)=>sum+d,0);
   let traveled=0;
   for(let i=1;i<points.length;i++) {
-    traveled+=Math.hypot(points[i][0]-points[i-1][0],points[i][1]-points[i-1][1]);
+    traveled+=increments[i-1];
     points[i][2]=mix(a[2],b[2],run>0?traveled/run:i/count);
   }
   return points;
@@ -107,7 +123,12 @@ export function transitionSections(pair: PortPair, path=pair.path??transitionPat
     let dx=b[0]-a[0],dy=b[1]-a[1];
     if(i===0&&pair.startDirection) [dx,dy]=pair.startDirection;
     if(i===n&&pair.endDirection) {dx=-pair.endDirection[0];dy=-pair.endDirection[1];}
-    if(pair.startDirection&&pair.endDirection) {
+    // Feature routes already leave/arrive along their measured interface
+    // directions. Interior frames must follow their local path tangent. The
+    // global edge-heading blend delayed that turn and then rotated sections
+    // abruptly, reversing adjacent walking facets on otherwise usable curves.
+    // Keep the legacy framing and exact endpoint overrides unchanged.
+    if(pair.startDirection&&pair.endDirection&&!pair.featureConnection) {
       const start=Math.atan2(pair.startDirection[1],pair.startDirection[0]),end=Math.atan2(-pair.endDirection[1],-pair.endDirection[0]);
       const delta=Math.atan2(Math.sin(end-start),Math.cos(end-start)),angle=start+delta*t;
       const edgeX=Math.cos(angle),edgeY=Math.sin(angle),len=Math.hypot(dx,dy)||1;
@@ -125,13 +146,18 @@ export function transitionSections(pair: PortPair, path=pair.path??transitionPat
     };
     const slope=mix(profileSlope(pair.startProfile,pair.startDirection),profileSlope(pair.endProfile,pair.endDirection?.map(v=>-v) as Vec3|undefined),t);
     const flare=pair.connectionClass==="ADAPTIVE"&&((pair.angle??0)>35||(pair.lateralOffset??0)>2)?.08:-.04;
-    return {center,side:[-dy/len,dx/len,slope],width:Math.max(Math.min(wa,wb),mix(wa,wb,t)*(1+flare*Math.sin(Math.PI*t)**2))};
+    const smooth=t*t*(3-2*t);
+    const thickness: [number,number] | undefined = pair.extension ? [0,1].map(k=>
+      mix(pair.extension!.start.thickness[k],pair.extension!.end.thickness[k],smooth)) as [number,number] : undefined;
+    return {center,side:[-dy/len,dx/len,slope],width:Math.max(Math.min(wa,wb),mix(wa,wb,t)*(1+flare*Math.sin(Math.PI*t)**2)),thickness};
   });
 }
-export function loftSections(sections: TransitionSection[],thickness=.25) {
+export function loftSections(sections: TransitionSection[],thickness=.25,precise=false) {
   const positions:number[]=[],indices:number[]=[];
-  for(const {center,side,width} of sections) for(const level of [0,-thickness]) for(const sign of [-1,1]) {
-    positions.push(center[0]+side[0]*width*.5*sign,center[1]+side[1]*width*.5*sign,center[2]+side[2]*width*.5*sign+level);
+  for(const section of sections) for(const bottom of [false,true]) for(const sign of [-1,1]) {
+    const {center,side,width}=section;
+    const depth=section.thickness?.[sign===-1?0:1]??thickness;
+    positions.push(center[0]+side[0]*width*.5*sign,center[1]+side[1]*width*.5*sign,center[2]+side[2]*width*.5*sign-(bottom?depth:0));
   }
   for(let i=0;i<sections.length-1;i++) {
     const a=i*4,b=a+4;
@@ -140,7 +166,7 @@ export function loftSections(sections: TransitionSection[],thickness=.25) {
   }
   const end=(sections.length-1)*4;
   indices.push(0,2,3,0,3,1,end,end+1,end+3,end,end+3,end+2);
-  const emitted=new Float32Array(positions),faces:number[]=[];
+  const emitted=precise?Float64Array.from(positions):Float32Array.from(positions),faces:number[]=[];
   for(let i=0;i<indices.length;i+=3) {
     const a=indices[i]*3,b=indices[i+1]*3,c=indices[i+2]*3;
     const u=[emitted[b]-emitted[a],emitted[b+1]-emitted[a+1],emitted[b+2]-emitted[a+2]];
@@ -154,26 +180,55 @@ export function loftSections(sections: TransitionSection[],thickness=.25) {
 }
 /** True horizontal treads and risers, with edge-aligned first/last transition sections. */
 export function transitionMeshes(pair: PortPair) {
+  if(pair.extension?.reconstructedMeshes)return pair.extension.reconstructedMeshes;
   const finishTiming = startConnectionTiming("connector geometry");
   try {
-  const sections=transitionSections(pair),route=pair.path??transitionPath(pair),run=route.slice(1).reduce((sum,p,i)=>sum+Math.hypot(p[0]-route[i][0],p[1]-route[i][1]),0),rise=Math.abs(pair.rise);
-  if(pair.connectionClass!=="VERTICAL"||run>=rise*12) return [{kind:(pair.connectionClass==="VERTICAL"?"ramp":pair.connectionClass==="DIRECT"?"plate":"bridge") as "ramp"|"plate"|"bridge",...loftSections(sections)}];
+  const sections=transitionSections(pair),route=pair.path??transitionPath(pair),run=pair.featureConnection?walkingPlanRun(pair,route):planRun(route),rise=Math.abs(pair.rise);
+  if(pair.connectionClass!=="VERTICAL"||run>=rise*12) return [{kind:(pair.connectionClass==="VERTICAL"?"ramp":pair.connectionClass==="DIRECT"?"plate":"bridge") as "ramp"|"plate"|"bridge",...loftSections(sections,.25,!!pair.featureConnection)}];
   const steps=Math.max(1,Math.ceil(rise/.6)),path=pair.path??transitionPath(pair),out:ReturnType<typeof loftSections>[]=[];
+  const stations=[0];for(let i=1;i<path.length;i++){
+    const travel=([-1,1] as const).map(sign=>{
+      const a=sections[i-1],b=sections[i];
+      return Math.hypot(b.center[0]+b.side[0]*b.width*.5*sign-a.center[0]-a.side[0]*a.width*.5*sign,b.center[1]+b.side[1]*b.width*.5*sign-a.center[1]-a.side[1]*a.width*.5*sign);
+    });
+    // Equal centerline stations still squeeze the inside treads on a bend.
+    // Allocate the existing risers using the shorter walking-edge travel;
+    // the exact final chord on BOTH edges must still pass the tread gate.
+    stations.push(stations[i-1]+Math.min(...travel));
+  }
   for(let step=0;step<steps;step++) {
     const t0=step/steps,t1=(step+1)/steps;
     const sectionAt=(t:number,z:number) => {
-      const at=t*(path.length-1),i=Math.min(path.length-2,Math.floor(at)),u=at-i;
+      let at=t*(path.length-1),i=Math.min(path.length-2,Math.floor(at)),u=at-i;
+      if(pair.extension||pair.featureConnection){
+        // Equal risers require stations along actual horizontal travel. Equal
+        // Bezier sample indices otherwise compress the first/last treads.
+        const station=t*stations.at(-1)!;i=0;while(i<path.length-2&&stations[i+1]<station)i++;
+        u=(station-stations[i])/(stations[i+1]-stations[i]||1);at=i+u;
+      }
       const a=sections[i],b=sections[i+1];
       const side:Vec3=[mix(a.side[0],b.side[0],u),mix(a.side[1],b.side[1],u),mix(a.side[2],b.side[2],u)];
       const norm=Math.hypot(side[0],side[1])||1;side[0]/=norm;side[1]/=norm;
-      return {center:[mix(a.center[0],b.center[0],u),mix(a.center[1],b.center[1],u),z] as Vec3,side,width:mix(a.width,b.width,u)};
+      const thickness: [number,number] | undefined = a.thickness&&b.thickness?
+        [mix(a.thickness[0],b.thickness[0],u),mix(a.thickness[1],b.thickness[1],u)]:undefined;
+      return {center:[mix(a.center[0],b.center[0],u),mix(a.center[1],b.center[1],u),z] as Vec3,side,width:mix(a.width,b.width,u),thickness};
     };
     // Ascending: riser then tread, so the final tread joins B at its floor level.
     // Descending: tread then riser, beginning flush with A. No final raised cap.
     const z=pair.from[2]+pair.rise*step/steps;
     const nextZ=pair.from[2]+pair.rise*(step+1)/steps;
     const a=sectionAt(t0,z),b=sectionAt(t1,pair.rise>0?nextZ:z),next=sectionAt(pair.rise>0?t0:t1,nextZ);
-    out.push(loftSections(pair.rise>0?[a,next,b]:[a,b,next]));
+    if(pair.extension){
+      // Keep the measured underside continuous beneath the treads. Translating
+      // the underside vertically at each riser folds the solid back through
+      // its own end cap and cannot form a manifold stair body.
+      const underside=(section:TransitionSection,t:number)=>{
+        const nominal=section.thickness!;
+        section.thickness=nominal.map(depth=>depth+section.center[2]-mix(pair.from[2],pair.to[2],t)) as [number,number];
+      };
+      underside(a,t0);underside(b,t1);underside(next,pair.rise>0?t0:t1);
+    }
+    out.push(loftSections(pair.rise>0?[a,next,b]:[a,b,next],.25,!!pair.featureConnection));
   }
   return out.map(mesh=>({kind:"stair" as const,...mesh}));
 

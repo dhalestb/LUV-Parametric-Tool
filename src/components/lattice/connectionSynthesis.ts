@@ -1,12 +1,13 @@
 import { beginGeometryValidation } from "./geometryRevision";
 import { acceptCirculationClass, preparePortConnection, portAttachmentMeets, switchbackRampPath, validateCirculationConnection } from "./portConnectionValidation";
-import { connectionDiagnostic } from "./connectionDiagnostics";
+import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import type { ConnectionReport, Direction, Mirror, PlacedTile, PortCandidate, PortPair, PortRejection, Rotation, TileModel } from "./types";
 import { portPairClearanceValidated } from "./portMatching";
 import { transitionMeshes, pathLength, transitionPath, circulationProfile, formatCirculation, planRun, maxPlanSlope, ACCESSIBLE_RAMP_SLOPE, type CirculationMode } from "./transitionGeometry";
 import { transitionSurfaceClear } from "./connectionClearance";
 import { findOrganicLinks, sealOrganicGraph, type JoinedStory, type OrganicDiagnostics, type OrganicLink, type OrganicRejection } from "./organicConnections";
 import { fitLoftContact, measureSurfaceGap } from "./surfaceAttachment";
+import { requiresSourceResponsiveExtension } from "./sourceResponsiveExtension";
 import { LATTICE_FEET, oppositeDirection, placementWorldZ, unpackCell } from "./types";
 
 export type ConnectorKind = "bridge" | "plate" | "ramp" | "stair" | "landing" | "vertical-link";
@@ -18,7 +19,7 @@ export type GeneratedConnector = {
   toTile: string;
   direction: Direction | "none";
   /** Thin walkable slab vertices (feet, Z-up). */
-  positions: Float32Array;
+  positions: import("./types").DerivedPositions;
   indices: number[];
   reason: string;
   cost: number;
@@ -28,6 +29,7 @@ export type GeneratedConnector = {
 };
 
 export type SynthesisResult = {
+  featureDiagnostics?:ReturnType<typeof import("./featureConnections").generateFeatureConnections>["featureDiagnostics"];
   connectors: GeneratedConnector[];
   directInterlocks: number;
   bridges: number;
@@ -46,6 +48,7 @@ export type SynthesisResult = {
   fallbackConnections?: number;
   portCandidates?: PortCandidate[];
   connectionDiagnostics?: {candidateCount:number;acceptedCount:number;rejectedCount:number;rejectionCounts:Partial<Record<PortRejection,number>>;componentsBefore:number;componentsAfter:number};
+  constructionDiagnostics?: Array<{source:string;target:string;routes:number;counts:Record<string,number>;approachRejections:unknown[]}>;
 };
 
 function sourceIdOf(id: string) {
@@ -272,12 +275,14 @@ export function synthesizeConnectors(
   models: TileModel[],
   placed: PlacedTile[],
   connections: ConnectionReport[],
-  options?: { portPairs: PortPair[]; candidates?: PortCandidate[]; componentsBefore?:number; componentsAfter?:number; rejectionCounts?:Partial<Record<PortRejection,number>> },
+  options?: { portPairs: PortPair[]; candidates?: PortCandidate[]; componentsBefore?:number; componentsAfter?:number; rejectionCounts?:Partial<Record<PortRejection,number>>; networkOnly?:boolean; constructionDiagnostics?:SynthesisResult["constructionDiagnostics"] },
 ): SynthesisResult {
   const finishGeometry = beginGeometryValidation();
+  const finishTiming = startConnectionTiming("connector synthesis");
   try {
   if (options) {
-    const result=synthesizePortConnectors(models,placed,connections,options.portPairs);
+    const result=synthesizePortConnectors(models,placed,connections,options.portPairs,options.networkOnly);
+    result.constructionDiagnostics=options.constructionDiagnostics;
     const accepted = new Set(result.portPairs?.map(pair=>JSON.stringify(pair)));
     result.portCandidates=options.candidates?.map(candidate=>candidate.accepted && !accepted.has(JSON.stringify(candidate.pair))
       ? {...candidate,accepted:false,reason:"CIRCULATION VALIDATION" as const} : {...candidate});
@@ -311,7 +316,7 @@ export function synthesizeConnectors(
     fromTile: string,
     toTile: string,
     direction: Direction | "none",
-    mesh: { positions: Float32Array; indices: number[] },
+    mesh: { positions: import("./types").DerivedPositions; indices: number[] },
     reason: string,
     cost: number,
   ) {
@@ -415,16 +420,19 @@ export function synthesizeConnectors(
     connectorCost,
   };
 
-  } finally { finishGeometry(); }
+  } finally { finishTiming(); finishGeometry(); }
 }
 
 /** Assignment-only synthesis. Existing GLOBAL FIELD callers keep the legacy path above. */
-function synthesizePortConnectors(models: TileModel[], tiles: PlacedTile[], reports: ConnectionReport[], portPairs: PortPair[]): SynthesisResult {
+function synthesizePortConnectors(models: TileModel[], tiles: PlacedTile[], reports: ConnectionReport[], portPairs: PortPair[],networkOnly=false): SynthesisResult {
   const result: SynthesisResult = {connectors:[],directInterlocks:0,bridges:0,ramps:0,stairs:0,landings:0,verticalLinks:0,interlocks:0,organicConnectors:0,connectorCost:0,portPairs,fallbackConnections:0};
   result.portPairs=[];
   const add = (original: PortPair, fallback=false) => {
     const surfaces = pairHasSurfaces(original, models, tiles);
-    const pair = portPairClearanceValidated(original, models, tiles) ? {...original} : preparePortConnection(original);
+    // Retain a measured route's actual path instead of replacing it with a
+    // freshly inferred loft. Acceptance below still revalidates emitted geometry.
+    const measuredPath=requiresSourceResponsiveExtension(original,models)&&!!original.path?.length;
+    const pair = measuredPath ? structuredClone(original) : portPairClearanceValidated(original, models, tiles) ? {...original} : preparePortConnection(original);
     if (Math.min(pair.startWidth ?? pair.usableWidth, pair.endWidth ?? pair.usableWidth) < 2) { connectionDiagnostic("port synthesis", "width", { pair }); return false; }
     if (surfaces && !portAttachmentMeets(pair, models, tiles)) { connectionDiagnostic("port synthesis", "surface attachment", { pair }); return false; }
     if (!acceptCirculationClass(pair)) { connectionDiagnostic("port synthesis", "slope", { pair }); return false; }
@@ -460,7 +468,7 @@ function synthesizePortConnectors(models: TileModel[], tiles: PlacedTile[], repo
   const organic = findOrganicLinks(models, tiles, joined);
   const accepted: OrganicLink[] = [];
   const keptStories = new Map<string, number[]>();
-  for (const link of organic.links) {
+  for (const link of networkOnly?[]:organic.links) {
     const key = link.tileA < link.tileB ? `${link.tileA}|${link.tileB}` : `${link.tileB}|${link.tileA}`;
     const elevation = (link.from[2] + link.to[2]) / 2;
     const stories = keptStories.get(key) ?? [];
@@ -615,9 +623,18 @@ export function connectorsToObj(connectors: GeneratedConnector[]) {
   const lines = ["# Generated connection synthesis geometry", "o generated_connectors"];
   let offset = 1;
   for (const connector of connectors) {
+    const extension=connector.portPair?.extension;
+    if(extension) {
+      const {start,end,coordinates,method,structuralCapacity,reconstruction}=extension;
+      const contacts=extension.contacts?.map(c=>({sourceId:c.sourceId,sourceTriangle:c.sourceTriangle,sourceTriangles:c.sourceTriangles,generatedFace:c.generatedFace}));
+      lines.push(`# derived provenance ${JSON.stringify({start,end,coordinates,method,structuralCapacity,reconstruction,contacts})}`);
+    }
     lines.push(`g ${connector.kind}_${connector.id.replace(/[^a-zA-Z0-9_-]+/g, "_")}`);
     for (let index = 0; index < connector.positions.length; index += 3) {
-      lines.push(`v ${connector.positions[index].toFixed(5)} ${connector.positions[index + 1].toFixed(5)} ${connector.positions[index + 2].toFixed(5)}`);
+      // Preserve the actual validated Float32 coordinates for derived extensions.
+      // Five-decimal rounding can introduce new cap gaps or penetration on export.
+      const coordinate=(n:number)=>extension?String(n):n.toFixed(5);
+      lines.push(`v ${coordinate(connector.positions[index])} ${coordinate(connector.positions[index + 1])} ${coordinate(connector.positions[index + 2])}`);
     }
     for (let index = 0; index < connector.indices.length; index += 3) {
       lines.push(`f ${connector.indices[index] + offset} ${connector.indices[index + 1] + offset} ${connector.indices[index + 2] + offset}`);

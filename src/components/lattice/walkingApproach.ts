@@ -1,6 +1,7 @@
 import { beginGeometryValidation, geometryRevision } from "./geometryRevision";
 import { sourceMaterialAtPoint, surfaceOrientation } from "./surfaceOrientation";
 import { localPoint, worldFromLocal } from "./surfaceAttachment";
+import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import type { ConnectorSurface } from "./connectionClearance";
 import type { PlacedTile, TileModel, Vec3 } from "./types";
 
@@ -8,6 +9,19 @@ type Face = { points: Vec3[]; normalZ: number; region: number; triangle: number;
 type FaceIndex = { faces: Face[]; min: Vec3; max: Vec3; grid: Map<string,number[]>; material: Map<string,ReturnType<typeof sourceMaterialAtPoint>> };
 const transformed = new WeakMap<object, Map<string, FaceIndex>>();
 const approaches = new WeakMap<object, Map<string, ReturnType<typeof checkApproach>>>();
+
+/** Source-only necessary condition, invariant under rigid instance placement.
+ * A failure cannot be repaired by moving another form. A pass is NOT scene
+ * clearance: validateWalkingApproach must still check the complete scene.
+ */
+export function validateSourceApproach(model:TileModel,tile:PlacedTile,point:Vec3,outward:Vec3,width:number) {
+  const variant=model.variants.findIndex(v=>v.rotation===0&&v.mirror==="none");
+  if(variant<0)return validateWalkingApproach(model,tile,point,outward,width,2,[model],[tile]);
+  const local=localPoint(point,tile,model),tip=localPoint(point.map((v,k)=>v+outward[k]) as Vec3,tile,model);
+  const direction=tip.map((v,k)=>v-local[k]) as Vec3;
+  const canonical={id:model.id,ix:0,iy:0,iz:0,zLift:0,variant};
+  return validateWalkingApproach(model,canonical,local,direction,width,2,[model],[canonical]);
+}
 const bounds = (points: Vec3[]) => ({min:[0,1,2].map(k=>Math.min(...points.map(p=>p[k]))) as Vec3,max:[0,1,2].map(k=>Math.max(...points.map(p=>p[k]))) as Vec3});
 function placedFaces(model: TileModel,tile: PlacedTile) {
   const surface=model.connectionSurface!;
@@ -55,7 +69,7 @@ function within(poly: Vec3[],boundary: Vec3[]) {
  */
 export function validateWalkingApproach(model: TileModel,tile: PlacedTile,point: Vec3,outward: Vec3,width: number,depth: number,
   models: TileModel[],tiles: PlacedTile[],existing: ConnectorSurface[]=[],landing=false) {
-  const finish=beginGeometryValidation(),start=performance.now();
+  const finish=beginGeometryValidation(),start=performance.now(),finishTiming=startConnectionTiming("walking approach qualification");
   try {
     if(!model.connectionSurface)return checkApproach(model,tile,point,outward,width,depth,models,tiles,existing,landing);
     const revision=geometryRevision(model.connectionSurface);
@@ -64,11 +78,12 @@ export function validateWalkingApproach(model: TileModel,tile: PlacedTile,point:
       existing.map(m=>geometryRevision(m).id)]);
     let entries=approaches.get(revision);if(!entries){entries=new Map();approaches.set(revision,entries);}
     const cached=entries.get(key);
-    if(cached)return {...structuredClone(cached),ms:performance.now()-start,cacheHit:true};
+    if(cached){connectionDiagnostic("cache","walking approach hit");return {...structuredClone(cached),ms:performance.now()-start,cacheHit:true};}
+    connectionDiagnostic("cache","walking approach miss");
     const result=checkApproach(model,tile,point,outward,width,depth,models,tiles,existing,landing);
     if(entries.size>=256)entries.delete(entries.keys().next().value!);
     entries.set(key,structuredClone(result));return {...result,ms:performance.now()-start,cacheHit:false};
-  } finally {finish();}
+  } finally {finishTiming();finish();}
 }
 
 function checkApproach(model: TileModel,tile: PlacedTile,point: Vec3,outward: Vec3,width: number,depth: number,
@@ -102,7 +117,7 @@ function checkApproach(model: TileModel,tile: PlacedTile,point: Vec3,outward: Ve
       maxSlope=Math.max(maxSlope,Math.abs(sx));maxCrossSlope=Math.max(maxCrossSlope,Math.abs(sy));
       return {poly:p.poly,height:(q:Vec3)=>a[2]+sx*(q[0]-a[0])+sy*(q[1]-a[1]),opening:false};
     });
-    if(maxSlope>(landing?1/48:1/12)+1e-6 || maxCrossSlope>1/48+1e-6)return fail("local approach slope",{region,maxSlope,maxCrossSlope,area});
+    if(maxSlope>(landing?1/48:1/12)+1e-6 || maxCrossSlope>1/48+1e-6)return fail("local approach slope",{region,maxSlope,maxCrossSlope,maximumSlope:landing?1/48:1/12,maximumCrossSlope:1/48,area});
     // Check the full opening from half a foot outside the real mesh edge as well.
     const interiorHeight=(q:Vec3)=>planes.find(p=>{const sign=Math.sign(signedArea(p.poly));return p.poly.every((a,i)=>{const b=p.poly[(i+1)%p.poly.length];return sign*((b[0]-a[0])*(q[1]-a[1])-(b[1]-a[1])*(q[0]-a[0]))>=-1e-7;});})?.height(q);
     const innerProfile=[-width/2,width/2].map(y=>world(depth,y,interiorHeight([depth,y,point[2]])??NaN));
