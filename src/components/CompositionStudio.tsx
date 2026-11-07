@@ -34,6 +34,17 @@ import PrototypeDemonstration from "./UnifiedPrototype";
 import { DEFAULT_TYPOLOGY_BY_CATEGORY, type PrototypeCategory, type PrototypeGeometryMode, type PrototypeTypologyId } from "./amphitheaterPrototype";
 import { OPTIMIZER_SESSION_KEY, readJson, writeJson } from "./browserSession";
 import type { Letter } from "./letterTypes";
+import {
+  clearHeightRouting,
+  heightRoutedSelectionVolume,
+  isHeightRoutingActive,
+  isSelectionHeightFeet,
+  planSourceFieldCapacity,
+  selectionHeightPresets,
+  typologyHeightAssignment,
+  type SelectionHeightFeet,
+} from "./selectionHeightRouting";
+import { intersectingSelectionPlacements, localizeIntersectingPlacements } from "./selectionFieldGeometry";
 
 type OverlayState = { circulation: boolean; volume: boolean; sightlines: boolean; hierarchy: boolean; vertical: boolean };
 type DisplayMode = "letters" | "void" | "both";
@@ -208,11 +219,19 @@ function resultsCsv(alternative: SpatialAlternative) {
   return `${rows.join("\n")}\n`;
 }
 
-/** Letters whose centers sit inside the alternative's crop. The full grid is not sent to the generator. */
-function cropRegionPlacements(alternative: SpatialAlternative): CompositionPlacement[] {
+/**
+ * Letters extracted for the prototype source.
+ * Height-routed fields use solid AABB intersection (original TRS preserved).
+ * Legacy free-form selection keeps the center-in-window crop used by the optimizer UI.
+ */
+function cropRegionPlacements(alternative: SpatialAlternative, thicknessPercent = 12): CompositionPlacement[] {
   const window = alternative.selection;
   const field = alternative.fullPlacements;
   if (window && field?.length) {
+    if (isSelectionHeightFeet(window.heightRouting)) {
+      const localized = localizeIntersectingPlacements(field, window, thicknessPercent);
+      if (localized.length) return localized;
+    }
     const contained = field.filter((placement) => placementCenterInSelection(placement, window));
     if (contained.length) return contained.map((placement) => ({ ...placement, x: placement.x - window.centerX, y: placement.y - window.centerY, z: placement.z - window.centerZ }));
   }
@@ -245,7 +264,13 @@ function OptimizationScene({ alternative, grid, thickness, overlays, displayMode
       halfZ: letterDepthSpan(depth, thickness, false) / 2,
     };
   }), { cols: grid.xCells, rows: grid.yCells, layers: grid.zCells }), [renderPlacements, grid.xCells, grid.yCells, grid.zCells, thickness]);
-  const insideSelection = (placement: CompositionPlacement) => !alternative.selection || placementCenterInSelection(placement, alternative.selection);
+  const insideSelection = (placement: CompositionPlacement) => {
+    if (!alternative.selection) return true;
+    if (isSelectionHeightFeet(alternative.selection.heightRouting)) {
+      return intersectingSelectionPlacements([placement], alternative.selection, thickness).length > 0;
+    }
+    return placementCenterInSelection(placement, alternative.selection);
+  };
   return <Canvas dpr={[1, 1.5]} gl={{ antialias: true }}>
     <color attach="background" args={["#05080b"]} />
     <ambientLight intensity={0.65} />
@@ -359,14 +384,18 @@ function clampSelectionToGrid(selection: SelectionVolume, dimensions: ReturnType
     const minimum = Math.min(0.1, safeMaximum);
     return Math.max(minimum, Math.min(Number.isFinite(value) ? value : minimum, safeMaximum));
   };
+  const routed = isHeightRoutingActive(selection) && isSelectionHeightFeet(selection.heightRouting)
+    ? heightRoutedSelectionVolume(selection.heightRouting, selection)
+    : selection;
   return {
-    ...selection,
-    width: clampSize(selection.width, dimensions.width),
-    height: clampSize(selection.height, dimensions.height),
-    depth: clampSize(selection.depth, dimensions.depth),
-    stepX: clampStep(selection.stepX, dimensions.width),
-    stepY: clampStep(selection.stepY, dimensions.height),
-    stepZ: clampStep(selection.stepZ, dimensions.depth),
+    ...routed,
+    width: clampSize(routed.width, dimensions.width),
+    height: clampSize(routed.height, dimensions.height),
+    depth: clampSize(routed.depth, dimensions.depth),
+    stepX: clampStep(routed.stepX, dimensions.width),
+    stepY: clampStep(routed.stepY, dimensions.height),
+    stepZ: clampStep(routed.stepZ, dimensions.depth),
+    heightRouting: routed.heightRouting ?? null,
   };
 }
 
@@ -406,8 +435,11 @@ export default function CompositionStudio() {
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
   const [storageReady, setStorageReady] = useState(false);
   const [keptNotice, setKeptNotice] = useState("Working session is kept in this browser.");
+  const [capacityNotice, setCapacityNotice] = useState("");
   const slideSourceSignature = `${store.cols}:${store.rows}:${store.layerMode}:${store.zLayers}:${store.spacing}:${store.zSpacing}:${store.attractorGap ?? "auto"}:${store.fontSize}:${store.letterThickness}:${store.yRotationEnabled}:${store.yRotationRange}`;
   const lastSlideSourceSignature = useRef<string | null>(null);
+  const heightRoutingActive = isHeightRoutingActive(selection);
+  const typologyHeight = typologyHeightAssignment(prototypeTypology);
   const sourceCells = useMemo(() => [store.cells, ...store.layerCells.slice(0, Math.max(0, store.zLayers - 1))].flat(), [store.cells, store.layerCells, store.zLayers]);
   const selectedSourceCells = useMemo(() => sourceCells.filter((cell) => selectedLetters.includes(cell.letter)), [sourceCells, selectedLetters]);
   const evaluationFocus = focus === "auto" ? "combined" : focus;
@@ -470,16 +502,19 @@ export default function CompositionStudio() {
       };
     });
   }, [selected, sourceCells, grid, rules.minimumLetterSize, rules.maximumLetterSize, rules.xyGap, rules.zGap, rules.attractorGap]);
-  const prototypeSourcePlacements = useMemo<CompositionPlacement[]>(() => selected ? cropRegionPlacements(selected) : completePrototypePlacements, [selected, completePrototypePlacements]);
+  const prototypeSourcePlacements = useMemo<CompositionPlacement[]>(
+    () => selected ? cropRegionPlacements(selected, rules.letterThicknessPercent) : completePrototypePlacements,
+    [selected, completePrototypePlacements, rules.letterThicknessPercent],
+  );
   const prototypeSourceOptions = useMemo(() => evaluatedAlternatives.map((alternative, index) => {
-    const crop = cropRegionPlacements(alternative);
+    const crop = cropRegionPlacements(alternative, rules.letterThicknessPercent);
     return {
       index,
       label: `Alternative ${index + 1} · seed ${alternative.seed} · ${crop.length} crop letters${alternative.selection ? ` · center ${alternative.selection.centerX.toFixed(1)}, ${alternative.selection.centerY.toFixed(1)}, ${alternative.selection.centerZ.toFixed(1)}` : ""}`,
     };
-  }), [evaluatedAlternatives]);
+  }), [evaluatedAlternatives, rules.letterThicknessPercent]);
   const prototypeSourceLabel = selected
-    ? `Alternative ${selectedIndex + 1} · seed ${selected.seed} · ${prototypeSourcePlacements.length} crop letters${selected.selection ? ` · selected ${selected.selection.width.toFixed(1)} × ${selected.selection.height.toFixed(1)} × ${selected.selection.depth.toFixed(1)} at center (${selected.selection.centerX.toFixed(1)}, ${selected.selection.centerY.toFixed(1)}, ${selected.selection.centerZ.toFixed(1)})` : ""}`
+    ? `Alternative ${selectedIndex + 1} · seed ${selected.seed} · ${prototypeSourcePlacements.length} crop letters${selected.selection ? ` · selected ${selected.selection.width.toFixed(1)} × ${selected.selection.height.toFixed(1)} × ${selected.selection.depth.toFixed(1)}${isSelectionHeightFeet(selected.selection.heightRouting) ? ` · height route ${selected.selection.heightRouting} ft` : ""} at center (${selected.selection.centerX.toFixed(1)}, ${selected.selection.centerY.toFixed(1)}, ${selected.selection.centerZ.toFixed(1)})` : ""}`
     : `Original synchronized grid · ${prototypeSourcePlacements.length} objects`;
   const selectedIsApplied = Boolean(selected
     && store.appliedComposition?.seed === selected.seed
@@ -511,6 +546,8 @@ export default function CompositionStudio() {
   useEffect(() => {
     if (!storageReady || !dashedSelection) return;
     setSelection((current) => {
+      // Height-routed 20 × 20 × H fields must not be resized by dashed octet groups.
+      if (isHeightRoutingActive(current)) return current;
       const next = clampSelectionToGrid({
         ...current,
         width: dashedSelection.width,
@@ -525,6 +562,18 @@ export default function CompositionStudio() {
       return unchanged ? current : next;
     });
   }, [dashedSelection, dimensions, storageReady]);
+
+  useEffect(() => {
+    if (!storageReady || !heightRoutingActive || !isSelectionHeightFeet(selection.heightRouting)) return;
+    const plan = planSourceFieldCapacity(grid, selection.heightRouting);
+    if (plan.sufficient) return;
+    setGrid(plan.expandedGrid);
+    setCapacityNotice(plan.notes.join(" "));
+    const expandedDimensions = gridDimensions(plan.expandedGrid);
+    setSelection((current) => clampSelectionToGrid(heightRoutedSelectionVolume(selection.heightRouting!, current), expandedDimensions));
+    // Intentionally omits `grid`: expansion is one-shot per height route; including grid would loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageReady, heightRoutingActive, selection.heightRouting]);
 
   useEffect(() => {
     try {
@@ -629,7 +678,11 @@ export default function CompositionStudio() {
     lastSlideSourceSignature.current = slideSourceSignature;
     const synchronizedGrid = gridFromSlide(store);
     const synchronizedRules = rulesFromSlide(store);
-    setGrid((current) => ({ ...synchronizedGrid, locked: current.locked }));
+    setGrid((current) => {
+      const synced = { ...synchronizedGrid, locked: current.locked };
+      if (!isSelectionHeightFeet(selection.heightRouting)) return synced;
+      return planSourceFieldCapacity(synced, selection.heightRouting).expandedGrid;
+    });
     setRules((current) => ({
       ...current,
       maximumLetterSize: Math.max(current.minimumLetterSize, synchronizedRules.maximumLetterSize),
@@ -644,7 +697,7 @@ export default function CompositionStudio() {
     setAlternatives([]);
     setSelectedIndex(0);
     setLockedParent(null);
-  }, [slideSourceSignature, store]);
+  }, [slideSourceSignature, store, selection.heightRouting]);
 
   const applySelectedToSlide = () => {
     if (!selected) return;
@@ -652,13 +705,29 @@ export default function CompositionStudio() {
     setAppliedComposition({
       seed: selected.seed,
       alternativeIndex: selectedIndex,
-      placements: cropRegionPlacements(selected),
+      placements: cropRegionPlacements(selected, rules.letterThicknessPercent),
       width: activeBounds.width,
       height: activeBounds.height,
       depth: activeBounds.depth,
       sourceCenter: selected.selection ? { x: selected.selection.centerX, y: selected.selection.centerY, z: selected.selection.centerZ } : undefined,
     });
     setLayerMode(true);
+  };
+
+  const applyHeightPreset = (height: SelectionHeightFeet) => {
+    const plan = planSourceFieldCapacity(grid, height);
+    setGrid(plan.expandedGrid);
+    setLayerMode(true);
+    setSelection(clampSelectionToGrid(heightRoutedSelectionVolume(height, selection), gridDimensions(plan.expandedGrid)));
+    setCapacityNotice(plan.notes.join(" "));
+    setAlternatives([]);
+    setSelectedIndex(0);
+    setLockedParent(null);
+  };
+
+  const clearHeightPreset = () => {
+    setSelection(clearHeightRouting(selection));
+    setCapacityNotice("");
   };
 
   const setDescriptor = (id: DescriptorId, key: "intensity" | "importance", value: number) => {
@@ -688,15 +757,19 @@ export default function CompositionStudio() {
     setRules((current) => ({ ...current, [key]: value }));
   };
   const setControl = (key: keyof OptimizerControls, value: number) => setControls((current) => ({ ...current, [key]: key === "alternatives" ? Math.min(4, value) : value }));
-  const setSelectionValue = (key: keyof SelectionVolume, value: number | boolean) => setSelection((current) => (
-    clampSelectionToGrid({ ...current, [key]: value }, dimensions)
-  ));
+  const setSelectionValue = (key: keyof SelectionVolume, value: number | boolean) => setSelection((current) => {
+    if (isHeightRoutingActive(current) && (key === "width" || key === "height" || key === "depth" || key === "heightRouting")) {
+      return current;
+    }
+    return clampSelectionToGrid({ ...current, [key]: value }, dimensions);
+  });
   const resetAll = () => {
     setDescriptors(structuredClone(DEFAULT_DESCRIPTORS));
     setGrid(gridFromSlide(store));
     setRules(rulesFromSlide(store));
     setControls({ ...DEFAULT_OPTIMIZER_CONTROLS });
-    setSelection({ ...DEFAULT_SELECTION });
+    setSelection({ ...DEFAULT_SELECTION, heightRouting: null });
+    setCapacityNotice("");
     setFocus("combined");
     setSelectedLetters([...comparisonLetters]);
     setDisplayMode("both");
@@ -828,15 +901,43 @@ export default function CompositionStudio() {
             <div><h2 className="text-sm font-semibold">Selection volume</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Search a smaller composition inside the overall solution.</p></div>
             <span className="text-[10px]" style={{ color: "var(--accent-gold)" }}>One box per alternative</span>
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
-            <NumberInput label="Selection X" value={selection.width} min={Math.min(0.5, dimensions.width)} max={dimensions.width} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("width", value)} />
-            <NumberInput label="Search step X" value={selection.stepX} min={0.1} max={Math.max(0.1, dimensions.width)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("stepX", value)} />
-            <NumberInput label="Selection Y" value={selection.height} min={Math.min(0.5, dimensions.height)} max={dimensions.height} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("height", value)} />
-            <NumberInput label="Search step Y" value={selection.stepY} min={0.1} max={Math.max(0.1, dimensions.height)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("stepY", value)} />
-            <NumberInput label="Selection Z" value={selection.depth} min={Math.min(0.5, dimensions.depth)} max={dimensions.depth} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("depth", value)} />
-            <NumberInput label="Search step Z" value={selection.stepZ} min={0.1} max={Math.max(0.1, dimensions.depth)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("stepZ", value)} />
+          <div className="mt-2">
+            <h3 className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--accent-pale)" }}>Height-specific fields</h3>
+            <p className="mt-1 text-[9px]" style={{ color: "var(--muted)" }}>20 × 20 ft plan × 20 / 40 / 60 ft height (X width, Y depth, Z height). Dashed-group auto-sizing is disabled while a height route is active. Letters are taken by solid intersection, not center-point only.</p>
+            <div className="mt-2 flex flex-wrap gap-1">
+              {selectionHeightPresets().map((preset) => (
+                <button
+                  key={preset.height}
+                  type="button"
+                  aria-pressed={selection.heightRouting === preset.height}
+                  onClick={() => applyHeightPreset(preset.height)}
+                  className="rounded border px-2 py-1 text-[10px] font-semibold"
+                  style={{
+                    borderColor: selection.heightRouting === preset.height ? "var(--accent-gold)" : "var(--line)",
+                    background: selection.heightRouting === preset.height ? "var(--accent-dark)" : "transparent",
+                    color: selection.heightRouting === preset.height ? "var(--accent-pale)" : "var(--muted)",
+                  }}
+                >
+                  {preset.label}
+                </button>
+              ))}
+              <button type="button" onClick={clearHeightPreset} disabled={!heightRoutingActive} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Clear height route</button>
+            </div>
+            {capacityNotice && <p className="mt-2 text-[9px]" style={{ color: "var(--accent-gold)" }}>{capacityNotice}</p>}
+            <p className="mt-2 text-[9px]" style={{ color: typologyHeight.status === "unresolved" ? "var(--muted)" : "var(--accent-pale)" }}>
+              Typology height for {prototypeTypology}: {typologyHeight.status === "assigned" ? `${typologyHeight.height} ft (${typologyHeight.source})` : `unresolved — ${typologyHeight.reason}`}
+            </p>
           </div>
-          <p className="mt-2 text-[9px]" style={{ color: selection.enabled ? "var(--accent-gold)" : "var(--muted)" }}>{dashedSelection ? `The selection box matches each dashed group: ${selection.width.toFixed(2)} × ${selection.height.toFixed(2)} × ${selection.depth.toFixed(2)}, centered on that group. Search steps of ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} move from one dashed box to the next.` : selection.enabled ? `The optimizer searches ${selection.width.toFixed(1)} × ${selection.height.toFixed(1)} × ${selection.depth.toFixed(1)} windows. Every letter whose center is inside the gold box is evaluated, including letters that cross the crop. Selection dimensions automatically reduce when the overall solution becomes smaller.` : "The entire overall grid is evaluated and exported."}</p>
+          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+            <NumberInput label="Selection X" value={selection.width} min={Math.min(0.5, dimensions.width)} max={dimensions.width} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("width", value)} />
+            <NumberInput label="Search step X" value={selection.stepX} min={0.1} max={Math.max(0.1, dimensions.width)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepX", value)} />
+            <NumberInput label="Selection Y" value={selection.height} min={Math.min(0.5, dimensions.height)} max={dimensions.height} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("height", value)} />
+            <NumberInput label="Search step Y" value={selection.stepY} min={0.1} max={Math.max(0.1, dimensions.height)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepY", value)} />
+            <NumberInput label="Selection Z" value={selection.depth} min={Math.min(0.5, dimensions.depth)} max={dimensions.depth} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("depth", value)} />
+            <NumberInput label="Search step Z" value={selection.stepZ} min={0.1} max={Math.max(0.1, dimensions.depth)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepZ", value)} />
+          </div>
+          <p className="mt-2 text-[9px]" style={{ color: selection.enabled ? "var(--accent-gold)" : "var(--muted)" }}>{heightRoutingActive ? `Height route ${selection.heightRouting} ft: fixed 20 × 20 × ${selection.depth.toFixed(0)} ft field. Search steps ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} reposition the window inside the source field. Letters whose solids intersect the box are kept with original transforms; boundary crossings are prepared for Manifold trim in Phase 2.` : dashedSelection ? `The selection box matches each dashed group: ${selection.width.toFixed(2)} × ${selection.height.toFixed(2)} × ${selection.depth.toFixed(2)}, centered on that group. Search steps of ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} move from one dashed box to the next.` : selection.enabled ? `The optimizer searches ${selection.width.toFixed(1)} × ${selection.height.toFixed(1)} × ${selection.depth.toFixed(1)} windows. Every letter whose center is inside the gold box is evaluated, including letters that cross the crop. Selection dimensions automatically reduce when the overall solution becomes smaller.` : "The entire overall grid is evaluated and exported."}</p>
+          {!selectionValid && heightRoutingActive && <p className="mt-2 text-[9px]" style={{ color: "#ffad95" }}>The height-routed selection does not fit inside the current source field. Expand overall X/Y/Z or choose a shorter height.</p>}
         </section>
 
         <section className="rounded-xl border p-3" style={panelStyle}>
