@@ -111,7 +111,8 @@ async function generate(h){
     stairs.push({from:a.id,to:b.id,vSource:v?.id,count,riser:rise/count,tread:run/count,width:w,connected:!!stair,contact:stair?.contact,heading:stair?.heading});
     if(stair)solidsForStairs.push(stair.solid);
   }
-  const A=M.union(solids),raw=M.union([...parts,...solidsForStairs]),C=raw.intersect(box);
+  const A=M.union(solids),raw=M.union([...parts,...solidsForStairs]),C=raw.intersect(box).subtract(M.union(pocketTools));
+  let linkIndex=0; for(const flight of stairs){if(!flight.connected)continue; const kept=solidsForStairs[linkIndex++].intersect(C); const i=items.findIndex(p=>p.id===flight.to); flight.finalContacts=[parts[i-1],parts[i]].map(s=>kept.intersect(s).volume()); flight.finalComponents=kept.decompose().length;}
   bays.forEach((bay,i)=>{const probe=pocketTools[i].intersect(box);bay.afterClipProbeVolume=probe.volume();bay.afterUnionObstructedVolume=C.intersect(probe).volume();});
   const arch=serialize(C,[241,192,119]),letters=serialize(A,[82,172,219]);
   const frame={min:[-10,-10,0],max:[10,10,60]};
@@ -129,6 +130,7 @@ async function generate(h){
  const pic=(h,m,v)=>'<figure><img src="'+h+'-'+m+'-'+v+'.png"><figcaption>'+h+' ft · '+v+'</figcaption></figure>';
  save('index.html','<!doctype html><meta charset=utf-8><title>Stepped Amphitheater</title><style>body{background:#101820;color:white;font:16px system-ui;margin:3%}section{display:flex}figure{margin:2px;flex:1}img{width:100%}</style><h1>Stepped Amphitheater</h1><section>'+rows.map(r=>pic(r.field[2],'C','iso')).join('')+'</section>'+rows.map(r=>'<h2>20 × 20 × '+r.field[2]+' ft · '+r.items.length+' letters</h2>'+['A','B','C'].map((m,i)=>'<h3>'+['A · Original letters','B · Letters and architecture','C · Architecture only'][i]+'</h3><section>'+['iso','plan','elevation','section'].map(v=>pic(r.field[2],m,v)).join('')+'</section>').join('')).join(''));
 })().catch(e=>{console.error(e);process.exitCode=1});
+
 
 
 
