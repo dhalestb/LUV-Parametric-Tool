@@ -1,0 +1,50 @@
+[
+  {
+    "height": 20,
+    "instances": 7,
+    "restoredMeshExact": true,
+    "defaultYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "overrideApplied": true,
+    "defaultVolume": 926.6658345001576,
+    "overrideVolume": 928.2464739566967,
+    "sourceCorrespondence": true
+  },
+  {
+    "height": 40,
+    "instances": 11,
+    "restoredMeshExact": true,
+    "defaultYaw": [
+      0,
+      15,
+      45,
+      90,
+      30
+    ],
+    "overrideApplied": false,
+    "defaultVolume": 2968.48914662006,
+    "overrideVolume": 2968.48914662006,
+    "sourceCorrespondence": true
+  },
+  {
+    "height": 60,
+    "instances": 16,
+    "restoredMeshExact": true,
+    "defaultYaw": [
+      0,
+      15,
+      45,
+      90,
+      30
+    ],
+    "overrideApplied": false,
+    "defaultVolume": 6530.091930605921,
+    "overrideVolume": 6530.091930605921,
+    "sourceCorrespondence": true
+  }
+]

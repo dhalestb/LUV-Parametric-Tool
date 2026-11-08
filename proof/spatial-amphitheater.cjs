@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const ts = require('typescript');
 const render = require('./render.cjs');
+const crypto = require('node:crypto');
 require.extensions['.ts'] = (module, filename) => module._compile(ts.transpileModule(
   fs.readFileSync(filename,'utf8'), {compilerOptions:{module:1,target:7,esModuleInterop:true}}
 ).outputText,filename);
@@ -12,6 +13,14 @@ const out=path.resolve(process.argv[3]||path.join(__dirname,'spatial-review'));
 const save=(name,data)=>fs.writeFileSync(path.join(out,name),data);
 const json=(name,obj)=>save(name,JSON.stringify(obj,null,2));
 const rad=a=>a*Math.PI/180;
+const override=fixture.orientationOverride?.enabled===true?fixture.orientationOverride:{enabled:false};
+function allowedYaw(height,index){
+  const active=override.enabled && (!override.heights || override.heights.includes(height))
+    && (!override.instances || override.instances.includes('instance-'+index));
+  const values=active?override.yaw:[0,15,30,45,90];
+  if(!Array.isArray(values)||!values.length||values.some(v=>!Number.isFinite(v)))throw Error('Invalid activated yaw override');
+  return {values,active};
+}
 function serialize(s,color){
   const m=s.getMesh();
   return {positions:Array.from(m.vertProperties),indices:Array.from(m.triVerts),color};
@@ -44,16 +53,17 @@ async function generate(h){
     const phi=i*.61;
 
     // Search the same ordered path at alternative headings around the opening.
-    let chosen;
-    for(const delta of [0,15,30,45,90]){
+    let chosen; const policy=allowedYaw(h,i), candidates=[];
+    for(const delta of policy.values){
+      const audit={relativeYaw:delta,containmentRejected:0,voidRejected:0,feasible:0}; candidates.push(audit);
       const yaw=heading+delta;
       for(let k=0;k<72;k++){
         const angle=phi+(k%24)*Math.PI/12;
         const stride=width*[.25,.39,.16][Math.floor(k/24)]; const center=i?[items[i-1].center[0]+stride*Math.cos(angle),items[i-1].center[1]+stride*Math.sin(angle),z]:[stride*Math.cos(angle),stride*Math.sin(angle),z];
         const solid=templates[id].rotate([p.letter==="V"?90:0,0,yaw]).translate(center);
         const b=solid.boundingBox();
-        if(b.min[0]<-9.3||b.max[0]>9.3||b.min[1]<-9.3||b.max[1]>9.3||b.min[2]<0||b.max[2]>h)continue;
-        if(solid.intersect(shaft).volume()>1e-8)continue;
+        if(b.min[0]<-9.3||b.max[0]>9.3||b.min[1]<-9.3||b.max[1]>9.3||b.min[2]<0||b.max[2]>h){audit.containmentRejected++;continue;}
+        if(solid.intersect(shaft).volume()>1e-8){audit.voidRejected++;continue;} audit.feasible++;
         const ideal=[Math.cos(phi)*width*.25,Math.sin(phi)*width*.25];
         const cost=Math.hypot(center[0]-ideal[0],center[1]-ideal[1])+Math.abs(delta-[0,15,30,45,90][i%5])*.04;
         if(!chosen||cost<chosen.cost)chosen={center,solid,yaw,cost};
@@ -72,7 +82,10 @@ async function generate(h){
     let mass=p.letter==='U'?profile.extrude(wallHeight):boundary.extrude(wallHeight);
     if(p.letter==='V'){
       // Terraced angular cheeks follow both converging strokes.
-      mass=mass.warp(q=>{q[2]*=.42+.58*(q[1]-bay.min[1])/depth;});
+            // Develop the actual upright local V profile into angular boundary mass.
+      mass=profile.offset(width*.025,'Round').extrude(width*.16)
+        .translate([0,0,-width*.08]).rotate([90,0,0]);
+      // Keep the source pivot at the recorded elevation.
     }
     let pocket;
     if(p.letter==='U'){
@@ -84,7 +97,7 @@ async function generate(h){
     }
     const built=world(mass.add(floor)).subtract(shaft);
     parts.push(built);solids.push(solid);
-    items.push({id:'instance-'+i,sourceIndex:id,source:p,letter:p.letter,footprintFeet:.92*scale(p),center,yaw,tilt:p.letter==="V"?90:0,bounds:solid.boundingBox(),level:z,wallHeight,pocket});
+    items.push({id:'instance-'+i,sourceIndex:id,source:p,letter:p.letter,footprintFeet:.92*scale(p),center,yaw,tilt:p.letter==="V"?90:0,bounds:solid.boundingBox(),level:z,wallHeight,pocket,principalHeading:heading,allowedYaw:policy.values,relativeYaw:yaw-heading,localXRotation:p.letter==='V'?90:0,localYRotation:0,pivot:center,rotationOrder:'local X then local Y then world Z, then translation',overrideActive:policy.active,candidates,selectionReason:'Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate',ruleBFrame:{worldYaw:yaw,boundaryTilt:p.letter==='V'?90:0,floorTilt:0}});
   }
   // Join successive floors at the closest overlap of their projected profiles.
   for(let i=1;i<items.length;i++){
@@ -121,15 +134,17 @@ async function generate(h){
   }
   json(h+'-architecture.json',arch);
   const bounds=C.boundingBox();
-  return {field:[20,20,h],items,levels:items.map(t=>t.level),counts:Object.fromEntries(['L','U','V'].map(l=>[l,items.filter(t=>t.letter===l).length])),terraces:parts.length,bays,stairs,ruleA:A.boundingBox(),ruleB:bounds,height:bounds.max[2]-bounds.min[2],volume:C.volume(),components:C.decompose().length,status:C.status(),shaftRadius:radius,shaftHeight:h,shaftOverlap:[A,C].map(s=>s.intersect(shaft).volume()),trimmed:raw.subtract(box).volume(),outside:C.subtract(box).volume(),scaleAfterGeneration:1};
+  const geometryHash=crypto.createHash('sha256').update(JSON.stringify([arch,letters])).digest('hex');
+  return {geometryHash,override,field:[20,20,h],items,levels:items.map(t=>t.level),counts:Object.fromEntries(['L','U','V'].map(l=>[l,items.filter(t=>t.letter===l).length])),terraces:parts.length,bays,stairs,ruleA:A.boundingBox(),ruleB:bounds,height:bounds.max[2]-bounds.min[2],volume:C.volume(),components:C.decompose().length,status:C.status(),shaftRadius:radius,shaftHeight:h,shaftOverlap:[A,C].map(s=>s.intersect(shaft).volume()),trimmed:raw.subtract(box).volume(),outside:C.subtract(box).volume(),scaleAfterGeneration:1};
 }
 
 (async()=>{
  fs.mkdirSync(out,{recursive:true});const rows=[];
  for(const h of [20,40,60]){const row=await generate(h);rows.push(row);json('measurements.json',rows);console.log(h,row.counts,row.height,row.components,row.bays.length,row.stairs.filter(s=>s.connected).length);}
  const pic=(h,m,v)=>'<figure><img src="'+h+'-'+m+'-'+v+'.png"><figcaption>'+h+' ft · '+v+'</figcaption></figure>';
- save('index.html','<!doctype html><meta charset=utf-8><title>Stepped Amphitheater</title><style>body{background:#101820;color:white;font:16px system-ui;margin:3%}section{display:flex}figure{margin:2px;flex:1}img{width:100%}</style><h1>Stepped Amphitheater</h1><section>'+rows.map(r=>pic(r.field[2],'C','iso')).join('')+'</section>'+rows.map(r=>'<h2>20 × 20 × '+r.field[2]+' ft · '+r.items.length+' letters</h2>'+['A','B','C'].map((m,i)=>'<h3>'+['A · Original letters','B · Letters and architecture','C · Architecture only'][i]+'</h3><section>'+['iso','plan','elevation','section'].map(v=>pic(r.field[2],m,v)).join('')+'</section>').join('')).join(''));
+ save('index.html','<!doctype html><meta charset=utf-8><title>Stepped Amphitheater</title><style>body{background:#101820;color:white;font:16px system-ui;margin:3%}section{display:flex}figure{margin:2px;flex:1}img{width:100%}</style><h1>Stepped Amphitheater</h1><section>'+rows.map(r=>pic(r.field[2],'C','iso')).join('')+'</section>'+rows.map(r=>'<h2>20 × 20 × '+r.field[2]+' ft · '+r.items.length+' letters</h2><table><tr><th>Instance/source</th><th>Role</th><th>Heading</th><th>Relative yaw</th><th>World yaw</th><th>Local X/Y tilt</th><th>Pivot</th><th>Override</th></tr>'+r.items.map(t=>'<tr><td>'+t.id+' / '+t.sourceIndex+' '+t.letter+'</td><td>'+({L:'terrace',U:'enclosure',V:'transition'}[t.letter])+'</td><td>'+t.principalHeading.toFixed(2)+'</td><td>'+t.relativeYaw.toFixed(2)+'</td><td>'+t.yaw.toFixed(2)+'</td><td>'+t.localXRotation+' / '+t.localYRotation+'</td><td>'+t.center.map(v=>v.toFixed(2)).join(', ')+'</td><td>'+t.overrideActive+'</td></tr>').join('')+'</table>'+['A','B','C'].map((m,i)=>'<h3>'+['A · Original letters','B · Letters and architecture','C · Architecture only'][i]+'</h3><section>'+['iso','plan','elevation','section'].map(v=>pic(r.field[2],m,v)).join('')+'</section>').join('')).join(''));
 })().catch(e=>{console.error(e);process.exitCode=1});
+
 
 
 

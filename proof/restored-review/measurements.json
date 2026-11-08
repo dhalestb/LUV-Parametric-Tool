@@ -1,0 +1,4315 @@
+[
+  {
+    "geometryHash": "7fa0e3ec69816085df9422d54febb7b160098e8d167237c15f80f893a220738e",
+    "override": {
+      "enabled": false
+    },
+    "field": [
+      20,
+      20,
+      20
+    ],
+    "items": [
+      {
+        "id": "instance-0",
+        "sourceIndex": 0,
+        "source": {
+          "letter": "L",
+          "x": -14.673913043478262,
+          "y": -1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 9,
+        "center": [
+          -2.6452370861582825e-16,
+          -1.44,
+          0.99
+        ],
+        "yaw": 7.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -4.764358533209435,
+            -6.4564752049230165,
+            0.3052173883889032
+          ],
+          "max": [
+            4.764358533209435,
+            2.8783059794435135,
+            1.6747826116110969
+          ]
+        },
+        "level": 0.99,
+        "wallHeight": 2.5200000000000005,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 0,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -2.6452370861582825e-16,
+          -1.44,
+          0.99
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 0,
+            "voidRejected": 50,
+            "feasible": 22
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 0,
+            "voidRejected": 50,
+            "feasible": 22
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 9,
+            "voidRejected": 44,
+            "feasible": 19
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 9,
+            "voidRejected": 44,
+            "feasible": 19
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 0,
+            "voidRejected": 50,
+            "feasible": 22
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 7.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-1",
+        "sourceIndex": 1,
+        "source": {
+          "letter": "U",
+          "x": -8.804347826086957,
+          "y": 1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 9,
+        "center": [
+          0.2512802964189407,
+          -0.02209372219754613,
+          3.5100000000000007
+        ],
+        "yaw": 22.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -5.417701923859417,
+            -4.7752565473734165,
+            2.825217388388904
+          ],
+          "max": [
+            4.793755127689218,
+            5.8841934211483595,
+            4.194782611611098
+          ]
+        },
+        "level": 3.5100000000000007,
+        "wallHeight": 5.040000000000001,
+        "pocket": {
+          "depth": 2.3233801774356677,
+          "width": 1.9350000321865082,
+          "clearHeight": 3.6792000000000007,
+          "roofThickness": 0.7758000000000003,
+          "removed": 15.836729515175364,
+          "referenceDepth": 9.29352070974267
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 15,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          0.2512802964189407,
+          -0.02209372219754613,
+          3.5100000000000007
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 3,
+            "voidRejected": 64,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 4,
+            "voidRejected": 61,
+            "feasible": 7
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 8,
+            "voidRejected": 57,
+            "feasible": 7
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 8,
+            "voidRejected": 56,
+            "feasible": 8
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 4,
+            "voidRejected": 61,
+            "feasible": 7
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 22.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-2",
+        "sourceIndex": 2,
+        "source": {
+          "letter": "V",
+          "x": -2.9347826086956528,
+          "y": -1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 9,
+        "center": [
+          -0.13559310046265177,
+          2.1943965157203422,
+          6.030000000000001
+        ],
+        "yaw": 37.59464336859145,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -4.148483936964047,
+            -1.093508667183602,
+            1.5299999183675528
+          ],
+          "max": [
+            3.877297736038744,
+            5.482301698624287,
+            10.53000008163245
+          ]
+        },
+        "level": 6.030000000000001,
+        "wallHeight": 3.2399999999999998,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 30.000000000000004,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          -0.13559310046265177,
+          2.1943965157203422,
+          6.030000000000001
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 0,
+            "voidRejected": 44,
+            "feasible": 28
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 0,
+            "voidRejected": 44,
+            "feasible": 28
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 0,
+            "voidRejected": 43,
+            "feasible": 29
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 0,
+            "voidRejected": 44,
+            "feasible": 28
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 0,
+            "voidRejected": 44,
+            "feasible": 28
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 37.59464336859145,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-3",
+        "sourceIndex": 3,
+        "source": {
+          "letter": "L",
+          "x": 2.9347826086956506,
+          "y": 1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 9,
+        "center": [
+          -0.7235753362428934,
+          0.02258232237716662,
+          8.55
+        ],
+        "yaw": 52.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -6.85343777492302,
+            -6.052426759927927,
+            7.865217388388904
+          ],
+          "max": [
+            5.406287102437234,
+            2.3538499206356347,
+            9.234782611611097
+          ]
+        },
+        "level": 8.55,
+        "wallHeight": 2.5200000000000005,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 45,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -0.7235753362428934,
+          0.02258232237716662,
+          8.55
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 5,
+            "voidRejected": 60,
+            "feasible": 7
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 3,
+            "voidRejected": 63,
+            "feasible": 6
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 6,
+            "voidRejected": 60,
+            "feasible": 6
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 8,
+            "voidRejected": 59,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 7,
+            "voidRejected": 58,
+            "feasible": 7
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 52.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-4",
+        "sourceIndex": 4,
+        "source": {
+          "letter": "U",
+          "x": 8.804347826086955,
+          "y": -1.9565217391304348,
+          "z": 1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 9,
+        "center": [
+          0.711370801021004,
+          0.14312104292546185,
+          11.070000000000002
+        ],
+        "yaw": 97.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -4.450577281448204,
+            -4.640633873956799,
+            10.385217388388906
+          ],
+          "max": [
+            5.379343095138981,
+            4.447991380911866,
+            11.754782611611098
+          ]
+        },
+        "level": 11.070000000000002,
+        "wallHeight": 5.040000000000001,
+        "pocket": {
+          "depth": 2.3233801774356677,
+          "width": 1.9350000321865082,
+          "clearHeight": 3.6792000000000007,
+          "roofThickness": 0.7758000000000003,
+          "removed": 15.836729515175364,
+          "referenceDepth": 9.29352070974267
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 90,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          0.711370801021004,
+          0.14312104292546185,
+          11.070000000000002
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 0,
+            "voidRejected": 67,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 6,
+            "voidRejected": 63,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 10,
+            "voidRejected": 58,
+            "feasible": 4
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 10,
+            "voidRejected": 59,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 2,
+            "voidRejected": 67,
+            "feasible": 3
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 97.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-5",
+        "sourceIndex": 5,
+        "source": {
+          "letter": "V",
+          "x": 14.673913043478262,
+          "y": 1.9565217391304348,
+          "z": 1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 9,
+        "center": [
+          -2.58172589655181,
+          1.3578696343776304,
+          13.590000000000002
+        ],
+        "yaw": 7.594643368591445,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -7.231472257332765,
+            0.08435725264796234,
+            9.089999918367553
+          ],
+          "max": [
+            2.0680204642291447,
+            2.6313820161072985,
+            18.09000008163245
+          ]
+        },
+        "level": 13.590000000000002,
+        "wallHeight": 3.2399999999999998,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 0,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          -2.58172589655181,
+          1.3578696343776304,
+          13.590000000000002
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 0,
+            "voidRejected": 44,
+            "feasible": 28
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 0,
+            "voidRejected": 44,
+            "feasible": 28
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 0,
+            "voidRejected": 43,
+            "feasible": 29
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 0,
+            "voidRejected": 41,
+            "feasible": 31
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 0,
+            "voidRejected": 40,
+            "feasible": 32
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 7.594643368591445,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-6",
+        "sourceIndex": 0,
+        "source": {
+          "letter": "L",
+          "x": -14.673913043478262,
+          "y": -1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 9,
+        "center": [
+          -2.010673546654716,
+          -0.81845736625371,
+          16.110000000000003
+        ],
+        "yaw": 22.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -7.623269147752057,
+            -6.589248653653806,
+            15.425217388388907
+          ],
+          "max": [
+            3.6019220544426256,
+            2.9227080431962102,
+            16.7947826116111
+          ]
+        },
+        "level": 16.110000000000003,
+        "wallHeight": 2.5200000000000005,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 15,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -2.010673546654716,
+          -0.81845736625371,
+          16.110000000000003
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 11,
+            "voidRejected": 41,
+            "feasible": 20
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 23,
+            "voidRejected": 37,
+            "feasible": 12
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 29,
+            "voidRejected": 35,
+            "feasible": 8
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 30,
+            "voidRejected": 36,
+            "feasible": 6
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 10,
+            "voidRejected": 60,
+            "feasible": 2
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 22.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      }
+    ],
+    "levels": [
+      0.99,
+      3.5100000000000007,
+      6.030000000000001,
+      8.55,
+      11.070000000000002,
+      13.590000000000002,
+      16.110000000000003
+    ],
+    "counts": {
+      "L": 3,
+      "U": 2,
+      "V": 2
+    },
+    "terraces": 7,
+    "bays": [
+      {
+        "id": 1,
+        "depth": 2.3233801774356677,
+        "width": 1.9350000321865082,
+        "clearHeight": 3.6792000000000007,
+        "roofThickness": 0.7758000000000003,
+        "removed": 15.836729515175364,
+        "referenceDepth": 9.29352070974267,
+        "afterClipProbeVolume": 16.54072925010531,
+        "afterUnionObstructedVolume": -4.440892098500626e-16
+      },
+      {
+        "id": 4,
+        "depth": 2.3233801774356677,
+        "width": 1.9350000321865082,
+        "clearHeight": 3.6792000000000007,
+        "roofThickness": 0.7758000000000003,
+        "removed": 15.836729515175364,
+        "referenceDepth": 9.29352070974267,
+        "afterClipProbeVolume": 16.54072925010531,
+        "afterUnionObstructedVolume": -2.220446049250313e-16
+      }
+    ],
+    "stairs": [
+      {
+        "from": "instance-0",
+        "to": "instance-1",
+        "vSource": "instance-2",
+        "count": 5,
+        "riser": 0.5040000000000001,
+        "tread": 0.6839999999999999,
+        "width": 1.44,
+        "connected": true,
+        "contact": [
+          0.25152546346576704,
+          0.6315552000000003
+        ],
+        "heading": 146.31559204330853,
+        "finalContacts": [
+          0.25152546346576704,
+          0.6315552000000001
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-1",
+        "to": "instance-2",
+        "vSource": "instance-2",
+        "count": 5,
+        "riser": 0.5040000000000001,
+        "tread": 0.6839999999999999,
+        "width": 1.44,
+        "connected": true,
+        "contact": [
+          2.7712512000000014,
+          0.6315552000000005
+        ],
+        "heading": 108.87369469387437,
+        "finalContacts": [
+          2.771251200000001,
+          0.6315552000000001
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-2",
+        "to": "instance-3",
+        "vSource": "instance-2",
+        "count": 5,
+        "riser": 0.5040000000000001,
+        "tread": 0.6839999999999999,
+        "width": 1.44,
+        "connected": true,
+        "contact": [
+          0.04721437650830229,
+          0.050519425317754926
+        ],
+        "heading": 146.31559204330853,
+        "finalContacts": [
+          0.04721437650830207,
+          0.05051942531775535
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-3",
+        "to": "instance-4",
+        "vSource": "instance-5",
+        "count": 5,
+        "riser": 0.5040000000000001,
+        "tread": 0.6839999999999999,
+        "width": 1.44,
+        "connected": true,
+        "contact": [
+          0.7072277495019254,
+          0.631555199999999
+        ],
+        "heading": 78.87369469387437,
+        "finalContacts": [
+          0.7072277495019254,
+          0.6315551999999994
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-4",
+        "to": "instance-5",
+        "vSource": "instance-5",
+        "count": 5,
+        "riser": 0.5040000000000001,
+        "tread": 0.6839999999999999,
+        "width": 1.44,
+        "connected": true,
+        "contact": [
+          2.4989650661743803,
+          0.5992502665781094
+        ],
+        "heading": 116.31559204330853,
+        "finalContacts": [
+          2.4989650661743803,
+          0.5992502665781093
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-5",
+        "to": "instance-6",
+        "vSource": "instance-5",
+        "count": 5,
+        "riser": 0.5040000000000001,
+        "tread": 0.6839999999999999,
+        "width": 1.44,
+        "connected": true,
+        "contact": [
+          0.12714431802911888,
+          0.002664539245917274
+        ],
+        "heading": 78.87369469387437,
+        "finalContacts": [
+          0.12714431802911855,
+          0.0026645392459172753
+        ],
+        "finalComponents": 1
+      }
+    ],
+    "ruleA": {
+      "min": [
+        -7.623269147752057,
+        -6.589248653653806,
+        0.3052173883889032
+      ],
+      "max": [
+        5.406287102437234,
+        5.8841934211483595,
+        18.09000008163245
+      ]
+    },
+    "ruleB": {
+      "min": [
+        -8.288006369601836,
+        -7.2539858741390955,
+        0.99
+      ],
+      "max": [
+        6.098988682607711,
+        9.242145305882389,
+        18.630000000000003
+      ]
+    },
+    "height": 17.640000000000004,
+    "volume": 926.6658345001576,
+    "components": 1,
+    "status": "NoError",
+    "shaftRadius": 0.99,
+    "shaftHeight": 20,
+    "shaftOverlap": [
+      0,
+      0
+    ],
+    "trimmed": 0,
+    "outside": 0,
+    "scaleAfterGeneration": 1
+  },
+  {
+    "geometryHash": "bdd96693be162bb2874d63a568a59a47d5390f622759b788f6297a82baf8b086",
+    "override": {
+      "enabled": false
+    },
+    "field": [
+      20,
+      20,
+      40
+    ],
+    "items": [
+      {
+        "id": "instance-0",
+        "sourceIndex": 0,
+        "source": {
+          "letter": "L",
+          "x": -14.673913043478262,
+          "y": -1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 11,
+        "center": [
+          -3.233067549749012e-16,
+          -1.76,
+          1.21
+        ],
+        "yaw": 7.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -5.8231048739226425,
+            -7.891247472683687,
+            0.3730434746975485
+          ],
+          "max": [
+            5.8231048739226425,
+            3.517929530430961,
+            2.0469565253024515
+          ]
+        },
+        "level": 1.21,
+        "wallHeight": 3.08,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 0,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -3.233067549749012e-16,
+          -1.76,
+          1.21
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 18,
+            "voidRejected": 38,
+            "feasible": 16
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 30,
+            "voidRejected": 32,
+            "feasible": 10
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 40,
+            "voidRejected": 24,
+            "feasible": 8
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 40,
+            "voidRejected": 24,
+            "feasible": 8
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 18,
+            "voidRejected": 38,
+            "feasible": 16
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 7.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-1",
+        "sourceIndex": 1,
+        "source": {
+          "letter": "U",
+          "x": -8.804347826086957,
+          "y": 1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 11,
+        "center": [
+          0.30712036228981643,
+          -0.027003438241445465,
+          4.29
+        ],
+        "yaw": 22.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -6.621635684717064,
+            -5.836424669011954,
+            3.4530434746975485
+          ],
+          "max": [
+            5.859034044953488,
+            7.191791959181328,
+            5.126956525302451
+          ]
+        },
+        "level": 4.29,
+        "wallHeight": 6.16,
+        "pocket": {
+          "depth": 2.839686883532482,
+          "width": 2.365000039339065,
+          "clearHeight": 4.4968,
+          "roofThickness": 0.9481999999999997,
+          "removed": 28.91452256801108,
+          "referenceDepth": 11.358747534129929
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 15,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          0.30712036228981643,
+          -0.027003438241445465,
+          4.29
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 20,
+            "voidRejected": 47,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 35,
+            "voidRejected": 32,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 37,
+            "voidRejected": 29,
+            "feasible": 6
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 37,
+            "voidRejected": 27,
+            "feasible": 8
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 26,
+            "voidRejected": 39,
+            "feasible": 7
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 22.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-2",
+        "sourceIndex": 2,
+        "source": {
+          "letter": "V",
+          "x": -2.9347826086956528,
+          "y": -1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 11,
+        "center": [
+          0.5515389949957521,
+          2.7121131222550514,
+          7.37
+        ],
+        "yaw": 22.594643368591445,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -4.929041085486946,
+            -0.17375334937066178,
+            1.8699999002270085
+          ],
+          "max": [
+            6.032119075478451,
+            5.597979593880765,
+            12.87000009977299
+          ]
+        },
+        "level": 7.37,
+        "wallHeight": 3.96,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 15,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          0.5515389949957521,
+          2.7121131222550514,
+          7.37
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 8,
+            "voidRejected": 38,
+            "feasible": 26
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 6,
+            "voidRejected": 40,
+            "feasible": 26
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 2,
+            "voidRejected": 43,
+            "feasible": 27
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 0,
+            "voidRejected": 44,
+            "feasible": 28
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 8,
+            "voidRejected": 37,
+            "feasible": 27
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 22.594643368591445,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-3",
+        "sourceIndex": 3,
+        "source": {
+          "letter": "L",
+          "x": 2.9347826086956506,
+          "y": 1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 11,
+        "center": [
+          -0.16710595984676524,
+          0.05767355261339224,
+          10.45
+        ],
+        "yaw": 52.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -7.65916005156692,
+            -7.367337547981723,
+            9.613043474697548
+          ],
+          "max": [
+            7.32494813187339,
+            2.90700061715152,
+            11.28695652530245
+          ]
+        },
+        "level": 10.45,
+        "wallHeight": 3.08,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 45,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -0.16710595984676524,
+          0.05767355261339224,
+          10.45
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 31,
+            "voidRejected": 36,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 32,
+            "voidRejected": 35,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 37,
+            "voidRejected": 30,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 38,
+            "voidRejected": 29,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 36,
+            "voidRejected": 28,
+            "feasible": 8
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 52.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-4",
+        "sourceIndex": 4,
+        "source": {
+          "letter": "U",
+          "x": 8.804347826086955,
+          "y": -1.9565217391304348,
+          "z": 1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 11,
+        "center": [
+          1.5867170968091096,
+          0.20499865550575308,
+          13.530000000000001
+        ],
+        "yaw": 97.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -4.722330559542145,
+            -5.6418129095725655,
+            12.69304347469755
+          ],
+          "max": [
+            7.292016567397749,
+            5.466506846378024,
+            14.366956525302452
+          ]
+        },
+        "level": 13.530000000000001,
+        "wallHeight": 6.16,
+        "pocket": {
+          "depth": 2.839686883532482,
+          "width": 2.365000039339065,
+          "clearHeight": 4.4968,
+          "roofThickness": 0.9481999999999997,
+          "removed": 28.91452256801108,
+          "referenceDepth": 11.358747534129929
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 90,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          1.5867170968091096,
+          0.20499865550575308,
+          13.530000000000001
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 17,
+            "voidRejected": 52,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 32,
+            "voidRejected": 37,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 42,
+            "voidRejected": 27,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 41,
+            "voidRejected": 27,
+            "feasible": 4
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 18,
+            "voidRejected": 52,
+            "feasible": 2
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 97.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-5",
+        "sourceIndex": 5,
+        "source": {
+          "letter": "V",
+          "x": 14.673913043478262,
+          "y": 1.9565217391304348,
+          "z": 1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 11,
+        "center": [
+          -2.685300615463463,
+          0.5973819706829087,
+          16.61
+        ],
+        "yaw": 37.59464336859145,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -7.589944971187391,
+            -3.4211688084219114,
+            11.109999900227008
+          ],
+          "max": [
+            2.2193437402604648,
+            4.615932749787729,
+            22.11000009977299
+          ]
+        },
+        "level": 16.61,
+        "wallHeight": 3.96,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 30.000000000000004,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          -2.685300615463463,
+          0.5973819706829087,
+          16.61
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 14,
+            "voidRejected": 36,
+            "feasible": 22
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 13,
+            "voidRejected": 36,
+            "feasible": 23
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 6,
+            "voidRejected": 38,
+            "feasible": 28
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 6,
+            "voidRejected": 37,
+            "feasible": 29
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 9,
+            "voidRejected": 31,
+            "feasible": 32
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 37.59464336859145,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-6",
+        "sourceIndex": 0,
+        "source": {
+          "letter": "L",
+          "x": -14.673913043478262,
+          "y": -1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 11,
+        "center": [
+          -2.238610777321736,
+          -1.1049893720331623,
+          19.69
+        ],
+        "yaw": 22.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -9.098449845329597,
+            -8.158178723299944,
+            18.85304347469755
+          ],
+          "max": [
+            4.621228290686126,
+            3.467546128405628,
+            20.526956525302452
+          ]
+        },
+        "level": 19.69,
+        "wallHeight": 3.08,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 15,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -2.238610777321736,
+          -1.1049893720331623,
+          19.69
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 34,
+            "voidRejected": 21,
+            "feasible": 17
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 43,
+            "voidRejected": 19,
+            "feasible": 10
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 46,
+            "voidRejected": 17,
+            "feasible": 9
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 47,
+            "voidRejected": 18,
+            "feasible": 7
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 31,
+            "voidRejected": 36,
+            "feasible": 5
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 22.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-7",
+        "sourceIndex": 1,
+        "source": {
+          "letter": "U",
+          "x": -8.804347826086957,
+          "y": 1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 11,
+        "center": [
+          0.5023260379166445,
+          -0.8819078289353881,
+          22.770000000000003
+        ],
+        "yaw": 37.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -7.036191216726035,
+            -6.730618546117558,
+            21.933043474697552
+          ],
+          "max": [
+            6.268448419715371,
+            6.754686332847989,
+            23.606956525302454
+          ]
+        },
+        "level": 22.770000000000003,
+        "wallHeight": 6.16,
+        "pocket": {
+          "depth": 2.839686883532482,
+          "width": 2.365000039339065,
+          "clearHeight": 4.4968,
+          "roofThickness": 0.9481999999999997,
+          "removed": 28.91452256801108,
+          "referenceDepth": 11.358747534129929
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 30.000000000000004,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          0.5023260379166445,
+          -0.8819078289353881,
+          22.770000000000003
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 34,
+            "voidRejected": 33,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 45,
+            "voidRejected": 22,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 47,
+            "voidRejected": 20,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 48,
+            "voidRejected": 22,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 37,
+            "voidRejected": 32,
+            "feasible": 3
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 37.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-8",
+        "sourceIndex": 2,
+        "source": {
+          "letter": "V",
+          "x": -2.9347826086956528,
+          "y": -1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 11,
+        "center": [
+          0.7959421314130347,
+          -2.617243413091928,
+          25.85
+        ],
+        "yaw": 52.59464336859145,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -3.2098764925688426,
+            -7.531345688520577,
+            20.34999990022701
+          ],
+          "max": [
+            4.801760755394912,
+            2.2968588623367214,
+            31.35000009977299
+          ]
+        },
+        "level": 25.85,
+        "wallHeight": 3.96,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 45,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          0.7959421314130347,
+          -2.617243413091928,
+          25.85
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 8,
+            "voidRejected": 34,
+            "feasible": 30
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 5,
+            "voidRejected": 38,
+            "feasible": 29
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 4,
+            "voidRejected": 39,
+            "feasible": 29
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 4,
+            "voidRejected": 40,
+            "feasible": 28
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 7,
+            "voidRejected": 37,
+            "feasible": 28
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 52.59464336859145,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-9",
+        "sourceIndex": 3,
+        "source": {
+          "letter": "L",
+          "x": 2.9347826086956506,
+          "y": 1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 11,
+        "center": [
+          2.326953245989998,
+          -1.7491391756631476,
+          28.93
+        ],
+        "yaw": 97.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -2.9509762844409626,
+            -7.57224404958579,
+            28.09304347469755
+          ],
+          "max": [
+            8.458200718673686,
+            4.073965698259495,
+            29.76695652530245
+          ]
+        },
+        "level": 28.93,
+        "wallHeight": 3.08,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 90,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          2.326953245989998,
+          -1.7491391756631476,
+          28.93
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 37,
+            "voidRejected": 21,
+            "feasible": 14
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 49,
+            "voidRejected": 14,
+            "feasible": 9
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 56,
+            "voidRejected": 9,
+            "feasible": 7
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 56,
+            "voidRejected": 6,
+            "feasible": 10
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 37,
+            "voidRejected": 18,
+            "feasible": 17
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 97.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-10",
+        "sourceIndex": 4,
+        "source": {
+          "letter": "U",
+          "x": 8.804347826086955,
+          "y": -1.9565217391304348,
+          "z": 1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 11,
+        "center": [
+          0.2357042116796113,
+          0.036687657066127644,
+          32.01
+        ],
+        "yaw": 7.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -5.611107353398706,
+            -5.668611813522512,
+            31.173043474697547
+          ],
+          "max": [
+            5.497212402551883,
+            6.345735313417382,
+            32.84695652530245
+          ]
+        },
+        "level": 32.01,
+        "wallHeight": 6.16,
+        "pocket": {
+          "depth": 2.839686883532482,
+          "width": 2.365000039339065,
+          "clearHeight": 4.4968,
+          "roofThickness": 0.9481999999999997,
+          "removed": 28.91452256801108,
+          "referenceDepth": 11.358747534129929
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 0,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          0.2357042116796113,
+          0.036687657066127644,
+          32.01
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 30,
+            "voidRejected": 39,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 37,
+            "voidRejected": 27,
+            "feasible": 8
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 42,
+            "voidRejected": 26,
+            "feasible": 4
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 43,
+            "voidRejected": 25,
+            "feasible": 4
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 36,
+            "voidRejected": 32,
+            "feasible": 4
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 7.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      }
+    ],
+    "levels": [
+      1.21,
+      4.29,
+      7.37,
+      10.45,
+      13.530000000000001,
+      16.61,
+      19.69,
+      22.770000000000003,
+      25.85,
+      28.93,
+      32.01
+    ],
+    "counts": {
+      "L": 4,
+      "U": 4,
+      "V": 3
+    },
+    "terraces": 11,
+    "bays": [
+      {
+        "id": 1,
+        "depth": 2.839686883532482,
+        "width": 2.365000039339065,
+        "clearHeight": 4.4968,
+        "roofThickness": 0.9481999999999997,
+        "removed": 28.91452256801108,
+        "referenceDepth": 11.358747534129929,
+        "afterClipProbeVolume": 30.199877410000216,
+        "afterUnionObstructedVolume": 1.3877787807814457e-16
+      },
+      {
+        "id": 4,
+        "depth": 2.839686883532482,
+        "width": 2.365000039339065,
+        "clearHeight": 4.4968,
+        "roofThickness": 0.9481999999999997,
+        "removed": 28.91452256801108,
+        "referenceDepth": 11.358747534129929,
+        "afterClipProbeVolume": 30.199877410000223,
+        "afterUnionObstructedVolume": -9.992007221626409e-16
+      },
+      {
+        "id": 7,
+        "depth": 2.839686883532482,
+        "width": 2.365000039339065,
+        "clearHeight": 4.4968,
+        "roofThickness": 0.9481999999999997,
+        "removed": 28.91452256801108,
+        "referenceDepth": 11.358747534129929,
+        "afterClipProbeVolume": 30.199877410000227,
+        "afterUnionObstructedVolume": -3.475518484119533e-15
+      },
+      {
+        "id": 10,
+        "depth": 2.839686883532482,
+        "width": 2.365000039339065,
+        "clearHeight": 4.4968,
+        "roofThickness": 0.9481999999999997,
+        "removed": 28.91452256801108,
+        "referenceDepth": 11.358747534129929,
+        "afterClipProbeVolume": 30.199877410000223,
+        "afterUnionObstructedVolume": -4.054374024009544e-16
+      }
+    ],
+    "stairs": [
+      {
+        "from": "instance-0",
+        "to": "instance-1",
+        "vSource": "instance-2",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          1.075341597345135,
+          1.119606400000001
+        ],
+        "heading": 131.31559204330853,
+        "finalContacts": [
+          1.075341597345135,
+          1.1196064000000006
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-1",
+        "to": "instance-2",
+        "vSource": "instance-2",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          4.963340800000002,
+          1.1196064000000023
+        ],
+        "heading": 93.87369469387437,
+        "finalContacts": [
+          4.963340800000002,
+          1.1196064000000026
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-2",
+        "to": "instance-3",
+        "vSource": "instance-2",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          0.08293033540146044,
+          0.1809312294798424
+        ],
+        "heading": 131.31559204330853,
+        "finalContacts": [
+          0.08293033540146114,
+          0.18093122947984197
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-3",
+        "to": "instance-4",
+        "vSource": "instance-5",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          1.0300058334157793,
+          1.1196063999999972
+        ],
+        "heading": 108.87369469387437,
+        "finalContacts": [
+          1.030005833415781,
+          1.1196063999999986
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-4",
+        "to": "instance-5",
+        "vSource": "instance-5",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          4.709592227840771,
+          1.1196064000000083
+        ],
+        "heading": 146.31559204330853,
+        "finalContacts": [
+          4.709592227840773,
+          1.1196064000000072
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-5",
+        "to": "instance-6",
+        "vSource": "instance-5",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          0.08334479999999808,
+          0.1366569941764536
+        ],
+        "heading": 108.87369469387437,
+        "finalContacts": [
+          0.08334479999999897,
+          0.1366569941764534
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-6",
+        "to": "instance-7",
+        "vSource": "instance-8",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          1.1794648483951329,
+          1.1196064000000043
+        ],
+        "heading": 161.31559204330853,
+        "finalContacts": [
+          1.1794648483951298,
+          1.119606400000004
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-7",
+        "to": "instance-8",
+        "vSource": "instance-8",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          4.892133070303947,
+          2.9973979194930958
+        ],
+        "heading": 123.87369469387437,
+        "finalContacts": [
+          4.892133070303943,
+          2.9973979194930913
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-8",
+        "to": "instance-9",
+        "vSource": "instance-8",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          1.4109547183222162,
+          0.019466226566970952
+        ],
+        "heading": 161.31559204330853,
+        "finalContacts": [
+          1.4109547183222164,
+          0.019466226566971327
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-9",
+        "to": "instance-10",
+        "vSource": "instance-8",
+        "count": 5,
+        "riser": 0.616,
+        "tread": 0.836,
+        "width": 1.76,
+        "connected": true,
+        "contact": [
+          0.972118769394386,
+          1.1196064000000048
+        ],
+        "heading": 123.87369469387437,
+        "finalContacts": [
+          0.9721187693943881,
+          1.1196064000000068
+        ],
+        "finalComponents": 1
+      }
+    ],
+    "ruleA": {
+      "min": [
+        -9.098449845329597,
+        -8.158178723299944,
+        0.3730434746975485
+      ],
+      "max": [
+        8.458200718673686,
+        7.191791959181328,
+        32.84695652530245
+      ]
+    },
+    "ruleB": {
+      "min": [
+        -10,
+        -8.971747880185088,
+        1.21
+      ],
+      "max": [
+        9.057893598369503,
+        10,
+        38.17
+      ]
+    },
+    "height": 36.96,
+    "volume": 2968.48914662006,
+    "components": 1,
+    "status": "NoError",
+    "shaftRadius": 1.21,
+    "shaftHeight": 40,
+    "shaftOverlap": [
+      0,
+      -6.591949208711867e-17
+    ],
+    "trimmed": 2.0458112315703465,
+    "outside": 0,
+    "scaleAfterGeneration": 1
+  },
+  {
+    "geometryHash": "76f5775d1ec87db08ba8120f1b6e1e6983db6c2d8471ae202e85b1c0520e696f",
+    "override": {
+      "enabled": false
+    },
+    "field": [
+      20,
+      20,
+      60
+    ],
+    "items": [
+      {
+        "id": "instance-0",
+        "sourceIndex": 0,
+        "source": {
+          "letter": "L",
+          "x": -14.673913043478262,
+          "y": -1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 13,
+        "center": [
+          -0.5383436138132429,
+          -2.009125718681262,
+          1.43
+        ],
+        "yaw": 7.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -7.420194828449095,
+            -9.25514545912562,
+            0.44086956100619357
+          ],
+          "max": [
+            6.343507600822608,
+            4.228427362737146,
+            2.419130438993806
+          ]
+        },
+        "level": 1.43,
+        "wallHeight": 3.6400000000000006,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 0,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -0.5383436138132429,
+          -2.009125718681262,
+          1.43
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 45,
+            "voidRejected": 20,
+            "feasible": 7
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 64,
+            "voidRejected": 8,
+            "feasible": 0
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 69,
+            "voidRejected": 3,
+            "feasible": 0
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 69,
+            "voidRejected": 3,
+            "feasible": 0
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 45,
+            "voidRejected": 20,
+            "feasible": 7
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 7.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-1",
+        "sourceIndex": 1,
+        "source": {
+          "letter": "U",
+          "x": -8.804347826086957,
+          "y": 1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 13,
+        "center": [
+          0.3423331193630087,
+          -0.12476681134911449,
+          5.07
+        ],
+        "yaw": 22.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -7.8461967543723965,
+            -6.990446447714261,
+            4.080869561006194
+          ],
+          "max": [
+            6.903685653420076,
+            8.406536840150526,
+            6.059130438993806
+          ]
+        },
+        "level": 5.07,
+        "wallHeight": 7.280000000000001,
+        "pocket": {
+          "depth": 3.3559935896292976,
+          "width": 2.795000046491623,
+          "clearHeight": 5.314400000000001,
+          "roofThickness": 1.1206000000000003,
+          "removed": 47.727427646108936,
+          "referenceDepth": 13.42397435851719
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 15,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          0.3423331193630087,
+          -0.12476681134911449,
+          5.07
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 53,
+            "voidRejected": 16,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 60,
+            "voidRejected": 10,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 64,
+            "voidRejected": 2,
+            "feasible": 6
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 64,
+            "voidRejected": 3,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 52,
+            "voidRejected": 14,
+            "feasible": 6
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 22.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-2",
+        "sourceIndex": 2,
+        "source": {
+          "letter": "V",
+          "x": -2.9347826086956528,
+          "y": -1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 13,
+        "center": [
+          0.6311915034700235,
+          3.1123709419649277,
+          8.71
+        ],
+        "yaw": 22.594643368591445,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -5.845857682554984,
+            -0.2981985245018244,
+            2.209999882086465
+          ],
+          "max": [
+            7.10824068949503,
+            6.52294040843168,
+            15.210000117913538
+          ]
+        },
+        "level": 8.71,
+        "wallHeight": 4.68,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 15,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          0.6311915034700235,
+          3.1123709419649277,
+          8.71
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 25,
+            "voidRejected": 27,
+            "feasible": 20
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 23,
+            "voidRejected": 30,
+            "feasible": 19
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 22,
+            "voidRejected": 37,
+            "feasible": 13
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 18,
+            "voidRejected": 39,
+            "feasible": 15
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 26,
+            "voidRejected": 26,
+            "feasible": 20
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 22.594643368591445,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-3",
+        "sourceIndex": 3,
+        "source": {
+          "letter": "L",
+          "x": 2.9347826086956506,
+          "y": 1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 13,
+        "center": [
+          -0.21811617043476983,
+          -0.024694003975214596,
+          12.350000000000001
+        ],
+        "yaw": 52.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -9.072361915194953,
+            -8.799707122860351,
+            11.360869561006195
+          ],
+          "max": [
+            8.636129574325413,
+            3.3426925268425722,
+            13.339130438993807
+          ]
+        },
+        "level": 12.350000000000001,
+        "wallHeight": 3.6400000000000006,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 45,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -0.21811617043476983,
+          -0.024694003975214596,
+          12.350000000000001
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 52,
+            "voidRejected": 16,
+            "feasible": 4
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 63,
+            "voidRejected": 7,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 68,
+            "voidRejected": 3,
+            "feasible": 1
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 67,
+            "voidRejected": 4,
+            "feasible": 1
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 53,
+            "voidRejected": 13,
+            "feasible": 6
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 52.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-4",
+        "sourceIndex": 4,
+        "source": {
+          "letter": "U",
+          "x": 8.804347826086955,
+          "y": -1.9565217391304348,
+          "z": 1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 13,
+        "center": [
+          1.8545838056130821,
+          0.14941748126121185,
+          15.990000000000002
+        ],
+        "yaw": 97.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -5.6015634246202195,
+            -6.760450732013165,
+            15.000869561006196
+          ],
+          "max": [
+            8.597210452672384,
+            6.367563525019351,
+            16.97913043899381
+          ]
+        },
+        "level": 15.990000000000002,
+        "wallHeight": 7.280000000000001,
+        "pocket": {
+          "depth": 3.3559935896292976,
+          "width": 2.795000046491623,
+          "clearHeight": 5.314400000000001,
+          "roofThickness": 1.1206000000000003,
+          "removed": 47.727427646108936,
+          "referenceDepth": 13.42397435851719
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 90,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          1.8545838056130821,
+          0.14941748126121185,
+          15.990000000000002
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 45,
+            "voidRejected": 25,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 60,
+            "voidRejected": 10,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 64,
+            "voidRejected": 6,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 64,
+            "voidRejected": 5,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 48,
+            "voidRejected": 23,
+            "feasible": 1
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 97.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-5",
+        "sourceIndex": 5,
+        "source": {
+          "letter": "V",
+          "x": 14.673913043478262,
+          "y": 1.9565217391304348,
+          "z": 1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 13,
+        "center": [
+          -3.194164399799959,
+          0.6131432173796685,
+          19.630000000000003
+        ],
+        "yaw": 37.59464336859145,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -8.99056227474642,
+            -4.136053157926028,
+            13.129999882086466
+          ],
+          "max": [
+            2.602233475146501,
+            5.362339592685364,
+            26.13000011791354
+          ]
+        },
+        "level": 19.630000000000003,
+        "wallHeight": 4.68,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 30.000000000000004,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          -3.194164399799959,
+          0.6131432173796685,
+          19.630000000000003
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 34,
+            "voidRejected": 21,
+            "feasible": 17
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 31,
+            "voidRejected": 24,
+            "feasible": 17
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 29,
+            "voidRejected": 30,
+            "feasible": 13
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 22,
+            "voidRejected": 34,
+            "feasible": 16
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 26,
+            "voidRejected": 21,
+            "feasible": 25
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 37.59464336859145,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-6",
+        "sourceIndex": 0,
+        "source": {
+          "letter": "L",
+          "x": -14.673913043478262,
+          "y": -1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 13,
+        "center": [
+          -2.1635298641329217,
+          -1.1935644108464347,
+          23.270000000000003
+        ],
+        "yaw": 7.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -9.045381078768772,
+            -8.439584151290793,
+            22.280869561006195
+          ],
+          "max": [
+            4.718321350502929,
+            5.043988670571974,
+            24.25913043899381
+          ]
+        },
+        "level": 23.270000000000003,
+        "wallHeight": 3.6400000000000006,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 0,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -2.1635298641329217,
+          -1.1935644108464347,
+          23.270000000000003
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 52,
+            "voidRejected": 12,
+            "feasible": 8
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 64,
+            "voidRejected": 6,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 67,
+            "voidRejected": 4,
+            "feasible": 1
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 67,
+            "voidRejected": 4,
+            "feasible": 1
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 51,
+            "voidRejected": 17,
+            "feasible": 4
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 7.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-7",
+        "sourceIndex": 1,
+        "source": {
+          "letter": "U",
+          "x": -8.804347826086957,
+          "y": 1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 13,
+        "center": [
+          1.0336185295386873,
+          -1.777295640817088,
+          26.910000000000004
+        ],
+        "yaw": 37.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -7.875538225948118,
+            -8.689408306577835,
+            25.920869561006196
+          ],
+          "max": [
+            7.848126798937184,
+            7.247770186745085,
+            27.89913043899381
+          ]
+        },
+        "level": 26.910000000000004,
+        "wallHeight": 7.280000000000001,
+        "pocket": {
+          "depth": 3.3559935896292976,
+          "width": 2.795000046491623,
+          "clearHeight": 5.314400000000001,
+          "roofThickness": 1.1206000000000003,
+          "removed": 47.727427646108936,
+          "referenceDepth": 13.42397435851719
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 30.000000000000004,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          1.0336185295386873,
+          -1.777295640817088,
+          26.910000000000004
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 52,
+            "voidRejected": 16,
+            "feasible": 4
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 61,
+            "voidRejected": 9,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 65,
+            "voidRejected": 5,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 66,
+            "voidRejected": 5,
+            "feasible": 1
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 55,
+            "voidRejected": 15,
+            "feasible": 2
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 37.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-8",
+        "sourceIndex": 2,
+        "source": {
+          "letter": "V",
+          "x": -2.9347826086956528,
+          "y": -1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 13,
+        "center": [
+          0.30870449772451913,
+          -3.726885250575749,
+          30.550000000000004
+        ],
+        "yaw": 37.59464336859145,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -5.487693377221942,
+            -8.476081625881445,
+            24.049999882086468
+          ],
+          "max": [
+            6.10510237267098,
+            1.0223111247299475,
+            37.05000011791354
+          ]
+        },
+        "level": 30.550000000000004,
+        "wallHeight": 4.68,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 30.000000000000004,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          0.30870449772451913,
+          -3.726885250575749,
+          30.550000000000004
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 30,
+            "voidRejected": 20,
+            "feasible": 22
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 31,
+            "voidRejected": 23,
+            "feasible": 18
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 28,
+            "voidRejected": 27,
+            "feasible": 17
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 26,
+            "voidRejected": 31,
+            "feasible": 15
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 34,
+            "voidRejected": 19,
+            "feasible": 19
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 37.59464336859145,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-9",
+        "sourceIndex": 3,
+        "source": {
+          "letter": "L",
+          "x": 2.9347826086956506,
+          "y": 1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 13,
+        "center": [
+          1.790895084962839,
+          -2.26760081527805,
+          34.190000000000005
+        ],
+        "yaw": 97.59464336859145,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -4.446657996455569,
+            -9.1494520299139,
+            33.2008695610062
+          ],
+          "max": [
+            9.036914825407196,
+            4.614250399357802,
+            35.17913043899381
+          ]
+        },
+        "level": 34.190000000000005,
+        "wallHeight": 3.6400000000000006,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 90,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          1.790895084962839,
+          -2.26760081527805,
+          34.190000000000005
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 57,
+            "voidRejected": 8,
+            "feasible": 7
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 67,
+            "voidRejected": 4,
+            "feasible": 1
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 71,
+            "voidRejected": 1,
+            "feasible": 0
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 70,
+            "voidRejected": 1,
+            "feasible": 1
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 54,
+            "voidRejected": 8,
+            "feasible": 10
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 97.59464336859145,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-10",
+        "sourceIndex": 4,
+        "source": {
+          "letter": "U",
+          "x": 8.804347826086955,
+          "y": -1.9565217391304348,
+          "z": 1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 13,
+        "center": [
+          0.2091503608298917,
+          -0.9168663381591797,
+          37.830000000000005
+        ],
+        "yaw": 7.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -6.700717852444486,
+            -7.65949298521848,
+            36.8408695610062
+          ],
+          "max": [
+            6.427296404588031,
+            6.539280892074123,
+            38.81913043899381
+          ]
+        },
+        "level": 37.830000000000005,
+        "wallHeight": 7.280000000000001,
+        "pocket": {
+          "depth": 3.3559935896292976,
+          "width": 2.795000046491623,
+          "clearHeight": 5.314400000000001,
+          "roofThickness": 1.1206000000000003,
+          "removed": 47.727427646108936,
+          "referenceDepth": 13.42397435851719
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 0,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          0.2091503608298917,
+          -0.9168663381591797,
+          37.830000000000005
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 54,
+            "voidRejected": 15,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 61,
+            "voidRejected": 8,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 65,
+            "voidRejected": 5,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 65,
+            "voidRejected": 6,
+            "feasible": 1
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 55,
+            "voidRejected": 15,
+            "feasible": 2
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 7.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-11",
+        "sourceIndex": 5,
+        "source": {
+          "letter": "V",
+          "x": 14.673913043478262,
+          "y": 1.9565217391304348,
+          "z": 1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 13,
+        "center": [
+          1.9884575061829695,
+          3.8306557610516805,
+          41.470000000000006
+        ],
+        "yaw": 22.594643368591445,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -4.488591679842038,
+            0.42008629458492885,
+            34.96999988208647
+          ],
+          "max": [
+            8.465506692207978,
+            7.241225227518433,
+            47.97000011791354
+          ]
+        },
+        "level": 41.470000000000006,
+        "wallHeight": 4.68,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 15,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          1.9884575061829695,
+          3.8306557610516805,
+          41.470000000000006
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 26,
+            "voidRejected": 25,
+            "feasible": 21
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 25,
+            "voidRejected": 28,
+            "feasible": 19
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 18,
+            "voidRejected": 37,
+            "feasible": 17
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 23,
+            "voidRejected": 34,
+            "feasible": 15
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 29,
+            "voidRejected": 26,
+            "feasible": 17
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 22.594643368591445,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-12",
+        "sourceIndex": 0,
+        "source": {
+          "letter": "L",
+          "x": -14.673913043478262,
+          "y": -1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 13,
+        "center": [
+          -0.5919935576226327,
+          -0.5335362955957512,
+          45.11000000000001
+        ],
+        "yaw": 22.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -8.699076092541016,
+            -8.869123710729223,
+            44.1208695610062
+          ],
+          "max": [
+            7.5150889772957505,
+            4.870369295831911,
+            46.09913043899381
+          ]
+        },
+        "level": 45.11000000000001,
+        "wallHeight": 3.6400000000000006,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 15,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -0.5919935576226327,
+          -0.5335362955957512,
+          45.11000000000001
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 57,
+            "voidRejected": 13,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 61,
+            "voidRejected": 10,
+            "feasible": 1
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 64,
+            "voidRejected": 8,
+            "feasible": 0
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 65,
+            "voidRejected": 7,
+            "feasible": 0
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 58,
+            "voidRejected": 11,
+            "feasible": 3
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 22.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-13",
+        "sourceIndex": 1,
+        "source": {
+          "letter": "U",
+          "x": -8.804347826086957,
+          "y": 1.9565217391304348,
+          "z": -1.9565217391304348,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "U",
+        "footprintFeet": 13,
+        "center": [
+          -0.20778807994458726,
+          1.5106716563803158,
+          48.75000000000001
+        ],
+        "yaw": 7.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -7.117656293218964,
+            -5.231954990678985,
+            47.7608695610062
+          ],
+          "max": [
+            6.0103579638135525,
+            8.966818886613618,
+            49.73913043899381
+          ]
+        },
+        "level": 48.75000000000001,
+        "wallHeight": 7.280000000000001,
+        "pocket": {
+          "depth": 3.3559935896292976,
+          "width": 2.795000046491623,
+          "clearHeight": 5.314400000000001,
+          "roofThickness": 1.1206000000000003,
+          "removed": 47.727427646108936,
+          "referenceDepth": 13.42397435851719
+        },
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 0,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -0.20778807994458726,
+          1.5106716563803158,
+          48.75000000000001
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 49,
+            "voidRejected": 20,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 61,
+            "voidRejected": 9,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 65,
+            "voidRejected": 5,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 65,
+            "voidRejected": 4,
+            "feasible": 3
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 51,
+            "voidRejected": 19,
+            "feasible": 2
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 7.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-14",
+        "sourceIndex": 2,
+        "source": {
+          "letter": "V",
+          "x": -2.9347826086956528,
+          "y": -1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "V",
+        "footprintFeet": 13,
+        "center": [
+          -3.44175222522858,
+          1.8331246095650777,
+          52.39000000000001
+        ],
+        "yaw": 97.59464336859145,
+        "tilt": 90,
+        "bounds": {
+          "min": [
+            -5.281270109949212,
+            -4.883175689340746,
+            45.88999988208647
+          ],
+          "max": [
+            -1.6022343405079478,
+            8.549424908470902,
+            58.890000117913544
+          ]
+        },
+        "level": 52.39000000000001,
+        "wallHeight": 4.68,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 90,
+        "localXRotation": 90,
+        "localYRotation": 0,
+        "pivot": [
+          -3.44175222522858,
+          1.8331246095650777,
+          52.39000000000001
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 26,
+            "voidRejected": 22,
+            "feasible": 24
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 27,
+            "voidRejected": 26,
+            "feasible": 19
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 21,
+            "voidRejected": 35,
+            "feasible": 16
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 26,
+            "voidRejected": 31,
+            "feasible": 15
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 33,
+            "voidRejected": 23,
+            "feasible": 16
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 97.59464336859145,
+          "boundaryTilt": 90,
+          "floorTilt": 0
+        }
+      },
+      {
+        "id": "instance-15",
+        "sourceIndex": 3,
+        "source": {
+          "letter": "L",
+          "x": 2.9347826086956506,
+          "y": 1.9565217391304348,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "scale": 9.782608695652174,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1
+        },
+        "letter": "L",
+        "footprintFeet": 13,
+        "center": [
+          -1.9901821073419446,
+          0.343378257712327,
+          56.03000000000001
+        ],
+        "yaw": 7.594643368591445,
+        "tilt": 0,
+        "bounds": {
+          "min": [
+            -8.872033321977796,
+            -6.902641482732031,
+            55.040869561006204
+          ],
+          "max": [
+            4.891669107293906,
+            6.580931339130736,
+            57.01913043899381
+          ]
+        },
+        "level": 56.03000000000001,
+        "wallHeight": 3.6400000000000006,
+        "principalHeading": 7.594643368591445,
+        "allowedYaw": [
+          0,
+          15,
+          30,
+          45,
+          90
+        ],
+        "relativeYaw": 0,
+        "localXRotation": 0,
+        "localYRotation": 0,
+        "pivot": [
+          -1.9901821073419446,
+          0.343378257712327,
+          56.03000000000001
+        ],
+        "rotationOrder": "local X then local Y then world Z, then translation",
+        "overrideActive": false,
+        "candidates": [
+          {
+            "relativeYaw": 0,
+            "containmentRejected": 56,
+            "voidRejected": 11,
+            "feasible": 5
+          },
+          {
+            "relativeYaw": 15,
+            "containmentRejected": 65,
+            "voidRejected": 5,
+            "feasible": 2
+          },
+          {
+            "relativeYaw": 30,
+            "containmentRejected": 69,
+            "voidRejected": 3,
+            "feasible": 0
+          },
+          {
+            "relativeYaw": 45,
+            "containmentRejected": 68,
+            "voidRejected": 4,
+            "feasible": 0
+          },
+          {
+            "relativeYaw": 90,
+            "containmentRejected": 55,
+            "voidRejected": 15,
+            "feasible": 2
+          }
+        ],
+        "selectionReason": "Minimum radial-placement error plus deterministic sequence yaw preference, evaluated over every feasible candidate",
+        "ruleBFrame": {
+          "worldYaw": 7.594643368591445,
+          "boundaryTilt": 0,
+          "floorTilt": 0
+        }
+      }
+    ],
+    "levels": [
+      1.43,
+      5.07,
+      8.71,
+      12.350000000000001,
+      15.990000000000002,
+      19.630000000000003,
+      23.270000000000003,
+      26.910000000000004,
+      30.550000000000004,
+      34.190000000000005,
+      37.830000000000005,
+      41.470000000000006,
+      45.11000000000001,
+      48.75000000000001,
+      52.39000000000001,
+      56.03000000000001
+    ],
+    "counts": {
+      "L": 6,
+      "U": 5,
+      "V": 5
+    },
+    "terraces": 16,
+    "bays": [
+      {
+        "id": 1,
+        "depth": 3.3559935896292976,
+        "width": 2.795000046491623,
+        "clearHeight": 5.314400000000001,
+        "roofThickness": 1.1206000000000003,
+        "removed": 47.727427646108936,
+        "referenceDepth": 13.42397435851719,
+        "afterClipProbeVolume": 49.84908389915141,
+        "afterUnionObstructedVolume": -2.886579864025407e-15
+      },
+      {
+        "id": 4,
+        "depth": 3.3559935896292976,
+        "width": 2.795000046491623,
+        "clearHeight": 5.314400000000001,
+        "roofThickness": 1.1206000000000003,
+        "removed": 47.727427646108936,
+        "referenceDepth": 13.42397435851719,
+        "afterClipProbeVolume": 49.84908389915138,
+        "afterUnionObstructedVolume": 1.5881867761018131e-22
+      },
+      {
+        "id": 7,
+        "depth": 3.3559935896292976,
+        "width": 2.795000046491623,
+        "clearHeight": 5.314400000000001,
+        "roofThickness": 1.1206000000000003,
+        "removed": 47.727427646108936,
+        "referenceDepth": 13.42397435851719,
+        "afterClipProbeVolume": 49.849083899151374,
+        "afterUnionObstructedVolume": 6.950994960698838e-16
+      },
+      {
+        "id": 10,
+        "depth": 3.3559935896292976,
+        "width": 2.795000046491623,
+        "clearHeight": 5.314400000000001,
+        "roofThickness": 1.1206000000000003,
+        "removed": 47.727427646108936,
+        "referenceDepth": 13.42397435851719,
+        "afterClipProbeVolume": 49.84908389915139,
+        "afterUnionObstructedVolume": 1.0804291489252549e-14
+      },
+      {
+        "id": 13,
+        "depth": 3.3559935896292976,
+        "width": 2.795000046491623,
+        "clearHeight": 5.314400000000001,
+        "roofThickness": 1.1206000000000003,
+        "removed": 47.727427646108936,
+        "referenceDepth": 13.42397435851719,
+        "afterClipProbeVolume": 49.8490838991514,
+        "afterUnionObstructedVolume": -1.4210854715202004e-14
+      }
+    ],
+    "stairs": [
+      {
+        "from": "instance-0",
+        "to": "instance-1",
+        "vSource": "instance-2",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          1.833203600141701,
+          1.8099744000000009
+        ],
+        "heading": 131.31559204330853,
+        "finalContacts": [
+          1.8332036001417007,
+          1.8099744000000026
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-1",
+        "to": "instance-2",
+        "vSource": "instance-2",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          8.082713600000005,
+          1.809974400000001
+        ],
+        "heading": 93.87369469387437,
+        "finalContacts": [
+          8.082713600000005,
+          1.8099744000000018
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-2",
+        "to": "instance-3",
+        "vSource": "instance-2",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          0.136273468830725,
+          0.28314633884552926
+        ],
+        "heading": 131.31559204330853,
+        "finalContacts": [
+          0.13627346883072405,
+          0.28314633884552703
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-3",
+        "to": "instance-4",
+        "vSource": "instance-5",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          1.687914770021252,
+          1.8099743999999984
+        ],
+        "heading": 108.87369469387437,
+        "finalContacts": [
+          1.6879147700212518,
+          1.8099743999999975
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-4",
+        "to": "instance-5",
+        "vSource": "instance-5",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          7.672770571315021,
+          1.8099744000000075
+        ],
+        "heading": 146.31559204330853,
+        "finalContacts": [
+          7.672770571315015,
+          1.8099744000000066
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-5",
+        "to": "instance-6",
+        "vSource": "instance-5",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          0.13695759999999846,
+          0.6199130068155774
+        ],
+        "heading": 108.87369469387437,
+        "finalContacts": [
+          0.13695759999999846,
+          0.6199130068155773
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-6",
+        "to": "instance-7",
+        "vSource": "instance-8",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          1.9233047678085002,
+          1.8099744000000069
+        ],
+        "heading": 146.31559204330853,
+        "finalContacts": [
+          1.923304767808504,
+          1.809974400000007
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-7",
+        "to": "instance-8",
+        "vSource": "instance-8",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          7.716392913428231,
+          2.3615912136913515
+        ],
+        "heading": 108.87369469387437,
+        "finalContacts": [
+          7.71639291342823,
+          2.3615912136913524
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-8",
+        "to": "instance-9",
+        "vSource": "instance-8",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          0.1369576000000007,
+          1.8099743999999982
+        ],
+        "heading": 146.31559204330853,
+        "finalContacts": [
+          0.12930780207440745,
+          1.8099743999999962
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-9",
+        "to": "instance-10",
+        "vSource": "instance-11",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          1.5731302969376462,
+          1.8099743999999993
+        ],
+        "heading": 93.87369469387437,
+        "finalContacts": [
+          1.5731302969376437,
+          1.8099743999999995
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-10",
+        "to": "instance-11",
+        "vSource": "instance-11",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          7.942741060455233,
+          1.8099744000000026
+        ],
+        "heading": 131.31559204330853,
+        "finalContacts": [
+          7.942741060455242,
+          1.8099743999999989
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-11",
+        "to": "instance-12",
+        "vSource": "instance-11",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          1.003481234524474,
+          1.0338660289976596
+        ],
+        "heading": 93.87369469387437,
+        "finalContacts": [
+          1.003481234524474,
+          1.0338660289976547
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-12",
+        "to": "instance-13",
+        "vSource": "instance-14",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          0.9883697517843778,
+          0.0011679673030351098
+        ],
+        "heading": 206.31559204330853,
+        "finalContacts": [
+          0.9883697517843922,
+          0.0011679673030351098
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-13",
+        "to": "instance-14",
+        "vSource": "instance-14",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          5.406516565940288,
+          1.8249433970579116
+        ],
+        "heading": 168.87369469387437,
+        "finalContacts": [
+          5.406516565940276,
+          1.8249433970579159
+        ],
+        "finalComponents": 1
+      },
+      {
+        "from": "instance-14",
+        "to": "instance-15",
+        "vSource": "instance-14",
+        "count": 5,
+        "riser": 0.7280000000000001,
+        "tread": 0.9880000000000001,
+        "width": 2.08,
+        "connected": true,
+        "contact": [
+          0.12729386199708936,
+          1.605652019656211
+        ],
+        "heading": 206.31559204330853,
+        "finalContacts": [
+          0.12729386199709114,
+          1.6056520196562099
+        ],
+        "finalComponents": 1
+      }
+    ],
+    "ruleA": {
+      "min": [
+        -9.072361915194953,
+        -9.25514545912562,
+        0.44086956100619357
+      ],
+      "max": [
+        9.036914825407196,
+        8.966818886613618,
+        58.890000117913544
+      ]
+    },
+    "ruleB": {
+      "min": [
+        -10,
+        -10,
+        1.43
+      ],
+      "max": [
+        9.745642776781892,
+        10,
+        59.67000000000001
+      ]
+    },
+    "height": 58.24000000000001,
+    "volume": 6530.091930605921,
+    "components": 1,
+    "status": "NoError",
+    "shaftRadius": 1.43,
+    "shaftHeight": 60,
+    "shaftOverlap": [
+      0,
+      8.673617379884035e-17
+    ],
+    "trimmed": 40.963315999293144,
+    "outside": 0,
+    "scaleAfterGeneration": 1
+  }
+]
