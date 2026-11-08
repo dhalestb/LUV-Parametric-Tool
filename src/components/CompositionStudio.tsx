@@ -393,6 +393,19 @@ function Check({ label, checked, onChange, disabled = false }: { label: string; 
   </label>;
 }
 
+function SelectionEnvelopePreview({selection,grid}:{selection:SelectionVolume;grid:OrthogonalGrid}) {
+  const field=gridDimensions(grid),span=Math.max(field.width,field.height,field.depth,selection.depth,20);
+  return <div className="mt-2 h-56" role="img" aria-label={`Selection envelope 20 by 20 by ${selection.depth} feet in the fixed grid`}>
+    <Canvas dpr={[1,1.5]}><color attach="background" args={["#05080b"]}/>
+      <OrthographicCamera makeDefault position={[span,-span,span*Math.SQRT2]} up={[0,0,1]} zoom={140/span} near={.01} far={span*10}/>
+      <lineSegments><edgesGeometry args={[new THREE.BoxGeometry(field.width,field.height,field.depth)]}/><lineBasicMaterial color="#3dd6db" transparent opacity={.5}/></lineSegments>
+      {Array.from({length:grid.zCells+1},(_,i)=><lineSegments key={i} position={[0,0,-field.depth/2+i*grid.cellZ]}><edgesGeometry args={[new THREE.PlaneGeometry(field.width,field.height)]}/><lineBasicMaterial color="#3dd6db" transparent opacity={.25}/></lineSegments>)}
+      <lineSegments><edgesGeometry args={[new THREE.BoxGeometry(selection.width,selection.height,selection.depth)]}/><lineBasicMaterial color="#ffbd4a" depthTest={false}/></lineSegments>
+      <TrackballControls makeDefault target={[0,0,0]} rotateSpeed={5}/><AxisIndicator scale={2/3} cornerInset={25}/>
+    </Canvas>
+  </div>;
+}
+
 export default function CompositionStudio() {
   const [capacityNotice, setCapacityNotice] = useState<string>("");
   const store = useGridStore();
@@ -715,6 +728,7 @@ export default function CompositionStudio() {
       setGridNotice(validation.errors.join(" "));
       return;
     }
+    setCapacityNotice("");
     setCompositionGridOwned(true);
     setGrid(next);
     syncSlideCellCounts(next);
@@ -725,16 +739,13 @@ export default function CompositionStudio() {
 
   const applyHeightPreset = (height: SelectionHeightFeet) => {
     const plan = planSourceFieldCapacity(grid, height);
-    const nextGrid = plan.expandedGrid;
-    const sizes = controlsFromPreset(height, letterSizes);
+    const nextGrid = grid;
     setCompositionGridOwned(true);
     setGrid(nextGrid);
     syncSlideCellCounts(nextGrid);
     setLayerMode(true);
-    setLetterSizes(sizes);
-    setRules((current) => applyLetterSizeControlsToRules(current, sizes));
     setSelection(clampSelectionToGrid(heightRoutedSelectionVolume(height, selection), gridDimensions(nextGrid)));
-    setCapacityNotice(plan.notes.join(" "));
+    setCapacityNotice(capacityShortfallMessages(plan).join(" "));
     setGridNotice(validateArchitecturalGrid(nextGrid).warnings.join(" "));
     setAlternatives([]);
     setSelectedIndex(0);
@@ -938,6 +949,52 @@ export default function CompositionStudio() {
     <div className="board-composition-content"><div className="grid gap-3 xl:grid-cols-[360px_minmax(0,1fr)_340px]">
       <aside className="space-y-3">
         <section className="rounded-xl border p-3" style={panelStyle}>
+          <div className="flex items-center justify-between gap-2">
+            <div><h2 className="text-sm font-semibold">Selection volume</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Search a smaller composition inside the overall solution.</p></div>
+            <span className="text-[10px]" style={{ color: "var(--accent-gold)" }}>One box per alternative</span>
+          </div>
+          <div className="mt-2">
+            <h3 className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--accent-pale)" }}>Height-specific fields</h3>
+            <p className="mt-1 text-[9px]" style={{ color: "var(--muted)" }}>20 × 20 ft plan × 20 / 40 / 60 ft height (X width, Y depth, Z height). Dashed-group auto-sizing is disabled while a height route is active. Letters are taken by solid intersection, not center-point only.</p>
+            <div className="mt-2 flex flex-wrap gap-1">
+              {selectionHeightPresets().map((preset) => (
+                <button
+                  key={preset.height}
+                  type="button"
+                  aria-pressed={selection.heightRouting === preset.height}
+                  onClick={() => applyHeightPreset(preset.height)}
+                  className="rounded border px-2 py-1 text-[10px] font-semibold"
+                  style={{
+                    borderColor: selection.heightRouting === preset.height ? "var(--accent-gold)" : "var(--line)",
+                    background: selection.heightRouting === preset.height ? "var(--accent-dark)" : "transparent",
+                    color: selection.heightRouting === preset.height ? "var(--accent-pale)" : "var(--muted)",
+                  }}
+                >
+                  {preset.label}
+                </button>
+              ))}
+              <button type="button" onClick={clearHeightPreset} disabled={!heightRoutingActive} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Clear height route</button>
+            </div>
+            {capacityNotice && <p className="mt-2 text-[9px]" style={{ color: "var(--accent-gold)" }}>{capacityNotice}</p>}
+            <p className="mt-2 text-[9px]" style={{ color: typologyHeight.status === "unresolved" ? "var(--muted)" : "var(--accent-pale)" }}>
+              Typology height for {prototypeTypology}: {typologyHeight.status === "assigned" ? `${typologyHeight.height} ft (${typologyHeight.source})` : `unresolved — ${typologyHeight.reason}`}
+            </p>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+            <NumberInput label="Selection X" value={selection.width} min={Math.min(0.5, dimensions.width)} max={dimensions.width} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("width", value)} />
+            <NumberInput label="Search step X" value={selection.stepX} min={0.1} max={Math.max(0.1, dimensions.width)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepX", value)} />
+            <NumberInput label="Selection Y" value={selection.height} min={Math.min(0.5, dimensions.height)} max={dimensions.height} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("height", value)} />
+            <NumberInput label="Search step Y" value={selection.stepY} min={0.1} max={Math.max(0.1, dimensions.height)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepY", value)} />
+            <NumberInput label="Selection Z" value={selection.depth} min={Math.min(0.5, dimensions.depth)} max={dimensions.depth} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("depth", value)} />
+            <NumberInput label="Search step Z" value={selection.stepZ} min={0.1} max={Math.max(0.1, dimensions.depth)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepZ", value)} />
+          </div>
+          <p className="mt-2 text-[9px]" style={{ color: selection.enabled ? "var(--accent-gold)" : "var(--muted)" }}>{heightRoutingActive ? `Height route ${selection.heightRouting} ft: fixed 20 × 20 × ${selection.depth.toFixed(0)} ft field. Search steps ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} reposition the window inside the source field. Letters whose solids intersect the box are kept with original transforms. The architectural generator uses this height and physically trims boundary crossings.` : dashedSelection ? `The selection box matches each dashed group: ${selection.width.toFixed(2)} × ${selection.height.toFixed(2)} × ${selection.depth.toFixed(2)}, centered on that group. Search steps of ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} move from one dashed box to the next.` : selection.enabled ? `The optimizer searches ${selection.width.toFixed(1)} × ${selection.height.toFixed(1)} × ${selection.depth.toFixed(1)} windows. Every letter whose center is inside the gold box is evaluated, including letters that cross the crop. Selection dimensions automatically reduce when the overall solution becomes smaller.` : "The entire overall grid is evaluated and exported."}</p>
+          {heightRoutingActive && <SelectionEnvelopePreview selection={selection} grid={grid}/>}
+          {capacityShortfall.length > 0 && <p role="alert" className="mt-2 text-[9px]" style={{color:"#ffad95"}}>{capacityShortfall.join(" ")}</p>}
+          {!selectionValid && heightRoutingActive && <p className="mt-2 text-[9px]" style={{ color: "#ffad95" }}>The height-routed selection does not fit inside the current source field. Expand overall X/Y/Z or choose a shorter height.</p>}
+        </section>
+
+        <section className="rounded-xl border p-3" style={panelStyle}>
           <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Fixed 3D grid</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Independent cell counts and pitches (ft). Example field 60×60×80 ft. Lock before generation.</p></div><button type="button" onClick={() => setGridValue("locked", !grid.locked)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: grid.locked ? "var(--accent-light)" : "var(--input-background)", color: grid.locked ? "var(--app-background)" : "var(--text-primary)" }}>{grid.locked ? "Locked" : "Unlocked"}</button></div>
           <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
             <NumberInput label="X cells" value={grid.xCells} min={ARCHITECTURAL_GRID_LIMITS.cellsMin} max={ARCHITECTURAL_GRID_LIMITS.cellsMax} disabled={grid.locked} onChange={(value) => setGridValue("xCells", value)} />
@@ -994,49 +1051,7 @@ export default function CompositionStudio() {
           )}
         </section>
 
-        <section className="rounded-xl border p-3" style={panelStyle}>
-          <div className="flex items-center justify-between gap-2">
-            <div><h2 className="text-sm font-semibold">Selection volume</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Search a smaller composition inside the overall solution.</p></div>
-            <span className="text-[10px]" style={{ color: "var(--accent-gold)" }}>One box per alternative</span>
-          </div>
-          <div className="mt-2">
-            <h3 className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--accent-pale)" }}>Height-specific fields</h3>
-            <p className="mt-1 text-[9px]" style={{ color: "var(--muted)" }}>20 × 20 ft plan × 20 / 40 / 60 ft height (X width, Y depth, Z height). Dashed-group auto-sizing is disabled while a height route is active. Letters are taken by solid intersection, not center-point only.</p>
-            <div className="mt-2 flex flex-wrap gap-1">
-              {selectionHeightPresets().map((preset) => (
-                <button
-                  key={preset.height}
-                  type="button"
-                  aria-pressed={selection.heightRouting === preset.height}
-                  onClick={() => applyHeightPreset(preset.height)}
-                  className="rounded border px-2 py-1 text-[10px] font-semibold"
-                  style={{
-                    borderColor: selection.heightRouting === preset.height ? "var(--accent-gold)" : "var(--line)",
-                    background: selection.heightRouting === preset.height ? "var(--accent-dark)" : "transparent",
-                    color: selection.heightRouting === preset.height ? "var(--accent-pale)" : "var(--muted)",
-                  }}
-                >
-                  {preset.label}
-                </button>
-              ))}
-              <button type="button" onClick={clearHeightPreset} disabled={!heightRoutingActive} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Clear height route</button>
-            </div>
-            {capacityNotice && <p className="mt-2 text-[9px]" style={{ color: "var(--accent-gold)" }}>{capacityNotice}</p>}
-            <p className="mt-2 text-[9px]" style={{ color: typologyHeight.status === "unresolved" ? "var(--muted)" : "var(--accent-pale)" }}>
-              Typology height for {prototypeTypology}: {typologyHeight.status === "assigned" ? `${typologyHeight.height} ft (${typologyHeight.source})` : `unresolved — ${typologyHeight.reason}`}
-            </p>
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
-            <NumberInput label="Selection X" value={selection.width} min={Math.min(0.5, dimensions.width)} max={dimensions.width} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("width", value)} />
-            <NumberInput label="Search step X" value={selection.stepX} min={0.1} max={Math.max(0.1, dimensions.width)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepX", value)} />
-            <NumberInput label="Selection Y" value={selection.height} min={Math.min(0.5, dimensions.height)} max={dimensions.height} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("height", value)} />
-            <NumberInput label="Search step Y" value={selection.stepY} min={0.1} max={Math.max(0.1, dimensions.height)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepY", value)} />
-            <NumberInput label="Selection Z" value={selection.depth} min={Math.min(0.5, dimensions.depth)} max={dimensions.depth} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("depth", value)} />
-            <NumberInput label="Search step Z" value={selection.stepZ} min={0.1} max={Math.max(0.1, dimensions.depth)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepZ", value)} />
-          </div>
-          <p className="mt-2 text-[9px]" style={{ color: selection.enabled ? "var(--accent-gold)" : "var(--muted)" }}>{heightRoutingActive ? `Height route ${selection.heightRouting} ft: fixed 20 × 20 × ${selection.depth.toFixed(0)} ft field. Search steps ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} reposition the window inside the source field. Letters whose solids intersect the box are kept with original transforms; boundary crossings are prepared for Manifold trim in Phase 2.` : dashedSelection ? `The selection box matches each dashed group: ${selection.width.toFixed(2)} × ${selection.height.toFixed(2)} × ${selection.depth.toFixed(2)}, centered on that group. Search steps of ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} move from one dashed box to the next.` : selection.enabled ? `The optimizer searches ${selection.width.toFixed(1)} × ${selection.height.toFixed(1)} × ${selection.depth.toFixed(1)} windows. Every letter whose center is inside the gold box is evaluated, including letters that cross the crop. Selection dimensions automatically reduce when the overall solution becomes smaller.` : "The entire overall grid is evaluated and exported."}</p>
-          {!selectionValid && heightRoutingActive && <p className="mt-2 text-[9px]" style={{ color: "#ffad95" }}>The height-routed selection does not fit inside the current source field. Expand overall X/Y/Z or choose a shorter height.</p>}
-        </section>
+
 
         <section className="rounded-xl border p-3" style={panelStyle}>
           <h2 className="text-sm font-semibold">Hard constraints</h2>
@@ -1204,6 +1219,7 @@ export default function CompositionStudio() {
       sourcePlacements={prototypeSourcePlacements}
       completeSourcePlacements={completePrototypePlacements}
       sourceLabel={prototypeSourceLabel}
+      envelopeHeight={isSelectionHeightFeet(selection.heightRouting) ? selection.heightRouting : 20}
       sourceBounds={selected?.selection ?? dimensions}
       sourceThickness={rules.letterThicknessPercent}
       sourceOptions={prototypeSourceOptions}

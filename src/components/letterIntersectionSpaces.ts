@@ -397,7 +397,7 @@ export function rotateWorkspaceLetter(p:IntersectionPlacement, rotation:[number,
  const e=new THREE.Euler().setFromQuaternion(delta.multiply(initial),'XYZ');
  return {...p,rx:THREE.MathUtils.radToDeg(e.x),ry:THREE.MathUtils.radToDeg(e.y),rz:THREE.MathUtils.radToDeg(e.z)};
 }
-export async function buildConnectionWorkflow(placements:IntersectionPlacement[], thickness:number, settings:FaceBridgeSettings,typology?:string,onProgress?:(percent:number,label:string)=>Promise<void>,angleLimits?:GatheringAngleLimits,gatheringOperations:GatheringOperations=DEFAULT_GATHERING_OPERATIONS,workspaceEdits?:WorkspaceEdits):Promise<ConnectionWorkflow> {
+export async function buildConnectionWorkflow(placements:IntersectionPlacement[], thickness:number, settings:FaceBridgeSettings,typology?:string,onProgress?:(percent:number,label:string)=>Promise<void>,angleLimits?:GatheringAngleLimits,gatheringOperations:GatheringOperations=DEFAULT_GATHERING_OPERATIONS,workspaceEdits?:WorkspaceEdits,envelopeHeight:20|40|60=20):Promise<ConnectionWorkflow> {
  const progress=onProgress??(async()=>{});
  await progress(2,"Preparing geometry");
  settings={...settings,linear:['linear-gallery-lobby','compressed-sequential-lobby'].includes(typology??''),allowedPlanes:/topographic|folded-undulating/.test(typology??'')?["xy"]:["xz","yz"],requiredGap:1};
@@ -724,8 +724,11 @@ export async function buildConnectionWorkflow(placements:IntersectionPlacement[]
   if(formation&&terraces?.count&&typology==='stepped-amphitheater'){formation.operations.push('Floor audit: each eligible letter generates a projected plate with a 6% outline offset; continuity geometry can add floor plates. Dimensions below are geometry bounding boxes in the generator coordinate units.');for(const m of terraces.measurements){const d=m.max.map((v,i)=>v-m.min[i]);formation.operations.push(`Source letter ${m.sourceIndex+1} initial plate bounds before protected-void cuts: ${d.map(v=>v.toFixed(3)).join(' × ')} units; elevation ${m.min[2].toFixed(3)} to ${m.max[2].toFixed(3)}.`);}}
   if(formation&&terraces?.count){formation.operations.push(`${CANYON_TYPOLOGIES.has(typology??'')?'Canyon staggering':'Letter-derived gathering plates'}: ${terraces.count} plate components, ${terraces.recesses} recesses at ${gatheringOperations.alcoveDepthPercent}% of bay depth and ${gatheringOperations.alcoveWidthPercent}% of bay width. ${terraces.skippedClearance} recesses were omitted so the remaining bay stays at least ${gatheringOperations.minimumClearance} ft clear. ${terraces.laps} floor and wall laps were added so neighboring plates and upright letters overlap.`);formation.operations.push('Adjacent connectors form the circulation chain. Floor plates stay horizontal. Connecting floor laps stay in a vertical plane perpendicular to the XY plane. Boundary rotation, when set, turns edge and enclosure plates by up to ±15° and leaves floor plates unrotated. Alcove pockets are cut from those plates only when the remaining bay meets the minimum clearance.');}
   // Fixed 20 ft cube, centered on the actual letter bounds.
+  // World axes: X width, Y plan depth, Z architectural height.
+  const envelope:[number,number,number]=[20,20,envelopeHeight];
+  const fitFactor=(min:number[],max:number[])=>Math.min(...envelope.map((size,i)=>size/Math.max(max[i]-min[i],1e-8)));
   let enclosure:InstanceType<typeof Manifold>|null=null;
-  if(source){const bounds=source.boundingBox();const side=20;const center:[number,number,number]=workspaceEdits?.enclosureCenter??[(bounds.min[0]+bounds.max[0])/2,(bounds.min[1]+bounds.max[1])/2,(bounds.min[2]+bounds.max[2])/2];enclosure=own(Manifold.cube([side,side,side],true).translate(center));}
+  if(source){const bounds=source.boundingBox();const center:[number,number,number]=workspaceEdits?.enclosureCenter??[(bounds.min[0]+bounds.max[0])/2,(bounds.min[1]+bounds.max[1])/2,(bounds.min[2]+bounds.max[2])/2];enclosure=own(Manifold.cube(envelope,true).translate(center));}
   await progress(82,"Building architectural variations");
   let a=union([source,bridges,terraces?.solid].filter((x):x is InstanceType<typeof Manifold>=>Boolean(x)));
   const continuous=(solid:InstanceType<typeof Manifold>)=>componentCount(solid)===1&&letters.every(letter=>{const leftover=own(letter.subtract(solid));try{return leftover.volume()<=letter.volume()*1e-6;}finally{release(leftover);}});
@@ -747,9 +750,9 @@ export async function buildConnectionWorkflow(placements:IntersectionPlacement[]
   if(!office&&!gathering&&letters.length>1&&continuity.connections!==letters.length-1)throw new Error('A required adjacent bridge is missing.');
   if(formation&&!office&&!gathering)formation.operations.push(continuity.connections+' generated bridges have rounded edges (radius 20% of bridge depth); '+retainedFillets.length+' intersection fillets verified on the connected core.');
   if((typology==='vertical-void-lobby'||horizontalLobby)&&a&&!workspaceEdits?.basePlacements){
-   const box=a.boundingBox(),span=Math.max(...box.max.map((value,axis)=>value-box.min[axis]),1e-8),center:[number,number,number]=[(box.min[0]+box.max[0])/2,(box.min[1]+box.max[1])/2,(box.min[2]+box.max[2])/2];
+   const box=a.boundingBox(),center:[number,number,number]=[(box.min[0]+box.max[0])/2,(box.min[1]+box.max[1])/2,(box.min[2]+box.max[2])/2];
    const verticalRadius=horizontalVoid?Math.max(Math.abs(box.min[2]-horizontalVoid.center[1]),Math.abs(box.max[2]-horizontalVoid.center[1]),1e-8):0;
-   const factor=horizontalVoid?Math.min(20/span,5/verticalRadius):20/span;
+   const factor=horizontalVoid?Math.min(fitFactor(box.min,box.max),5/verticalRadius):fitFactor(box.min,box.max);
    const destination:[number,number,number]=horizontalVoid?[center[0],(center[1]-horizontalVoid.center[0])*factor,(center[2]-horizontalVoid.center[1])*factor]:center;
    const fit=(solid:InstanceType<typeof Manifold>|null)=>{
     if(!solid)return solid;
@@ -785,8 +788,8 @@ export async function buildConnectionWorkflow(placements:IntersectionPlacement[]
    }
    for(const placement of arranged){placement.x=destination[0]+(placement.x-center[0])*factor;placement.y=destination[1]+(placement.y-center[1])*factor;placement.z=destination[2]+(placement.z-center[2])*factor;placement.scale*=factor;if(placement.letterRules)placement.letterRules={...placement.letterRules,supportZ:destination[2]+(placement.letterRules.supportZ-center[2])*factor,strokeWidth:placement.letterRules.strokeWidth*factor};}
    if(bridgeMesh.links)for(const link of bridgeMesh.links){link.start=link.start.map((value,axis)=>destination[axis]+(value-center[axis])*factor);link.end=link.end.map((value,axis)=>destination[axis]+(value-center[axis])*factor);if(link.gapFeet)link.gapFeet*=factor;}
-   enclosure=own(Manifold.cube([20,20,20],true).translate(horizontalLobby?[destination[0],destination[1],0]:destination));
-   if(formation)formation.operations.push(horizontalLobby?`Letters share one size around the X-axis. The form is uniformly scaled to stay between Z = -5 ft and +5 ft inside the 20 ft enclosure.`:`Letters and bridge connections keep the vertical-void arrangement, then scale uniformly by ${factor.toFixed(3)} so the longest side of the connected form is 20 ft inside the 20 × 20 × 20 ft cube.`);
+   enclosure=own(Manifold.cube(envelope,true).translate(horizontalLobby?[destination[0],destination[1],0]:destination));
+   if(formation)formation.operations.push(horizontalLobby?`Letters share one size around the X-axis. The form is uniformly scaled to stay between Z = -5 ft and +5 ft inside the 20 ft enclosure.`:`Letters and bridge connections keep the vertical-void arrangement, then scale uniformly by ${factor.toFixed(3)} so the longest side of the connected form is 20 ft inside the 20 × 20 × ${envelopeHeight} ft envelope.`);
    if(horizontalLobby&&a&&arrangement&&formation){
     const fittedComponents=componentCount(a);
     if(fittedComponents!==1)formation.operations.push(`Constraint note: The scaled result contains ${fittedComponents} separate solids; review the connections.`);
@@ -804,7 +807,7 @@ export async function buildConnectionWorkflow(placements:IntersectionPlacement[]
   // Fit generated letters and their actual connections together. Editor saves
   // already use the displayed, fitted placements and must retain exact feet.
   if(a&&!workspaceEdits?.basePlacements){
-   const bounds=a.boundingBox(),span=Math.max(...bounds.max.map((v,i)=>v-bounds.min[i]),1e-8),factor=20/span;
+   const bounds=a.boundingBox(),span=Math.max(...bounds.max.map((v,i)=>v-bounds.min[i]),1e-8),factor=envelopeHeight===20?20/span:fitFactor(bounds.min,bounds.max);
    const from=bounds.min.map((v,i)=>(v+bounds.max[i])/2);
    const cubeBox=enclosure?.boundingBox(),to=cubeBox?cubeBox.min.map((v,i)=>(v+cubeBox.max[i])/2):from;
    const shift=to.map((v,i)=>v-factor*from[i]),cache=new Map<InstanceType<typeof Manifold>,InstanceType<typeof Manifold>>();
@@ -816,11 +819,18 @@ export async function buildConnectionWorkflow(placements:IntersectionPlacement[]
    for(const link of bridgeMesh.links??[]){link.start=link.start.map((v,i)=>v*factor+shift[i]);link.end=link.end.map((v,i)=>v*factor+shift[i]);if(link.gapFeet)link.gapFeet*=factor;}
    if(arrangement?.atrium){arrangement.atrium.center=[arrangement.atrium.center[0]*factor+shift[0],arrangement.atrium.center[1]*factor+shift[1]];arrangement.atrium.radius*=factor;}
    for(let i=0;i<3;i++)hallCenter[i]=hallCenter[i]*factor+shift[i];
-   enclosure=own(Manifold.cube([20,20,20],true).translate(to as [number,number,number]));
-   formation?.operations.push(`Final cube fit: generated letters and connections were uniformly scaled by ${factor.toFixed(6)}. The longest dimension reaches 20 ft inside the 20 × 20 × 20 ft cube; letter proportions and the layout are retained.`);
+   enclosure=own(Manifold.cube(envelope,true).translate(to as [number,number,number]));
+   formation?.operations.push(`Final cube fit: generated letters and connections were uniformly scaled by ${factor.toFixed(6)}. The geometry is uniformly fitted inside the 20 × 20 × ${envelopeHeight} ft envelope; letter proportions and the layout are retained.`);
+  }
+  // Boolean intersection caps every crossing face; retain the original 20 ft path.
+  if(envelopeHeight!==20&&enclosure){
+   const clip=(solid:InstanceType<typeof Manifold>|null)=>solid?own(solid.intersect(enclosure!)):null;
+   a=clip(a);source=clip(source);bridges=clip(bridges);floors=clip(floors);protectedOpening=clip(protectedOpening);
+   for(let i=0;i<letters.length;i++)letters[i]=clip(letters[i])!;
+   for(let i=0;i<intersectionSolids.length;i++)intersectionSolids[i]=clip(intersectionSolids[i])!;
   }
   let b:InstanceType<typeof Manifold>|null=null;
-  if(a&&workspaceEdits?.enclosureCenter){const box=a.boundingBox(),center=workspaceEdits.enclosureCenter;if(box.min.some((v,i)=>v<center[i]-10-1e-5)||box.max.some((v,i)=>v>center[i]+10+1e-5))throw new Error('Edited geometry must remain inside the fixed 20 × 20 × 20 ft enclosure. Reduce the scale or Z movement before saving.');}
+  if(a&&workspaceEdits?.enclosureCenter){const box=a.boundingBox(),center=workspaceEdits.enclosureCenter;if(box.min.some((v,i)=>v<center[i]-envelope[i]/2-1e-5)||box.max.some((v,i)=>v>center[i]+envelope[i]/2+1e-5))throw new Error('Edited geometry must remain inside the fixed 20 × 20 × 20 ft enclosure. Reduce the scale or Z movement before saving.');}
   if(enclosure&&source){
    const bounds=enclosure.boundingBox(),height=bounds.max[2]-bounds.min[2],overrun=Math.max(height*1e-5,1e-6);
    const order=arranged.map((_,i)=>i).sort((a,b)=>arranged[a].z-arranged[b].z||a-b);
@@ -857,8 +867,19 @@ export async function buildConnectionWorkflow(placements:IntersectionPlacement[]
   }
   await progress(94,"Combining variations");
   // Preserve exact shared boundaries when combining enclosed profiles with their void.
-  const c=!b||b.isEmpty()?a:union([a,b].filter((x):x is InstanceType<typeof Manifold>=>Boolean(x)));
+  let c=!b||b.isEmpty()?a:union([a,b].filter((x):x is InstanceType<typeof Manifold>=>Boolean(x)));
 
+  if(envelopeHeight!==20&&c){
+   // Drop only boolean dust: never discard an architectural component.
+   const pieces=c.decompose();
+   for(const piece of pieces)if(piece!==c)own(piece);
+   const meaningful=pieces.filter(piece=>Math.abs(piece.volume())>1e-7);
+   if(meaningful.length===1&&pieces.length>1){
+    const retained=meaningful[0];
+    const lost=a?own(a.subtract(retained)).volume():0;
+    if(lost<=1e-7){c=retained;formation?.operations.push('Removed negligible boolean fragments below 0.0000001 cubic feet; architectural letter solids retained.');}
+   }
+  }
   await progress(98,"Preparing preview meshes");
   const limits=angleLimits??{xMin:-180,xMax:180,yMin:-180,yMax:180,zMin:0,zMax:360};
   const yawOf=(angle:number)=>((angle%360)+360)%360;

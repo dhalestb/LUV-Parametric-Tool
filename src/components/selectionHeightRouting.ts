@@ -80,7 +80,7 @@ export function typologyHeightAssignment(typology: string): TypologyHeightAssign
   return {
     status: "unresolved",
     reason:
-      "No typology-to-height table exists in the codebase. All typologies currently generate inside a shared 20 × 20 × 20 ft enclosure; taller envelopes are post-generation stretches via Module Modifier.",
+      "The selected envelope controls generation height independently of typology; no automatic typology-to-height assignment is applied.",
   };
 }
 
@@ -317,7 +317,7 @@ export function capacityShortfallMessages(plan: SourceCapacityPlan): string[] {
       messages.push(`${label} is ${current.toFixed(2)} ft and must be at least ${required.toFixed(0)} ft.`);
     }
   }
-  return [...messages, ...plan.notes];
+  return [...messages, ...plan.notes.map(note=>note.replace("Increased Cell", "To expand capacity, increase Cell"))];
 }
 
 /** Phase 2 generator contract — not wired into UnifiedPrototype during Phase 1. */

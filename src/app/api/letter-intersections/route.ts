@@ -31,7 +31,8 @@ export async function POST(request: Request) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
-  const payload = body as { thickness?: unknown; placements?: unknown; mode?: unknown; behaviors?: unknown; faceBridges?: Partial<FaceBridgeSettings>; typology?: string; workflow?: boolean; gatheringAngles?: unknown; gatheringOperations?: unknown; workspaceEdits?:WorkspaceEdits };
+  const payload = body as { thickness?: unknown; placements?: unknown; mode?: unknown; behaviors?: unknown; faceBridges?: Partial<FaceBridgeSettings>; typology?: string; workflow?: boolean; gatheringAngles?: unknown; gatheringOperations?: unknown; workspaceEdits?:WorkspaceEdits; envelopeHeight?:20|40|60 };
+  if(payload.envelopeHeight!==undefined&&![20,40,60].includes(payload.envelopeHeight))return NextResponse.json({error:"Envelope height must be 20, 40 or 60 feet."},{status:400});
   if(payload.workspaceEdits&&(!Array.isArray(payload.workspaceEdits.scales)||payload.workspaceEdits.scales.length>240||!payload.workspaceEdits.scales.every(v=>finite(v)&&v>=.1&&v<=5)||!Array.isArray(payload.workspaceEdits.mirror)||payload.workspaceEdits.mirror.length!==3||!payload.workspaceEdits.mirror.every(v=>typeof v==='boolean')))return NextResponse.json({error:'Invalid workspace letter edits.'},{status:400});
   if(payload.workspaceEdits?.rotations&&(!Array.isArray(payload.workspaceEdits.rotations)||payload.workspaceEdits.rotations.length!==payload.workspaceEdits.scales.length||!payload.workspaceEdits.rotations.every(r=>Array.isArray(r)&&r.length===3&&r.every(v=>finite(v)&&Math.abs(v)<=36000))))return NextResponse.json({error:'Invalid workspace letter rotations.'},{status:400});
   if(payload.workspaceEdits?.zScales&&(!Array.isArray(payload.workspaceEdits.zScales)||payload.workspaceEdits.zScales.length!==payload.workspaceEdits.scales.length||!payload.workspaceEdits.zScales.every(v=>finite(v)&&v>=.001&&v<=1000)))return NextResponse.json({error:'Invalid letter Z thickness.'},{status:400});
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
              if(cancelled||request.signal.aborted)throw new Error("Generation cancelled");
              send({type:"progress",percent:Math.round(percent),label});
              await new Promise(resolve=>setTimeout(resolve,0));
-            },gatheringAngles,gatheringOperations,payload.workspaceEdits);
+            },gatheringAngles,gatheringOperations,payload.workspaceEdits,payload.envelopeHeight);
             send({type:"result",data});
            }catch(error){send({type:"error",message:error instanceof Error?error.message:"Generation failed"});}
            finally{if(!cancelled)controller.close();}
@@ -100,7 +101,7 @@ export async function POST(request: Request) {
         });
         return new Response(stream,{headers:{"Content-Type":"application/x-ndjson","Cache-Control":"no-store","X-Accel-Buffering":"no"}});
        }
-       return NextResponse.json(await buildConnectionWorkflow(placements,thickness,settings,rule.id,undefined,gatheringAngles,gatheringOperations,payload.workspaceEdits));
+       return NextResponse.json(await buildConnectionWorkflow(placements,thickness,settings,rule.id,undefined,gatheringAngles,gatheringOperations,payload.workspaceEdits,payload.envelopeHeight));
       }
       const mesh=await buildBridgeSpaceMesh(payload.placements,payload.thickness as number,mode??"combined",typologyBridgeSettings(base,rule.behaviors));
       return NextResponse.json(mesh);
