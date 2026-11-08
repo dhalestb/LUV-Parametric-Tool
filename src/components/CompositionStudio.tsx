@@ -14,10 +14,9 @@ import { gridDimensions } from "./constraintValidation";
 import { evaluateSpatialDesign } from "./descriptorEvaluation";
 import { getLetterVolumeGeometry } from "./letterGeometry3d";
 import DashedOctetBoxes from "./DashedOctetBoxes";
-import { attractorBlend, dashedGroupMeasure, diagonalAttractorScale, diagonalCenterGap, DIAGONAL_GAP_MAXIMUM, DIAGONAL_GAP_MINIMUM, letterDepthSpan, octetBoxes, pullToOctet, scaleTowardOctet, separatedPitch, UNIT_LETTER_SPAN, XY_GAP_MINIMUM, Z_GAP_MINIMUM } from "./letterVolumeLayout";
+import { attractorBlend, dashedGroupMeasure, diagonalAttractorScale, diagonalCenterGap, DIAGONAL_GAP_MAXIMUM, DIAGONAL_GAP_MINIMUM, letterDepthSpan, octetBoxes, pullToOctet, scaleTowardOctet, UNIT_LETTER_SPAN, Z_GAP_MINIMUM } from "./letterVolumeLayout";
 import { useGridStore } from "./GridStore";
 import {
-  DEFAULT_GRID,
   DEFAULT_OPTIMIZER_CONTROLS,
   DEFAULT_RULES,
   DEFAULT_SELECTION,
@@ -35,16 +34,41 @@ import { DEFAULT_TYPOLOGY_BY_CATEGORY, type PrototypeCategory, type PrototypeGeo
 import { OPTIMIZER_SESSION_KEY, readJson, writeJson } from "./browserSession";
 import type { Letter } from "./letterTypes";
 import {
+  applyDashedGroupSelection,
+  capacityShortfallMessages,
   clearHeightRouting,
   heightRoutedSelectionVolume,
   isHeightRoutingActive,
   isSelectionHeightFeet,
+  normalizeStoredSelection,
   planSourceFieldCapacity,
+  projectSelectionOntoField,
   selectionHeightPresets,
   typologyHeightAssignment,
   type SelectionHeightFeet,
 } from "./selectionHeightRouting";
 import { intersectingSelectionPlacements, localizeIntersectingPlacements } from "./selectionFieldGeometry";
+import {
+  ARCHITECTURAL_GRID_LIMITS,
+  createArchitecturalGrid,
+  normalizeArchitecturalGrid,
+  setGridCellCount,
+  setGridCellPitch,
+  setGridOverall,
+  validateArchitecturalGrid,
+  type GridAxis,
+} from "./architecturalGrid";
+import {
+  applyLetterSizeControlsToRules,
+  controlsFromPreset,
+  DEFAULT_LETTER_SIZE_CONTROLS,
+  letterFootprintFeet,
+  letterSizeControlsFromRules,
+  letterSpansMultipleCells,
+  validateLetterSizeControls,
+  type LetterSizeControls,
+} from "./architecturalLetterSizing";
+import { evaluateLetterLegibility, summarizeLegibility } from "./letterLegibility";
 
 type OverlayState = { circulation: boolean; volume: boolean; sightlines: boolean; hierarchy: boolean; vertical: boolean };
 type DisplayMode = "letters" | "void" | "both";
@@ -118,35 +142,20 @@ function letterInventory(alternative: SpatialAlternative) {
   return comparisonLetters.map((letter) => `${letter} ${alternative.placements.filter((placement) => placement.cell.letter === letter).length}`).join(" · ");
 }
 
-function gridFromSlide(settings: { cols: number; rows: number; zLayers: number; spacing: number; zSpacing: number; fontSize: number; letterThickness: number }): OrthogonalGrid {
-  const letterSize = Math.max(0.1, settings.fontSize / 50);
-  const planSpan = letterSize * UNIT_LETTER_SPAN;
-  const depthSpan = letterDepthSpan(letterSize, settings.letterThickness, false);
-  const cell = separatedPitch(settings.spacing, planSpan);
+/**
+ * Legacy Slide→grid mapping kept for documentation / optional import.
+ * Composition Fixed 3D Grid pitches are authored locally and are NOT derived from letter size.
+ */
+function gridCountsFromSlide(settings: { cols: number; rows: number; zLayers: number }): Pick<OrthogonalGrid, "xCells" | "yCells" | "zCells"> {
   return {
-    ...DEFAULT_GRID,
     xCells: settings.cols,
     yCells: settings.rows,
-    zCells: settings.zLayers,
-    cellX: cell,
-    cellY: cell,
-    cellZ: separatedPitch(settings.zSpacing, depthSpan),
+    zCells: Math.max(1, settings.zLayers),
   };
 }
 
-const GAP_SLIDER_MAX = 120;
-
-/** Map a composition cell pitch back onto the shared gap slider. */
-function gapFromPitch(pitch: number, minimum: number) {
-  return Math.min(GAP_SLIDER_MAX, Math.max(minimum, Math.round(pitch * 50)));
-}
-
-function rulesFromSlide(settings: { fontSize: number; letterThickness: number; yRotationEnabled: boolean; yRotationRange: number; spacing: number; zSpacing: number; attractorGap?: number | null }): GenerationRules {
-  const slideLetterSize = Math.max(0.1, settings.fontSize / 50);
+function rulesSharedFromSlide(settings: { letterThickness: number; yRotationEnabled: boolean; yRotationRange: number; spacing: number; zSpacing: number; attractorGap?: number | null }): Pick<GenerationRules, "letterThicknessPercent" | "allowRotationY" | "maximumRotationY" | "xyGap" | "zGap" | "attractorGap"> {
   return {
-    ...DEFAULT_RULES,
-    minimumLetterSize: Math.min(DEFAULT_RULES.minimumLetterSize, slideLetterSize),
-    maximumLetterSize: Math.max(DEFAULT_RULES.minimumLetterSize, slideLetterSize),
     letterThicknessPercent: settings.letterThickness,
     allowRotationY: settings.yRotationEnabled,
     maximumRotationY: settings.yRotationRange,
@@ -374,29 +383,7 @@ function NumberInput({ label, value, min, max, step = 1, disabled = false, onCha
 }
 
 function clampSelectionToGrid(selection: SelectionVolume, dimensions: ReturnType<typeof gridDimensions>): SelectionVolume {
-  const clampSize = (value: number, maximum: number) => {
-    const safeMaximum = Math.max(0.01, maximum);
-    const minimum = Math.min(0.5, safeMaximum);
-    return Math.max(minimum, Math.min(Number.isFinite(value) ? value : minimum, safeMaximum));
-  };
-  const clampStep = (value: number, maximum: number) => {
-    const safeMaximum = Math.max(0.01, maximum);
-    const minimum = Math.min(0.1, safeMaximum);
-    return Math.max(minimum, Math.min(Number.isFinite(value) ? value : minimum, safeMaximum));
-  };
-  const routed = isHeightRoutingActive(selection) && isSelectionHeightFeet(selection.heightRouting)
-    ? heightRoutedSelectionVolume(selection.heightRouting, selection)
-    : selection;
-  return {
-    ...routed,
-    width: clampSize(routed.width, dimensions.width),
-    height: clampSize(routed.height, dimensions.height),
-    depth: clampSize(routed.depth, dimensions.depth),
-    stepX: clampStep(routed.stepX, dimensions.width),
-    stepY: clampStep(routed.stepY, dimensions.height),
-    stepZ: clampStep(routed.stepZ, dimensions.depth),
-    heightRouting: routed.heightRouting ?? null,
-  };
+  return projectSelectionOntoField(selection, dimensions);
 }
 
 function Check({ label, checked, onChange, disabled = false }: { label: string; checked: boolean; onChange: (checked: boolean) => void; disabled?: boolean }) {
@@ -407,11 +394,19 @@ function Check({ label, checked, onChange, disabled = false }: { label: string; 
 }
 
 export default function CompositionStudio() {
+  const [capacityNotice, setCapacityNotice] = useState<string>("");
   const store = useGridStore();
   const { setAppliedComposition, setLayerMode } = store;
   const [descriptors, setDescriptors] = useState<DescriptorSettings>(() => structuredClone(DEFAULT_DESCRIPTORS));
-  const [grid, setGrid] = useState<OrthogonalGrid>(() => gridFromSlide(store));
-  const [rules, setRules] = useState<GenerationRules>(() => rulesFromSlide(store));
+  const [grid, setGrid] = useState<OrthogonalGrid>(() => createArchitecturalGrid());
+  const [rules, setRules] = useState<GenerationRules>(() => ({
+    ...DEFAULT_RULES,
+    ...rulesSharedFromSlide(store),
+  }));
+  const [letterSizes, setLetterSizes] = useState<LetterSizeControls>(() => letterSizeControlsFromRules({
+    ...DEFAULT_RULES,
+    ...rulesSharedFromSlide(store),
+  }));
   const [controls, setControls] = useState<OptimizerControls>(() => ({ ...DEFAULT_OPTIMIZER_CONTROLS }));
   const [selection, setSelection] = useState<SelectionVolume>(() => ({ ...DEFAULT_SELECTION }));
   const [focus, setFocus] = useState<OptimizationFocus>("combined");
@@ -435,11 +430,15 @@ export default function CompositionStudio() {
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
   const [storageReady, setStorageReady] = useState(false);
   const [keptNotice, setKeptNotice] = useState("Working session is kept in this browser.");
-  const [capacityNotice, setCapacityNotice] = useState("");
-  const slideSourceSignature = `${store.cols}:${store.rows}:${store.layerMode}:${store.zLayers}:${store.spacing}:${store.zSpacing}:${store.attractorGap ?? "auto"}:${store.fontSize}:${store.letterThickness}:${store.yRotationEnabled}:${store.yRotationRange}`;
+  const [gridNotice, setGridNotice] = useState("");
+  /** Once true, Slide gap/font sync must not overwrite Composition pitches or letter-size feet controls. */
+  const [compositionGridOwned, setCompositionGridOwned] = useState(true);
+  const slideSourceSignature = `${store.cols}:${store.rows}:${store.layerMode}:${store.zLayers}:${store.letterThickness}:${store.yRotationEnabled}:${store.yRotationRange}:${store.spacing}:${store.zSpacing}:${store.attractorGap ?? "auto"}`;
   const lastSlideSourceSignature = useRef<string | null>(null);
   const heightRoutingActive = isHeightRoutingActive(selection);
   const typologyHeight = typologyHeightAssignment(prototypeTypology);
+  const gridValidation = useMemo(() => validateArchitecturalGrid(grid), [grid]);
+  const letterValidation = useMemo(() => validateLetterSizeControls(letterSizes), [letterSizes]);
   const sourceCells = useMemo(() => [store.cells, ...store.layerCells.slice(0, Math.max(0, store.zLayers - 1))].flat(), [store.cells, store.layerCells, store.zLayers]);
   const selectedSourceCells = useMemo(() => sourceCells.filter((cell) => selectedLetters.includes(cell.letter)), [sourceCells, selectedLetters]);
   const evaluationFocus = focus === "auto" ? "combined" : focus;
@@ -465,7 +464,7 @@ export default function CompositionStudio() {
     const offsetY = (grid.yCells - 1) * grid.cellY / 2;
     const offsetZ = (grid.zCells - 1) * grid.cellZ / 2;
     const capacity = grid.xCells * grid.yCells * grid.zCells;
-    const scale = Math.max(rules.minimumLetterSize, rules.maximumLetterSize);
+    const scale = rules.preferredLetterSize ?? Math.max(rules.minimumLetterSize, rules.maximumLetterSize);
     const xyBlend = attractorBlend(rules.xyGap ?? 56);
     const zBlend = attractorBlend(rules.zGap ?? 56);
     const diagonalScale = rules.attractorGap == null
@@ -501,7 +500,7 @@ export default function CompositionStudio() {
         scale,
       };
     });
-  }, [selected, sourceCells, grid, rules.minimumLetterSize, rules.maximumLetterSize, rules.xyGap, rules.zGap, rules.attractorGap]);
+  }, [selected, sourceCells, grid, rules.minimumLetterSize, rules.preferredLetterSize, rules.maximumLetterSize, rules.xyGap, rules.zGap, rules.attractorGap]);
   const prototypeSourcePlacements = useMemo<CompositionPlacement[]>(
     () => selected ? cropRegionPlacements(selected, rules.letterThicknessPercent) : completePrototypePlacements,
     [selected, completePrototypePlacements, rules.letterThicknessPercent],
@@ -534,6 +533,10 @@ export default function CompositionStudio() {
       : diagonalAttractorScale(rules.attractorGap, rules.xyGap ?? 56, Math.max(rules.minimumLetterSize, rules.maximumLetterSize) * UNIT_LETTER_SPAN),
   }), [grid, rules.minimumLetterSize, rules.maximumLetterSize, rules.letterThicknessPercent, rules.attractorGap, rules.xyGap]);
   const selectionValid = !selection.enabled || (selection.width <= dimensions.width && selection.height <= dimensions.height && selection.depth <= dimensions.depth);
+  const capacityPlan = heightRoutingActive && isSelectionHeightFeet(selection.heightRouting)
+    ? planSourceFieldCapacity(grid, selection.heightRouting)
+    : null;
+  const capacityShortfall = capacityPlan ? capacityShortfallMessages(capacityPlan) : [];
 
   useEffect(() => {
     setSelection((current) => {
@@ -546,34 +549,12 @@ export default function CompositionStudio() {
   useEffect(() => {
     if (!storageReady || !dashedSelection) return;
     setSelection((current) => {
-      // Height-routed 20 × 20 × H fields must not be resized by dashed octet groups.
-      if (isHeightRoutingActive(current)) return current;
-      const next = clampSelectionToGrid({
-        ...current,
-        width: dashedSelection.width,
-        height: dashedSelection.height,
-        depth: dashedSelection.depth,
-        stepX: dashedSelection.stepX,
-        stepY: dashedSelection.stepY,
-        stepZ: dashedSelection.stepZ,
-      }, dimensions);
+      const next = clampSelectionToGrid(applyDashedGroupSelection(current, dashedSelection), dimensions);
       const unchanged = (Object.keys(next) as Array<keyof SelectionVolume>)
         .every((key) => next[key] === current[key]);
       return unchanged ? current : next;
     });
   }, [dashedSelection, dimensions, storageReady]);
-
-  useEffect(() => {
-    if (!storageReady || !heightRoutingActive || !isSelectionHeightFeet(selection.heightRouting)) return;
-    const plan = planSourceFieldCapacity(grid, selection.heightRouting);
-    if (plan.sufficient) return;
-    setGrid(plan.expandedGrid);
-    setCapacityNotice(plan.notes.join(" "));
-    const expandedDimensions = gridDimensions(plan.expandedGrid);
-    setSelection((current) => clampSelectionToGrid(heightRoutedSelectionVolume(selection.heightRouting!, current), expandedDimensions));
-    // Intentionally omits `grid`: expansion is one-shot per height route; including grid would loop.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storageReady, heightRoutingActive, selection.heightRouting]);
 
   useEffect(() => {
     try {
@@ -585,10 +566,13 @@ export default function CompositionStudio() {
     const session = readJson<OptimizerSession>(OPTIMIZER_SESSION_KEY);
     if (session?.descriptors && session.grid && session.rules && session.controls && session.selection && session.focus) {
       setDescriptors(session.descriptors);
-      setGrid(session.grid);
+      const restoredGrid = normalizeArchitecturalGrid(session.grid);
+      setGrid(restoredGrid);
+      setCompositionGridOwned(true);
       setRules(session.rules);
+      setLetterSizes(letterSizeControlsFromRules(session.rules));
       setControls({ ...session.controls, alternatives: Math.min(4, session.controls.alternatives) });
-      setSelection(session.selection);
+      setSelection(normalizeStoredSelection(session.selection));
       setFocus(session.focus);
       if (Array.isArray(session.selectedLetters) && session.selectedLetters.length) setSelectedLetters(session.selectedLetters.filter((letter): letter is Letter => comparisonLetters.includes(letter)));
       setAlternatives(Array.isArray(session.alternatives) ? session.alternatives : []);
@@ -676,28 +660,30 @@ export default function CompositionStudio() {
     const firstSync = lastSlideSourceSignature.current === null;
     if (!firstSync && lastSlideSourceSignature.current === slideSourceSignature) return;
     lastSlideSourceSignature.current = slideSourceSignature;
-    const synchronizedGrid = gridFromSlide(store);
-    const synchronizedRules = rulesFromSlide(store);
-    setGrid((current) => {
-      const synced = { ...synchronizedGrid, locked: current.locked };
-      if (!isSelectionHeightFeet(selection.heightRouting)) return synced;
-      return planSourceFieldCapacity(synced, selection.heightRouting).expandedGrid;
-    });
+    const shared = rulesSharedFromSlide(store);
+    // Shared Slide settings: thickness, rotation, attractor gaps. Letter feet sizes stay on Composition.
     setRules((current) => ({
       ...current,
-      maximumLetterSize: Math.max(current.minimumLetterSize, synchronizedRules.maximumLetterSize),
-      letterThicknessPercent: synchronizedRules.letterThicknessPercent,
-      allowRotationY: synchronizedRules.allowRotationY,
-      maximumRotationY: synchronizedRules.maximumRotationY,
-      xyGap: synchronizedRules.xyGap,
-      zGap: synchronizedRules.zGap,
-      attractorGap: synchronizedRules.attractorGap,
+      letterThicknessPercent: shared.letterThicknessPercent,
+      allowRotationY: shared.allowRotationY,
+      maximumRotationY: shared.maximumRotationY,
+      xyGap: shared.xyGap,
+      zGap: shared.zGap,
+      attractorGap: shared.attractorGap,
     }));
+    // Composition owns pitches/overall. Optionally absorb Slide cell counts only before local authorship.
+    if (!compositionGridOwned) {
+      const counts = gridCountsFromSlide(store);
+      setGrid((current) => {
+        const next = { ...current, ...counts, locked: current.locked };
+        return next;
+      });
+    }
     if (firstSync) return;
     setAlternatives([]);
     setSelectedIndex(0);
     setLockedParent(null);
-  }, [slideSourceSignature, store, selection.heightRouting]);
+  }, [slideSourceSignature, store, selection.heightRouting, compositionGridOwned]);
 
   const applySelectedToSlide = () => {
     if (!selected) return;
@@ -714,12 +700,42 @@ export default function CompositionStudio() {
     setLayerMode(true);
   };
 
+  const syncSlideCellCounts = (next: OrthogonalGrid) => {
+    // Keep Slide source capacity aligned with Composition cell counts without rewriting pitches.
+    if (next.xCells !== store.cols || next.yCells !== store.rows) store.resizeGrid(next.xCells, next.yCells);
+    if (next.zCells !== store.zLayers) {
+      store.setLayerMode(true);
+      store.setZLayers(next.zCells);
+    }
+  };
+
+  const commitGrid = (next: OrthogonalGrid, notice?: string) => {
+    const validation = validateArchitecturalGrid(next);
+    if (!validation.valid) {
+      setGridNotice(validation.errors.join(" "));
+      return;
+    }
+    setCompositionGridOwned(true);
+    setGrid(next);
+    syncSlideCellCounts(next);
+    setGridNotice([...(validation.warnings), notice].filter(Boolean).join(" "));
+    // Preserve selection size/height when overall grows; clamp only if it no longer fits.
+    setSelection((current) => clampSelectionToGrid(current, gridDimensions(next)));
+  };
+
   const applyHeightPreset = (height: SelectionHeightFeet) => {
     const plan = planSourceFieldCapacity(grid, height);
-    setGrid(plan.expandedGrid);
+    const nextGrid = plan.expandedGrid;
+    const sizes = controlsFromPreset(height, letterSizes);
+    setCompositionGridOwned(true);
+    setGrid(nextGrid);
+    syncSlideCellCounts(nextGrid);
     setLayerMode(true);
-    setSelection(clampSelectionToGrid(heightRoutedSelectionVolume(height, selection), gridDimensions(plan.expandedGrid)));
+    setLetterSizes(sizes);
+    setRules((current) => applyLetterSizeControlsToRules(current, sizes));
+    setSelection(clampSelectionToGrid(heightRoutedSelectionVolume(height, selection), gridDimensions(nextGrid)));
     setCapacityNotice(plan.notes.join(" "));
+    setGridNotice(validateArchitecturalGrid(nextGrid).warnings.join(" "));
     setAlternatives([]);
     setSelectedIndex(0);
     setLockedParent(null);
@@ -730,6 +746,20 @@ export default function CompositionStudio() {
     setCapacityNotice("");
   };
 
+  const setLetterSizeValue = (key: keyof LetterSizeControls, value: number | boolean) => {
+    setLetterSizes((current) => {
+      const next = { ...current, [key]: value } as LetterSizeControls;
+      const validation = validateLetterSizeControls(next);
+      if (!validation.valid) {
+        setGridNotice(validation.errors.join(" "));
+        return current;
+      }
+      setRules((rulesCurrent) => applyLetterSizeControlsToRules(rulesCurrent, next));
+      setGridNotice(validation.warnings.join(" "));
+      return next;
+    });
+  };
+
   const setDescriptor = (id: DescriptorId, key: "intensity" | "importance", value: number) => {
     setDescriptors((current) => ({ ...current, [id]: { ...current[id], [key]: value } }));
   };
@@ -738,19 +768,19 @@ export default function CompositionStudio() {
       setGrid((current) => ({ ...current, locked: Boolean(value) }));
       return;
     }
-    if (typeof value !== "number") return;
-    if (key === "xCells") store.resizeGrid(Math.round(value), store.rows);
-    else if (key === "yCells") store.resizeGrid(store.cols, Math.round(value));
-    else if (key === "zCells") {
-      store.setLayerMode(true);
-      store.setZLayers(Math.round(value));
-    } else if (key === "cellX" || key === "cellY") store.setSpacing(gapFromPitch(value, XY_GAP_MINIMUM));
-    else if (key === "cellZ") store.setZSpacing(gapFromPitch(value, Z_GAP_MINIMUM));
+    if (typeof value !== "number" || grid.locked) return;
+    if (key === "xCells") commitGrid(setGridCellCount(grid, "x", value));
+    else if (key === "yCells") commitGrid(setGridCellCount(grid, "y", value));
+    else if (key === "zCells") commitGrid(setGridCellCount(grid, "z", value));
+    else if (key === "cellX") commitGrid(setGridCellPitch(grid, "x", value), "Cell X changed; letter sizes were not modified.");
+    else if (key === "cellY") commitGrid(setGridCellPitch(grid, "y", value), "Cell Y changed; letter sizes were not modified.");
+    else if (key === "cellZ") commitGrid(setGridCellPitch(grid, "z", value), "Cell Z changed; letter sizes were not modified.");
+  };
+  const setOverallValue = (axis: GridAxis, overall: number) => {
+    if (grid.locked) return;
+    commitGrid(setGridOverall(grid, axis, overall), `Overall ${axis.toUpperCase()} updated cell pitch only; cell count and letter sizes unchanged.`);
   };
   const setRule = (key: keyof GenerationRules, value: number | boolean) => {
-    if (key === "maximumLetterSize" && typeof value === "number") {
-      store.setFontSize(Math.min(96, Math.max(16, Math.round(value * 50))));
-    }
     if (key === "letterThicknessPercent" && typeof value === "number") store.setLetterThickness(value);
     if (key === "allowRotationY" && typeof value === "boolean") store.setYRotationEnabled(value);
     if (key === "maximumRotationY" && typeof value === "number") store.setYRotationRange(value);
@@ -764,12 +794,18 @@ export default function CompositionStudio() {
     return clampSelectionToGrid({ ...current, [key]: value }, dimensions);
   });
   const resetAll = () => {
+    const nextGrid = createArchitecturalGrid();
+    const nextSizes = { ...DEFAULT_LETTER_SIZE_CONTROLS };
     setDescriptors(structuredClone(DEFAULT_DESCRIPTORS));
-    setGrid(gridFromSlide(store));
-    setRules(rulesFromSlide(store));
+    setCompositionGridOwned(true);
+    setGrid(nextGrid);
+    syncSlideCellCounts(nextGrid);
+    setLetterSizes(nextSizes);
+    setRules(applyLetterSizeControlsToRules({ ...DEFAULT_RULES, ...rulesSharedFromSlide(store) }, nextSizes));
     setControls({ ...DEFAULT_OPTIMIZER_CONTROLS });
     setSelection({ ...DEFAULT_SELECTION, heightRouting: null });
     setCapacityNotice("");
+    setGridNotice("");
     setFocus("combined");
     setSelectedLetters([...comparisonLetters]);
     setDisplayMode("both");
@@ -817,7 +853,13 @@ export default function CompositionStudio() {
     setSavedDesigns((current) => [design, ...current].slice(0, 8));
   };
   const restoreDesign = (design: SavedDesign) => {
-    setGrid(design.grid); setRules(design.rules); setControls({ ...design.controls, alternatives: Math.min(4, design.controls.alternatives) }); setSelection(design.selection ?? { ...DEFAULT_SELECTION }); setFocus(design.focus);
+    setGrid(normalizeArchitecturalGrid(design.grid));
+    setCompositionGridOwned(true);
+    setRules(design.rules);
+    setLetterSizes(letterSizeControlsFromRules(design.rules));
+    setControls({ ...design.controls, alternatives: Math.min(4, design.controls.alternatives) });
+    setSelection(design.selection ?? { ...DEFAULT_SELECTION });
+    setFocus(design.focus);
     setDescriptors(design.descriptors); setAlternatives(design.alternatives); setSelectedIndex(Math.min(3, design.selectedIndex));
     if (design.selectedLetters?.length) setSelectedLetters(design.selectedLetters);
     if (design.prototypeCategory) setPrototypeCategory(design.prototypeCategory);
@@ -827,8 +869,10 @@ export default function CompositionStudio() {
   const restoreHistoryRun = (index: number) => {
     const previous = history[index];
     if (!previous) return;
-    setGrid(previous.grid);
+    setGrid(normalizeArchitecturalGrid(previous.grid));
+    setCompositionGridOwned(true);
     setRules(previous.rules);
+    setLetterSizes(letterSizeControlsFromRules(previous.rules));
     setControls({ ...previous.controls, alternatives: Math.min(4, previous.controls.alternatives) });
     setSelection(previous.selection ?? { ...DEFAULT_SELECTION });
     setFocus(previous.focus);
@@ -840,6 +884,18 @@ export default function CompositionStudio() {
     setLockedParent(null);
     setActiveHistoryId(previous.id);
   };
+
+  const legibilityReport = useMemo(() => {
+    if (!selected) return null;
+    return evaluateLetterLegibility({
+      placements: cropRegionPlacements(selected, rules.letterThicknessPercent),
+      thicknessPercent: rules.letterThicknessPercent,
+      selection: selected.selection ?? null,
+      preserveProportions: rules.preserveProportions,
+    });
+  }, [selected, rules.letterThicknessPercent, rules.preserveProportions]);
+
+  const preferredSpansCells = letterSpansMultipleCells(letterSizes.preferredFeet, Math.min(grid.cellX, grid.cellY));
   const undo = () => restoreHistoryRun(0);
   const toggleComparisonLetter = (letter: Letter) => {
     const enabled = selectedLetters.includes(letter);
@@ -865,35 +921,77 @@ export default function CompositionStudio() {
         <button type="button" onClick={undo} disabled={!history.length} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Undo run</button>
         <button type="button" onClick={saveDesign} disabled={!selected} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Save configuration</button>
         <button type="button" onClick={resetAll} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Reset</button>
-        <button type="button" onClick={() => void runOptimization()} disabled={!grid.locked || !selectionValid || !selectedSourceCells.length || optimizing} className="rounded px-3 py-1 text-[11px] font-semibold text-black disabled:opacity-40" style={{ background: "var(--accent-primary)" }}>{optimizing ? `Optimizing ${progress}%` : "Generate + optimize"}</button>
+        <button type="button" onClick={() => void runOptimization()} disabled={!grid.locked || !selectionValid || !gridValidation.valid || !letterValidation.valid || !selectedSourceCells.length || optimizing} className="rounded px-3 py-1 text-[11px] font-semibold text-black disabled:opacity-40" style={{ background: "var(--accent-primary)" }}>{optimizing ? `Optimizing ${progress}%` : "Generate + optimize"}</button>
       </div>
     </header><FeetScaleNote/>
 
     {optimizing && <div className="h-1 overflow-hidden rounded bg-[var(--input-background)]"><div className="h-full bg-[var(--accent)] transition-all" style={{ width: `${progress}%` }} /></div>}
-    {!grid.locked && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b7634", color: "#ffd38a", background: "#2b2415" }}>Lock the orthogonal grid before optimization.</p>}
+    {!grid.locked && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b7634", color: "#ffd38a", background: "#2b2415" }}>Lock the Fixed 3D Grid before optimization.</p>}
     {!selectionValid && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>The selection volume must fit completely inside the overall solution volume.</p>}
+    {!gridValidation.valid && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>{gridValidation.errors.join(" ")}</p>}
+    {!letterValidation.valid && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>{letterValidation.errors.join(" ")}</p>}
+    {gridNotice && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b7634", color: "#ffd38a", background: "#2b2415" }}>{gridNotice}</p>}
     {!selectedSourceCells.length && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>None of the enabled letter types are present in the current composition.</p>}
     <p className="rounded border px-3 py-2 text-[10px]" style={{ borderColor: "var(--accent-secondary)", color: "var(--accent-pale)", background: "var(--panel-background)" }}>
-      Slide and Composition share dimensions in feet. Gap controls specify nominal spacing; attraction can reduce actual separation. Letter size is the unrotated footprint span. The overlap threshold is 0.2 ft. Thickness is a percentage of letter size. Generate creates alternatives; Apply selected to Slide transfers the selected arrangement.</p>
+      Composition Fixed 3D Grid pitches and letter footprints (ft) are independent. Slide still supplies letter identities, thickness, and rotation; cell counts stay aligned for source capacity. Letter size is the unrotated plan footprint = scale × 0.92 ft. Generate creates alternatives; Apply selected to Slide transfers the selected arrangement.</p>
 
     <div className="board-composition-content"><div className="grid gap-3 xl:grid-cols-[360px_minmax(0,1fr)_340px]">
       <aside className="space-y-3">
         <section className="rounded-xl border p-3" style={panelStyle}>
-          <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Fixed 3D grid</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Shared with Slide. Cell X and Cell Y use the same gap. Lock the dimensions before generation.</p></div><button type="button" onClick={() => setGridValue("locked", !grid.locked)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: grid.locked ? "var(--accent-light)" : "var(--input-background)", color: grid.locked ? "var(--app-background)" : "var(--text-primary)" }}>{grid.locked ? "Locked" : "Unlocked"}</button></div>
+          <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Fixed 3D grid</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Independent cell counts and pitches (ft). Example field 60×60×80 ft. Lock before generation.</p></div><button type="button" onClick={() => setGridValue("locked", !grid.locked)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: grid.locked ? "var(--accent-light)" : "var(--input-background)", color: grid.locked ? "var(--app-background)" : "var(--text-primary)" }}>{grid.locked ? "Locked" : "Unlocked"}</button></div>
           <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
-            <NumberInput label="X cells" value={grid.xCells} min={2} max={16} disabled={grid.locked} onChange={(value) => setGridValue("xCells", value)} />
-            <NumberInput label="Cell X" value={grid.cellX} min={0.4} max={8} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellX", value)} />
-            <NumberInput label="Y cells" value={grid.yCells} min={2} max={12} disabled={grid.locked} onChange={(value) => setGridValue("yCells", value)} />
-            <NumberInput label="Cell Y" value={grid.cellY} min={0.4} max={8} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellY", value)} />
-            <NumberInput label="Z cells" value={grid.zCells} min={2} max={8} disabled={grid.locked} onChange={(value) => setGridValue("zCells", value)} />
-            <NumberInput label="Cell Z" value={grid.cellZ} min={0.4} max={8} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellZ", value)} />
+            <NumberInput label="X cells" value={grid.xCells} min={ARCHITECTURAL_GRID_LIMITS.cellsMin} max={ARCHITECTURAL_GRID_LIMITS.cellsMax} disabled={grid.locked} onChange={(value) => setGridValue("xCells", value)} />
+            <NumberInput label="Cell X" value={Number(grid.cellX.toFixed(3))} min={ARCHITECTURAL_GRID_LIMITS.cellPitchMin} max={ARCHITECTURAL_GRID_LIMITS.cellPitchMax} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellX", value)} />
+            <NumberInput label="Y cells" value={grid.yCells} min={ARCHITECTURAL_GRID_LIMITS.cellsMin} max={ARCHITECTURAL_GRID_LIMITS.cellsMax} disabled={grid.locked} onChange={(value) => setGridValue("yCells", value)} />
+            <NumberInput label="Cell Y" value={Number(grid.cellY.toFixed(3))} min={ARCHITECTURAL_GRID_LIMITS.cellPitchMin} max={ARCHITECTURAL_GRID_LIMITS.cellPitchMax} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellY", value)} />
+            <NumberInput label="Z cells" value={grid.zCells} min={ARCHITECTURAL_GRID_LIMITS.cellsMin} max={ARCHITECTURAL_GRID_LIMITS.cellsMax} disabled={grid.locked} onChange={(value) => setGridValue("zCells", value)} />
+            <NumberInput label="Cell Z" value={Number(grid.cellZ.toFixed(3))} min={ARCHITECTURAL_GRID_LIMITS.cellPitchMin} max={ARCHITECTURAL_GRID_LIMITS.cellPitchMax} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellZ", value)} />
           </div>
           <div className="mt-2 grid grid-cols-3 gap-1 border-t pt-2" style={{ borderColor: "var(--line)" }}>
-            <NumberInput label="Overall X" value={Number(dimensions.width.toFixed(2))} min={2} max={100} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellX", value / grid.xCells)} />
-            <NumberInput label="Overall Y" value={Number(dimensions.height.toFixed(2))} min={2} max={100} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellY", value / grid.yCells)} />
-            <NumberInput label="Overall Z" value={Number(dimensions.depth.toFixed(2))} min={2} max={100} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellZ", value / grid.zCells)} />
+            <NumberInput label="Overall X" value={Number(dimensions.width.toFixed(2))} min={ARCHITECTURAL_GRID_LIMITS.overallMin} max={ARCHITECTURAL_GRID_LIMITS.overallMax} step={0.1} disabled={grid.locked} onChange={(value) => setOverallValue("x", value)} />
+            <NumberInput label="Overall Y" value={Number(dimensions.height.toFixed(2))} min={ARCHITECTURAL_GRID_LIMITS.overallMin} max={ARCHITECTURAL_GRID_LIMITS.overallMax} step={0.1} disabled={grid.locked} onChange={(value) => setOverallValue("y", value)} />
+            <NumberInput label="Overall Z" value={Number(dimensions.depth.toFixed(2))} min={ARCHITECTURAL_GRID_LIMITS.overallMin} max={ARCHITECTURAL_GRID_LIMITS.overallMax} step={0.1} disabled={grid.locked} onChange={(value) => setOverallValue("z", value)} />
           </div>
-          <p className="mt-2 rounded bg-[var(--input-background)] px-2 py-1 text-[10px] tabular-nums" style={{ color: "var(--accent-pale)" }}>Overall: {dimensions.width.toFixed(1)} × {dimensions.height.toFixed(1)} × {dimensions.depth.toFixed(1)} ft · {dimensions.volume.toFixed(1)} ft³</p>
+          <p className="mt-2 rounded bg-[var(--input-background)] px-2 py-1 text-[10px] tabular-nums" style={{ color: "var(--accent-pale)" }}>Overall: {dimensions.width.toFixed(1)} × {dimensions.height.toFixed(1)} × {dimensions.depth.toFixed(1)} ft · {dimensions.volume.toFixed(1)} ft³ · {grid.xCells * grid.yCells * grid.zCells} cells</p>
+          <p className="mt-1 text-[9px]" style={{ color: "var(--muted)" }}>Changing cell pitch updates overall on that axis only. Changing overall updates pitch and keeps cell count. Letter sizes are not coupled to pitch.</p>
+          {preferredSpansCells && <p className="mt-1 text-[9px]" style={{ color: "var(--accent-gold)" }}>Preferred letter footprint ({letterSizes.preferredFeet.toFixed(1)} ft) can span multiple cells (min pitch {Math.min(grid.cellX, grid.cellY).toFixed(2)} ft).</p>}
+        </section>
+
+        <section className="rounded-xl border p-3" style={panelStyle}>
+          <h2 className="text-sm font-semibold">Architectural letter size</h2>
+          <p className="text-[9px]" style={{ color: "var(--muted)" }}>Unrotated plan footprint in feet (scale × 0.92). Presets follow selection height guidelines and remain editable. Different letters may vary within min–max.</p>
+          <div className="mt-2 flex flex-wrap gap-1">
+            {([20, 40, 60] as const).map((height) => (
+              <button
+                key={height}
+                type="button"
+                onClick={() => {
+                  const sizes = controlsFromPreset(height, letterSizes);
+                  setLetterSizes(sizes);
+                  setRules((current) => applyLetterSizeControlsToRules(current, sizes));
+                }}
+                className="rounded border px-2 py-1 text-[10px]"
+                style={{ borderColor: "var(--line)" }}
+              >
+                {height}&apos; letters
+              </button>
+            ))}
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+            <NumberInput label="Min size ft" value={letterSizes.minimumFeet} min={1} max={40} step={0.5} onChange={(value) => setLetterSizeValue("minimumFeet", value)} />
+            <NumberInput label="Preferred ft" value={letterSizes.preferredFeet} min={1} max={40} step={0.5} onChange={(value) => setLetterSizeValue("preferredFeet", value)} />
+            <NumberInput label="Max size ft" value={letterSizes.maximumFeet} min={1} max={40} step={0.5} onChange={(value) => setLetterSizeValue("maximumFeet", value)} />
+            <NumberInput label="Variation %" value={letterSizes.variationPercent} min={0} max={100} step={5} onChange={(value) => setLetterSizeValue("variationPercent", value)} />
+          </div>
+          <div className="mt-2">
+            <Check label="Preserve letter proportions" checked={letterSizes.preserveProportions} onChange={(checked) => setLetterSizeValue("preserveProportions", checked)} />
+          </div>
+          <p className="mt-2 text-[9px]" style={{ color: "var(--muted)" }}>Optimizer scale range {rules.minimumLetterSize.toFixed(2)}–{rules.maximumLetterSize.toFixed(2)} (preferred { (rules.preferredLetterSize ?? rules.maximumLetterSize).toFixed(2) }). Footprints {letterFootprintFeet(rules.minimumLetterSize).toFixed(1)}–{letterFootprintFeet(rules.maximumLetterSize).toFixed(1)} ft.</p>
+          {legibilityReport && (
+            <p className="mt-2 text-[9px]" style={{ color: legibilityReport.compromisedCount ? "#ffad95" : "var(--accent-pale)" }}>
+              Legibility: score {(legibilityReport.recognizabilityProxy * 100).toFixed(0)}% · {legibilityReport.compromisedCount} compromised · {legibilityReport.watchCount} watch — {summarizeLegibility(legibilityReport)}
+            </p>
+          )}
         </section>
 
         <section className="rounded-xl border p-3" style={panelStyle}>
@@ -960,11 +1058,10 @@ export default function CompositionStudio() {
             <Check label="Y rotation" checked={store.yRotationEnabled} onChange={store.setYRotationEnabled} />
           </div>
           <h3 className="mt-3 border-t pt-2 text-[10px] font-semibold uppercase tracking-wide" style={{ borderColor: "var(--line)", color: "var(--accent-pale)" }}>Optimizer feasibility</h3>
+          <p className="mt-1 text-[9px]" style={{ color: "var(--muted)" }}>Letter footprint min/preferred/max are set in Architectural letter size (feet). Clearance remains in feet.</p>
           <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
             <NumberInput label="Clearance" value={rules.minimumClearance} min={0} max={4} step={0.1} onChange={(value) => setRule("minimumClearance", value)} />
             <NumberInput label="Max intersections" value={rules.maximumIntersections} min={0} max={500} onChange={(value) => setRule("maximumIntersections", value)} />
-            <NumberInput label="Min letter size" value={rules.minimumLetterSize} min={0.1} max={4} step={0.05} onChange={(value) => setRule("minimumLetterSize", value)} />
-            <NumberInput label="Max letter size" value={rules.maximumLetterSize} min={0.2} max={8} step={0.05} onChange={(value) => setRule("maximumLetterSize", value)} />
             <NumberInput label="Rotation step" value={rules.rotationStep} min={1} max={90} onChange={(value) => setRule("rotationStep", value)} />
           </div>
           <div className="mt-2 grid grid-cols-2 gap-1">

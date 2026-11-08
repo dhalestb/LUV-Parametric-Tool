@@ -6,6 +6,7 @@ const register = path.join(__dirname, "ts-test-register.cjs");
 const suites = [
   "src/components/selectionHeightRouting.test.ts",
   "src/components/selectionFieldGeometry.test.ts",
+  "src/components/architecturalGrid.test.ts",
 ];
 
 const result = spawnSync(

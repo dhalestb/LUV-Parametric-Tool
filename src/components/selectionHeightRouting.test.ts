@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { DEFAULT_GRID } from "./optimizerTypes.ts";
+import { DEFAULT_GRID, DEFAULT_SELECTION } from "./optimizerTypes.ts";
 import {
+  applyDashedGroupSelection,
+  capacityShortfallMessages,
   clearHeightRouting,
   describeDeferredGeneratorInterface,
   EXISTING_TYPOLOGY_HEIGHT_SIGNALS,
   heightRoutedSelectionVolume,
   isHeightRoutingActive,
+  normalizeStoredSelection,
   planSourceFieldCapacity,
+  projectSelectionOntoField,
   SELECTION_HEIGHTS_FEET,
   SELECTION_PLAN_FEET,
   selectionFieldDimensions,
@@ -101,6 +105,72 @@ describe("selectionHeightRouting", () => {
     const cleared = clearHeightRouting(routed);
     assert.equal(cleared.heightRouting, null);
     assert.equal(isHeightRoutingActive(cleared), false);
+  });
+
+  it("selects each architectural envelope and keeps it when the grid is smaller or locked", () => {
+    for (const height of [20, 40, 60] as const) {
+      const routed = heightRoutedSelectionVolume(height, { ...DEFAULT_SELECTION, stepX: 4, stepY: 5, stepZ: 6 });
+      assert.equal(routed.enabled, true);
+      assert.equal(routed.width, 20);
+      assert.equal(routed.height, 20);
+      assert.equal(routed.depth, height);
+      assert.equal(routed.heightRouting, height);
+      assert.equal(routed.stepX, 4);
+      const smallField = { width: 10, height: 10, depth: 12 };
+      const projected = projectSelectionOntoField(routed, smallField);
+      assert.equal(projected.width, 20);
+      assert.equal(projected.height, 20);
+      assert.equal(projected.depth, height);
+      assert.equal(projected.heightRouting, height);
+    }
+  });
+
+  it("does not let dashed-group sizing override an active height route", () => {
+    const routed = heightRoutedSelectionVolume(40, { stepX: 8, stepY: 8, stepZ: 10 });
+    const dashed = { width: 22.04, height: 22.04, depth: 21.87, stepX: 11, stepY: 11, stepZ: 10 };
+    const kept = applyDashedGroupSelection(routed, dashed);
+    assert.equal(kept.width, 20);
+    assert.equal(kept.height, 20);
+    assert.equal(kept.depth, 40);
+    assert.equal(kept.heightRouting, 40);
+    const open = applyDashedGroupSelection({ ...DEFAULT_SELECTION, enabled: true }, dashed);
+    assert.equal(open.width, 22.04);
+    assert.equal(open.depth, 21.87);
+    assert.equal(open.heightRouting, null);
+  });
+
+  it("reports an undersized source field without shrinking the requested envelope", () => {
+    const small = { ...DEFAULT_GRID, cellX: 1.2, cellY: 1.2, cellZ: 1.2, locked: true };
+    const plan = planSourceFieldCapacity(small, 60);
+    assert.equal(plan.sufficient, false);
+    assert.equal(plan.expandedGrid.locked, true);
+    const messages = capacityShortfallMessages(plan);
+    assert.ok(messages.some((line) => line.includes("Overall Z")));
+    assert.ok(messages.some((line) => line.includes("Cell Z")));
+    const selection = projectSelectionOntoField(heightRoutedSelectionVolume(60), plan.current);
+    assert.equal(selection.depth, 60);
+    assert.equal(selectionVolumeFitsSource(selection, plan.current), false);
+  });
+
+  it("restores a saved height route at its architectural size", () => {
+    const restored = normalizeStoredSelection({
+      enabled: true,
+      width: 22.04,
+      height: 22.04,
+      depth: 21.87,
+      stepX: 3,
+      stepY: 4,
+      stepZ: 5,
+      heightRouting: 60,
+    });
+    assert.equal(restored.width, 20);
+    assert.equal(restored.height, 20);
+    assert.equal(restored.depth, 60);
+    assert.equal(restored.stepX, 3);
+    assert.equal(restored.heightRouting, 60);
+    const legacy = normalizeStoredSelection({ ...DEFAULT_SELECTION, width: 4, heightRouting: null });
+    assert.equal(legacy.width, 4);
+    assert.equal(legacy.heightRouting, null);
   });
 
   it("documents the deferred Phase 2 generator interface", () => {

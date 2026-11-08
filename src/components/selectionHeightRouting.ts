@@ -1,4 +1,4 @@
-import type { OrthogonalGrid, SelectionVolume } from "./optimizerTypes";
+import { DEFAULT_SELECTION, type OrthogonalGrid, type SelectionVolume } from "./optimizerTypes";
 import { gridDimensions } from "./constraintValidation";
 
 /** Architectural plan bay shared with the 20 ft module and lattice. */
@@ -187,7 +187,7 @@ export function planSourceFieldCapacity(
     cellX,
     cellY,
     cellZ,
-    locked: true,
+    locked: grid.locked,
   };
   const expanded = gridDimensions(expandedGrid);
   return {
@@ -226,6 +226,98 @@ export function clearHeightRouting(selection: SelectionVolume): SelectionVolume 
 
 export function isHeightRoutingActive(selection: Pick<SelectionVolume, "heightRouting" | "enabled">): boolean {
   return Boolean(selection.enabled && isSelectionHeightFeet(selection.heightRouting));
+}
+
+export type DashedSelectionMeasure = {
+  width: number;
+  height: number;
+  depth: number;
+  stepX: number;
+  stepY: number;
+  stepZ: number;
+};
+
+/** Dashed octet boxes size the selection only when no architectural height route is active. */
+export function applyDashedGroupSelection(
+  selection: SelectionVolume,
+  dashed: DashedSelectionMeasure | null | undefined,
+): SelectionVolume {
+  if (!dashed || isHeightRoutingActive(selection)) return selection;
+  return {
+    ...selection,
+    width: dashed.width,
+    height: dashed.height,
+    depth: dashed.depth,
+    stepX: dashed.stepX,
+    stepY: dashed.stepY,
+    stepZ: dashed.stepZ,
+  };
+}
+
+function clampToRange(value: number, minimum: number, maximum: number): number {
+  const safeMaximum = Math.max(minimum, maximum);
+  return Math.max(minimum, Math.min(Number.isFinite(value) ? value : minimum, safeMaximum));
+}
+
+/**
+ * Keep an active 20 × 20 × H envelope at its preset size.
+ * Search steps stay inside the source field. Non-routed selections may still shrink to the field.
+ */
+export function projectSelectionOntoField(
+  selection: SelectionVolume,
+  field: SourceFieldExtents,
+): SelectionVolume {
+  if (isHeightRoutingActive(selection) && isSelectionHeightFeet(selection.heightRouting)) {
+    const routed = heightRoutedSelectionVolume(selection.heightRouting, selection);
+    return {
+      ...routed,
+      stepX: clampToRange(routed.stepX, Math.min(0.1, field.width), Math.max(0.01, field.width)),
+      stepY: clampToRange(routed.stepY, Math.min(0.1, field.height), Math.max(0.01, field.height)),
+      stepZ: clampToRange(routed.stepZ, Math.min(0.1, field.depth), Math.max(0.01, field.depth)),
+    };
+  }
+  return {
+    ...selection,
+    width: clampToRange(selection.width, Math.min(0.5, field.width), Math.max(0.01, field.width)),
+    height: clampToRange(selection.height, Math.min(0.5, field.height), Math.max(0.01, field.height)),
+    depth: clampToRange(selection.depth, Math.min(0.5, field.depth), Math.max(0.01, field.depth)),
+    stepX: clampToRange(selection.stepX, Math.min(0.1, field.width), Math.max(0.01, field.width)),
+    stepY: clampToRange(selection.stepY, Math.min(0.1, field.height), Math.max(0.01, field.height)),
+    stepZ: clampToRange(selection.stepZ, Math.min(0.1, field.depth), Math.max(0.01, field.depth)),
+    heightRouting: selection.heightRouting ?? null,
+  };
+}
+
+/** Restore a saved selection without letting a missing height route invent one, and without shrinking an active route. */
+export function normalizeStoredSelection(selection: Partial<SelectionVolume> | null | undefined): SelectionVolume {
+  const fallback: SelectionVolume = { ...DEFAULT_SELECTION };
+  if (!selection) return fallback;
+  const heightRouting = isSelectionHeightFeet(selection.heightRouting) ? selection.heightRouting : null;
+  const merged: SelectionVolume = {
+    ...fallback,
+    ...selection,
+    enabled: typeof selection.enabled === "boolean" ? selection.enabled : fallback.enabled,
+    heightRouting,
+  };
+  if (heightRouting) return heightRoutedSelectionVolume(heightRouting, { ...merged, enabled: true });
+  return merged;
+}
+
+/** Axes that are too small for the selected envelope, plus the pitch changes an explicit expand would make. */
+export function capacityShortfallMessages(plan: SourceCapacityPlan): string[] {
+  if (plan.sufficient) return [];
+  const messages: string[] = [];
+  const axes = [
+    ["Overall X (width)", plan.current.width, plan.required.width],
+    ["Overall Y (plan depth)", plan.current.height, plan.required.height],
+    ["Overall Z (height)", plan.current.depth, plan.required.depth],
+  ] as const;
+  for (const [label, current, required] of axes) {
+    if (current + 1e-6 < required) {
+      messages.push(`${label} is ${current.toFixed(2)} ft and must be at least ${required.toFixed(0)} ft.`);
+    }
+  }
+  return [...messages, ...plan.notes];
 }
 
 /** Phase 2 generator contract — not wired into UnifiedPrototype during Phase 1. */
