@@ -1,0 +1,32 @@
+raw NoError 1964.017993419726 negative NoError 17285.746702072753 [
+  [ 'primary-gathering-void', 'NoError', 17168.003311673467 ],
+  [ 'alcove-0', 'NoError', 52.51946069139815 ],
+  [ 'alcove-1', 'NoError', 52.51946069139811 ],
+  [ 'alcove-2', 'NoError', 52.51946069139813 ]
+]
+{"status":"NoError","volume":1630.9118454856728,"bounds":{"min":[-24.39427375793457,-15.889518737792969,2.6627285480499268],"max":[25.538461685180664,10.242955207824707,25.39602279663086]},"shellVolumes":[1630.9118454856728],"outside":0,"sourceOutside":0,"sourceFocusOverlap":50.322370107209906,"clipped":0,"sourceCount":15}
+[
+  {
+    id: 'primary-gathering-void',
+    removed: 257.37177689051055,
+    obstruction: 4.706799818217021e-15
+  },
+  {
+    id: 'alcove-0',
+    removed: 39.006465010350425,
+    obstruction: -1.5428196914468728e-16
+  },
+  {
+    id: 'alcove-1',
+    removed: 7.856286903830982,
+    obstruction: -1.614160194396419e-15
+  },
+  {
+    id: 'alcove-2',
+    removed: 34.49118372272017,
+    obstruction: 1.968477464364682e-15
+  }
+]
+(node:44540) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)

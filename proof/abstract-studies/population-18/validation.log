@@ -1,0 +1,72 @@
+{
+  passed: true,
+  exports: [
+    {
+      file: 'combined-envelope.obj',
+      status: 'NoError',
+      volume: 1881.336397336996,
+      vertices: 3628,
+      triangles: 7256
+    },
+    {
+      file: 'Orthogonal_curved_projection.obj',
+      status: 'NoError',
+      volume: 723.9400321894756,
+      vertices: 1436,
+      triangles: 2872
+    },
+    {
+      file: 'Cross_letter_folded_enclosure.obj',
+      status: 'NoError',
+      volume: 801.6411250176672,
+      vertices: 1444,
+      triangles: 2884
+    },
+    {
+      file: 'Angular_recessed_envelope.obj',
+      status: 'NoError',
+      volume: 404.2402752827013,
+      vertices: 657,
+      triangles: 1310
+    },
+    {
+      file: 'primary-gathering-void.obj',
+      status: 'NoError',
+      volume: 14465.524634872188,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'alcove-0.obj',
+      status: 'NoError',
+      volume: 52.519461273822365,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'alcove-1.obj',
+      status: 'NoError',
+      volume: 52.51946100093559,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'alcove-2.obj',
+      status: 'NoError',
+      volume: 52.51947676329245,
+      vertices: 8,
+      triangles: 12
+    }
+  ],
+  coplanarAreas: [],
+  nonAdjacentTriangleChecks: 316761,
+  selfIntersectionPairs: 0,
+  coplanar: 0,
+  nonCoplanar: 0,
+  examples: [],
+  shellVolumes: [ 1881.3363888361844 ],
+  sourceFocusOverlap: 43.14400050835994
+}
+(node:3696) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)

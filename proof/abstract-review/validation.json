@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "exports": [
+    {
+      "file": "combined-envelope.obj",
+      "status": "NoError",
+      "volume": 1433.6540725246066,
+      "vertices": 1922,
+      "triangles": 3840
+    },
+    {
+      "file": "Orthogonal_curved_projection.obj",
+      "status": "NoError",
+      "volume": 575.0565091882157,
+      "vertices": 688,
+      "triangles": 1372
+    },
+    {
+      "file": "Cross_letter_folded_enclosure.obj",
+      "status": "NoError",
+      "volume": 347.08465680732195,
+      "vertices": 418,
+      "triangles": 832
+    },
+    {
+      "file": "Angular_recessed_envelope.obj",
+      "status": "NoError",
+      "volume": 597.3893329097369,
+      "vertices": 730,
+      "triangles": 1456
+    },
+    {
+      "file": "primary-gathering-void.obj",
+      "status": "NoError",
+      "volume": 16820.48945121322,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "alcove-0.obj",
+      "status": "NoError",
+      "volume": 52.5194688980214,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "alcove-1.obj",
+      "status": "NoError",
+      "volume": 52.519457651644466,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "alcove-2.obj",
+      "status": "NoError",
+      "volume": 52.51944810030035,
+      "vertices": 8,
+      "triangles": 12
+    }
+  ],
+  "coplanarAreas": [],
+  "nonAdjacentTriangleChecks": 147346,
+  "selfIntersectionPairs": 0,
+  "coplanar": 0,
+  "nonCoplanar": 0,
+  "examples": [],
+  "shellVolumes": [
+    1433.654073113481
+  ],
+  "sourceFocusOverlap": 43.83892823227964
+}
