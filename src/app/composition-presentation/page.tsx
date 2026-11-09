@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { loadPresentationGraphics, loadPresentationPdf, savePresentationPdf, loadPdfBoards, savePdfBoards, type PdfBoard } from "@/components/presentationGraphics";
+import { loadPresentationGraphics, loadPresentationPdf, savePresentationPdf, loadPdfBoards, savePdfBoards, exportPresentationBackup, importPresentationBackup, type PdfBoard } from "@/components/presentationGraphics";
 import type { PrototypeCategory, PrototypeTypologyId } from "@/components/amphitheaterPrototype";
 import AppNav from "@/components/AppNav";
 import { PRESENTATION_BOARD_STORAGE_KEY, useBoardMode } from "@/components/BoardMode";
@@ -39,6 +39,9 @@ export default function CompositionPresentationPage() {
   const [zoom, setZoom] = useState(100);
   const [board, setBoard] = useState('current');
   const [pdfBoards, setPdfBoards] = useState<PdfBoard[]>([{id:'current', title:'Blank Board'}]);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState('');
+  const [boardRevision, setBoardRevision] = useState(0);
   const [draggedBoard, setDraggedBoard] = useState<string | null>(null);
   const isPdfBoard = board !== 'geometry' && board !== 'rules';
   useEffect(() => { void loadPdfBoards().then(setPdfBoards).catch(() => setError('Could not load board titles.')); }, []);
@@ -63,7 +66,7 @@ export default function CompositionPresentationPage() {
     const channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("composition-presentation") : null;
     if (channel) channel.onmessage = () => { void refresh(); };
     return () => { active = false; window.removeEventListener("focus", refresh); channel?.close(); currentUrls.forEach(URL.revokeObjectURL); };
-  }, [board]);
+  }, [board, boardRevision]);
   useEffect(() => {
     let active = true; let url = '';
     setPdfUrl('');
@@ -73,7 +76,7 @@ export default function CompositionPresentationPage() {
     }).catch(() => setPdfError('Could not load the PDF board.'));
     else setPdfUrl('');
     return () => { active = false; if (url) URL.revokeObjectURL(url); };
-  }, [board]);
+  }, [board, boardRevision]);
   const addPdf = async (file?: File) => {
     if (!file) return;
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) { setPdfError('Drop a PDF file onto the board.'); return; }
@@ -84,6 +87,32 @@ export default function CompositionPresentationPage() {
   const updateBoards = (next: PdfBoard[]) => { setPdfBoards(next); void savePdfBoards(next).catch(() => setError('Could not save board order or title.')); };
   const currentTitle = pdfBoards.find(item => item.id === board)?.title ?? 'PDF Board';
   const boardIndex = boardOrder.indexOf(board);
+  const syncBoards = async (action: 'save' | 'load') => {
+    if (action === 'load' && !window.confirm('Replace the boards in this browser with the saved GitHub boards?')) return;
+    setSyncing(true);
+    setSyncMessage('');
+    try {
+      if (action === 'save') await savePdfBoards(pdfBoards);
+      const response = await fetch('/api/presentation-github', action === 'save' ? {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(await exportPresentationBackup()),
+      } : { method: 'GET', cache: 'no-store' });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'GitHub request failed.');
+      if (action === 'load') {
+        await importPresentationBackup(result);
+        setPdfBoards(result.boards);
+        setBoard(result.boards[0]?.id ?? 'geometry');
+        setBoardRevision(value => value + 1);
+        if (typeof BroadcastChannel !== 'undefined') {
+          const channel = new BroadcastChannel('composition-presentation');
+          channel.postMessage('updated');
+          channel.close();
+        }
+      }
+      setSyncMessage(action === 'save' ? 'Boards saved to GitHub.' : 'Boards restored from GitHub.');
+    } catch (error) { setSyncMessage(error instanceof Error ? error.message : 'Could not sync boards.'); }
+    finally { setSyncing(false); }
+  };
   return (
     <main data-board-page="presentation" className="min-h-screen bg-black px-4 py-4 md:px-5">
       <div className="flex flex-wrap items-center gap-4">
@@ -91,6 +120,11 @@ export default function CompositionPresentationPage() {
 
       </div>
       <div className="mt-3 overflow-x-auto pb-1"><AppNav /></div>
+      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+        <button type="button" disabled={syncing} onClick={() => void syncBoards('save')} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor:'var(--line)'}}>Save boards to GitHub</button>
+        <button type="button" disabled={syncing} onClick={() => void syncBoards('load')} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor:'var(--line)'}}>Restore boards from GitHub</button>
+        <span role="status" aria-live="polite">{syncing ? 'Connecting to GitHub…' : syncMessage}</span>
+      </div>
       <h2 className="mt-3 text-sm font-semibold" style={{ color: "#d6ad4f" }}>General Rules</h2>
       <p className="mt-1 max-w-5xl text-xs leading-relaxed text-white">Letters keep their proportions and stay between 75% and 150% of their original size, while rising along Z and overlapping the other letters by at least 25% of their own volume. Adjacent letters remain connected through bridges or intersections, with central openings protected and fillets rounding connections.</p>
       <div className="mt-4 flex flex-wrap items-center gap-3 text-xs" aria-label="Board navigation">
