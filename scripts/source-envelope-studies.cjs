@@ -6,11 +6,11 @@ const cases=[
 ];cases.push(cases[0].map((a,i)=>i===1?[a[0],a[1],a[2]+4,...a.slice(3)]:a));
 const results=[];
 for(const [n,c] of cases.entries()){
-const source=c.map(([letter,x,y,z,rz])=>({letter,x,y,z,rz,rx:0,ry:0,scale:13/.92,scaleX:1,scaleY:1,scaleZ:1})),request={generator:'source-preserving',field:{width:40,depth:40,height:60},preferredFeet:13,population:'auto',sourceId:'network-'+n,sourceName:['Offset sequence','Split courtyard','Converging fields','Offset sequence · U moved 4 ft'][n],source},id=randomUUID(),out=path.resolve('.amphitheater-runs',id);
+const source=c.map(([letter,x,y,z,rz])=>({letter,x,y,z,rz,rx:0,ry:0,scale:13/.92,scaleX:1,scaleY:1,scaleZ:1})),request={generator:'source-preserving',field:{width:40,depth:40,height:60},preferredFeet:13,articulation:Number(process.argv[2]??0),population:'auto',sourceId:'network-'+n,sourceName:['Offset sequence','Split courtyard','Converging fields','Offset sequence · U moved 4 ft'][n],source},id=randomUUID(),out=path.resolve('.amphitheater-runs',id);
 fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'request.json'),JSON.stringify(request));
 execFileSync(process.execPath,['scripts/amphitheater-interactive-worker.cjs',path.join(out,'request.json'),out]);
 const r=JSON.parse(fs.readFileSync(path.join(out,'result.json')));assert.deepEqual(r.request.source,source);results.push(r);
-console.log(JSON.stringify({id,name:request.sourceName,volume:r.volume,triangles:r.architecture.indices.length/3,pairs:r.validation.nonAdjacentTriangleChecks,edges:r.paths.map(e=>e.sources)}));
+console.log(JSON.stringify({id,name:request.sourceName,volume:r.volume,before:r.articulationReport.before,ops:r.articulationReport.operations.map(o=>[o.kind,o.depth,o.bayDepth,o.alcove]),triangles:r.architecture.indices.length/3,pairs:r.validation.nonAdjacentTriangleChecks,edges:r.paths.map(e=>e.sources)}));
 }
 assert.deepEqual(results[0].letters[0],results[3].letters[0]);assert.deepEqual(results[0].letters[2],results[3].letters[2]);assert.notDeepEqual(results[0].paths,results[3].paths);assert.notEqual(results[0].volume,results[3].volume);
 

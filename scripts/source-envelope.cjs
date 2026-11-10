@@ -54,14 +54,20 @@ async function buildSource(r,out){
  }}
  const solid=M.union(cells);bands.push({solid,id:'bank-'+(bands.length+1),sources:paths.at(-1).sources});
  }
- const solid=M.union(bands.map(b=>b.solid)),bounds=solid.boundingBox(),shellVolumes=solid.decompose().map(s=>s.volume());
+ const primary=M.union(bands.map(b=>b.solid));
+ const degree=r.articulation??0;
+ if(!Number.isFinite(degree)||degree<0||degree>1)throw Error('Articulation must be between 0 and 1');
+ const {solid,tools,projections,report}=require('./source-articulation.cjs').articulate(M,primary,nodes,edges,degree,r.field);
+ for(const band of bands)for(const tool of tools)band.solid=band.solid.subtract(tool.solid);
+ for(const p of projections)bands.push({id:p.id,sources:p.sources,solid:p.solid.intersect(solid)});
+ const bounds=solid.boundingBox(),shellVolumes=solid.decompose().map(s=>s.volume());
  const mesh=s=>{const m=s.getMesh();return {positions:Array.from(m.vertProperties),indices:Array.from(m.triVerts)}};
  const dump=(f,data)=>fs.writeFileSync(path.join(out,f),JSON.stringify(data));
  const obj=(f,m)=>{let text='';for(let i=0;i<m.positions.length;i+=3)text+='v '+m.positions.slice(i,i+3).join(' ')+'\n';for(let i=0;i<m.indices.length;i+=3)text+='f '+m.indices.slice(i,i+3).map(x=>x+1).join(' ')+'\n';fs.writeFileSync(path.join(out,f),text);};
  const architecture=mesh(solid),components=bands.map(b=>({id:b.id,sources:b.sources,mesh:mesh(b.solid)}));
  obj('combined-envelope.obj',architecture);dump('combined-envelope.json',architecture);
  const outside=solid.subtract(M.cube([W,D,H]).translate([-W/2,-D/2,0])).volume();
- dump('manifest.json',{generator:r.generator,validation:{status:solid.status(),outside,sourceOutside:0,shellVolumes},instances:nodes.map(n=>({pose:n.p,matrix:n.matrix})),components:components.map((c,i)=>{const file=c.id+'.obj';obj(file,c.mesh);return {file,sources:c.sources,finalVolume:bands[i].solid.volume()}}),tools:[]});
- return {architecture,letters,components,paths,features:nodes.map(n=>({id:n.id,line:n.line.map(p=>p.toArray())})),bounds,volume:solid.volume(),sourceCount:letters.length};
+ dump('manifest.json',{generator:r.generator,validation:{status:solid.status(),outside,sourceOutside:0,shellVolumes},instances:nodes.map(n=>({pose:n.p,matrix:n.matrix})),components:components.map((c,i)=>{const file=c.id+'.obj';obj(file,c.mesh);return {file,sources:c.sources,finalVolume:bands[i].solid.volume()}}),tools:tools.map(t=>{const file=t.id+'.obj';obj(file,mesh(t.solid));return {file,removed:t.removed,finalObstruction:solid.intersect(t.solid).volume()}})});
+ return {primary:mesh(primary),articulationReport:report,architecture,letters,components,paths,features:nodes.map(n=>({id:n.id,line:n.line.map(p=>p.toArray())})),bounds,volume:solid.volume(),sourceCount:letters.length};
 }
 module.exports={derive,buildSource};
