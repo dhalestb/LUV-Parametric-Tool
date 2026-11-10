@@ -9,11 +9,13 @@ import { AxisIndicator } from './AxisIndicator';
 import AppNav from './AppNav';
 import { LETTER_SIZE_PRESETS } from './architecturalLetterSizing';
 import { OPTIMIZER_SESSION_KEY } from './browserSession';
-import { localizeIntersectingPlacements } from './selectionFieldGeometry';
-import { placementCenterInSelection } from './selectionSearch';
-import type { SpatialAlternative } from './optimizerTypes';
-import type { AmphitheaterRequest,AmphitheaterResult,AmphitheaterSource,AmphitheaterSummary,ProofMesh } from './amphitheaterInteractiveTypes';
-type Source={id:string;name:string;source:AmphitheaterSource[];snapshot?:unknown};
+import { collectCompositionSources,mergeCompositionSources,compositionRefreshMessage,type ProofSource as Source } from './amphitheaterCompositionSources';
+
+
+import type { AmphitheaterRequest,AmphitheaterResult,AmphitheaterSummary,ProofMesh } from './amphitheaterInteractiveTypes';
+function readCompositionSources(){
+ return collectCompositionSources(JSON.parse(localStorage.getItem(OPTIMIZER_SESSION_KEY)??'null'),JSON.parse(localStorage.getItem('vul-optimizer-designs')??'[]'));
+}
 type View='isometric'|'plan'|'elevation'|'section';
 type Mode='A'|'B'|'C';
 const panel={border:'1px solid var(--line)',borderRadius:10,padding:16,background:'var(--panel-background)'};
@@ -50,6 +52,7 @@ export default function AmphitheaterStudio(){
  const [studies,setStudies]=useState<AmphitheaterSummary[]>([]),[result,setResult]=useState<AmphitheaterResult>(),[comparison,setComparison]=useState<AmphitheaterResult>();
  const [mode,setMode]=useState<Mode>('C'),[view,setView]=useState<View>('isometric'),[cut,setCut]=useState(0),[selected,setSelected]=useState(''),[isolate,setIsolate]=useState(false),[reset,setReset]=useState(0);
  const [busy,setBusy]=useState(false),[message,setMessage]=useState('Choose a generator to begin.'),[error,setError]=useState('');
+ const [sourceMessage,setSourceMessage]=useState('');
  const source=sources.find(s=>s.id===sourceId);
  const displayStudy=useCallback((data:AmphitheaterResult)=>{
   setResult(data);setField(data.request.field);setPreferred(data.request.preferredFeet);setPopulation(String(data.request.population));setGenerator('typology-baseline');setSelected('');setComparison(undefined);
@@ -57,18 +60,20 @@ export default function AmphitheaterStudio(){
   const url=new URL(window.location.href);url.searchParams.set('study',data.id);window.history.replaceState(window.history.state,'',url);
  },[]);
  const refreshSources=useCallback(()=>{
-  const imported:Source[]=[];
-  const importSession=(saved:{alternatives?:SpatialAlternative[];name?:string;id?:string},prefix:string)=>{
-   for(const [i,a] of (saved.alternatives??[]).entries()){
-    let placements=a.placements;
-    if(a.selection&&a.fullPlacements?.length){const w=a.selection;if(w.heightRouting)placements=localizeIntersectingPlacements(a.fullPlacements,w,12);else placements=a.fullPlacements.filter(p=>placementCenterInSelection(p,w)).map(p=>({...p,x:p.x-w.centerX,y:p.y-w.centerY,z:p.z-w.centerZ}));}
-    const converted=placements.filter(p=>['L','U','V'].includes(p.cell.letter)).map(p=>({letter:p.cell.letter as 'L'|'U'|'V',x:p.x,y:p.y,z:p.z,rx:p.rx,ry:p.ry,rz:p.rz,scale:p.scale,scaleX:p.scaleX??1,scaleY:p.scaleY??1,scaleZ:p.scaleZ??1}));
-    if(converted.length)imported.push({id:prefix+':'+a.id,name:(saved.name??'Current Composition')+' · alternative '+(i+1)+' · '+converted.length+' source letters',source:converted,snapshot:a});
-   }
-  };
-  try{const session=JSON.parse(localStorage.getItem(OPTIMIZER_SESSION_KEY)??'null');if(session)importSession(session,'session');const saved=JSON.parse(localStorage.getItem('vul-optimizer-designs')??'[]');for(const s of saved)importSession(s,'saved:'+s.id);setSources(current=>[...current.filter(s=>s.id==='fixture'||s.id==='custom'),...imported]);}catch{setError('Could not read Composition storage. Use source JSON or return to Composition.');}
- },[]);
- useEffect(()=>{let active=true;fetch('/api/amphitheater').then(r=>r.json()).then(data=>{if(active){setSources([{id:'fixture',name:'Recorded L/U/V proof fixture',source:data.fixture}]);setStudies(data.studies);refreshSources();const id=new URL(window.location.href).searchParams.get('study');if(id)fetch('/api/amphitheater?id='+encodeURIComponent(id)).then(r=>r.json()).then(saved=>{if(active&&saved.id)displayStudy(saved);});}}).catch(e=>setError(String(e)));return()=>{active=false;};},[refreshSources,displayStudy]);
+  try{const imported=readCompositionSources();setSources(current=>mergeCompositionSources(current,imported,sourceId));setSourceMessage(compositionRefreshMessage(imported.length));setError('');}
+  catch{setSourceMessage('Composition storage could not be read. Your selected source has been retained. Open Composition or use source JSON.');}
+ },[sourceId]);
+ useEffect(()=>{
+  let active=true;
+  fetch('/api/amphitheater').then(r=>r.json()).then(data=>{
+   if(!active)return;
+   setSources([{id:'fixture',name:'Recorded L/U/V proof fixture',source:data.fixture}]);setStudies(data.studies);
+   try{const imported=readCompositionSources();setSources(current=>mergeCompositionSources(current,imported,'fixture'));setSourceMessage(compositionRefreshMessage(imported.length));}catch{setSourceMessage('Composition storage could not be read. Recorded and saved-study sources remain available.');}
+   const id=new URL(window.location.href).searchParams.get('study');
+   if(id)fetch('/api/amphitheater?id='+encodeURIComponent(id)).then(r=>r.json()).then(saved=>{if(active&&saved.id)displayStudy(saved);});
+  }).catch(e=>setError(String(e)));
+  return()=>{active=false;};
+ },[displayStudy]);
  const currentRequest=useMemo(()=>source?{generator:'typology-baseline' as const,field,preferredFeet:preferred,population:population==='auto'?'auto' as const:Number(population),sourceId:source.id,sourceName:source.name,source:source.source,sourceSnapshot:source.snapshot}:null,[source,field,preferred,population]);
  const stale=result&&JSON.stringify(result.request)!==JSON.stringify(currentRequest);
  async function generate(){if(!currentRequest||generator!=='typology-baseline')return;setBusy(true);setError('');setMessage('Generating actual meshes and running exported-solid / triangle checks…');
@@ -88,7 +93,7 @@ export default function AmphitheaterStudio(){
  <label className="block">Preferred letter size (ft)<input aria-label="Preferred letter size" className="block w-full" type="number" min="0.1" step="0.1" value={preferred} disabled={busy} onChange={e=>setPreferred(+e.target.value)}/></label>
  <div className="flex gap-2">{([20,40,60] as const).map(h=><button key={h} disabled={busy} onClick={()=>setPreferred(LETTER_SIZE_PRESETS[h].preferredFeet)} className="border p-1">{LETTER_SIZE_PRESETS[h].preferredFeet}′ preset</button>)}</div><p className="text-xs">Letter presets and field dimensions are independent.</p>
  <label className="block">Letter population<input aria-label="Letter population" className="block w-full" value={population} disabled={busy} onChange={e=>setPopulation(e.target.value)} placeholder="auto or integer"/></label>
- <label className="block">Source composition<select aria-label="Source composition" className="block w-full" value={sourceId} disabled={busy} onChange={e=>setSourceId(e.target.value)}>{sources.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label><button className="border p-1" disabled={busy} onClick={refreshSources}>Refresh Composition sources</button><p className="text-xs">Reads current and saved alternatives from Composition on this app origin. Selected windows are localized by translation only before submission. The baseline then rearranges them.</p>
+ <label className="block">Source composition<select aria-label="Source composition" className="block w-full" value={sourceId} disabled={busy} onChange={e=>setSourceId(e.target.value)}>{sources.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label><button className="border p-1" disabled={busy} onClick={refreshSources}>Refresh Composition source list</button><p role="status" className="text-xs">{sourceMessage}</p><a className="underline text-sm" href="/composition" target="_blank" rel="noreferrer">Open Composition to create a study</a><p className="text-xs">Reads current and saved alternatives from Composition on this app origin. Selected windows are localized by translation only before submission. The baseline then rearranges them.</p>
  <button className="border rounded p-3 w-full" disabled={busy||!source||!generator} onClick={()=>void generate()}>{busy?'Generating and validating…':'Generate baseline study'}</button><p role="status">{message}</p>{error&&<p role="alert" style={{color:'#ed8989',whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{error}</p>}
  </section><details style={panel}><summary>Inspect / edit input composition</summary><p className="text-xs">Positions do not drive this baseline. Proportions and source features can affect its geometry. No source-preserving claim is made.</p><button className="border p-1" onClick={()=>setSourceText(JSON.stringify(source?.source??[],null,2))}>Copy selected source into editor</button><textarea aria-label="Source JSON" style={{width:'100%',height:220,fontSize:11}} value={sourceText} onChange={e=>setSourceText(e.target.value)}/><button disabled={busy} className="border p-1" onClick={applySource}>Use edited source</button></details>
  </aside><section className="space-y-3" style={{minWidth:0}}><section style={panel}><div className="flex flex-wrap gap-2">{(['A','B','C'] as const).map(m=><button aria-pressed={mode===m} className="border rounded p-2" key={m} onClick={()=>setMode(m)}>{m} — {m==='A'?'Original Letters':m==='B'?'Letters + Architecture':'Architecture Only'}</button>)}</div><p className="text-xs my-2">A/B show the baseline’s actual rearranged source-instance population. Input Composition poses are preserved in the result snapshot, not in this baseline geometry.</p><div className="flex flex-wrap gap-2">{(['isometric','plan','elevation','section'] as const).map(v=><button className="border p-2" key={v} aria-pressed={view===v} onClick={()=>setView(v)}>{v}</button>)}<button className="border p-2" onClick={()=>setReset(r=>r+1)}>Reset camera</button></div>{view==='section'&&<label>Section X = {cut.toFixed(1)} ft<input aria-label="Section position" type="range" min={-displayField.width/2} max={displayField.width/2} step="0.1" value={cut} onChange={e=>setCut(+e.target.value)}/></label>}
@@ -102,6 +107,7 @@ export default function AmphitheaterStudio(){
  {comparison&&<section style={panel}><h2>Comparison study · matching field and size</h2><button className="border p-1" onClick={()=>setComparison(undefined)}>Close comparison</button><p>{comparison.request.sourceName} · {comparison.sourceCount} letters · {comparison.volume.toFixed(3)} ft³ · population {comparison.request.population}</p><Viewer result={comparison} field={comparison.request.field} mode={mode} view={view} cut={cut} selected="" onPick={()=>{}} isolate={false} reset={reset}/></section>}
  </section></div></main>;
 }
+
 
 
 
