@@ -1,6 +1,6 @@
 import { enforceContactOverlap, enforceLetterOverlap, letterBoxGap, letterOverlapFractions, limitAdjacentLetterGap } from './letterOverlapRule';
 import { ATRIUM_TYPOLOGIES, gatheringAtriumLayout, gatheringEnclosureLayout } from './gatheringAtriumLayout';
-import { foundationPoses } from './typologyOrientationRules';
+import { editorRotationSteps, foundationPoses } from './typologyOrientationRules';
 import { typologyLetterPriority } from './typologyLetterOrder';
 import { originalLetterJoins } from './preserveLetterIntersections';
 import type { Manifold } from 'manifold-3d/manifold';
@@ -25,11 +25,39 @@ function letterInteriorPoint(solid:Manifold) {
 export function typologyLayout(id:string) {
  return {ring:/amphitheater|void-field|void-edge|contained/.test(id),topographic:/topographic|folded-undulating/.test(id),vertical:id==='vertical-void-lobby',compressed:id==='compressed-sequential-lobby',axis:/vertical|linear|continuous|open-hall|flat-deep|cascaded|inserted/.test(id)};
 }
+function letterOrientation(p:IntersectionPlacement) {
+ const rad=THREE.MathUtils.degToRad;
+ return new THREE.Quaternion().setFromEuler(new THREE.Euler(rad(p.rx),rad(p.ry),rad(p.rz),'XYZ'));
+}
+
+function matchingNeighborOrientations(a:IntersectionPlacement,b:IntersectionPlacement) {
+ // Equivalent Euler angles and opposite quaternion signs are the same orientation.
+ return a.letter===b.letter&&Math.abs(letterOrientation(a).dot(letterOrientation(b)))>1-1e-10;
+}
+
+function varyLobbyNeighborOrientations(placements:IntersectionPlacement[],sequence:number[],typology:string) {
+ const steps=editorRotationSteps(typology);
+ for(let k=1;k<sequence.length;k++){
+  const id=sequence[k],p=placements[id],previous=placements[sequence[k-1]];
+  if(!matchingNeighborOrientations(previous,p))continue;
+  // For Linear Gallery, turn within the face plane so XY and YZ stay locked.
+  // In the topographic spiral a world Z turn retains the face tilt.
+  const axis=typology==='linear-gallery-lobby'&&Math.abs(p.ry)===90?0:
+   typology==='compressed-sequential-lobby'||typology==='continuous-hall-lobby'?1:2;
+  const turn=new THREE.Vector3().setComponent(axis,1);
+  const q=new THREE.Quaternion().setFromAxisAngle(turn,THREE.MathUtils.degToRad(steps[axis])).multiply(letterOrientation(p));
+  const e=new THREE.Euler().setFromQuaternion(q,'XYZ'),deg=THREE.MathUtils.radToDeg;
+  const angles=[e.x,e.y,e.z].map(deg).map(angle=>typology==='linear-gallery-lobby'?Math.round(angle/90)*90:angle);
+  placements[id]={...p,rx:angles[0],ry:angles[1],rz:angles[2],letterRules:p.letterRules?{...p.letterRules,yaw:angles[2]}:undefined};
+ }
+}
+
 /** Typology-driven reinterpretation happens after the untouched original selection. */
 export function arrangeTypologyLetters(source:IntersectionPlacement[],originals:Manifold[],makeSolid:(p:IntersectionPlacement)=>Manifold,typology:string, angleLimits:GatheringAngleLimits=DEFAULT_GATHERING_ANGLES,operations:GatheringOperations=DEFAULT_GATHERING_OPERATIONS,thicknessPercent=12) {
  if(OFFICE_TYPOLOGIES.has(typology)){const office=arrangeIntersectingOfficeLetters(source,typology,thicknessPercent,makeSolid);return {...office,atrium:null};}
  const priority=typologyLetterPriority(typology),layout=typologyLayout(typology),n=source.length, gathering=GATHERING_TYPOLOGIES.has(typology);
- const placementOrder=layout.topographic?['U','L','V']:priority;
+ const topographicLobby=typology==='topographic-ground-field-lobby';
+ const placementOrder=topographicLobby?['L','U','V']:layout.topographic?['U','L','V']:priority;
  const sequence=source.map((_,i)=>i).sort((a,b)=>placementOrder.indexOf(source[a].letter)-placementOrder.indexOf(source[b].letter)||a-b);
  if(!n)return {placements:[],sequence,preservedPairs:[],operations:[],supported:true,officePlan:null,atrium:null};
  const center=source.reduce((a,p)=>[a[0]+p.x/n,a[1]+p.y/n,a[2]+p.z/n],[0,0,0]);
@@ -41,6 +69,7 @@ export function arrangeTypologyLetters(source:IntersectionPlacement[],originals:
  const atrium=ATRIUM_TYPOLOGIES.has(typology)?gatheringAtriumLayout(source,sequence,typology,operations):null;
  const enclosurePoses=['contained-room-within-volume','linear-edge-gallery'].includes(typology)?gatheringEnclosureLayout(source,sequence,typology,operations,foundation.heading):null;
  const sharedLobbyAxis=['compressed-sequential-lobby','continuous-hall-lobby','linear-gallery-lobby'].includes(typology);
+ const lobby=typology.endsWith('-lobby');
  const layeredGathering=typology==='void-field-gathering';
  const sharedZGathering=typology==='contained-room-within-volume';
  const stackedGathering=layeredGathering||sharedZGathering;
@@ -87,11 +116,18 @@ export function arrangeTypologyLetters(source:IntersectionPlacement[],originals:
   // receive a 45-degree rotation around world Y.
   sequence.forEach((id,k)=>{
    const p=result[id],base=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),Math.PI).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI/2));
+   if(typology==='linear-gallery-lobby'){
+    const horizontal=k===0||(k===sequence.length-1&&sequence.length>1);
+    const z=center[2]+(horizontal?(k===0?-.5:.5)*commonScale:0);
+    result[id]={...p,x:center[0],y:center[1],z,rx:0,ry:horizontal?0:90,rz:0,letterRules:p.letterRules?{...p.letterRules,yaw:0,supportZ:z}:undefined};
+    return;
+   }
    const q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),k%2?Math.PI/4:0).multiply(base),e=new THREE.Euler().setFromQuaternion(q,'XYZ');
    const aperture=new THREE.Vector3(p.letter==='L'?.06:0,p.letter==='V'?.22:p.letter==='L'?.06:.05,0).multiplyScalar(commonScale).applyQuaternion(q);
    const oriented={...p,x:center[0],y:center[1]-aperture.y,z:center[2]-aperture.z,rx:THREE.MathUtils.radToDeg(e.x),ry:THREE.MathUtils.radToDeg(e.y),rz:THREE.MathUtils.radToDeg(e.z)};
    result[id]={...oriented,letterRules:oriented.letterRules?{...oriented.letterRules,yaw:oriented.rz}:undefined};
   });
+  varyLobbyNeighborOrientations(result,sequence,typology);
   // Search one equal X increment for the entire sequence. Prefer candidates
   // with all neighbors intersecting, then the closest feasible 2:1 outline.
   const bases=result.map(makeSolid),boxes=bases.map(solid=>solid.boundingBox());
@@ -109,7 +145,10 @@ export function arrangeTypologyLetters(source:IntersectionPlacement[],originals:
   neighborIntersections=bestConnected;
  }
 
- const overlap=sharedLobbyAxis||stackedGathering?{placements:result,fractions:letterOverlapFractions(result.map(makeSolid)),riseFractions:[] as number[]}:gathering?enforceContactOverlap(result,makeSolid,{minimum:.05,lockZ:false,radialYaw:typology==='void-field-gathering',protectedCircle:atrium?{center:atrium.center,radius:atrium.radius}:undefined,allowIncomplete:true}):enforceLetterOverlap(result,makeSolid,layout.topographic?center:undefined,foundation.family==='void');
+ if(lobby&&!sharedLobbyAxis)varyLobbyNeighborOrientations(result,sequence,typology);
+ // Preserve the Topographic Ground-Field spiral even when its selected letter
+ // profiles cannot also satisfy the general 25% lobby overlap target.
+ const overlap=sharedLobbyAxis||stackedGathering||topographicLobby?{placements:result,fractions:letterOverlapFractions(result.map(makeSolid)),riseFractions:[] as number[]}:gathering?enforceContactOverlap(result,makeSolid,{minimum:.05,lockZ:false,radialYaw:typology==='void-field-gathering',protectedCircle:atrium?{center:atrium.center,radius:atrium.radius}:undefined,allowIncomplete:true}):enforceLetterOverlap(result,makeSolid,layout.topographic?center:undefined,foundation.family==='void');
  result=overlap.placements;
  const boundsOf=(placements:IntersectionPlacement[])=>{const min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];for(const solid of placements.map(makeSolid)){const box=solid.boundingBox();for(let axis=0;axis<3;axis++){min[axis]=Math.min(min[axis],box.min[axis]);max[axis]=Math.max(max[axis],box.max[axis]);}}return Math.max(...max.map((value,axis)=>value-min[axis]),1e-8);};
  const gapOptions={radialYaw:typology==='void-field-gathering',xOnly:sharedLobbyAxis,protectedCircle:atrium?{center:atrium.center,radius:atrium.radius}:undefined};
@@ -143,7 +182,6 @@ export function arrangeTypologyLetters(source:IntersectionPlacement[],originals:
  if(sharedLobbyAxis)overlap.fractions=letterOverlapFractions(result.map(makeSolid));
  if(typology==='topographic-ground-field-lobby'){
   const fractions=letterOverlapFractions(result.map(makeSolid));
-  if(fractions.some(value=>value<.25-1e-6)) throw new Error('The topographic arrangement cannot maintain the required 25% overlap after closing adjacent gaps. Try a different selection.');
   overlap.fractions=fractions;
   const boxes=result.map(p=>makeSolid(p).boundingBox());
   const low=Math.min(...boxes.map(box=>box.min[2])), high=Math.max(...boxes.map(box=>box.max[2]));
@@ -152,6 +190,7 @@ export function arrangeTypologyLetters(source:IntersectionPlacement[],originals:
   result=result.map(p=>({...p,x:center[0]+(p.x-center[0])*factor,y:center[1]+(p.y-center[1])*factor,z:(p.z-low)*factor,scale:p.scale*factor,letterRules:p.letterRules?{...p.letterRules,supportZ:(p.letterRules.supportZ-low)*factor,strokeWidth:p.letterRules.strokeWidth*factor}:undefined}));
  }
  if(typology==='vertical-void-lobby'){const span=boundsOf(result);if(closed.largest*20/span>0.1+1e-4){closed=limitAdjacentLetterGap(result,sequence,makeSolid,0.1*span/20,gapOptions);result=closed.placements;}}
+ if(lobby&&sequence.slice(1).some((id,k)=>matchingNeighborOrientations(result[sequence[k]],result[id])))throw new Error('The lobby could not keep adjacent copies of the same letter at different orientations. Try another letter selection.');
  const adjacentGapFeet=typology==='vertical-void-lobby'?closed.largest*20/Math.max(boundsOf(result),1e-8):closed.largest;
  const originalKeys=new Set(originalLetterJoins(originals).map(j=>j.a+':'+j.b));
  const preservedPairs=originalLetterJoins(result.map(makeSolid)).filter(j=>originalKeys.has(j.a+':'+j.b)).map(j=>[j.a,j.b]);
@@ -162,16 +201,17 @@ export function arrangeTypologyLetters(source:IntersectionPlacement[],originals:
   ...(sharedZGathering?['Contained-room letters share the same X and Y center and stack upward along Z. Existing letter orientations are retained. Elevations may tighten to obtain direct intersections while preserving the shared axis and ascending order.']:[]),
   ...(gathering&&sequence.length>1?[`Direct letter intersections: ${directPairs} of ${sequence.length-1} adjacent pairs intersect before joining.`,...(directPairs<sequence.length-1?['Constraint note: Some adjacent letters could not be made to intersect directly; the generated layout is retained.']:[])]:[]),
   ...(gathering?['Direct-intersection acceptance uses positive solid contact and final connectivity; no fixed overlap percentage is required.']:[]),
-  ...(sharedLobbyAxis?['Letters begin in the YZ plane and surround a protected void along X. The sequence uses equal X offsets with alternating 45-degree Y rotation.']:[]),
-  ...(sharedLobbyAxis?['Letters have equal X offsets; alternating letters rotate 45 degrees around Y. No minimum or maximum overlap percentage is imposed.']:[]),
+  ...(sharedLobbyAxis?[typology==='linear-gallery-lobby'?'The first and last letters are horizontal on XY at the bottom and top; intervening letters stand on YZ. All rotations use 90° increments.':'Letters begin in the YZ plane and surround a protected void along X. The sequence uses equal X offsets with alternating 45-degree Y rotation.']:[]),
+  ...(sharedLobbyAxis?[typology==='linear-gallery-lobby'?'Letters have equal X offsets. No minimum or maximum overlap percentage is imposed.':'Letters have equal X offsets; alternating letters rotate 45 degrees around Y. No minimum or maximum overlap percentage is imposed.']:[]),
+  ...(lobby?['Neighbor rotation rule: in the generated layout, adjacent copies of the same letter have different orientations.']:[]),
   ...(sharedLobbyAxis&&neighborIntersections<Math.max(0,sequence.length-1)?[`Constraint note: ${neighborIntersections} of ${sequence.length-1} adjacent letter pairs intersect before bridging; the remaining pairs require bridges.`]:[]),
   ...(gathering?[`Gathering standards: Z is up; yaw about Z, X tilt and Y tilt use degrees. Each letter rotates around its original local origin using XYZ Euler order, then is translated to its world position. Z position is independent of rotation. Rotation limits: X ${angleLimits.xMin}° to ${angleLimits.xMax}°, Y ${angleLimits.yMin}° to ${angleLimits.yMax}°, Z ${angleLimits.zMin}° to ${angleLimits.zMax}°.` ,
    "Original letter identities and axis proportions are retained; original and generated transforms are recorded in the workflow. Floor and wall previews classify surfaces by orientation; semantic enclosure and void-boundary designations require further validation."]:[]),
-  ...(layout.topographic?[typology==='topographic-ground-field-lobby'?'Curved U/C elements first, then L, then V. Faces progressively tilt from horizontal to vertical. Connections use horizontal XY bridge plates. The letter assembly is grounded and uniformly reduced only when needed to fit within four feet.':'Curved U/C elements first, then L, then V. Faces progressively tilt from horizontal to vertical. Connections use horizontal XY bridge plates. Letter dimensions follow the selected source and typology scales without a fixed height cap.']:[]),
-  ...(!gathering&&!sharedLobbyAxis?[(layout.topographic?'Topographical faces progress from horizontal to vertical; Vs finish at 90 degrees.':((typology==='flat-deep-plan-plate'||typology==='inserted-horizontal-plate')?'Letters rotate in 90-degree YZ increments.':'V faces tilt 45–135 degrees relative to XY (45 degrees initially).'))+' All letters rise along Z; 75% of the preceding letter height is the target, reduced when needed to keep 25% overlap. '+overlap.riseFractions.filter(r=>r<.75-1e-6).length+' level rises were reduced.']:[]),
-  ...(!gathering&&!sharedLobbyAxis?['Each letter overlaps the union of the other letters by at least 25% of its own solid volume; shared regions count once. Minimum verified overlap: '+(Math.min(...overlap.fractions)*100).toFixed(1)+'%.']:[]),
-  gathering?`Gathering letters ${operations.levelRise>0?`initially target a ${operations.levelRise.toFixed(3)} ft rise between sequence levels`:amphitheater?'rise one terrace at a time using the amphitheater level spacing':typology==='void-field-gathering'?'form horizontal layers at distinct ascending levels':typology==='inserted-horizontal-plate'?'share a floor level in successive pairs':typology==='contained-room-within-volume'?'stack on a shared vertical axis at ascending levels':typology==='linear-edge-gallery'?'shift alternate gallery groups between adjacent levels':'retain their source elevations'}. ${sharedZGathering?"Horizontal stagger is inactive while the contained-room centers share a Z-axis.":`Initial horizontal stagger targets ${operations.staggerPercent}% of representative letter width at ${operations.staggerDirection}° to the source axis; positions may shift to make direct intersections.`} Measured overlap with the union of the other letters: ${(Math.min(...overlap.fractions)*100).toFixed(1)}%. Letter-derived floor plates are currently disabled.`:sharedLobbyAxis?'Letters follow the shared X-axis; adjacent connections establish continuity.':foundation.family==='void'?'Letters share a vertical axis; every letter overlaps the others by at least 25% and neighboring levels receive rounded bridges.':'Every letter interlocks with other selected letters by at least 25% of its own volume. Positions close gaps after the foundation layout; rotation intervals and letter proportions are preserved. Bridges connect adjacent sequence members or surfaces within 2 feet.',
-  gathering?'Letter-space rules: selected U, L and V profiles and their original axis proportions are retained.':'Letter-space rules: U becomes a curved band, L becomes a 90-degree corner, and V becomes a 45-degree wedge.',
+  ...(layout.topographic?[topographicLobby?'The spiral proceeds L → U → V around the center Z-axis. L faces tilt 0–45°, U faces tilt 45–90°, and V faces tilt 90–120° relative to XY, in 15° steps. Connections use horizontal XY bridge plates. The letter assembly is grounded and uniformly reduced only when needed to fit within four feet; the source letter profiles and proportions, including the U width-to-height ratio, are retained.':'Curved U/C elements first, then L, then V. Faces progressively tilt from horizontal to vertical. Connections use horizontal XY bridge plates. Letter dimensions follow the selected source and typology scales without a fixed height cap.']:[]),
+  ...(!gathering&&!sharedLobbyAxis?[topographicLobby?'Topographic levels and adjacent gaps may adjust to retain the center-Z spiral. The 25% overlap target is measured but is not a generation constraint.':(layout.topographic?'Topographical faces progress from horizontal to vertical; Vs finish at 90 degrees.':((typology==='flat-deep-plan-plate'||typology==='inserted-horizontal-plate')?'Letters rotate in 90-degree YZ increments.':'V faces tilt 45–135 degrees relative to XY (45 degrees initially).'))+' All letters rise along Z; 75% of the preceding letter height is the target, reduced when needed to keep 25% overlap. '+overlap.riseFractions.filter(r=>r<.75-1e-6).length+' level rises were reduced.']:[]),
+  ...(!gathering&&!sharedLobbyAxis?[topographicLobby?'Topographic overlap is non-blocking; measured minimum overlap: '+(Math.min(...overlap.fractions)*100).toFixed(1)+'%.':'Each letter overlaps the union of the other letters by at least 25% of its own solid volume; shared regions count once. Minimum verified overlap: '+(Math.min(...overlap.fractions)*100).toFixed(1)+'%.']:[]),
+  gathering?`Gathering letters ${operations.levelRise>0?`initially target a ${operations.levelRise.toFixed(3)} ft rise between sequence levels`:amphitheater?'rise one terrace at a time using the amphitheater level spacing':typology==='void-field-gathering'?'form horizontal layers at distinct ascending levels':typology==='inserted-horizontal-plate'?'share a floor level in successive pairs':typology==='contained-room-within-volume'?'stack on a shared vertical axis at ascending levels':typology==='linear-edge-gallery'?'shift alternate gallery groups between adjacent levels':'retain their source elevations'}. ${sharedZGathering?"Horizontal stagger is inactive while the contained-room centers share a Z-axis.":`Initial horizontal stagger targets ${operations.staggerPercent}% of representative letter width at ${operations.staggerDirection}° to the source axis; positions may shift to make direct intersections.`} Measured overlap with the union of the other letters: ${(Math.min(...overlap.fractions)*100).toFixed(1)}%. Letter-derived floor plates are currently disabled.`:sharedLobbyAxis?'Letters follow the shared X-axis; adjacent connections establish continuity.':topographicLobby?'Letters retain the center-Z spiral and type-specific tilt bands even when measured overlap is below 25%. Adjacent gaps may close and connections may be added without making overlap a generation requirement.':foundation.family==='void'?'Letters share a vertical axis; every letter overlaps the others by at least 25% and neighboring levels receive rounded bridges.':'Every letter interlocks with other selected letters by at least 25% of its own volume. Positions close gaps after the foundation layout; rotation intervals and letter proportions are preserved. Bridges connect adjacent sequence members or surfaces within 2 feet.',
+  gathering?'Letter-space rules: selected U, L and V profiles and their original axis proportions are retained.':topographicLobby?'Letter-space rules: the existing U curved-band width-to-height ratio is retained; L remains a 90-degree corner and V remains a 45-degree wedge.':'Letter-space rules: U becomes a curved band, L becomes a 90-degree corner, and V becomes a 45-degree wedge.',
   sharedLobbyAxis?'Typology priority: '+priority.join(' > ')+'. All selected letters use the same scale.':'Typology priority: '+priority.join(' > ')+'. Initial scales: primary 140%, secondary 100%, supporting 75%; letter dimensions have no fixed minimum or maximum. All selected letters are used.',
   gathering?'Foundation rotations are constrained by the selected axis limits. Adjacent letters connect by direct intersection.':sharedLobbyAxis?'Equal sequence spacing is retained when adding connections.':'Foundation rotation intervals are retained. Direct interlocking takes priority over exact placement spacing or symmetry.',
   sharedLobbyAxis?'Adjacent letters connect around the protected X-axis void.':`Adjacent letters in the typology sequence stay within a 0.1 ft clear gap. Largest gap: ${adjacentGapFeet.toFixed(3)} ft.`,

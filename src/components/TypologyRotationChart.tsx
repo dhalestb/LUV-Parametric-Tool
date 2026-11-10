@@ -19,7 +19,7 @@ const familyLabel: Record<OrientationFamily, string> = {
   terrain: "Terrain / stepped",
 };
 const rotationGroups: RotationGroup[] = (Object.keys(familyLabel) as OrientationFamily[]).flatMap((family) => {
-  const familyMembers = TYPOLOGY_RULES.filter((rule) => orientationFamily(rule.id) === family && rule.id !== "open-hall-workspace");
+  const familyMembers = TYPOLOGY_RULES.filter((rule) => orientationFamily(rule.id) === family && rule.id !== "open-hall-workspace" && rule.id !== "linear-gallery-lobby");
   if (!familyMembers.length) return [];
   if (family === "flat") {
     return [{ key: family, label: familyLabel[family], members: familyMembers.map((rule) => rule.id), xy: "90° steps", xz: "Level (0°)", yz: "90° steps" }];
@@ -35,10 +35,12 @@ const rotationGroups: RotationGroup[] = (Object.keys(familyLabel) as Orientation
   if (family === "terrain") {
     const amphitheater = familyMembers.filter((rule) => rule.id === "stepped-amphitheater");
     const stepped = familyMembers.filter((rule) => rule.id === "cascaded-terraced-plates");
-    const progressive = familyMembers.filter((rule) => rule.id !== "cascaded-terraced-plates" && rule.id !== "stepped-amphitheater");
+    const topographic = familyMembers.filter((rule) => rule.id === "topographic-ground-field-lobby");
+    const progressive = familyMembers.filter((rule) => rule.id !== "cascaded-terraced-plates" && rule.id !== "stepped-amphitheater" && rule.id !== "topographic-ground-field-lobby");
     const groups: RotationGroup[] = [];
     if (amphitheater.length) groups.push({ key: "amphitheater", label: "Staggered amphitheater", members: amphitheater.map((rule) => rule.id), xy: "0°, 15°, 30°, 45°, 90° relative to axis", xz: "0°", yz: "0° or ±90°" });
     if (stepped.length) groups.push({ key: "terrain-stepped", label: familyLabel[family], members: stepped.map((rule) => rule.id), xy: "15° steps", xz: "15° steps", yz: "15° steps" });
+    if (topographic.length) groups.push({ key: "terrain-topographic", label: "Topographic L → U → V spiral", members: topographic.map((rule) => rule.id), xy: "15° steps; 90° spiral around Z", xz: "L 0°–45° · U 45°–90° · V 90°–120°", yz: "L 0°–45° · U 45°–90° · V 90°–120°" });
     if (progressive.length) groups.push({ key: "terrain-progressive", label: "Terrain / progressive tilt", members: progressive.map((rule) => rule.id), xy: "15° steps; 90°–120° spiral", xz: "15° steps; tilt 0°–90°", yz: "15° steps; tilt 0°–90°" });
     return groups;
   }
@@ -51,7 +53,7 @@ const rotationGroups: RotationGroup[] = (Object.keys(familyLabel) as Orientation
     xz: `${steps.vertical}° steps`,
     yz: `${steps.vertical}° steps`,
   }];
-}).concat([{key:"open-hall-l",label:"L wall and floor pairs",members:["open-hall-workspace"],xy:"Mirrored L pair + 90°",xz:"90° to place walls on YZ",yz:"Mirrored L pair + 90°"}] as RotationGroup[]);
+}).concat([{key:"linear-gallery",label:"Linear gallery",members:["linear-gallery-lobby"],xy:"90° steps",xz:"90° steps",yz:"90° steps"},{key:"open-hall-l",label:"L wall and floor pairs",members:["open-hall-workspace"],xy:"Mirrored L pair + 90°",xz:"90° to place walls on YZ",yz:"Mirrored L pair + 90°"}] as RotationGroup[]);
 
 export function TypologyRotationChart() {
   const categories: Array<keyof typeof CATEGORY_DEFINITIONS> = ["lobby", "gathering", "office"];
@@ -86,7 +88,7 @@ export function TypologyRotationChart() {
           </tbody>
         </table>
       </div>
-      <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>For topographical and folded forms, faces progress from horizontal to vertical in 15° steps and the spiral spans 90°–120°.</p>
+      <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Topographic Ground-Field uses letter-specific 15° tilt bands around the center Z-axis: L 0°–45°, U 45°–90°, and V 90°–120°. Folded forms retain their existing 0°–90° progression.</p>
     </section>
   );
 }

@@ -9,7 +9,7 @@ import { BoardCanvas as Canvas } from "@/components/BoardCanvas";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import AppNav from "./AppNav";
-import { DEFAULT_DESCRIPTORS, DESCRIPTORS, type CompositionPlacement, type DescriptorId, type DescriptorSettings } from "./compositionEngine";
+import { DEFAULT_DESCRIPTORS, DESCRIPTORS, type CompositionPlacement, type DescriptorSettings } from "./compositionEngine";
 import { gridDimensions } from "./constraintValidation";
 import { evaluateSpatialDesign } from "./descriptorEvaluation";
 import { getLetterVolumeGeometry } from "./letterGeometry3d";
@@ -31,13 +31,13 @@ import {
 import { optimizeSpatial } from "./spatialOptimizer";
 import { placementCenterInSelection, selectionEvaluationGrid } from "./selectionSearch";
 import PrototypeDemonstration from "./UnifiedPrototype";
+import { TypologyRotationChart } from "./TypologyRotationChart";
 import { DEFAULT_TYPOLOGY_BY_CATEGORY, type PrototypeCategory, type PrototypeGeometryMode, type PrototypeTypologyId } from "./amphitheaterPrototype";
 import { OPTIMIZER_SESSION_KEY, readJson, writeJson } from "./browserSession";
 import type { Letter } from "./letterTypes";
 
 type OverlayState = { circulation: boolean; volume: boolean; sightlines: boolean; hierarchy: boolean; vertical: boolean };
 type DisplayMode = "letters" | "void" | "both";
-type Preset = { id: string; name: string; settings: DescriptorSettings; prototypeCategory?: PrototypeCategory; prototypeTypology?: PrototypeTypologyId; prototypeSource?: PrototypeGeometryMode };
 type SavedDesign = {
   id: string;
   name: string;
@@ -57,6 +57,7 @@ type SavedDesign = {
 };
 type RunHistory = {
   id: string;
+  name?: string;
   seed: number;
   focus: OptimizationFocus;
   fit: number | null;
@@ -397,12 +398,10 @@ export default function CompositionStudio() {
   const [displayMode, setDisplayMode] = useState<DisplayMode>("letters");
   const [prototypeCategory, setPrototypeCategory] = useState<PrototypeCategory>("gathering");
   const [prototypeTypology, setPrototypeTypology] = useState<PrototypeTypologyId>("stepped-amphitheater");
-  const [presets, setPresets] = useState<Preset[]>([]);
-  const [presetName, setPresetName] = useState("My preset");
-  const [selectedPresetId, setSelectedPresetId] = useState("");
   const [storageMessage, setStorageMessage] = useState("");
   const [savedDesigns, setSavedDesigns] = useState<SavedDesign[]>([]);
   const [history, setHistory] = useState<RunHistory[]>([]);
+  const [renamingRun, setRenamingRun] = useState<{ id: string; name: string } | null>(null);
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
   const [storageReady, setStorageReady] = useState(false);
   const [keptNotice, setKeptNotice] = useState("Working session is kept in this browser.");
@@ -528,9 +527,7 @@ export default function CompositionStudio() {
 
   useEffect(() => {
     try {
-      const presetData = localStorage.getItem("vul-optimizer-presets");
       const designData = localStorage.getItem("vul-optimizer-designs");
-      if (presetData) setPresets(JSON.parse(presetData));
       if (designData) setSavedDesigns(JSON.parse(designData));
     } catch { /* Ignore unavailable or corrupted storage. */ }
     const session = readJson<OptimizerSession>(OPTIMIZER_SESSION_KEY);
@@ -661,9 +658,6 @@ export default function CompositionStudio() {
     setLayerMode(true);
   };
 
-  const setDescriptor = (id: DescriptorId, key: "intensity" | "importance", value: number) => {
-    setDescriptors((current) => ({ ...current, [id]: { ...current[id], [key]: value } }));
-  };
   const setGridValue = (key: keyof OrthogonalGrid, value: number | boolean) => {
     if (key === "locked") {
       setGrid((current) => ({ ...current, locked: Boolean(value) }));
@@ -704,23 +698,23 @@ export default function CompositionStudio() {
     setPrototypeTypology("stepped-amphitheater");
     setLockedParent(null);
   };
-  const savePreset = () => {
-    if (presets.length >= 12) { setStorageMessage("Presets are full (12 presets). Delete a previous preset before saving another."); return; }
-    const next = [{ id: crypto.randomUUID(), name: presetName.trim() || "Preset", settings: structuredClone(descriptors), prototypeCategory, prototypeTypology, prototypeSource: (displayMode === "void" ? "voids" : displayMode === "both" ? "combined" : "letters") as PrototypeGeometryMode }, ...presets];
-    if (writeJson("vul-optimizer-presets", next)) { setPresets(next); setStorageMessage(""); }
-    else setStorageMessage("Preset could not be saved: browser storage is full or unavailable. Delete previous runs or presets and try again.");
-  };
-  const deletePreset = () => {
-    const next = presets.filter(p => p.id !== selectedPresetId);
-    if (writeJson("vul-optimizer-presets", next)) { setPresets(next); setSelectedPresetId(""); setStorageMessage(""); }
-    else setStorageMessage("Could not update presets in browser storage.");
+  const saveHistory = (next: RunHistory[], activeId = activeHistoryId) => {
+    const session = { descriptors, grid, rules, controls, selection, focus, alternatives, selectedIndex, lockedParent, overlays, displayMode, prototypeCategory, prototypeTypology, history: next, activeHistoryId: activeId, rankingEnabled, selectedLetters };
+    if (!writeJson(OPTIMIZER_SESSION_KEY, session)) {
+      setStorageMessage("Could not update history in browser storage.");
+      return false;
+    }
+    setHistory(next);
+    setActiveHistoryId(activeId);
+    setStorageMessage("");
+    return true;
   };
   const deleteHistory = (id: string) => {
-    const next = history.filter(run => run.id !== id);
-    const activeId = activeHistoryId === id ? null : activeHistoryId;
-    const session = { descriptors, grid, rules, controls, selection, focus, alternatives, selectedIndex, lockedParent, overlays, displayMode, prototypeCategory, prototypeTypology, history: next, activeHistoryId: activeId, rankingEnabled, selectedLetters };
-    if (writeJson(OPTIMIZER_SESSION_KEY, session)) { setHistory(next); setActiveHistoryId(activeId); setStorageMessage(""); }
-    else setStorageMessage("Could not update history in browser storage.");
+    saveHistory(history.filter(run => run.id !== id), activeHistoryId === id ? null : activeHistoryId);
+  };
+  const renameHistory = () => {
+    if (!renamingRun || optimizing || !renamingRun.name.trim()) return;
+    if (saveHistory(history.map(run => run.id === renamingRun.id ? { ...run, name: renamingRun.name.trim() } : run))) setRenamingRun(null);
   };
   const saveDesign = () => {
     if (!selected) return;
@@ -795,6 +789,15 @@ export default function CompositionStudio() {
         <button type="button" onClick={() => void runOptimization()} disabled={!grid.locked || !selectionValid || !selectedSourceCells.length || optimizing} className="rounded px-3 py-1 text-[11px] font-semibold text-black disabled:opacity-40" style={{ background: "var(--accent-primary)" }}>{optimizing ? `Optimizing ${progress}%` : "Generate + optimize"}</button>
       </div>
     </header><FeetScaleNote/>
+
+    <details className="rounded-xl border p-3" style={panelStyle}>
+      <summary className="cursor-pointer text-sm font-semibold" style={{ color: "var(--accent-gold)" }}>Watch the Vertical Void Lobby walkthrough</summary>
+      <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>A captioned walkthrough using L and U, an alternative, and the Form Editor.</p>
+      <video className="mt-3 w-full max-w-4xl rounded" controls preload="none" playsInline aria-label="Vertical Void Lobby walkthrough">
+        <source src="/tutorials/vertical-void-walkthrough.mp4" type="video/mp4" />
+        Your browser does not support video playback.
+      </video>
+    </details>
 
     {optimizing && <div className="h-1 overflow-hidden rounded bg-[var(--input-background)]"><div className="h-full bg-[var(--accent)] transition-all" style={{ width: `${progress}%` }} /></div>}
     {!grid.locked && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b7634", color: "#ffd38a", background: "#2b2415" }}>Lock the orthogonal grid before optimization.</p>}
@@ -878,19 +881,6 @@ export default function CompositionStudio() {
           </div>
         </section>
 
-        <section className="rounded-xl border p-3" style={panelStyle}>
-          <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Descriptor targets</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Zero importance excludes ranking, not measurement.</p></div></div>
-          <div className="mt-2 max-h-[620px] space-y-1.5 overflow-auto pr-1">
-            {DESCRIPTORS.map((descriptor) => <div key={descriptor.id} className="rounded-lg border p-2" style={{ borderColor: "var(--line)", background: "var(--input-background)" }}>
-              <div className="mb-1 flex justify-between"><strong className="text-[10px]">{descriptor.name}</strong><span className="text-[8px] uppercase" style={{ color: descriptor.kind === "objective" ? "var(--accent-light)" : "var(--accent-gold)" }}>{descriptor.kind}</span></div>
-              <Slider label="Target" value={descriptors[descriptor.id].intensity} onChange={(value) => setDescriptor(descriptor.id, "intensity", value)} />
-              <Slider label="Importance" value={descriptors[descriptor.id].importance} color="var(--accent-gold)" onChange={(value) => setDescriptor(descriptor.id, "importance", value)} />
-            </div>)}
-          </div>
-          <div className="mt-2 flex gap-1"><input value={presetName} onChange={(event) => setPresetName(event.target.value)} className="min-w-0 flex-1 rounded border px-2 py-1 text-[10px]" style={inputStyle} /><button type="button" onClick={savePreset} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Save preset</button></div>
-          {presets.length > 0 && <select aria-label="Load descriptor preset" value={selectedPresetId} onChange={(event) => { setSelectedPresetId(event.target.value); const preset = presets.find((item) => item.id === event.target.value); if (preset) { setDescriptors(structuredClone(preset.settings)); if (preset.prototypeCategory) setPrototypeCategory(preset.prototypeCategory); if (preset.prototypeTypology) setPrototypeTypology(preset.prototypeTypology); if (preset.prototypeSource) setDisplayMode(preset.prototypeSource === "voids" ? "void" : preset.prototypeSource === "combined" ? "both" : "letters"); } }} className="mt-1 w-full rounded border px-2 py-1 text-[10px]" style={inputStyle}><option value="" disabled>Load descriptor preset…</option>{presets.map((preset) => <option key={preset.id} value={preset.id}>{preset.name}</option>)}</select>}
-          {selectedPresetId && <button type="button" onClick={deletePreset} className="mt-1 rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Delete selected preset</button>}
-        </section>
       </aside>
 
       <section className="min-w-0 space-y-3">
@@ -963,6 +953,8 @@ export default function CompositionStudio() {
             </table>
           </div>
         </section>}
+
+
       </section>
 
       <aside className="space-y-3">
@@ -985,18 +977,30 @@ export default function CompositionStudio() {
           {savedDesigns.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Save a complete grid, objective, geometry, and analysis state.</p> : <div className="mt-2 max-h-64 space-y-1 overflow-auto">{savedDesigns.map((design) => <button key={design.id} type="button" onClick={() => restoreDesign(design)} className="w-full rounded border p-2 text-left" style={{ borderColor: "var(--line)", background: "var(--input-background)" }}><div className="text-[10px] font-medium">{design.name}</div><div className="text-[8px]" style={{ color: "var(--muted)" }}>{design.created} · {design.alternatives.length} alternatives</div></button>)}</div>}
         </section>
 
-        <section className="rounded-xl border p-3" style={panelStyle}>
-          <h2 className="text-sm font-semibold">Configuration history</h2>
-          {history.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Optimization runs are kept here. Select any run to restore it; newer runs stay available.</p> : <div className="mt-2 max-h-48 space-y-1 overflow-auto">{history.map((run, index) => {
-            const isActive = run.id === activeHistoryId;
-            return <div key={run.id} className="flex gap-1"><button type="button" onClick={() => restoreHistoryRun(index)} className="w-full rounded border p-2 text-left text-[9px] transition-colors hover:bg-[var(--panel-background)]" style={{ borderColor: isActive ? "var(--accent-secondary)" : "var(--line)", background: isActive ? "var(--panel-background)" : "var(--input-background)", color: isActive ? "var(--accent-light)" : undefined }}><strong>Run {history.length - index}</strong> · seed {run.seed} · {focusLabels[run.focus]} · {run.fit?.toFixed(1) ?? "unranked"}{isActive ? " · active" : ""}<div className="mt-0.5 text-[8px]" style={{ color: "var(--muted)" }}>{run.alternatives.length} alternatives · click to restore</div></button><button type="button" aria-label={`Delete run ${history.length - index}`} onClick={() => deleteHistory(run.id)} className="rounded border px-2 text-[9px]" style={{borderColor:"var(--line)"}}>Delete</button></div>;
-          })}</div>}
-        </section>
-
         <section className="rounded-xl border p-3 text-[9px]" style={panelStyle}>
           <h2 className="text-sm font-semibold">Evaluation basis</h2>
           <p className="mt-2" style={{ color: "var(--muted)" }}>Enabled-letter count determines comparison order. Descriptor fit resolves ties between alternatives with the same selected-letter count.</p>
           <p className="mt-2" style={{ color: "var(--muted)" }}>Circulation clearance is excluded from comparison ranking and does not produce an invalid warning in this panel.</p>
+        </section>
+        <section className="rounded-xl border p-3" style={panelStyle}>
+          <h2 className="text-sm font-semibold">Configuration history</h2>
+          {history.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Optimization runs are kept here. Select any run to restore it; newer runs stay available.</p> : <div className="mt-2 max-h-48 space-y-1 overflow-auto">{history.map((run, index) => {
+            const isActive = run.id === activeHistoryId;
+            const name = run.name || ("Run " + (history.length - index));
+            const editing = renamingRun?.id === run.id;
+            return <div key={run.id} className="space-y-1">
+              <div className="flex gap-1">
+                <button type="button" onClick={() => restoreHistoryRun(index)} className="min-w-0 flex-1 rounded border p-2 text-left text-[9px] transition-colors hover:bg-[var(--panel-background)]" style={{ borderColor: isActive ? "var(--accent-secondary)" : "var(--line)", background: isActive ? "var(--panel-background)" : "var(--input-background)", color: isActive ? "var(--accent-light)" : undefined }}><strong className="break-words">{name}</strong> · seed {run.seed} · {focusLabels[run.focus]} · {run.fit?.toFixed(1) ?? "unranked"}{isActive ? " · active" : ""}<div className="mt-0.5 text-[8px]" style={{ color: "var(--muted)" }}>{run.alternatives.length} alternatives · click to restore</div></button>
+                <button type="button" aria-label={"Rename " + name} disabled={optimizing || editing} onClick={() => setRenamingRun({ id: run.id, name })} className="rounded border px-2 text-[9px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Rename</button>
+                <button type="button" aria-label={"Delete " + name} disabled={optimizing} onClick={() => deleteHistory(run.id)} className="rounded border px-2 text-[9px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Delete</button>
+              </div>
+              {editing && <form className="flex flex-wrap items-center gap-1" onSubmit={event => { event.preventDefault(); renameHistory(); }}>
+                <input aria-label="Run name" autoFocus maxLength={80} value={renamingRun.name} onChange={event => setRenamingRun({ id: run.id, name: event.target.value })} className="min-w-0 flex-1 rounded border px-2 py-1 text-[10px]" style={inputStyle} />
+                <button type="submit" disabled={optimizing || !renamingRun.name.trim()} className="rounded border px-2 py-1 text-[9px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Save name</button>
+                <button type="button" onClick={() => setRenamingRun(null)} className="rounded border px-2 py-1 text-[9px]" style={{ borderColor: "var(--line)" }}>Cancel</button>
+              </form>}
+            </div>;
+          })}</div>}
         </section>
       </aside>
     </div>
@@ -1019,6 +1023,7 @@ export default function CompositionStudio() {
       onSelectedCategoryChange={(category: PrototypeCategory) => { setPrototypeCategory(category); setPrototypeTypology(DEFAULT_TYPOLOGY_BY_CATEGORY[category]); }}
       onSelectedTypologyChange={setPrototypeTypology}
     />
+    <TypologyRotationChart />
   </div></main>;
 }
 

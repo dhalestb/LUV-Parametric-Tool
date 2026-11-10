@@ -113,7 +113,7 @@ export async function importPresentationBackup(backup: PresentationBackup): Prom
   if (backup?.version !== 1 || !Array.isArray(backup.boards) || !Array.isArray(backup.pdfs) || !Array.isArray(backup.geometry) || !Array.isArray(backup.rules)
     || backup.boards.some(board => !board || typeof board.id !== 'string' || typeof board.title !== 'string')
     || new Set(backup.boards.map(board => board.id)).size !== backup.boards.length
-    || backup.boards.some(board => ['boards', 'geometry', 'rules'].includes(board.id))) throw new Error('Invalid GitHub board backup.');
+    || backup.boards.some(board => ['boards', 'geometry', 'rules', 'video'].includes(board.id))) throw new Error('Invalid GitHub board backup.');
   const ids = new Set(backup.boards.map(board => board.id));
   const pdfs = backup.pdfs.map(item => {
     if (!item || !ids.has(item.id)) throw new Error('Invalid PDF board in backup.');
@@ -160,6 +160,20 @@ export async function savePdfBoards(boards: PdfBoard[]) {
       tx.objectStore('pdfBoard').put(boards, 'boards');
       tx.oncomplete = () => resolve();
       tx.onabort = tx.onerror = () => reject(tx.error);
+    });
+  } finally { db.close(); }
+}
+/** Delete a PDF and its tab together so a failed write cannot leave them inconsistent. */
+export async function deletePdfBoard(id: string, boards: PdfBoard[]) {
+  const db = await openStore();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction('pdfBoard', 'readwrite');
+      const store = tx.objectStore('pdfBoard');
+      store.delete(id);
+      store.put(boards, 'boards');
+      tx.oncomplete = () => resolve();
+      tx.onabort = tx.onerror = () => reject(tx.error ?? new Error('Could not delete the PDF board.'));
     });
   } finally { db.close(); }
 }

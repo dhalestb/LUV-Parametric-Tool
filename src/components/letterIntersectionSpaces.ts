@@ -389,7 +389,7 @@ export type ConnectionWorkflow = {
 };
 
 /** A, B and C share a single source, bridge graph and boolean construction. */
-export type WorkspaceEdits = { scales:number[]; zScales?:number[]; zOffsets?:number[]; basePlacements?:IntersectionPlacement[]; enclosureCenter?:[number,number,number]; referenceCenter?:[number,number,number]; mirror:[boolean,boolean,boolean]; rotations?:[number,number,number][]; duplicates?:{source:number;axis:0|1|2;deleted?:boolean}[] };
+export type WorkspaceEdits = { scales:number[]; zScales?:number[]; zOffsets?:number[]; xOffsets?:number[]; yOffsets?:number[]; basePlacements?:IntersectionPlacement[]; enclosureCenter?:[number,number,number]; referenceCenter?:[number,number,number]; mirror:[boolean,boolean,boolean]; rotations?:[number,number,number][]; duplicates?:{source:number;axis:0|1|2;deleted?:boolean}[] };
 export function rotateWorkspaceLetter(p:IntersectionPlacement, rotation:[number,number,number]):IntersectionPlacement {
  const radians=(v:number)=>THREE.MathUtils.degToRad(v);
  const initial=new THREE.Quaternion().setFromEuler(new THREE.Euler(radians(p.rx),radians(p.ry),radians(p.rz),'XYZ'));
@@ -479,7 +479,7 @@ export async function buildConnectionWorkflow(placements:IntersectionPlacement[]
    }
    formation?.operations.push(`${workspaceEdits.duplicates.length} selected-letter mirrored copies were added in Typology formation.`);
   }
-  if(workspaceEdits){if(workspaceEdits.scales.length!==arranged.length||workspaceEdits.rotations&&workspaceEdits.rotations.length!==arranged.length||workspaceEdits.zScales&&workspaceEdits.zScales.length!==arranged.length||workspaceEdits.zOffsets&&workspaceEdits.zOffsets.length!==arranged.length)throw new Error('The letter selection changed. Generate again before saving edits.');arranged.forEach((p,i)=>{p.scale*=workspaceEdits.scales[i];p.scaleZ*=workspaceEdits.zScales?.[i]??1;p.z+=workspaceEdits.zOffsets?.[i]??0;if(workspaceEdits.rotations)Object.assign(p,rotateWorkspaceLetter(p,workspaceEdits.rotations[i]));if(p.letterRules)p.letterRules={...p.letterRules,yaw:p.rz,supportZ:p.z};});formation?.operations.push('Tab 13 manual edits applied. Edited letter positions and dimensions are retained in feet; typology constraints may no longer be satisfied.');}
+  if(workspaceEdits){if(workspaceEdits.scales.length!==arranged.length||workspaceEdits.rotations&&workspaceEdits.rotations.length!==arranged.length||workspaceEdits.zScales&&workspaceEdits.zScales.length!==arranged.length||[workspaceEdits.xOffsets,workspaceEdits.yOffsets,workspaceEdits.zOffsets].some(v=>v&&v.length!==arranged.length))throw new Error('The letter selection changed. Generate again before saving edits.');arranged.forEach((p,i)=>{p.scale*=workspaceEdits.scales[i];p.scaleZ*=workspaceEdits.zScales?.[i]??1;p.x+=workspaceEdits.xOffsets?.[i]??0;p.y+=workspaceEdits.yOffsets?.[i]??0;p.z+=workspaceEdits.zOffsets?.[i]??0;if(workspaceEdits.rotations)Object.assign(p,rotateWorkspaceLetter(p,workspaceEdits.rotations[i]));if(p.letterRules)p.letterRules={...p.letterRules,yaw:p.rz,supportZ:p.z};});formation?.operations.push('Tab 13 manual edits applied. Edited letter positions and dimensions are retained in feet; typology constraints may no longer be satisfied.');}
   if(workspaceEdits?.duplicates?.some(c=>c.deleted)&&office){
    const kept=arranged.map((_,i)=>i).filter(i=>i<originalLetterCount||!workspaceEdits.duplicates?.[i-originalLetterCount]?.deleted);
    const poses=kept.map(i=>arranged[i]),masks=kept.map(i=>copyMirrors[i]),sources=arrangement?.officePlan?.letterSources;
@@ -801,11 +801,24 @@ export async function buildConnectionWorkflow(placements:IntersectionPlacement[]
     if(largest>.1+1e-4)formation.operations.push(`Constraint note: Largest adjacent bounding-box gap is ${largest.toFixed(3)} ft, above the 0.1 ft target.`);
    }
   }
-  // Fit generated letters and their actual connections together. Editor saves
-  // already use the displayed, fitted placements and must retain exact feet.
+  // Fit the finished solid and the original profiles shown in Tab 13 together.
+  // Some typologies build with different profiles, so the solid's bounds alone
+  // do not guarantee the unedited Form Editor letters fit. Saves retain exact feet.
   if(a&&!workspaceEdits?.basePlacements){
-   const bounds=a.boundingBox(),span=Math.max(...bounds.max.map((v,i)=>v-bounds.min[i]),1e-8),factor=20/span;
-   const from=bounds.min.map((v,i)=>(v+bounds.max[i])/2);
+   const solidBounds=a.boundingBox();
+   const solidSpan=Math.max(...solidBounds.max.map((v,i)=>v-solidBounds.min[i]),1e-8);
+   const solidCenter=solidBounds.min.map((v,i)=>(v+solidBounds.max[i])/2);
+   const editorBounds=new THREE.Box3(),point=new THREE.Vector3();
+   for(const p of arranged){
+    const position=getLetterVolumeGeometry(p.letter,thickness).getAttribute('position'),matrix=placementMatrix(p);
+    for(let i=0;i<position.count;i++)editorBounds.expandByPoint(point.fromBufferAttribute(position,i).applyMatrix4(matrix));
+   }
+   const editorMin=editorBounds.min.toArray(),editorMax=editorBounds.max.toArray();
+   const needsEditorFit=solidCenter.some((v,i)=>editorMin[i]<v-solidSpan/2||editorMax[i]>v+solidSpan/2);
+   const min=needsEditorFit?solidBounds.min.map((v,i)=>Math.min(v,editorMin[i])):solidBounds.min;
+   const max=needsEditorFit?solidBounds.max.map((v,i)=>Math.max(v,editorMax[i])):solidBounds.max;
+   const span=Math.max(...max.map((v,i)=>v-min[i]),1e-8),factor=20/span;
+   const from=min.map((v,i)=>(v+max[i])/2);
    const cubeBox=enclosure?.boundingBox(),to=cubeBox?cubeBox.min.map((v,i)=>(v+cubeBox.max[i])/2):from;
    const shift=to.map((v,i)=>v-factor*from[i]),cache=new Map<InstanceType<typeof Manifold>,InstanceType<typeof Manifold>>();
    const fit=(solid:InstanceType<typeof Manifold>|null)=>{if(!solid)return null;const existing=cache.get(solid);if(existing)return existing;const result=own(solid.transform([factor,0,0,0,0,factor,0,0,0,0,factor,0,shift[0],shift[1],shift[2],1]));cache.set(solid,result);return result;};
@@ -817,7 +830,7 @@ export async function buildConnectionWorkflow(placements:IntersectionPlacement[]
    if(arrangement?.atrium){arrangement.atrium.center=[arrangement.atrium.center[0]*factor+shift[0],arrangement.atrium.center[1]*factor+shift[1]];arrangement.atrium.radius*=factor;}
    for(let i=0;i<3;i++)hallCenter[i]=hallCenter[i]*factor+shift[i];
    enclosure=own(Manifold.cube([20,20,20],true).translate(to as [number,number,number]));
-   formation?.operations.push(`Final cube fit: generated letters and connections were uniformly scaled by ${factor.toFixed(6)}. The longest dimension reaches 20 ft inside the 20 × 20 × 20 ft cube; letter proportions and the layout are retained.`);
+   formation?.operations.push(`Final cube fit: the starting Form Editor letters and finished geometry fit inside the 20 × 20 × 20 ft cube. The layout and letter proportions were retained using a uniform scale of ${factor.toFixed(6)}.`);
   }
   let b:InstanceType<typeof Manifold>|null=null;
   if(a&&workspaceEdits?.enclosureCenter){const box=a.boundingBox(),center=workspaceEdits.enclosureCenter;if(box.min.some((v,i)=>v<center[i]-10-1e-5)||box.max.some((v,i)=>v>center[i]+10+1e-5))throw new Error('Edited geometry must remain inside the fixed 20 × 20 × 20 ft enclosure. Reduce the scale or Z movement before saving.');}
