@@ -19,6 +19,14 @@ function sourceObjects(file){
  }return objects.map(object=>({id:object.id,mesh:object.mesh}));
 }
 (async()=>{
+ if(request.generator==='source-preserving'){
+ const data=await require('./source-envelope.cjs').buildSource(request,out);
+ const check=spawnSync(process.execPath,[path.join(__dirname,'../proof/rule-validation.cjs'),out],{encoding:'utf8'});
+ if(check.status!==0)throw Error('Exported geometry rejected: '+check.stderr);
+ const v=JSON.parse(fs.readFileSync(path.join(out,'validation.json')));
+ fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({...data,id:path.basename(out),created:new Date().toISOString(),request,generator:request.generator,validation:{passed:true,selfIntersectionPairs:v.selfIntersectionPairs,nonAdjacentTriangleChecks:v.nonAdjacentTriangleChecks,legacyFlags:v.broadPhaseFlags},warnings:['Source-derived stepped banks; recess backing, circulation and occupiability have not been verified.']}));
+ return;
+ }
  if(request.generator!=='typology-baseline')throw Error('Source-preserving generation is not implemented. No automatic fallback is permitted.');
  const m=await build({source:request.source,field:request.field,preferredFeet:request.preferredFeet,population:request.population,thickness:12},out);
  const legacy=spawnSync(process.execPath,[path.join(__dirname,'../proof/abstract-validation.cjs'),out],{encoding:'utf8'});

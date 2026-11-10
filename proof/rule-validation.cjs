@@ -87,7 +87,14 @@ bvh.bvhcast(bvh,new THREE.Matrix4(),{intersectsTriangles:(a,b,i,j)=>{
  assert.equal(manifest.validation.sourceOutside,0);
  assert(manifest.components.every(c=>c.finalVolume>0&&c.sources.length>=2));
  assert(manifest.tools.every(t=>t.removed>0&&Math.abs(t.finalObstruction)<1e-8));
- assert(manifest.instances.every(t=>!t.overrideActive&&[0,15,30,45,90].some(a=>Math.abs(a-t.relativeYaw)<1e-8)));
+ if(manifest.generator==='source-preserving'){
+ const r=JSON.parse(fs.readFileSync(path.join(root,'request.json'),'utf8'));
+ assert.deepEqual(manifest.instances.map(i=>i.pose),r.source);
+ for(const [i,p] of r.source.entries()){
+ const m=new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(...[p.rx,p.ry,p.rz].map(THREE.MathUtils.degToRad))).scale(new THREE.Vector3(p.scale*p.scaleX,p.scale*p.scaleY,p.scale*p.scaleZ)).setPosition(p.x,p.y,p.z+r.field.height/2);
+ assert(m.elements.every((v,k)=>Math.abs(v-manifest.instances[i].matrix[k])<1e-9));
+ }
+ }else assert(manifest.instances.every(t=>!t.overrideActive&&[0,15,30,45,90].some(a=>Math.abs(a-t.relativeYaw)<1e-8)));
  assert.equal(nonCoplanar,0,"Noncoplanar intersections remain");
  assert(coplanarAreas.every(a=>a===0),"Positive-area coplanar overlap remains");
  const result={passed:true,broadPhaseFlags,preciseMethod:"all nonadjacent BVH pairs tested with independent segment/triangle crossings and coplanar polygon clipping; original preflight retained separately",exports:results,coplanarAreas,nonAdjacentTriangleChecks:tested,selfIntersectionPairs:intersections,coplanar,nonCoplanar,examples,shellVolumes:manifest.validation.shellVolumes,sourceFocusOverlap:manifest.validation.sourceFocusOverlap};
