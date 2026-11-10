@@ -1,0 +1,8 @@
+export type AmphitheaterSource = { letter: 'L'|'U'|'V'; x:number; y:number; z:number; rx:number; ry:number; rz:number; scale:number; scaleX:number; scaleY:number; scaleZ:number };
+export type AmphitheaterRequest = { generator:'typology-baseline'; field:{width:number;depth:number;height:number}; preferredFeet:number; population:'auto'|number; sourceSnapshot?:unknown; sourceId:string; sourceName:string; source:AmphitheaterSource[] };
+export type ProofMesh = {positions:number[];indices:number[]};
+export type ProofObject = {id:string;mesh:ProofMesh;sources?:string[]};
+export type AmphitheaterResult = {id:string;created:string;request:AmphitheaterRequest;generator:'typology-baseline';architecturalValidation?:{passed:boolean;failures:string[]};architecture:ProofMesh;letters:ProofObject[];components:ProofObject[];volume:number;bounds:{min:number[];max:number[]};validation:{passed:boolean;selfIntersectionPairs:number;nonAdjacentTriangleChecks:number;legacyFlags:number};sourceCount:number;warnings:string[]};
+export type AmphitheaterSummary = Pick<AmphitheaterResult,'id'|'created'|'request'|'sourceCount'|'volume'>;
+
+

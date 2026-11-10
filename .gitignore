@@ -46,3 +46,7 @@ next-env.d.ts
 
 # Generated descriptor calibration snapshots
 reports/descriptor-calibration/*.json
+
+# Isolated interactive proof studies
+/.amphitheater-runs/
+/proof/interactive-check/

@@ -1,0 +1,56 @@
+(node:34792) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+▶ architecturalGrid
+  ✔ defaults to an example field that hosts all three selection heights (6.0874ms)
+  ✔ adjusts cell counts independently without changing unrelated pitches (0.2396ms)
+  ✔ adjusts cell pitches independently and recalculates overall (0.2193ms)
+  ✔ updates pitch from overall while preserving cell count (0.1915ms)
+  ✔ reports invalid configurations instead of silently clamping (0.3652ms)
+✔ architecturalGrid (8.5631ms)
+▶ architecturalLetterSizing
+  ✔ converts footprint feet and scale using UNIT_LETTER_SPAN (0.2286ms)
+  ✔ applies height-specific presets without forcing proportional stretch (0.1872ms)
+  ✔ keeps cell pitch independent from letter size helpers (0.1594ms)
+  ✔ samples varied letter scales within min/max (0.3328ms)
+  ✔ validates letter-size control conflicts (0.2634ms)
+✔ architecturalLetterSizing (1.5008ms)
+▶ selection compatibility with expanded grids
+  ✔ keeps fixed 20×20×H selection sizes while overall grows (0.8842ms)
+✔ selection compatibility with expanded grids (0.9904ms)
+▶ letterLegibility
+  ✔ flags near-total engulfment while allowing modest productive overlaps (10.8254ms)
+✔ letterLegibility (10.9665ms)
+(node:59544) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+▶ selectionFieldGeometry
+  ✔ classifies letter solids by AABB intersection, not centers alone (0.951ms)
+  ✔ preserves original TRS for intersecting letters in all three heights (12.8621ms)
+  ✔ physically trims a boundary-crossing letter with Manifold and keeps fully inside letters intact (39.7435ms)
+  ✔ extracts a height field with compatibility metadata (12.4701ms)
+  ✔ keeps legacy center-based optimizer selection when height routing is off (14.1152ms)
+  ✔ uses body intersection for height-routed optimizer windows (3.5071ms)
+✔ selectionFieldGeometry (85.2914ms)
+▶ selectionHeightRouting
+  ✔ defines the three architectural selection sizes (1.9671ms)
+  ✔ reports every typology height assignment as unresolved (0.3164ms)
+  ✔ validates selection volumes against the source field (0.358ms)
+  ✔ checks geometry compatibility with required height (0.1937ms)
+  ✔ expands source capacity for 60 ft without stretching letter scales (0.3312ms)
+  ✔ locks SelectionVolume presets and clears height routing (0.2376ms)
+  ✔ selects each architectural envelope and keeps it when the grid is smaller or locked (0.2862ms)
+  ✔ does not let dashed-group sizing override an active height route (0.445ms)
+  ✔ reports an undersized source field without shrinking the requested envelope (0.4794ms)
+  ✔ restores a saved height route at its architectural size (0.3067ms)
+  ✔ documents the deferred Phase 2 generator interface (0.1763ms)
+✔ selectionHeightRouting (6.8334ms)
+ℹ tests 29
+ℹ suites 6
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 842.3016
+PASS: selection-height routing suites

@@ -1,0 +1,399 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "name": "source-preserving unavailable",
+      "status": 400,
+      "error": "Source-preserving generation is not implemented; choose the explicitly labeled comparison baseline."
+    },
+    {
+      "name": "invalid width rejected",
+      "status": 400,
+      "error": "Each field dimension must be 20, 40 or 60 feet."
+    },
+    {
+      "name": "browser-generated initial study",
+      "id": "1d6164db-6e86-4605-875f-529dd5019208",
+      "request": {
+        "generator": "typology-baseline",
+        "field": {
+          "width": 40,
+          "depth": 40,
+          "height": 60
+        },
+        "preferredFeet": 13,
+        "population": "auto",
+        "sourceId": "fixture",
+        "sourceName": "Recorded L/U/V proof fixture",
+        "source": [
+          {
+            "letter": "L",
+            "x": -14.673913043478262,
+            "y": -1.9565217391304348,
+            "z": -1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "U",
+            "x": -8.804347826086957,
+            "y": 1.9565217391304348,
+            "z": -1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "V",
+            "x": -2.9347826086956528,
+            "y": -1.9565217391304348,
+            "z": 0,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "L",
+            "x": 2.9347826086956506,
+            "y": 1.9565217391304348,
+            "z": 0,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "U",
+            "x": 8.804347826086955,
+            "y": -1.9565217391304348,
+            "z": 1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "V",
+            "x": 14.673913043478262,
+            "y": 1.9565217391304348,
+            "z": 1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          }
+        ]
+      },
+      "sourceCount": 19,
+      "components": 24,
+      "volume": 2161.400049777864,
+      "bounds": {
+        "min": [
+          -15.530529975891113,
+          -19.30760955810547,
+          0.9590299725532532
+        ],
+        "max": [
+          15.573419570922852,
+          15.301569938659668,
+          58.7846794128418
+        ]
+      },
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 368400,
+        "legacyFlags": 49
+      },
+      "architecturalValidation": {
+        "passed": false,
+        "failures": [
+          "recess-enclosure-left-U-1: backing material absent at probe",
+          "recess-enclosure-left-U-2: backing material absent at probe",
+          "recess-enclosure-right-U-1: backing material absent at probe",
+          "recess-enclosure-right-U-2: backing material absent at probe",
+          "recess-rear-enclosure: backing material absent at probe"
+        ]
+      },
+      "meshHash": "54bf6ec1007403e765265b2b1c4cc01a1507464939cf63f04e57af124ad36709"
+    },
+    {
+      "name": "explicit population 13",
+      "id": "92f00914-61ee-4b8b-bacb-75b4c62fe429",
+      "request": {
+        "generator": "typology-baseline",
+        "field": {
+          "width": 40,
+          "depth": 40,
+          "height": 60
+        },
+        "preferredFeet": 13,
+        "population": 13,
+        "sourceId": "fixture",
+        "sourceName": "Recorded L/U/V proof fixture",
+        "source": [
+          {
+            "letter": "L",
+            "x": -14.673913043478262,
+            "y": -1.9565217391304348,
+            "z": -1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "U",
+            "x": -8.804347826086957,
+            "y": 1.9565217391304348,
+            "z": -1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "V",
+            "x": -2.9347826086956528,
+            "y": -1.9565217391304348,
+            "z": 0,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "L",
+            "x": 2.9347826086956506,
+            "y": 1.9565217391304348,
+            "z": 0,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "U",
+            "x": 8.804347826086955,
+            "y": -1.9565217391304348,
+            "z": 1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "V",
+            "x": 14.673913043478262,
+            "y": 1.9565217391304348,
+            "z": 1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          }
+        ]
+      },
+      "sourceCount": 13,
+      "components": 18,
+      "volume": 1888.6662893651187,
+      "bounds": {
+        "min": [
+          -15.570119857788086,
+          -19.30760955810547,
+          0.992330014705658
+        ],
+        "max": [
+          15.48429012298584,
+          10.762419700622559,
+          58.7784309387207
+        ]
+      },
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 289317,
+        "legacyFlags": 37
+      },
+      "architecturalValidation": {
+        "passed": false,
+        "failures": [
+          "recess-enclosure-left-U-0: backing material absent at probe",
+          "recess-enclosure-left-U-1: backing material absent at probe",
+          "recess-enclosure-right-U-0: backing material absent at probe",
+          "recess-enclosure-right-U-1: backing material absent at probe",
+          "recess-rear-enclosure: backing material absent at probe"
+        ]
+      },
+      "meshHash": "5a4990de41244d438d7496a01918f583eec271e2ae007805346765f02b92a55c"
+    },
+    {
+      "name": "U proportion change",
+      "id": "25d14f28-28ab-4e0b-8e4b-fca5450003d3",
+      "request": {
+        "generator": "typology-baseline",
+        "field": {
+          "width": 40,
+          "depth": 40,
+          "height": 60
+        },
+        "preferredFeet": 13,
+        "population": "auto",
+        "sourceId": "shape-change",
+        "sourceName": "U depth +3%",
+        "source": [
+          {
+            "letter": "L",
+            "x": -14.673913043478262,
+            "y": -1.9565217391304348,
+            "z": -1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "U",
+            "x": -8.804347826086957,
+            "y": 1.9565217391304348,
+            "z": -1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1.03,
+            "scaleZ": 1
+          },
+          {
+            "letter": "V",
+            "x": -2.9347826086956528,
+            "y": -1.9565217391304348,
+            "z": 0,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "L",
+            "x": 2.9347826086956506,
+            "y": 1.9565217391304348,
+            "z": 0,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          },
+          {
+            "letter": "U",
+            "x": 8.804347826086955,
+            "y": -1.9565217391304348,
+            "z": 1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1.03,
+            "scaleZ": 1
+          },
+          {
+            "letter": "V",
+            "x": 14.673913043478262,
+            "y": 1.9565217391304348,
+            "z": 1.9565217391304348,
+            "rx": 0,
+            "ry": 0,
+            "rz": 0,
+            "scale": 9.782608695652174,
+            "scaleX": 1,
+            "scaleY": 1,
+            "scaleZ": 1
+          }
+        ]
+      },
+      "sourceCount": 19,
+      "components": 24,
+      "volume": 2201.0971120377144,
+      "bounds": {
+        "min": [
+          -15.542019844055176,
+          -19.307449340820312,
+          0.9722899794578552
+        ],
+        "max": [
+          15.586119651794434,
+          15.744850158691406,
+          58.7861213684082
+        ]
+      },
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 379591,
+        "legacyFlags": 33
+      },
+      "architecturalValidation": {
+        "passed": false,
+        "failures": [
+          "recess-enclosure-left-U-1: backing material absent at probe",
+          "recess-enclosure-left-U-2: backing material absent at probe",
+          "recess-enclosure-right-U-1: backing material absent at probe",
+          "recess-enclosure-right-U-2: backing material absent at probe",
+          "recess-rear-enclosure: backing material absent at probe"
+        ]
+      },
+      "meshHash": "d564491240b548a6e7ff4fcdad775cb4f5d1a304b2f9f777ef5f0279ff7c87f6"
+    }
+  ]
+}
