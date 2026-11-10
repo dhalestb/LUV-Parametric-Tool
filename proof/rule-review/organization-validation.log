@@ -1,0 +1,64 @@
+(node:28492) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{
+  terraces: 12,
+  displacementRange: [ 2.74652092061691, 2.7529327454728385 ],
+  risersWithBothContacts: 11,
+  backingProbes: [
+    {
+      id: 'recess-enclosure-left-U-0',
+      nominalBacking: 1.1724943718623162,
+      probe: [Array],
+      backingMaterialAtProbe: true
+    },
+    {
+      id: 'recess-enclosure-left-U-1',
+      nominalBacking: 1.403937120410557,
+      probe: [Array],
+      backingMaterialAtProbe: true
+    },
+    {
+      id: 'recess-enclosure-left-U-2',
+      nominalBacking: 1.4644137336935645,
+      probe: [Array],
+      backingMaterialAtProbe: true
+    },
+    {
+      id: 'recess-enclosure-left-U-3',
+      nominalBacking: 1.336463478369084,
+      probe: [Array],
+      backingMaterialAtProbe: true
+    },
+    {
+      id: 'recess-enclosure-right-U-0',
+      nominalBacking: 1.1724943718623162,
+      probe: [Array],
+      backingMaterialAtProbe: true
+    },
+    {
+      id: 'recess-enclosure-right-U-1',
+      nominalBacking: 1.403937120410557,
+      probe: [Array],
+      backingMaterialAtProbe: true
+    },
+    {
+      id: 'recess-enclosure-right-U-2',
+      nominalBacking: 1.4644137336935645,
+      probe: [Array],
+      backingMaterialAtProbe: true
+    },
+    {
+      id: 'recess-enclosure-right-U-3',
+      nominalBacking: 1.336463478369084,
+      probe: [Array],
+      backingMaterialAtProbe: true
+    },
+    {
+      id: 'recess-rear-enclosure',
+      nominalBacking: 2.531147743816397,
+      probe: [Array],
+      backingMaterialAtProbe: true
+    }
+  ]
+}

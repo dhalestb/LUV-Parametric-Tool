@@ -1,0 +1,4870 @@
+[
+  {
+    "id": "L-0",
+    "sourceIndex": 0,
+    "source": {
+      "letter": "L",
+      "x": -14.673913043478262,
+      "y": -1.9565217391304348,
+      "z": -1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -2.407054432827155,
+      -9.819021739130436,
+      1.6739130434782605
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -2.407054432827155,
+      -9.819021739130436,
+      1.6739130434782605
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -7.548358866172949,
+        -15.319021838903428,
+        0.8369565181758091
+      ],
+      "max": [
+        2.7342500005186388,
+        -4.3190216393574445,
+        2.510869568780712
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      -0.9722718241315029,
+      -7.666847826086958,
+      1.6739130434782605
+    ],
+    "edge": [
+      [
+        -0.9722718241315029,
+        -7.666847826086958,
+        1.6739130434782605
+      ],
+      [
+        -7.428793563261937,
+        -7.666847826086958,
+        1.6739130434782605
+      ]
+    ],
+    "perpendicular": [
+      [
+        -0.9722718241315029,
+        -7.666847826086958,
+        1.6739130434782605
+      ],
+      [
+        -0.9722718241315038,
+        -15.199456521739132,
+        1.6739130434782605
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049027
+    ],
+    "constructionComponents": [
+      "terrace-0",
+      "riser-1",
+      "enclosure-left-U-0",
+      "enclosure-right-U-0",
+      "presentation-focus-surface",
+      "focus-terrace-threshold"
+    ],
+    "influence": {
+      "id": "L-0",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.054800417743462254,
+      "finalBoundaryDelta": 0.05480352794074542,
+      "changedFinalVertices": 1257,
+      "volumeDelta": -1.374191778387285,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-1",
+    "sourceIndex": 3,
+    "source": {
+      "letter": "L",
+      "x": 2.9347826086956506,
+      "y": 1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -0.4625107845641495,
+      -7.874478090867431,
+      3.347826086956521
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -0.4625107845641495,
+      -7.874478090867431,
+      3.347826086956521
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -5.603815217909943,
+        -13.374478190640422,
+        2.5108695616540695
+      ],
+      "max": [
+        4.678793648781644,
+        -2.374477991094439,
+        4.184782612258973
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      0.9722718241315026,
+      -5.722304177823952,
+      3.347826086956521
+    ],
+    "edge": [
+      [
+        0.9722718241315026,
+        -5.722304177823952,
+        3.347826086956521
+      ],
+      [
+        -5.484249914998932,
+        -5.722304177823952,
+        3.347826086956521
+      ]
+    ],
+    "perpendicular": [
+      [
+        0.9722718241315026,
+        -5.722304177823952,
+        3.347826086956521
+      ],
+      [
+        0.9722718241315017,
+        -13.254912873476126,
+        3.347826086956521
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049031
+    ],
+    "constructionComponents": [
+      "terrace-1",
+      "riser-1",
+      "riser-2",
+      "enclosure-left-U-0",
+      "enclosure-right-U-0"
+    ],
+    "influence": {
+      "id": "L-1",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.064076671310893,
+      "finalBoundaryDelta": 0.06569320150716643,
+      "changedFinalVertices": 1989,
+      "volumeDelta": -0.7982670200963184,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-2",
+    "sourceIndex": 0,
+    "source": {
+      "letter": "L",
+      "x": -14.673913043478262,
+      "y": -1.9565217391304348,
+      "z": -1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -2.407054432827155,
+      -5.929934442604425,
+      5.021739130434781
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -2.407054432827155,
+      -5.929934442604425,
+      5.021739130434781
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -7.548358866172949,
+        -11.429934542377417,
+        4.18478260513233
+      ],
+      "max": [
+        2.7342500005186388,
+        -0.4299343428314337,
+        5.8586956557372325
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      -0.9722718241315029,
+      -3.7777605295609473,
+      5.021739130434781
+    ],
+    "edge": [
+      [
+        -0.9722718241315029,
+        -3.7777605295609473,
+        5.021739130434781
+      ],
+      [
+        -7.428793563261937,
+        -3.777760529560947,
+        5.021739130434781
+      ]
+    ],
+    "perpendicular": [
+      [
+        -0.9722718241315029,
+        -3.7777605295609473,
+        5.021739130434781
+      ],
+      [
+        -0.9722718241315038,
+        -11.31036922521312,
+        5.021739130434781
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-2",
+      "riser-2",
+      "riser-3",
+      "enclosure-left-U-0",
+      "enclosure-right-U-0"
+    ],
+    "influence": {
+      "id": "L-2",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.06548131298499696,
+      "finalBoundaryDelta": 0.0626833769192205,
+      "changedFinalVertices": 1649,
+      "volumeDelta": -0.6756766764374333,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-3",
+    "sourceIndex": 3,
+    "source": {
+      "letter": "L",
+      "x": 2.9347826086956506,
+      "y": 1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -0.4625107845641495,
+      -3.9853907943414195,
+      6.695652173913042
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -0.4625107845641495,
+      -3.9853907943414195,
+      6.695652173913042
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -5.603815217909943,
+        -9.485390894114412,
+        5.858695648610591
+      ],
+      "max": [
+        4.678793648781644,
+        1.5146093054315721,
+        7.532608699215493
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      0.9722718241315026,
+      -1.8332168812979415,
+      6.695652173913042
+    ],
+    "edge": [
+      [
+        0.9722718241315026,
+        -1.8332168812979415,
+        6.695652173913042
+      ],
+      [
+        -5.484249914998932,
+        -1.833216881297941,
+        6.695652173913042
+      ]
+    ],
+    "perpendicular": [
+      [
+        0.9722718241315026,
+        -1.8332168812979415,
+        6.695652173913042
+      ],
+      [
+        0.9722718241315017,
+        -9.365825576950115,
+        6.695652173913042
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-3",
+      "riser-3",
+      "riser-4",
+      "enclosure-left-U-0",
+      "enclosure-left-U-1",
+      "enclosure-right-U-0",
+      "enclosure-right-U-1"
+    ],
+    "influence": {
+      "id": "L-3",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.0649445794629089,
+      "finalBoundaryDelta": 0.06494223515883894,
+      "changedFinalVertices": 1934,
+      "volumeDelta": -0.2502167752109017,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-4",
+    "sourceIndex": 0,
+    "source": {
+      "letter": "L",
+      "x": -14.673913043478262,
+      "y": -1.9565217391304348,
+      "z": -1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -2.407054432827155,
+      -2.040847146078414,
+      8.369565217391303
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -2.407054432827155,
+      -2.040847146078414,
+      8.369565217391303
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -7.548358866172949,
+        -7.540847245851406,
+        7.532608692088852
+      ],
+      "max": [
+        2.7342500005186388,
+        3.4591529536945775,
+        9.206521742693754
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      -0.9722718241315029,
+      0.11132676696506394,
+      8.369565217391303
+    ],
+    "edge": [
+      [
+        -0.9722718241315029,
+        0.11132676696506394,
+        8.369565217391303
+      ],
+      [
+        -7.428793563261937,
+        0.11132676696506438,
+        8.369565217391303
+      ]
+    ],
+    "perpendicular": [
+      [
+        -0.9722718241315029,
+        0.11132676696506394,
+        8.369565217391303
+      ],
+      [
+        -0.9722718241315038,
+        -7.42128192868711,
+        8.369565217391303
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-4",
+      "riser-4",
+      "riser-5",
+      "enclosure-left-U-1",
+      "enclosure-right-U-1"
+    ],
+    "influence": {
+      "id": "L-4",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.06396027160970627,
+      "finalBoundaryDelta": 0.5613756998689619,
+      "changedFinalVertices": 1942,
+      "volumeDelta": -0.9608610651312119,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-5",
+    "sourceIndex": 3,
+    "source": {
+      "letter": "L",
+      "x": 2.9347826086956506,
+      "y": 1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -0.4625107845641495,
+      -0.09630349781540737,
+      10.043478260869563
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -0.4625107845641495,
+      -0.09630349781540737,
+      10.043478260869563
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -5.603815217909943,
+        -5.596303597588399,
+        9.206521735567112
+      ],
+      "max": [
+        4.678793648781644,
+        5.403696601957584,
+        10.880434786172014
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      0.9722718241315026,
+      2.0558704152280707,
+      10.043478260869563
+    ],
+    "edge": [
+      [
+        0.9722718241315026,
+        2.0558704152280707,
+        10.043478260869563
+      ],
+      [
+        -5.484249914998932,
+        2.055870415228071,
+        10.043478260869563
+      ]
+    ],
+    "perpendicular": [
+      [
+        0.9722718241315026,
+        2.0558704152280707,
+        10.043478260869563
+      ],
+      [
+        0.9722718241315017,
+        -5.476738280424103,
+        10.043478260869563
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-5",
+      "riser-5",
+      "riser-6",
+      "enclosure-left-U-1",
+      "enclosure-left-U-2",
+      "enclosure-right-U-1",
+      "enclosure-right-U-2"
+    ],
+    "influence": {
+      "id": "L-5",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.06339753718321975,
+      "finalBoundaryDelta": 0.06339571252623327,
+      "changedFinalVertices": 1948,
+      "volumeDelta": -0.168344469454496,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-6",
+    "sourceIndex": 0,
+    "source": {
+      "letter": "L",
+      "x": -14.673913043478262,
+      "y": -1.9565217391304348,
+      "z": -1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -2.407054432827155,
+      1.848240150447598,
+      11.717391304347823
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -2.407054432827155,
+      1.848240150447598,
+      11.717391304347823
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -7.548358866172949,
+        -3.6517599493253936,
+        10.880434779045371
+      ],
+      "max": [
+        2.7342500005186388,
+        7.34824025022059,
+        12.554347829650274
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      -0.9722718241315029,
+      4.0004140634910765,
+      11.717391304347823
+    ],
+    "edge": [
+      [
+        -0.9722718241315029,
+        4.0004140634910765,
+        11.717391304347823
+      ],
+      [
+        -7.428793563261937,
+        4.0004140634910765,
+        11.717391304347823
+      ]
+    ],
+    "perpendicular": [
+      [
+        -0.9722718241315029,
+        4.0004140634910765,
+        11.717391304347823
+      ],
+      [
+        -0.9722718241315038,
+        -3.5321946321610973,
+        11.717391304347823
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-6",
+      "riser-6",
+      "riser-7",
+      "enclosure-left-U-2",
+      "enclosure-right-U-2"
+    ],
+    "influence": {
+      "id": "L-6",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.061856925662654244,
+      "finalBoundaryDelta": 0.06185982472756422,
+      "changedFinalVertices": 1929,
+      "volumeDelta": -0.9327968742727535,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-7",
+    "sourceIndex": 3,
+    "source": {
+      "letter": "L",
+      "x": 2.9347826086956506,
+      "y": 1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -0.4625107845641495,
+      3.7927837987106034,
+      13.391304347826084
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -0.4625107845641495,
+      3.7927837987106034,
+      13.391304347826084
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -5.603815217909943,
+        -1.7072163010623882,
+        12.554347822523633
+      ],
+      "max": [
+        4.678793648781644,
+        9.292783898483595,
+        14.228260873128535
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      0.9722718241315026,
+      5.944957711754082,
+      13.391304347826084
+    ],
+    "edge": [
+      [
+        0.9722718241315026,
+        5.944957711754082,
+        13.391304347826084
+      ],
+      [
+        -5.484249914998932,
+        5.944957711754082,
+        13.391304347826084
+      ]
+    ],
+    "perpendicular": [
+      [
+        0.9722718241315026,
+        5.944957711754082,
+        13.391304347826084
+      ],
+      [
+        0.9722718241315017,
+        -1.587650983898092,
+        13.391304347826084
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-7",
+      "riser-7",
+      "riser-8",
+      "enclosure-left-U-2",
+      "enclosure-right-U-2"
+    ],
+    "influence": {
+      "id": "L-7",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.060104899605431084,
+      "finalBoundaryDelta": 0.06010496156109354,
+      "changedFinalVertices": 1684,
+      "volumeDelta": -0.4679133281315444,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-8",
+    "sourceIndex": 0,
+    "source": {
+      "letter": "L",
+      "x": -14.673913043478262,
+      "y": -1.9565217391304348,
+      "z": -1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -2.407054432827155,
+      5.737327446973609,
+      15.065217391304344
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -2.407054432827155,
+      5.737327446973609,
+      15.065217391304344
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -7.548358866172949,
+        0.2373273472006172,
+        14.228260866001893
+      ],
+      "max": [
+        2.7342500005186388,
+        11.2373275467466,
+        15.902173916606795
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      -0.9722718241315029,
+      7.889501360017087,
+      15.065217391304344
+    ],
+    "edge": [
+      [
+        -0.9722718241315029,
+        7.889501360017087,
+        15.065217391304344
+      ],
+      [
+        -7.428793563261937,
+        7.889501360017087,
+        15.065217391304344
+      ]
+    ],
+    "perpendicular": [
+      [
+        -0.9722718241315029,
+        7.889501360017087,
+        15.065217391304344
+      ],
+      [
+        -0.9722718241315038,
+        0.3568926643649135,
+        15.065217391304344
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-8",
+      "riser-8",
+      "riser-9",
+      "enclosure-left-U-2",
+      "enclosure-left-U-3",
+      "enclosure-right-U-2",
+      "enclosure-right-U-3"
+    ],
+    "influence": {
+      "id": "L-8",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.0588205601959627,
+      "finalBoundaryDelta": 0.06965716553750284,
+      "changedFinalVertices": 1981,
+      "volumeDelta": -0.10871909033812699,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-9",
+    "sourceIndex": 3,
+    "source": {
+      "letter": "L",
+      "x": 2.9347826086956506,
+      "y": 1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -0.4625107845641495,
+      7.681871095236614,
+      16.739130434782606
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -0.4625107845641495,
+      7.681871095236614,
+      16.739130434782606
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -5.603815217909943,
+        2.1818709954636226,
+        15.902173909480155
+      ],
+      "max": [
+        4.678793648781644,
+        13.181871195009606,
+        17.576086960085057
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      0.9722718241315026,
+      9.834045008280093,
+      16.739130434782606
+    ],
+    "edge": [
+      [
+        0.9722718241315026,
+        9.834045008280093,
+        16.739130434782606
+      ],
+      [
+        -5.484249914998932,
+        9.834045008280093,
+        16.739130434782606
+      ]
+    ],
+    "perpendicular": [
+      [
+        0.9722718241315026,
+        9.834045008280093,
+        16.739130434782606
+      ],
+      [
+        0.9722718241315017,
+        2.301436312627919,
+        16.739130434782606
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-9",
+      "riser-9",
+      "riser-10",
+      "enclosure-left-U-3",
+      "enclosure-right-U-3"
+    ],
+    "influence": {
+      "id": "L-9",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.057782938110577275,
+      "finalBoundaryDelta": 0.222894382848346,
+      "changedFinalVertices": 1881,
+      "volumeDelta": -0.5616750623958069,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-10",
+    "sourceIndex": 0,
+    "source": {
+      "letter": "L",
+      "x": -14.673913043478262,
+      "y": -1.9565217391304348,
+      "z": -1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -2.407054432827155,
+      9.626414743499621,
+      18.413043478260867
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -2.407054432827155,
+      9.626414743499621,
+      18.413043478260867
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -7.548358866172949,
+        4.12641464372663,
+        17.576086952958416
+      ],
+      "max": [
+        2.7342500005186388,
+        15.126414843272613,
+        19.25000000356332
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      -0.9722718241315029,
+      11.7785886565431,
+      18.413043478260867
+    ],
+    "edge": [
+      [
+        -0.9722718241315029,
+        11.7785886565431,
+        18.413043478260867
+      ],
+      [
+        -7.428793563261937,
+        11.7785886565431,
+        18.413043478260867
+      ]
+    ],
+    "perpendicular": [
+      [
+        -0.9722718241315029,
+        11.7785886565431,
+        18.413043478260867
+      ],
+      [
+        -0.9722718241315038,
+        4.245979960890926,
+        18.413043478260867
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-10",
+      "riser-10",
+      "riser-11",
+      "enclosure-left-U-3",
+      "enclosure-right-U-3"
+    ],
+    "influence": {
+      "id": "L-10",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.05744614703076342,
+      "finalBoundaryDelta": 0.057446648368712876,
+      "changedFinalVertices": 1548,
+      "volumeDelta": -0.20595093771134998,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "L-11",
+    "sourceIndex": 3,
+    "source": {
+      "letter": "L",
+      "x": 2.9347826086956506,
+      "y": 1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -0.4625107845641495,
+      11.570958391762625,
+      20.08695652173913
+    ],
+    "yaw": 180,
+    "tilt": 0,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      -0.4625107845641495,
+      11.570958391762625,
+      20.08695652173913
+    ],
+    "role": "ascending terrace boundary",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -5.603815217909943,
+        6.070958291989633,
+        19.249999996436678
+      ],
+      "max": [
+        4.678793648781644,
+        17.070958491535617,
+        20.92391304704158
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "corner": [
+      0.9722718241315026,
+      13.723132304806104,
+      20.08695652173913
+    ],
+    "edge": [
+      [
+        0.9722718241315026,
+        13.723132304806104,
+        20.08695652173913
+      ],
+      [
+        -5.484249914998932,
+        13.723132304806104,
+        20.08695652173913
+      ]
+    ],
+    "perpendicular": [
+      [
+        0.9722718241315026,
+        13.723132304806104,
+        20.08695652173913
+      ],
+      [
+        0.9722718241315017,
+        6.19052360915393,
+        20.08695652173913
+      ]
+    ],
+    "actualWorldDimensions": [
+      10.282608866691588,
+      11.000000199545983,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-11",
+      "riser-11",
+      "enclosure-left-U-3",
+      "enclosure-right-U-3",
+      "rear-enclosure"
+    ],
+    "influence": {
+      "id": "L-11",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.07011645270625937,
+      "finalBoundaryDelta": 0.07011360553661741,
+      "changedFinalVertices": 1423,
+      "volumeDelta": -3.4975854493341103,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "U-0",
+    "sourceIndex": 1,
+    "source": {
+      "letter": "U",
+      "x": -8.804347826086957,
+      "y": 1.9565217391304348,
+      "z": -1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.080000000000002,
+      -7.666847826086959,
+      10.402173913043477
+    ],
+    "yaw": 105,
+    "tilt": 0,
+    "relativeYaw": 15,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.030460141296751952,
+    "pivot": [
+      22.080000000000002,
+      -7.666847826086959,
+      10.402173913043477
+    ],
+    "role": "focus-facing enclosure curvature",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        15.263478697223402,
+        -14.102896654242205,
+        9.565217387741026
+      ],
+      "max": [
+        27.835530790916494,
+        -2.2579946450314683,
+        11.239130438345928
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "curve": [
+      [
+        16.276421814210366,
+        -7.48894961218938,
+        10.402173913043477
+      ],
+      [
+        22.281960647225006,
+        -5.87977033176936,
+        10.402173913043477
+      ],
+      [
+        22.441875638773098,
+        -5.8390820021203425,
+        10.402173913043477
+      ],
+      [
+        22.596828990226644,
+        -5.803984225387138,
+        10.402173913043477
+      ],
+      [
+        22.74686147741071,
+        -5.774375414327596,
+        10.402173913043477
+      ],
+      [
+        22.89201387615037,
+        -5.750153981699568,
+        10.402173913043477
+      ],
+      [
+        23.032326962270687,
+        -5.731218340260903,
+        10.402173913043477
+      ],
+      [
+        23.167841511596734,
+        -5.717466902769452,
+        10.402173913043477
+      ],
+      [
+        23.298598299953575,
+        -5.708798081983064,
+        10.402173913043477
+      ],
+      [
+        23.42463810316628,
+        -5.70511029065959,
+        10.402173913043477
+      ],
+      [
+        23.546001697059925,
+        -5.706301941556879,
+        10.402173913043477
+      ],
+      [
+        23.662729857459567,
+        -5.712271447432782,
+        10.402173913043477
+      ],
+      [
+        23.774863360190285,
+        -5.72291722104515,
+        10.402173913043477
+      ],
+      [
+        23.88244298107714,
+        -5.738137675151831,
+        10.402173913043477
+      ],
+      [
+        23.985509495945205,
+        -5.757831222510678,
+        10.402173913043477
+      ],
+      [
+        24.084103680619545,
+        -5.781896275879538,
+        10.402173913043477
+      ],
+      [
+        24.178266310925235,
+        -5.810231248016263,
+        10.402173913043477
+      ],
+      [
+        24.268038162687336,
+        -5.842734551678702,
+        10.402173913043477
+      ],
+      [
+        24.353460011730924,
+        -5.879304599624706,
+        10.402173913043477
+      ],
+      [
+        24.43457263388106,
+        -5.919839804612124,
+        10.402173913043477
+      ],
+      [
+        24.51141680496282,
+        -5.964238579398808,
+        10.402173913043477
+      ],
+      [
+        24.584033300801266,
+        -6.0123993367426065,
+        10.402173913043477
+      ],
+      [
+        24.652462897221472,
+        -6.064220489401371,
+        10.402173913043477
+      ],
+      [
+        24.716746370048504,
+        -6.11960045013295,
+        10.402173913043477
+      ],
+      [
+        24.77692449510743,
+        -6.178437631695193,
+        10.402173913043477
+      ],
+      [
+        24.833038048223322,
+        -6.2406304468459535,
+        10.402173913043477
+      ],
+      [
+        24.885127805221245,
+        -6.306077308343079,
+        10.402173913043477
+      ],
+      [
+        24.933234541926268,
+        -6.374676628944419,
+        10.402173913043477
+      ],
+      [
+        24.977399034163465,
+        -6.446326821407827,
+        10.402173913043477
+      ],
+      [
+        25.017662057757896,
+        -6.520926298491149,
+        10.402173913043477
+      ],
+      [
+        25.054064388534638,
+        -6.598373472952238,
+        10.402173913043477
+      ],
+      [
+        25.086646802318754,
+        -6.678566757548943,
+        10.402173913043477
+      ],
+      [
+        25.115450074935314,
+        -6.761404565039115,
+        10.402173913043477
+      ],
+      [
+        25.140514982209385,
+        -6.846785308180602,
+        10.402173913043477
+      ],
+      [
+        25.16149850733728,
+        -6.933259654372161,
+        10.402173913043477
+      ],
+      [
+        25.177973045284297,
+        -7.019400936360734,
+        10.402173913043477
+      ],
+      [
+        25.189852489528988,
+        -7.105141564926454,
+        10.402173913043477
+      ],
+      [
+        25.19705073354991,
+        -7.190413950849452,
+        10.402173913043477
+      ],
+      [
+        25.199481670825623,
+        -7.2751505049098615,
+        10.402173913043477
+      ],
+      [
+        25.197059194834676,
+        -7.359283637887813,
+        10.402173913043477
+      ],
+      [
+        25.189697199055626,
+        -7.44274576056344,
+        10.402173913043477
+      ],
+      [
+        25.177309576967026,
+        -7.525469283716875,
+        10.402173913043477
+      ],
+      [
+        25.15981022204744,
+        -7.607386618128247,
+        10.402173913043477
+      ],
+      [
+        25.137113027775413,
+        -7.688430174577693,
+        10.402173913043477
+      ],
+      [
+        25.109131887629506,
+        -7.76853236384534,
+        10.402173913043477
+      ],
+      [
+        25.075780695088273,
+        -7.847625596711324,
+        10.402173913043477
+      ],
+      [
+        25.036973343630272,
+        -7.925642283955775,
+        10.402173913043477
+      ],
+      [
+        24.992623726734053,
+        -8.002514836358825,
+        10.402173913043477
+      ],
+      [
+        24.942645737878173,
+        -8.078175664700609,
+        10.402173913043477
+      ],
+      [
+        24.88695327054119,
+        -8.152557179761256,
+        10.402173913043477
+      ],
+      [
+        24.82546021820166,
+        -8.2255917923209,
+        10.402173913043477
+      ],
+      [
+        24.758080474338133,
+        -8.297211913159671,
+        10.402173913043477
+      ],
+      [
+        24.68472793242917,
+        -8.367349953057703,
+        10.402173913043477
+      ],
+      [
+        24.605316485953324,
+        -8.435938322795128,
+        10.402173913043477
+      ],
+      [
+        24.519760028389147,
+        -8.502909433152077,
+        10.402173913043477
+      ],
+      [
+        24.427972453215197,
+        -8.568195694908683,
+        10.402173913043477
+      ],
+      [
+        24.329867653910032,
+        -8.631729518845079,
+        10.402173913043477
+      ],
+      [
+        24.225359523952207,
+        -8.693443315741394,
+        10.402173913043477
+      ],
+      [
+        24.11436195682027,
+        -8.753269496377765,
+        10.402173913043477
+      ],
+      [
+        23.99678884599279,
+        -8.81114047153432,
+        10.402173913043477
+      ],
+      [
+        23.87255408494831,
+        -8.866988651991191,
+        10.402173913043477
+      ],
+      [
+        23.741571567165387,
+        -8.920746448528513,
+        10.402173913043477
+      ],
+      [
+        23.60375518612258,
+        -8.972346271926416,
+        10.402173913043477
+      ],
+      [
+        23.459018835298444,
+        -9.021720532965032,
+        10.402173913043477
+      ],
+      [
+        23.307276408171532,
+        -9.068801642424496,
+        10.402173913043477
+      ],
+      [
+        23.148441798220404,
+        -9.113522011084937,
+        10.402173913043477
+      ],
+      [
+        17.142902965205764,
+        -10.722701291504956,
+        10.402173913043477
+      ]
+    ],
+    "actualWorldDimensions": [
+      12.572052093693092,
+      11.844902009210736,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-0",
+      "terrace-1",
+      "riser-1",
+      "terrace-2",
+      "riser-2",
+      "riser-3",
+      "enclosure-left-U-0",
+      "enclosure-right-U-0",
+      "presentation-focus-surface",
+      "focus-terrace-threshold"
+    ],
+    "influence": {
+      "id": "U-0",
+      "role": "U",
+      "sourceIndex": 1,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.048696182246532355,
+      "finalBoundaryDelta": 0.04869150582548828,
+      "changedFinalVertices": 1379,
+      "volumeDelta": 0.03274492637228832,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "U-1",
+    "sourceIndex": 4,
+    "source": {
+      "letter": "U",
+      "x": 8.804347826086955,
+      "y": -1.9565217391304348,
+      "z": 1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.080000000000002,
+      -2.3193527933636933,
+      17.173913043478258
+    ],
+    "yaw": 120,
+    "tilt": 0,
+    "relativeYaw": 30,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.0779141675222601,
+    "pivot": [
+      22.080000000000002,
+      -2.3193527933636933,
+      17.173913043478258
+    ],
+    "role": "focus-facing enclosure curvature",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        14.59086582346192,
+        -9.611539924763191,
+        16.336956518175807
+      ],
+      "max": [
+        27.920736652541567,
+        3.352646315455865,
+        18.01086956878071
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "curve": [
+      [
+        16.42813049961152,
+        -3.649592878333217,
+        17.173913043478258
+      ],
+      [
+        21.812549314445203,
+        -0.5408972261593066,
+        17.173913043478258
+      ],
+      [
+        21.95648442016573,
+        -0.4602062723127027,
+        17.173913043478258
+      ],
+      [
+        22.097073891145445,
+        -0.38619954486213093,
+        17.173913043478258
+      ],
+      [
+        22.234330821093867,
+        -0.3187683645066697,
+        17.173913043478258
+      ],
+      [
+        22.368268303720512,
+        -0.25780405194539746,
+        17.173913043478258
+      ],
+      [
+        22.498899432734888,
+        -0.20319792787739388,
+        17.173913043478258
+      ],
+      [
+        22.626237301846515,
+        -0.15484131300173498,
+        17.173913043478258
+      ],
+      [
+        22.750295004764908,
+        -0.11262552801750125,
+        17.173913043478258
+      ],
+      [
+        22.871085635199574,
+        -0.07644189362377052,
+        17.173913043478258
+      ],
+      [
+        22.988622286860032,
+        -0.0461817305196206,
+        17.173913043478258
+      ],
+      [
+        23.1029180534558,
+        -0.021736359404129768,
+        17.173913043478258
+      ],
+      [
+        23.213986028696382,
+        -0.002997100976377176,
+        17.173913043478258
+      ],
+      [
+        23.321839306291302,
+        0.01014472406455802,
+        17.173913043478258
+      ],
+      [
+        23.426490979950067,
+        0.017797795019599327,
+        17.173913043478258
+      ],
+      [
+        23.527954143382196,
+        0.02007079118966759,
+        17.173913043478258
+      ],
+      [
+        23.626241890297205,
+        0.017072391875683657,
+        17.173913043478258
+      ],
+      [
+        23.721367314404603,
+        0.008911276378570143,
+        17.173913043478258
+      ],
+      [
+        23.813343509413908,
+        -0.004303876000751217,
+        17.173913043478258
+      ],
+      [
+        23.90218356903463,
+        -0.022464385961360467,
+        17.173913043478258
+      ],
+      [
+        23.987900586976288,
+        -0.04546157420233454,
+        17.173913043478258
+      ],
+      [
+        24.070507656948394,
+        -0.07318676142275304,
+        17.173913043478258
+      ],
+      [
+        24.150017872660463,
+        -0.10553126832169246,
+        17.173913043478258
+      ],
+      [
+        24.226444327822005,
+        -0.1423864155982324,
+        17.173913043478258
+      ],
+      [
+        24.29980011614254,
+        -0.1836435239514529,
+        17.173913043478258
+      ],
+      [
+        24.37009833133158,
+        -0.22919391408042866,
+        17.173913043478258
+      ],
+      [
+        24.437352067098637,
+        -0.278928906684242,
+        17.173913043478258
+      ],
+      [
+        24.50157441715323,
+        -0.332739822461968,
+        17.173913043478258
+      ],
+      [
+        24.56277847520487,
+        -0.39051798211268673,
+        17.173913043478258
+      ],
+      [
+        24.620977334963072,
+        -0.45215470633547516,
+        17.173913043478258
+      ],
+      [
+        24.67618409013735,
+        -0.5175413158294146,
+        17.173913043478258
+      ],
+      [
+        24.728411834437217,
+        -0.5865691312935808,
+        17.173913043478258
+      ],
+      [
+        24.777673661572194,
+        -0.6591294734270532,
+        17.173913043478258
+      ],
+      [
+        24.823982665251783,
+        -0.7351136629289114,
+        17.173913043478258
+      ],
+      [
+        24.866632401806566,
+        -0.8132105312903137,
+        17.173913043478258
+      ],
+      [
+        24.90484058783396,
+        -0.8921526960927735,
+        17.173913043478258
+      ],
+      [
+        24.938506557443738,
+        -0.9718971571709005,
+        17.173913043478258
+      ],
+      [
+        24.96752964474568,
+        -1.052400914359302,
+        17.173913043478258
+      ],
+      [
+        24.991809183849572,
+        -1.1336209674925892,
+        17.173913043478258
+      ],
+      [
+        25.01124450886519,
+        -1.2155143164053652,
+        17.173913043478258
+      ],
+      [
+        25.025734953902308,
+        -1.298037960932243,
+        17.173913043478258
+      ],
+      [
+        25.03517985307071,
+        -1.381148900907828,
+        17.173913043478258
+      ],
+      [
+        25.039478540480175,
+        -1.4648041361667303,
+        17.173913043478258
+      ],
+      [
+        25.038530350240485,
+        -1.5489606665435556,
+        17.173913043478258
+      ],
+      [
+        25.032234616461412,
+        -1.6335754918729157,
+        17.173913043478258
+      ],
+      [
+        25.02049067325274,
+        -1.7186056119894175,
+        17.173913043478258
+      ],
+      [
+        25.00319785472425,
+        -1.8040080267276672,
+        17.173913043478258
+      ],
+      [
+        24.98025549498572,
+        -1.889739735922276,
+        17.173913043478258
+      ],
+      [
+        24.951562928146924,
+        -1.9757577394078507,
+        17.173913043478258
+      ],
+      [
+        24.91701948831765,
+        -2.062019037019001,
+        17.173913043478258
+      ],
+      [
+        24.876524509607666,
+        -2.148480628590333,
+        17.173913043478258
+      ],
+      [
+        24.829977326126762,
+        -2.2350995139564573,
+        17.173913043478258
+      ],
+      [
+        24.777277271984715,
+        -2.3218326929519804,
+        17.173913043478258
+      ],
+      [
+        24.718323681291302,
+        -2.4086371654115113,
+        17.173913043478258
+      ],
+      [
+        24.6530158881563,
+        -2.4954699311696573,
+        17.173913043478258
+      ],
+      [
+        24.58125322668949,
+        -2.582287990061029,
+        17.173913043478258
+      ],
+      [
+        24.502935031000657,
+        -2.6690483419202327,
+        17.173913043478258
+      ],
+      [
+        24.417960635199574,
+        -2.755707986581877,
+        17.173913043478258
+      ],
+      [
+        24.326229373396018,
+        -2.8422239238805718,
+        17.173913043478258
+      ],
+      [
+        24.227640579699777,
+        -2.9285531536509235,
+        17.173913043478258
+      ],
+      [
+        24.122093588220622,
+        -3.0146526757275405,
+        17.173913043478258
+      ],
+      [
+        24.009487733068337,
+        -3.100479489945032,
+        17.173913043478258
+      ],
+      [
+        23.8897223483527,
+        -3.185990596138007,
+        17.173913043478258
+      ],
+      [
+        23.76269676818349,
+        -3.2711429941410715,
+        17.173913043478258
+      ],
+      [
+        23.628310326670483,
+        -3.355893683788835,
+        17.173913043478258
+      ],
+      [
+        23.486462357923465,
+        -3.440199664915906,
+        17.173913043478258
+      ],
+      [
+        18.10204354308978,
+        -6.5488953170898165,
+        17.173913043478258
+      ]
+    ],
+    "actualWorldDimensions": [
+      13.329870829079647,
+      12.964186240219057,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-1",
+      "riser-1",
+      "terrace-2",
+      "riser-2",
+      "terrace-3",
+      "riser-3",
+      "terrace-4",
+      "riser-4",
+      "terrace-5",
+      "riser-5",
+      "riser-6",
+      "enclosure-left-U-0",
+      "enclosure-left-U-1",
+      "enclosure-left-U-2",
+      "enclosure-right-U-0",
+      "enclosure-right-U-1",
+      "enclosure-right-U-2"
+    ],
+    "influence": {
+      "id": "U-1",
+      "role": "U",
+      "sourceIndex": 4,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.044402692941543156,
+      "finalBoundaryDelta": 0.36529561430116764,
+      "changedFinalVertices": 2756,
+      "volumeDelta": 1.0880009949869418,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "U-2",
+    "sourceIndex": 1,
+    "source": {
+      "letter": "U",
+      "x": -8.804347826086957,
+      "y": 1.9565217391304348,
+      "z": -1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.080000000000002,
+      3.028142239359572,
+      23.945652173913043
+    ],
+    "yaw": 120,
+    "tilt": 0,
+    "relativeYaw": 30,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.1003788494870335,
+    "pivot": [
+      22.080000000000002,
+      3.028142239359572,
+      23.945652173913043
+    ],
+    "role": "focus-facing enclosure curvature",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        14.59086582346192,
+        -4.264044892039926,
+        23.108695648610592
+      ],
+      "max": [
+        27.920736652541567,
+        8.70014134817913,
+        24.782608699215494
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "curve": [
+      [
+        16.42813049961152,
+        1.6979021543900483,
+        23.945652173913043
+      ],
+      [
+        21.812549314445203,
+        4.806597806563959,
+        23.945652173913043
+      ],
+      [
+        21.95648442016573,
+        4.887288760410563,
+        23.945652173913043
+      ],
+      [
+        22.097073891145445,
+        4.961295487861134,
+        23.945652173913043
+      ],
+      [
+        22.234330821093867,
+        5.028726668216596,
+        23.945652173913043
+      ],
+      [
+        22.368268303720512,
+        5.089690980777868,
+        23.945652173913043
+      ],
+      [
+        22.498899432734888,
+        5.144297104845871,
+        23.945652173913043
+      ],
+      [
+        22.626237301846515,
+        5.19265371972153,
+        23.945652173913043
+      ],
+      [
+        22.750295004764908,
+        5.234869504705764,
+        23.945652173913043
+      ],
+      [
+        22.871085635199574,
+        5.271053139099495,
+        23.945652173913043
+      ],
+      [
+        22.988622286860032,
+        5.301313302203645,
+        23.945652173913043
+      ],
+      [
+        23.1029180534558,
+        5.325758673319136,
+        23.945652173913043
+      ],
+      [
+        23.213986028696382,
+        5.344497931746888,
+        23.945652173913043
+      ],
+      [
+        23.321839306291302,
+        5.357639756787823,
+        23.945652173913043
+      ],
+      [
+        23.426490979950067,
+        5.365292827742865,
+        23.945652173913043
+      ],
+      [
+        23.527954143382196,
+        5.367565823912933,
+        23.945652173913043
+      ],
+      [
+        23.626241890297205,
+        5.364567424598949,
+        23.945652173913043
+      ],
+      [
+        23.721367314404603,
+        5.3564063091018355,
+        23.945652173913043
+      ],
+      [
+        23.813343509413908,
+        5.343191156722514,
+        23.945652173913043
+      ],
+      [
+        23.90218356903463,
+        5.325030646761904,
+        23.945652173913043
+      ],
+      [
+        23.987900586976288,
+        5.302033458520931,
+        23.945652173913043
+      ],
+      [
+        24.070507656948394,
+        5.274308271300512,
+        23.945652173913043
+      ],
+      [
+        24.150017872660463,
+        5.241963764401573,
+        23.945652173913043
+      ],
+      [
+        24.226444327822005,
+        5.205108617125033,
+        23.945652173913043
+      ],
+      [
+        24.29980011614254,
+        5.163851508771812,
+        23.945652173913043
+      ],
+      [
+        24.37009833133158,
+        5.118301118642837,
+        23.945652173913043
+      ],
+      [
+        24.437352067098637,
+        5.068566126039023,
+        23.945652173913043
+      ],
+      [
+        24.50157441715323,
+        5.014755210261297,
+        23.945652173913043
+      ],
+      [
+        24.56277847520487,
+        4.956977050610579,
+        23.945652173913043
+      ],
+      [
+        24.620977334963072,
+        4.895340326387791,
+        23.945652173913043
+      ],
+      [
+        24.67618409013735,
+        4.829953716893851,
+        23.945652173913043
+      ],
+      [
+        24.728411834437217,
+        4.760925901429685,
+        23.945652173913043
+      ],
+      [
+        24.777673661572194,
+        4.688365559296212,
+        23.945652173913043
+      ],
+      [
+        24.823982665251783,
+        4.612381369794354,
+        23.945652173913043
+      ],
+      [
+        24.866632401806566,
+        4.534284501432952,
+        23.945652173913043
+      ],
+      [
+        24.90484058783396,
+        4.455342336630492,
+        23.945652173913043
+      ],
+      [
+        24.938506557443738,
+        4.375597875552365,
+        23.945652173913043
+      ],
+      [
+        24.96752964474568,
+        4.295094118363963,
+        23.945652173913043
+      ],
+      [
+        24.991809183849572,
+        4.2138740652306765,
+        23.945652173913043
+      ],
+      [
+        25.01124450886519,
+        4.1319807163179,
+        23.945652173913043
+      ],
+      [
+        25.025734953902308,
+        4.049457071791022,
+        23.945652173913043
+      ],
+      [
+        25.03517985307071,
+        3.9663461318154374,
+        23.945652173913043
+      ],
+      [
+        25.039478540480175,
+        3.882690896556535,
+        23.945652173913043
+      ],
+      [
+        25.038530350240485,
+        3.7985343661797097,
+        23.945652173913043
+      ],
+      [
+        25.032234616461412,
+        3.7139195408503496,
+        23.945652173913043
+      ],
+      [
+        25.02049067325274,
+        3.628889420733848,
+        23.945652173913043
+      ],
+      [
+        25.00319785472425,
+        3.543487005995598,
+        23.945652173913043
+      ],
+      [
+        24.98025549498572,
+        3.4577552968009893,
+        23.945652173913043
+      ],
+      [
+        24.951562928146924,
+        3.3717372933154146,
+        23.945652173913043
+      ],
+      [
+        24.91701948831765,
+        3.2854759957042643,
+        23.945652173913043
+      ],
+      [
+        24.876524509607666,
+        3.1990144041329325,
+        23.945652173913043
+      ],
+      [
+        24.829977326126762,
+        3.112395518766808,
+        23.945652173913043
+      ],
+      [
+        24.777277271984715,
+        3.025662339771285,
+        23.945652173913043
+      ],
+      [
+        24.718323681291302,
+        2.938857867311754,
+        23.945652173913043
+      ],
+      [
+        24.6530158881563,
+        2.852025101553608,
+        23.945652173913043
+      ],
+      [
+        24.58125322668949,
+        2.765207042662236,
+        23.945652173913043
+      ],
+      [
+        24.502935031000657,
+        2.6784466908030327,
+        23.945652173913043
+      ],
+      [
+        24.417960635199574,
+        2.591787046141388,
+        23.945652173913043
+      ],
+      [
+        24.326229373396018,
+        2.5052711088426936,
+        23.945652173913043
+      ],
+      [
+        24.227640579699777,
+        2.418941879072342,
+        23.945652173913043
+      ],
+      [
+        24.122093588220622,
+        2.332842356995725,
+        23.945652173913043
+      ],
+      [
+        24.009487733068337,
+        2.2470155427782332,
+        23.945652173913043
+      ],
+      [
+        23.8897223483527,
+        2.1615044365852585,
+        23.945652173913043
+      ],
+      [
+        23.76269676818349,
+        2.076352038582194,
+        23.945652173913043
+      ],
+      [
+        23.628310326670483,
+        1.9916013489344304,
+        23.945652173913043
+      ],
+      [
+        23.486462357923465,
+        1.9072953678073594,
+        23.945652173913043
+      ],
+      [
+        18.10204354308978,
+        -1.2014002843665512,
+        23.945652173913043
+      ]
+    ],
+    "actualWorldDimensions": [
+      13.329870829079647,
+      12.964186240219057,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-3",
+      "riser-3",
+      "terrace-4",
+      "riser-4",
+      "terrace-5",
+      "riser-5",
+      "terrace-6",
+      "riser-6",
+      "terrace-7",
+      "riser-7",
+      "terrace-8",
+      "riser-8",
+      "riser-9",
+      "enclosure-left-U-0",
+      "enclosure-left-U-1",
+      "enclosure-left-U-2",
+      "enclosure-left-U-3",
+      "enclosure-right-U-0",
+      "enclosure-right-U-1",
+      "enclosure-right-U-2",
+      "enclosure-right-U-3"
+    ],
+    "influence": {
+      "id": "U-2",
+      "role": "U",
+      "sourceIndex": 1,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.047789927201639534,
+      "finalBoundaryDelta": 0.20959967263977136,
+      "changedFinalVertices": 2834,
+      "volumeDelta": 1.4920872326356402,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "U-3",
+    "sourceIndex": 4,
+    "source": {
+      "letter": "U",
+      "x": 8.804347826086955,
+      "y": -1.9565217391304348,
+      "z": 1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.080000000000002,
+      8.375637272082837,
+      30.717391304347828
+    ],
+    "yaw": 135,
+    "tilt": 0,
+    "relativeYaw": 45,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.019304134098021803,
+    "pivot": [
+      22.080000000000002,
+      8.375637272082837,
+      30.717391304347828
+    ],
+    "role": "focus-facing enclosure curvature",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        14.428625067452108,
+        0.7242623395349437,
+        29.880434779045377
+      ],
+      "max": [
+        27.904936625337328,
+        14.200573897420162,
+        31.55434782965028
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "curve": [
+      [
+        16.965004751308182,
+        5.627912551711201,
+        30.717391304347828
+      ],
+      [
+        21.361364303902803,
+        10.02427210430582,
+        30.717391304347828
+      ],
+      [
+        21.479510584204917,
+        10.139466727193472,
+        30.717391304347828
+      ],
+      [
+        21.596155234598623,
+        10.247338969187554,
+        30.717391304347828
+      ],
+      [
+        21.71128277436322,
+        10.347997195333004,
+        30.717391304347828
+      ],
+      [
+        21.824877722777995,
+        10.441549770674758,
+        30.717391304347828
+      ],
+      [
+        21.936924599122253,
+        10.528105060257754,
+        30.717391304347828
+      ],
+      [
+        22.047407922675283,
+        10.607771429126927,
+        30.717391304347828
+      ],
+      [
+        22.15631221271638,
+        10.680657242327216,
+        30.717391304347828
+      ],
+      [
+        22.26362198852484,
+        10.746870864903554,
+        30.717391304347828
+      ],
+      [
+        22.369321769379955,
+        10.80652066190088,
+        30.717391304347828
+      ],
+      [
+        22.473396074561023,
+        10.85971499836413,
+        30.717391304347828
+      ],
+      [
+        22.57582942334734,
+        10.906562239338239,
+        30.717391304347828
+      ],
+      [
+        22.676606335018196,
+        10.947170749868146,
+        30.717391304347828
+      ],
+      [
+        22.77571132885289,
+        10.981648894998784,
+        30.717391304347828
+      ],
+      [
+        22.87312892413071,
+        11.010105039775095,
+        30.717391304347828
+      ],
+      [
+        22.968843640130963,
+        11.03264754924201,
+        30.717391304347828
+      ],
+      [
+        23.062839996132933,
+        11.04938478844447,
+        30.717391304347828
+      ],
+      [
+        23.155102511415922,
+        11.060425122427409,
+        30.717391304347828
+      ],
+      [
+        23.24561570525922,
+        11.065876916235764,
+        30.717391304347828
+      ],
+      [
+        23.33436409694212,
+        11.06584853491447,
+        30.717391304347828
+      ],
+      [
+        23.421332205743923,
+        11.060448343508465,
+        30.717391304347828
+      ],
+      [
+        23.50650455094392,
+        11.049784707062688,
+        30.717391304347828
+      ],
+      [
+        23.589865651821405,
+        11.033965990622072,
+        30.717391304347828
+      ],
+      [
+        23.67140002765567,
+        11.013100559231555,
+        30.717391304347828
+      ],
+      [
+        23.751092197726024,
+        10.987296777936074,
+        30.717391304347828
+      ],
+      [
+        23.828926681311746,
+        10.956663011780561,
+        30.717391304347828
+      ],
+      [
+        23.904887997692136,
+        10.921307625809959,
+        30.717391304347828
+      ],
+      [
+        23.97896066614649,
+        10.881338985069203,
+        30.717391304347828
+      ],
+      [
+        24.051129205954105,
+        10.836865454603226,
+        30.717391304347828
+      ],
+      [
+        24.12137813639427,
+        10.787995399456968,
+        30.717391304347828
+      ],
+      [
+        24.189691976746282,
+        10.734837184675364,
+        30.717391304347828
+      ],
+      [
+        24.25605524628944,
+        10.677499175303351,
+        30.717391304347828
+      ],
+      [
+        24.32045246430303,
+        10.616089736385865,
+        30.717391304347828
+      ],
+      [
+        24.381861903220514,
+        10.551692518372272,
+        30.717391304347828
+      ],
+      [
+        24.439199912592528,
+        10.485329248829117,
+        30.717391304347828
+      ],
+      [
+        24.492358127374132,
+        10.417015408477104,
+        30.717391304347828
+      ],
+      [
+        24.541228182520392,
+        10.346766478036939,
+        30.717391304347828
+      ],
+      [
+        24.585701712986367,
+        10.274597938229327,
+        30.717391304347828
+      ],
+      [
+        24.625670353727127,
+        10.200525269774973,
+        30.717391304347828
+      ],
+      [
+        24.661025739697727,
+        10.12456395339458,
+        30.717391304347828
+      ],
+      [
+        24.691659505853238,
+        10.046729469808858,
+        30.717391304347828
+      ],
+      [
+        24.717463287148718,
+        9.967037299738509,
+        30.717391304347828
+      ],
+      [
+        24.738328718539236,
+        9.88550292390424,
+        30.717391304347828
+      ],
+      [
+        24.754147434979853,
+        9.802141823026753,
+        30.717391304347828
+      ],
+      [
+        24.76481107142563,
+        9.716969477826757,
+        30.717391304347828
+      ],
+      [
+        24.770211262831637,
+        9.630001369024955,
+        30.717391304347828
+      ],
+      [
+        24.770239644152927,
+        9.541252977342053,
+        30.717391304347828
+      ],
+      [
+        24.764787850344575,
+        9.450739783498756,
+        30.717391304347828
+      ],
+      [
+        24.753747516361635,
+        9.35847726821577,
+        30.717391304347828
+      ],
+      [
+        24.737010277159175,
+        9.264480912213799,
+        30.717391304347828
+      ],
+      [
+        24.71446776769226,
+        9.168766196213548,
+        30.717391304347828
+      ],
+      [
+        24.68601162291595,
+        9.071348600935723,
+        30.717391304347828
+      ],
+      [
+        24.65153347778531,
+        8.972243607101031,
+        30.717391304347828
+      ],
+      [
+        24.610924967255404,
+        8.871466695430172,
+        30.717391304347828
+      ],
+      [
+        24.564077726281294,
+        8.769033346643857,
+        30.717391304347828
+      ],
+      [
+        24.510883389818044,
+        8.664959041462788,
+        30.717391304347828
+      ],
+      [
+        24.45123359282072,
+        8.559259260607673,
+        30.717391304347828
+      ],
+      [
+        24.38501997024438,
+        8.451949484799213,
+        30.717391304347828
+      ],
+      [
+        24.312134157044092,
+        8.343045194758115,
+        30.717391304347828
+      ],
+      [
+        24.23246778817492,
+        8.232561871205087,
+        30.717391304347828
+      ],
+      [
+        24.145912498591922,
+        8.12051499486083,
+        30.717391304347828
+      ],
+      [
+        24.05235992325017,
+        8.006920046446053,
+        30.717391304347828
+      ],
+      [
+        23.951701697104717,
+        7.891792506681458,
+        30.717391304347828
+      ],
+      [
+        23.843829455110637,
+        7.775147856287752,
+        30.717391304347828
+      ],
+      [
+        23.728634832222987,
+        7.657001575985639,
+        30.717391304347828
+      ],
+      [
+        19.332275279628362,
+        3.2606420233910196,
+        30.717391304347828
+      ]
+    ],
+    "actualWorldDimensions": [
+      13.47631155788522,
+      13.476311557885218,
+      1.6739130506049023
+    ],
+    "constructionComponents": [
+      "terrace-6",
+      "riser-6",
+      "terrace-7",
+      "riser-7",
+      "terrace-8",
+      "riser-8",
+      "terrace-9",
+      "riser-9",
+      "terrace-10",
+      "riser-10",
+      "riser-11",
+      "enclosure-left-U-2",
+      "enclosure-left-U-3",
+      "enclosure-right-U-2",
+      "enclosure-right-U-3"
+    ],
+    "influence": {
+      "id": "U-3",
+      "role": "U",
+      "sourceIndex": 4,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.04867194047437535,
+      "finalBoundaryDelta": 0.05366775720226718,
+      "changedFinalVertices": 2269,
+      "volumeDelta": 1.6787051251967569,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "U-4",
+    "sourceIndex": 1,
+    "source": {
+      "letter": "U",
+      "x": -8.804347826086957,
+      "y": 1.9565217391304348,
+      "z": -1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.080000000000002,
+      13.723132304806104,
+      37.48913043478261
+    ],
+    "yaw": 135,
+    "tilt": 0,
+    "relativeYaw": 45,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.0924207365447429,
+    "pivot": [
+      22.080000000000002,
+      13.723132304806104,
+      37.48913043478261
+    ],
+    "role": "focus-facing enclosure curvature",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        14.428625067452108,
+        6.07175737225821,
+        36.652173909480155
+      ],
+      "max": [
+        27.904936625337328,
+        19.54806893014343,
+        38.326086960085064
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "curve": [
+      [
+        16.965004751308182,
+        10.975407584434468,
+        37.48913043478261
+      ],
+      [
+        21.361364303902803,
+        15.371767137029087,
+        37.48913043478261
+      ],
+      [
+        21.479510584204917,
+        15.486961759916738,
+        37.48913043478261
+      ],
+      [
+        21.596155234598623,
+        15.59483400191082,
+        37.48913043478261
+      ],
+      [
+        21.71128277436322,
+        15.69549222805627,
+        37.48913043478261
+      ],
+      [
+        21.824877722777995,
+        15.789044803398024,
+        37.48913043478261
+      ],
+      [
+        21.936924599122253,
+        15.87560009298102,
+        37.48913043478261
+      ],
+      [
+        22.047407922675283,
+        15.955266461850194,
+        37.48913043478261
+      ],
+      [
+        22.15631221271638,
+        16.02815227505048,
+        37.48913043478261
+      ],
+      [
+        22.26362198852484,
+        16.094365897626822,
+        37.48913043478261
+      ],
+      [
+        22.369321769379955,
+        16.154015694624146,
+        37.48913043478261
+      ],
+      [
+        22.473396074561023,
+        16.207210031087396,
+        37.48913043478261
+      ],
+      [
+        22.57582942334734,
+        16.254057272061505,
+        37.48913043478261
+      ],
+      [
+        22.676606335018196,
+        16.294665782591412,
+        37.48913043478261
+      ],
+      [
+        22.77571132885289,
+        16.32914392772205,
+        37.48913043478261
+      ],
+      [
+        22.87312892413071,
+        16.35760007249836,
+        37.48913043478261
+      ],
+      [
+        22.968843640130963,
+        16.380142581965277,
+        37.48913043478261
+      ],
+      [
+        23.062839996132933,
+        16.396879821167737,
+        37.48913043478261
+      ],
+      [
+        23.155102511415922,
+        16.407920155150677,
+        37.48913043478261
+      ],
+      [
+        23.24561570525922,
+        16.41337194895903,
+        37.48913043478261
+      ],
+      [
+        23.33436409694212,
+        16.413343567637735,
+        37.48913043478261
+      ],
+      [
+        23.421332205743923,
+        16.40794337623173,
+        37.48913043478261
+      ],
+      [
+        23.50650455094392,
+        16.397279739785954,
+        37.48913043478261
+      ],
+      [
+        23.589865651821405,
+        16.381461023345338,
+        37.48913043478261
+      ],
+      [
+        23.67140002765567,
+        16.36059559195482,
+        37.48913043478261
+      ],
+      [
+        23.751092197726024,
+        16.33479181065934,
+        37.48913043478261
+      ],
+      [
+        23.828926681311746,
+        16.30415804450383,
+        37.48913043478261
+      ],
+      [
+        23.904887997692136,
+        16.268802658533225,
+        37.48913043478261
+      ],
+      [
+        23.97896066614649,
+        16.22883401779247,
+        37.48913043478261
+      ],
+      [
+        24.051129205954105,
+        16.184360487326494,
+        37.48913043478261
+      ],
+      [
+        24.12137813639427,
+        16.135490432180234,
+        37.48913043478261
+      ],
+      [
+        24.189691976746282,
+        16.08233221739863,
+        37.48913043478261
+      ],
+      [
+        24.25605524628944,
+        16.02499420802662,
+        37.48913043478261
+      ],
+      [
+        24.32045246430303,
+        15.963584769109131,
+        37.48913043478261
+      ],
+      [
+        24.381861903220514,
+        15.899187551095538,
+        37.48913043478261
+      ],
+      [
+        24.439199912592528,
+        15.832824281552384,
+        37.48913043478261
+      ],
+      [
+        24.492358127374132,
+        15.76451044120037,
+        37.48913043478261
+      ],
+      [
+        24.541228182520392,
+        15.694261510760205,
+        37.48913043478261
+      ],
+      [
+        24.585701712986367,
+        15.622092970952593,
+        37.48913043478261
+      ],
+      [
+        24.625670353727127,
+        15.548020302498239,
+        37.48913043478261
+      ],
+      [
+        24.661025739697727,
+        15.472058986117846,
+        37.48913043478261
+      ],
+      [
+        24.691659505853238,
+        15.394224502532124,
+        37.48913043478261
+      ],
+      [
+        24.717463287148718,
+        15.314532332461775,
+        37.48913043478261
+      ],
+      [
+        24.738328718539236,
+        15.232997956627505,
+        37.48913043478261
+      ],
+      [
+        24.754147434979853,
+        15.14963685575002,
+        37.48913043478261
+      ],
+      [
+        24.76481107142563,
+        15.064464510550023,
+        37.48913043478261
+      ],
+      [
+        24.770211262831637,
+        14.97749640174822,
+        37.48913043478261
+      ],
+      [
+        24.770239644152927,
+        14.888748010065319,
+        37.48913043478261
+      ],
+      [
+        24.764787850344575,
+        14.798234816222022,
+        37.48913043478261
+      ],
+      [
+        24.753747516361635,
+        14.705972300939036,
+        37.48913043478261
+      ],
+      [
+        24.737010277159175,
+        14.611975944937065,
+        37.48913043478261
+      ],
+      [
+        24.71446776769226,
+        14.516261228936814,
+        37.48913043478261
+      ],
+      [
+        24.68601162291595,
+        14.41884363365899,
+        37.48913043478261
+      ],
+      [
+        24.65153347778531,
+        14.319738639824298,
+        37.48913043478261
+      ],
+      [
+        24.610924967255404,
+        14.218961728153438,
+        37.48913043478261
+      ],
+      [
+        24.564077726281294,
+        14.116528379367123,
+        37.48913043478261
+      ],
+      [
+        24.510883389818044,
+        14.012454074186055,
+        37.48913043478261
+      ],
+      [
+        24.45123359282072,
+        13.90675429333094,
+        37.48913043478261
+      ],
+      [
+        24.38501997024438,
+        13.79944451752248,
+        37.48913043478261
+      ],
+      [
+        24.312134157044092,
+        13.690540227481382,
+        37.48913043478261
+      ],
+      [
+        24.23246778817492,
+        13.580056903928353,
+        37.48913043478261
+      ],
+      [
+        24.145912498591922,
+        13.468010027584096,
+        37.48913043478261
+      ],
+      [
+        24.05235992325017,
+        13.35441507916932,
+        37.48913043478261
+      ],
+      [
+        23.951701697104717,
+        13.239287539404724,
+        37.48913043478261
+      ],
+      [
+        23.843829455110637,
+        13.122642889011018,
+        37.48913043478261
+      ],
+      [
+        23.728634832222987,
+        13.004496608708905,
+        37.48913043478261
+      ],
+      [
+        19.332275279628362,
+        8.608137056114286,
+        37.48913043478261
+      ]
+    ],
+    "actualWorldDimensions": [
+      13.47631155788522,
+      13.47631155788522,
+      1.6739130506049094
+    ],
+    "constructionComponents": [
+      "terrace-9",
+      "riser-9",
+      "terrace-10",
+      "riser-10",
+      "terrace-11",
+      "riser-11",
+      "enclosure-left-U-3",
+      "enclosure-right-U-3",
+      "rear-enclosure"
+    ],
+    "influence": {
+      "id": "U-4",
+      "role": "U",
+      "sourceIndex": 1,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.049999237060546875,
+      "finalBoundaryDelta": 0.0500030517578125,
+      "changedFinalVertices": 1488,
+      "volumeDelta": 5.816449030354306,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-0",
+    "sourceIndex": 2,
+    "source": {
+      "letter": "V",
+      "x": -2.9347826086956528,
+      "y": -1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -22.63,
+      -6.694576001955455,
+      8.01086956521739
+    ],
+    "yaw": 90,
+    "tilt": 90,
+    "relativeYaw": 0,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.7853981633974484,
+    "pivot": [
+      -22.63,
+      -6.694576001955455,
+      8.01086956521739
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -23.46695652530245,
+        -12.332240382236321,
+        2.510869465444399
+      ],
+      "max": [
+        -21.793043474697548,
+        -1.0569116216745877,
+        13.510869664990382
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        -22.63,
+        -8.48805426282502,
+        13.391304347826086
+      ],
+      [
+        -22.63,
+        -6.694576001955455,
+        6.0978260869565215
+      ],
+      [
+        -22.63,
+        -4.90109774108589,
+        13.391304347826086
+      ]
+    ],
+    "armDirections": [
+      [
+        0,
+        -0.23878812125503412,
+        0.9710716931038053
+      ],
+      [
+        0,
+        0.23878812125503412,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      0,
+      0.23878812125503412,
+      0.9710716931038053
+    ],
+    "from": "L-0",
+    "to": "L-1",
+    "ascentDirection": [
+      0.6040095911547237,
+      0.6040095911547237,
+      0.5199469468957452
+    ],
+    "actualWorldDimensions": [
+      1.6739130506049023,
+      11.275328760561734,
+      11.000000199545983
+    ],
+    "constructionComponents": [
+      "riser-1",
+      "enclosure-left-U-0",
+      "enclosure-right-U-0"
+    ],
+    "influence": {
+      "id": "V-0",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010727349177632418,
+      "finalBoundaryDelta": 0.010724623339718298,
+      "changedFinalVertices": 626,
+      "volumeDelta": 0.002078940479805169,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-1",
+    "sourceIndex": 5,
+    "source": {
+      "letter": "V",
+      "x": 14.673913043478262,
+      "y": 1.9565217391304348,
+      "z": 1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.63,
+      -4.75003235369245,
+      9.684782608695652
+    ],
+    "yaw": 135,
+    "tilt": 90,
+    "relativeYaw": 45,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 1.4901161193847656e-8,
+    "pivot": [
+      22.63,
+      -4.75003235369245,
+      9.684782608695652
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        18.136297041919352,
+        -9.243735311773097,
+        4.184782508922661
+      ],
+      "max": [
+        27.123702958080646,
+        -0.256329395611802,
+        15.184782708468644
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        23.898180640171525,
+        -6.018212993863976,
+        15.065217391304348
+      ],
+      [
+        22.63,
+        -4.75003235369245,
+        7.771739130434783
+      ],
+      [
+        21.361819359828473,
+        -3.481851713520925,
+        15.065217391304348
+      ]
+    ],
+    "armDirections": [
+      [
+        0.1688486998062302,
+        -0.16884869980623032,
+        0.9710716931038053
+      ],
+      [
+        -0.1688486998062302,
+        0.16884869980623007,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      -0.1688486998062302,
+      0.16884869980623007,
+      0.9710716931038053
+    ],
+    "from": "L-1",
+    "to": "L-2",
+    "ascentDirection": [
+      -0.6040095911547237,
+      0.6040095911547236,
+      0.5199469468957452
+    ],
+    "actualWorldDimensions": [
+      8.987405916161293,
+      8.987405916161295,
+      11.000000199545983
+    ],
+    "constructionComponents": [
+      "riser-2",
+      "enclosure-left-U-0",
+      "enclosure-right-U-0"
+    ],
+    "influence": {
+      "id": "V-1",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010796123956260449,
+      "finalBoundaryDelta": 0.010795901324650978,
+      "changedFinalVertices": 329,
+      "volumeDelta": 0.09623209095843777,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-2",
+    "sourceIndex": 2,
+    "source": {
+      "letter": "V",
+      "x": -2.9347826086956528,
+      "y": -1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -22.63,
+      -2.805488705429444,
+      11.358695652173912
+    ],
+    "yaw": 90,
+    "tilt": 90,
+    "relativeYaw": 0,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.7853981633974483,
+    "pivot": [
+      -22.63,
+      -2.805488705429444,
+      11.358695652173912
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -23.46695652530245,
+        -8.44315308571031,
+        5.8586955524009205
+      ],
+      "max": [
+        -21.793043474697548,
+        2.832175674851423,
+        16.858695751946904
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        -22.63,
+        -4.59896696629901,
+        16.73913043478261
+      ],
+      [
+        -22.63,
+        -2.805488705429444,
+        9.445652173913043
+      ],
+      [
+        -22.63,
+        -1.0120104445598792,
+        16.73913043478261
+      ]
+    ],
+    "armDirections": [
+      [
+        0,
+        -0.23878812125503407,
+        0.9710716931038053
+      ],
+      [
+        0,
+        0.238788121255034,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      0,
+      0.238788121255034,
+      0.9710716931038053
+    ],
+    "from": "L-2",
+    "to": "L-3",
+    "ascentDirection": [
+      0.6040095911547236,
+      0.6040095911547239,
+      0.5199469468957452
+    ],
+    "actualWorldDimensions": [
+      1.6739130506049023,
+      11.275328760561734,
+      11.000000199545983
+    ],
+    "constructionComponents": [
+      "riser-3",
+      "enclosure-left-U-0",
+      "enclosure-right-U-0"
+    ],
+    "influence": {
+      "id": "V-2",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010801179351609458,
+      "finalBoundaryDelta": 0.01080248809177868,
+      "changedFinalVertices": 333,
+      "volumeDelta": 0.09510561913430138,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-3",
+    "sourceIndex": 5,
+    "source": {
+      "letter": "V",
+      "x": 14.673913043478262,
+      "y": 1.9565217391304348,
+      "z": 1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.63,
+      -0.8609450571664388,
+      13.032608695652172
+    ],
+    "yaw": 135,
+    "tilt": 90,
+    "relativeYaw": 45,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 1.4901161193847656e-8,
+    "pivot": [
+      22.63,
+      -0.8609450571664388,
+      13.032608695652172
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        18.136297041919352,
+        -5.354648015247086,
+        7.53260859587918
+      ],
+      "max": [
+        27.123702958080646,
+        3.632757900914209,
+        18.532608795425162
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        23.898180640171525,
+        -2.129125697337965,
+        18.413043478260867
+      ],
+      [
+        22.63,
+        -0.8609450571664384,
+        11.119565217391303
+      ],
+      [
+        21.361819359828473,
+        0.407235583005086,
+        18.413043478260867
+      ]
+    ],
+    "armDirections": [
+      [
+        0.1688486998062302,
+        -0.16884869980623032,
+        0.9710716931038053
+      ],
+      [
+        -0.1688486998062302,
+        0.16884869980623002,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      -0.1688486998062302,
+      0.16884869980623002,
+      0.9710716931038053
+    ],
+    "from": "L-3",
+    "to": "L-4",
+    "ascentDirection": [
+      -0.6040095911547237,
+      0.6040095911547237,
+      0.5199469468957453
+    ],
+    "actualWorldDimensions": [
+      8.987405916161293,
+      8.987405916161295,
+      11.000000199545982
+    ],
+    "constructionComponents": [
+      "riser-4",
+      "enclosure-left-U-1",
+      "enclosure-right-U-1"
+    ],
+    "influence": {
+      "id": "V-3",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.01080521308390864,
+      "finalBoundaryDelta": 0.04454110729752173,
+      "changedFinalVertices": 646,
+      "volumeDelta": 0.09436211304455355,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-4",
+    "sourceIndex": 2,
+    "source": {
+      "letter": "V",
+      "x": -2.9347826086956528,
+      "y": -1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -22.63,
+      1.0835985910965673,
+      14.706521739130434
+    ],
+    "yaw": 90,
+    "tilt": 90,
+    "relativeYaw": 0,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.785398163397448,
+    "pivot": [
+      -22.63,
+      1.0835985910965673,
+      14.706521739130434
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -23.46695652530245,
+        -4.5540657891843,
+        9.206521639357442
+      ],
+      "max": [
+        -21.793043474697548,
+        6.721262971377435,
+        20.206521838903427
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        -22.63,
+        -0.7098796697729977,
+        20.08695652173913
+      ],
+      [
+        -22.63,
+        1.0835985910965673,
+        12.793478260869565
+      ],
+      [
+        -22.63,
+        2.877076851966132,
+        20.08695652173913
+      ]
+    ],
+    "armDirections": [
+      [
+        0,
+        -0.23878812125503407,
+        0.9710716931038053
+      ],
+      [
+        0,
+        0.23878812125503404,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      0,
+      0.23878812125503404,
+      0.9710716931038053
+    ],
+    "from": "L-4",
+    "to": "L-5",
+    "ascentDirection": [
+      0.6040095911547236,
+      0.6040095911547241,
+      0.5199469468957449
+    ],
+    "actualWorldDimensions": [
+      1.6739130506049023,
+      11.275328760561734,
+      11.000000199545985
+    ],
+    "constructionComponents": [
+      "enclosure-left-U-1",
+      "enclosure-right-U-1"
+    ],
+    "influence": {
+      "id": "V-4",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010813727202001935,
+      "finalBoundaryDelta": 0.010812691831785052,
+      "changedFinalVertices": 356,
+      "volumeDelta": 0.11124787601693242,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-5",
+    "sourceIndex": 5,
+    "source": {
+      "letter": "V",
+      "x": 14.673913043478262,
+      "y": 1.9565217391304348,
+      "z": 1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.63,
+      3.028142239359574,
+      16.380434782608692
+    ],
+    "yaw": 135,
+    "tilt": 90,
+    "relativeYaw": 45,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      22.63,
+      3.028142239359574,
+      16.380434782608692
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        18.136297041919352,
+        -1.4655607187210737,
+        10.8804346828357
+      ],
+      "max": [
+        27.123702958080646,
+        7.521845197440221,
+        21.880434882381685
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        23.898180640171525,
+        1.7599615991880477,
+        21.760869565217387
+      ],
+      [
+        22.63,
+        3.0281422393595743,
+        14.467391304347823
+      ],
+      [
+        21.361819359828473,
+        4.296322879531099,
+        21.760869565217387
+      ]
+    ],
+    "armDirections": [
+      [
+        0.1688486998062302,
+        -0.16884869980623032,
+        0.9710716931038053
+      ],
+      [
+        -0.1688486998062302,
+        0.16884869980623002,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      -0.1688486998062302,
+      0.16884869980623002,
+      0.9710716931038053
+    ],
+    "from": "L-5",
+    "to": "L-6",
+    "ascentDirection": [
+      -0.6040095911547237,
+      0.604009591154724,
+      0.519946946895745
+    ],
+    "actualWorldDimensions": [
+      8.987405916161293,
+      8.987405916161295,
+      11.000000199545985
+    ],
+    "constructionComponents": [
+      "riser-5",
+      "riser-6",
+      "enclosure-left-U-2",
+      "enclosure-right-U-2"
+    ],
+    "influence": {
+      "id": "V-5",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010825059181937437,
+      "finalBoundaryDelta": 0.010832814472250426,
+      "changedFinalVertices": 638,
+      "volumeDelta": 0.11298357114901592,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-6",
+    "sourceIndex": 2,
+    "source": {
+      "letter": "V",
+      "x": -2.9347826086956528,
+      "y": -1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -22.63,
+      4.972685887622579,
+      18.054347826086953
+    ],
+    "yaw": 90,
+    "tilt": 90,
+    "relativeYaw": 0,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.7853981633974484,
+    "pivot": [
+      -22.63,
+      4.972685887622579,
+      18.054347826086953
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -23.46695652530245,
+        -0.664978492658288,
+        12.554347726313962
+      ],
+      "max": [
+        -21.793043474697548,
+        10.610350267903446,
+        23.554347925859943
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        -22.63,
+        3.1792076267530143,
+        23.43478260869565
+      ],
+      [
+        -22.63,
+        4.972685887622579,
+        16.141304347826086
+      ],
+      [
+        -22.63,
+        6.766164148492145,
+        23.43478260869565
+      ]
+    ],
+    "armDirections": [
+      [
+        0,
+        -0.23878812125503412,
+        0.9710716931038053
+      ],
+      [
+        0,
+        0.23878812125503418,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      0,
+      0.23878812125503418,
+      0.9710716931038053
+    ],
+    "from": "L-6",
+    "to": "L-7",
+    "ascentDirection": [
+      0.6040095911547236,
+      0.6040095911547236,
+      0.5199469468957455
+    ],
+    "actualWorldDimensions": [
+      1.6739130506049023,
+      11.275328760561734,
+      11.000000199545982
+    ],
+    "constructionComponents": [
+      "riser-7",
+      "enclosure-left-U-2",
+      "enclosure-right-U-2"
+    ],
+    "influence": {
+      "id": "V-6",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010841157729115026,
+      "finalBoundaryDelta": 0.01084166928100012,
+      "changedFinalVertices": 345,
+      "volumeDelta": 0.1340710913609655,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-7",
+    "sourceIndex": 5,
+    "source": {
+      "letter": "V",
+      "x": 14.673913043478262,
+      "y": 1.9565217391304348,
+      "z": 1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.63,
+      6.917229535885585,
+      19.728260869565215
+    ],
+    "yaw": 135,
+    "tilt": 90,
+    "relativeYaw": 45,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 1.4901161193847656e-8,
+    "pivot": [
+      22.63,
+      6.917229535885585,
+      19.728260869565215
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        18.136297041919352,
+        2.423526577804937,
+        14.228260769792223
+      ],
+      "max": [
+        27.123702958080646,
+        11.410932493966232,
+        25.22826096933821
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        23.898180640171525,
+        5.649048895714058,
+        25.10869565217391
+      ],
+      [
+        22.63,
+        6.917229535885585,
+        17.815217391304344
+      ],
+      [
+        21.361819359828473,
+        8.18541017605711,
+        25.10869565217391
+      ]
+    ],
+    "armDirections": [
+      [
+        0.16884869980623016,
+        -0.1688486998062303,
+        0.9710716931038053
+      ],
+      [
+        -0.16884869980623016,
+        0.16884869980623005,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      -0.16884869980623016,
+      0.16884869980623005,
+      0.9710716931038053
+    ],
+    "from": "L-7",
+    "to": "L-8",
+    "ascentDirection": [
+      -0.6040095911547237,
+      0.6040095911547237,
+      0.519946946895745
+    ],
+    "actualWorldDimensions": [
+      8.987405916161293,
+      8.987405916161295,
+      11.000000199545985
+    ],
+    "constructionComponents": [
+      "enclosure-left-U-2",
+      "enclosure-right-U-2"
+    ],
+    "influence": {
+      "id": "V-7",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010858998007469861,
+      "finalBoundaryDelta": 0.010857212006273615,
+      "changedFinalVertices": 353,
+      "volumeDelta": 0.13478413995017036,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-8",
+    "sourceIndex": 2,
+    "source": {
+      "letter": "V",
+      "x": -2.9347826086956528,
+      "y": -1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -22.63,
+      8.86177318414859,
+      21.402173913043477
+    ],
+    "yaw": 90,
+    "tilt": 90,
+    "relativeYaw": 0,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.7853981633974484,
+    "pivot": [
+      -22.63,
+      8.86177318414859,
+      21.402173913043477
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -23.46695652530245,
+        3.224108803867722,
+        15.902173813270485
+      ],
+      "max": [
+        -21.793043474697548,
+        14.499437564429456,
+        26.902174012816467
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        -22.63,
+        7.068294923279025,
+        26.782608695652172
+      ],
+      [
+        -22.63,
+        8.86177318414859,
+        19.48913043478261
+      ],
+      [
+        -22.63,
+        10.655251445018154,
+        26.782608695652172
+      ]
+    ],
+    "armDirections": [
+      [
+        0,
+        -0.23878812125503407,
+        0.9710716931038053
+      ],
+      [
+        0,
+        0.23878812125503407,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      0,
+      0.23878812125503407,
+      0.9710716931038053
+    ],
+    "from": "L-8",
+    "to": "L-9",
+    "ascentDirection": [
+      0.6040095911547236,
+      0.6040095911547236,
+      0.5199469468957455
+    ],
+    "actualWorldDimensions": [
+      1.6739130506049023,
+      11.275328760561734,
+      11.000000199545982
+    ],
+    "constructionComponents": [
+      "riser-8",
+      "riser-9",
+      "enclosure-left-U-3",
+      "enclosure-right-U-3"
+    ],
+    "influence": {
+      "id": "V-8",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010880078935195922,
+      "finalBoundaryDelta": 0.010884659176964899,
+      "changedFinalVertices": 614,
+      "volumeDelta": 0.14272310445358016,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-9",
+    "sourceIndex": 5,
+    "source": {
+      "letter": "V",
+      "x": 14.673913043478262,
+      "y": 1.9565217391304348,
+      "z": 1.9565217391304348,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      22.63,
+      10.806316832411596,
+      23.076086956521735
+    ],
+    "yaw": 135,
+    "tilt": 90,
+    "relativeYaw": 45,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0,
+    "pivot": [
+      22.63,
+      10.806316832411596,
+      23.076086956521735
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        18.136297041919352,
+        6.312613874330949,
+        17.576086856748745
+      ],
+      "max": [
+        27.123702958080646,
+        15.300019790492243,
+        28.576087056294725
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        23.898180640171525,
+        9.53813619224007,
+        28.45652173913043
+      ],
+      [
+        22.63,
+        10.806316832411596,
+        21.163043478260867
+      ],
+      [
+        21.361819359828473,
+        12.074497472583122,
+        28.45652173913043
+      ]
+    ],
+    "armDirections": [
+      [
+        0.16884869980623024,
+        -0.16884869980623024,
+        0.9710716931038053
+      ],
+      [
+        -0.16884869980623024,
+        0.16884869980623024,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      -0.16884869980623024,
+      0.16884869980623024,
+      0.9710716931038053
+    ],
+    "from": "L-9",
+    "to": "L-10",
+    "ascentDirection": [
+      -0.6040095911547234,
+      0.604009591154724,
+      0.5199469468957452
+    ],
+    "actualWorldDimensions": [
+      8.987405916161293,
+      8.987405916161293,
+      11.00000019954598
+    ],
+    "constructionComponents": [
+      "enclosure-left-U-3",
+      "enclosure-right-U-3"
+    ],
+    "influence": {
+      "id": "V-9",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.017510888253383088,
+      "finalBoundaryDelta": 0.017510006388087973,
+      "changedFinalVertices": 238,
+      "volumeDelta": 0.07033904771833477,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  },
+  {
+    "id": "V-10",
+    "sourceIndex": 2,
+    "source": {
+      "letter": "V",
+      "x": -2.9347826086956528,
+      "y": -1.9565217391304348,
+      "z": 0,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 9.782608695652174,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    "center": [
+      -22.63,
+      12.750860480674602,
+      24.75
+    ],
+    "yaw": 180,
+    "tilt": 90,
+    "relativeYaw": 90,
+    "overrideActive": false,
+    "allowedYaw": [
+      0,
+      15,
+      30,
+      45,
+      90
+    ],
+    "cost": 0.7853981633974481,
+    "pivot": [
+      -22.63,
+      12.750860480674602,
+      24.75
+    ],
+    "role": "inter-terrace direction and angular transition",
+    "footprintFeet": 11,
+    "bounds": {
+      "min": [
+        -28.267664380280866,
+        11.91390395537215,
+        19.24999990022701
+      ],
+      "max": [
+        -16.99233561971913,
+        13.587817005977053,
+        30.25000009977299
+      ]
+    },
+    "selectionReason": "L edge across gathering focus; U opening toward focus; V plane toward ascending terrace route",
+    "arms": [
+      [
+        -20.836521739130433,
+        12.7508604806746,
+        30.130434782608695
+      ],
+      [
+        -22.63,
+        12.750860480674602,
+        22.836956521739133
+      ],
+      [
+        -24.423478260869565,
+        12.750860480674602,
+        30.130434782608695
+      ]
+    ],
+    "armDirections": [
+      [
+        0.2387881212550343,
+        -2.3650853295163814e-16,
+        0.9710716931038053
+      ],
+      [
+        -0.2387881212550343,
+        0,
+        0.9710716931038053
+      ]
+    ],
+    "forwardArm": [
+      0.2387881212550343,
+      -2.3650853295163814e-16,
+      0.9710716931038053
+    ],
+    "from": "L-10",
+    "to": "L-11",
+    "ascentDirection": [
+      0.6040095911547237,
+      0.6040095911547232,
+      0.5199469468957456
+    ],
+    "actualWorldDimensions": [
+      11.275328760561734,
+      1.6739130506049023,
+      11.00000019954598
+    ],
+    "constructionComponents": [
+      "riser-10",
+      "riser-11",
+      "enclosure-left-U-3",
+      "enclosure-right-U-3"
+    ],
+    "influence": {
+      "id": "V-10",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010886596720136978,
+      "finalBoundaryDelta": 0.010887239205671383,
+      "changedFinalVertices": 224,
+      "volumeDelta": 0.16444779140329047,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    "independentlyDisplayed": true
+  }
+]

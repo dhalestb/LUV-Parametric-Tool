@@ -1,0 +1,611 @@
+[
+  {
+    "id": "height-20",
+    "status": 0,
+    "study": {
+      "requestedPopulation": "auto",
+      "actualPopulation": 13,
+      "preferredSize": 11,
+      "counts": {
+        "L": 5,
+        "U": 4,
+        "V": 4
+      },
+      "capacity": {
+        "terracesByPlan": 12,
+        "terracesByHeight": 5
+      },
+      "desired": {
+        "L": 5,
+        "U": 4,
+        "V": 4
+      },
+      "enclosureSupportLength": 64.08063106725393,
+      "measuredUArcLength": 19.238708560009563,
+      "uprightVHeight": 11.000000199545983,
+      "sourceRegistration": [
+        20,
+        20,
+        20
+      ],
+      "minorRise": 1.6739130434782605,
+      "run": 1.9445436482630056,
+      "displacement": 2.75,
+      "majorLevelSpacing": 12,
+      "runtimeMs": 1247.1763
+    },
+    "geometry": {
+      "sealedConstructionSeams": [],
+      "status": "NoError",
+      "volume": 2037.6002899539337,
+      "bounds": {
+        "min": [
+          -26.075790405273438,
+          -19.41312026977539,
+          0.6249099969863892
+        ],
+        "max": [
+          26.071239471435547,
+          4.136250019073486,
+          19.70111083984375
+        ]
+      },
+      "shellVolumes": [
+        2037.6001942567732,
+        0.00009569716067101626
+      ],
+      "outside": 0,
+      "sourceOutside": 0,
+      "sourceCount": 13,
+      "beforeSerializationShellVolumes": [
+        2037.6000817796141,
+        0.00009573698859148853
+      ],
+      "serializationVolumeDelta": 0.00011243733092669572,
+      "numericalCutClearance": 0.0001,
+      "exportGrid": 0.00001,
+      "sourceFocusOverlap": 5.079591878259228,
+      "clipped": 0
+    }
+  },
+  {
+    "id": "height-40",
+    "status": 0,
+    "study": {
+      "requestedPopulation": "auto",
+      "actualPopulation": 28,
+      "preferredSize": 11,
+      "counts": {
+        "L": 12,
+        "U": 5,
+        "V": 11
+      },
+      "capacity": {
+        "terracesByPlan": 12,
+        "terracesByHeight": 17
+      },
+      "desired": {
+        "L": 12,
+        "U": 5,
+        "V": 11
+      },
+      "enclosureSupportLength": 92.41092862110978,
+      "measuredUArcLength": 19.238708560009563,
+      "uprightVHeight": 11.000000199545983,
+      "sourceRegistration": [
+        20,
+        20,
+        20
+      ],
+      "minorRise": 1.6739130434782605,
+      "run": 1.9445436482630056,
+      "displacement": 2.75,
+      "majorLevelSpacing": 12,
+      "runtimeMs": 1722.5489
+    },
+    "geometry": {
+      "sealedConstructionSeams": [
+        {
+          "volume": -0.0011197802350214944,
+          "bounds": {
+            "min": [
+              21.201955743694768,
+              10.159372999221016,
+              18.389129871833518
+            ],
+            "max": [
+              21.472612645916918,
+              10.389225325666356,
+              18.634412805726743
+            ]
+          }
+        },
+        {
+          "volume": -6.043451068946527e-26,
+          "bounds": {
+            "min": [
+              22.757728167044355,
+              11.778588652479858,
+              18.413043478260867
+            ],
+            "max": [
+              22.757728175868497,
+              11.778588658915549,
+              18.413043490736637
+            ]
+          }
+        }
+      ],
+      "status": "NoError",
+      "volume": 5238.17668936441,
+      "bounds": {
+        "min": [
+          -26.21845054626465,
+          -19.41312026977539,
+          0.7500500082969666
+        ],
+        "max": [
+          26.221139907836914,
+          17.740659713745117,
+          39.22719955444336
+        ]
+      },
+      "shellVolumes": [
+        5238.17668936441
+      ],
+      "outside": 0,
+      "sourceOutside": 0,
+      "sourceCount": 28,
+      "beforeSerializationShellVolumes": [
+        5238.1769482001655
+      ],
+      "serializationVolumeDelta": -0.00025883575563057093,
+      "numericalCutClearance": 0.0001,
+      "exportGrid": 0.00001,
+      "sourceFocusOverlap": 31.96568724658529,
+      "clipped": 0
+    }
+  },
+  {
+    "id": "height-60",
+    "status": 0,
+    "study": {
+      "requestedPopulation": "auto",
+      "actualPopulation": 29,
+      "preferredSize": 11,
+      "counts": {
+        "L": 12,
+        "U": 6,
+        "V": 11
+      },
+      "capacity": {
+        "terracesByPlan": 12,
+        "terracesByHeight": 29
+      },
+      "desired": {
+        "L": 12,
+        "U": 6,
+        "V": 11
+      },
+      "enclosureSupportLength": 98.67269869495959,
+      "measuredUArcLength": 19.238708560009563,
+      "uprightVHeight": 11.000000199545983,
+      "sourceRegistration": [
+        20,
+        20,
+        20
+      ],
+      "minorRise": 1.6739130434782605,
+      "run": 1.9445436482630056,
+      "displacement": 2.75,
+      "majorLevelSpacing": 12,
+      "runtimeMs": 1885.4116
+    },
+    "geometry": {
+      "sealedConstructionSeams": [
+        {
+          "volume": -0.00015252312166730807,
+          "bounds": {
+            "min": [
+              -21.28318389483405,
+              -3.4972732294270474,
+              6.690607584204675
+            ],
+            "max": [
+              -21.15591864064714,
+              -3.393786237727211,
+              6.811159218201298
+            ]
+          }
+        },
+        {
+          "volume": -0.0006495777658399274,
+          "bounds": {
+            "min": [
+              -21.35589615822185,
+              4.197229003825564,
+              13.380503093791987
+            ],
+            "max": [
+              -21.076225109661664,
+              4.44596554606351,
+              13.645880664024942
+            ]
+          }
+        },
+        {
+          "volume": -0.00002053672074464228,
+          "bounds": {
+            "min": [
+              21.19151978883063,
+              -5.402016705476375,
+              5.01903586047586
+            ],
+            "max": [
+              21.263104968854144,
+              -5.345669852467205,
+              5.0897931908369785
+            ]
+          }
+        },
+        {
+          "volume": -3.742956530173203e-8,
+          "bounds": {
+            "min": [
+              21.254798421091245,
+              2.4378136836628594,
+              11.72360975378256
+            ],
+            "max": [
+              21.265520531639105,
+              2.4474628428214436,
+              11.731661006397612
+            ]
+          }
+        },
+        {
+          "volume": -2.8651852090363705e-25,
+          "bounds": {
+            "min": [
+              22.7577281594808,
+              11.778588644600953,
+              18.413043478260867
+            ],
+            "max": [
+              22.757728175868497,
+              11.778588659051078,
+              18.413043503472686
+            ]
+          }
+        }
+      ],
+      "status": "NoError",
+      "volume": 8485.741012601895,
+      "bounds": {
+        "min": [
+          -26.245580673217773,
+          -19.41312026977539,
+          0.8089100122451782
+        ],
+        "max": [
+          26.258779525756836,
+          17.740659713745117,
+          58.93632888793945
+        ]
+      },
+      "shellVolumes": [
+        8485.741012601895
+      ],
+      "outside": 0,
+      "sourceOutside": 0,
+      "sourceCount": 29,
+      "beforeSerializationShellVolumes": [
+        8485.74152118695
+      ],
+      "serializationVolumeDelta": -0.0005085850552859483,
+      "numericalCutClearance": 0.0001,
+      "exportGrid": 0.00001,
+      "sourceFocusOverlap": 31.96568724658529,
+      "clipped": 0
+    }
+  },
+  {
+    "id": "target-5",
+    "status": 0,
+    "study": {
+      "requestedPopulation": 5,
+      "actualPopulation": 5,
+      "preferredSize": 11,
+      "counts": {
+        "L": 3,
+        "U": 1,
+        "V": 1
+      },
+      "capacity": {
+        "terracesByPlan": 12,
+        "terracesByHeight": 17
+      },
+      "desired": {
+        "L": 12,
+        "U": 5,
+        "V": 11
+      },
+      "enclosureSupportLength": 92.41092862110978,
+      "measuredUArcLength": 19.238708560009563,
+      "uprightVHeight": 11.000000199545983,
+      "sourceRegistration": [
+        20,
+        20,
+        20
+      ],
+      "minorRise": 1.6739130434782605,
+      "run": 1.9445436482630056,
+      "displacement": 2.75,
+      "majorLevelSpacing": 12,
+      "runtimeMs": 905.9781
+    },
+    "geometry": {
+      "sealedConstructionSeams": [],
+      "status": "NoError",
+      "volume": 2631.484896698347,
+      "bounds": {
+        "min": [
+          -26.11389923095703,
+          -19.411270141601562,
+          1.1090500354766846
+        ],
+        "max": [
+          26.117700576782227,
+          0.24492999911308289,
+          25.739810943603516
+        ]
+      },
+      "shellVolumes": [
+        2631.484896698347
+      ],
+      "outside": 0,
+      "sourceOutside": 0,
+      "sourceCount": 5,
+      "beforeSerializationShellVolumes": [
+        2631.4848958411962
+      ],
+      "serializationVolumeDelta": 8.571505532017909e-7,
+      "numericalCutClearance": 0.0001,
+      "exportGrid": 0.00001,
+      "sourceFocusOverlap": 0.7631747126479194,
+      "clipped": 0
+    }
+  },
+  {
+    "id": "target-7",
+    "status": 0,
+    "study": {
+      "requestedPopulation": 7,
+      "actualPopulation": 7,
+      "preferredSize": 11,
+      "counts": {
+        "L": 3,
+        "U": 2,
+        "V": 2
+      },
+      "capacity": {
+        "terracesByPlan": 12,
+        "terracesByHeight": 17
+      },
+      "desired": {
+        "L": 12,
+        "U": 5,
+        "V": 11
+      },
+      "enclosureSupportLength": 92.41092862110978,
+      "measuredUArcLength": 19.238708560009563,
+      "uprightVHeight": 11.000000199545983,
+      "sourceRegistration": [
+        20,
+        20,
+        20
+      ],
+      "minorRise": 1.6739130434782605,
+      "run": 1.9445436482630056,
+      "displacement": 2.75,
+      "majorLevelSpacing": 12,
+      "runtimeMs": 850.4944999999999
+    },
+    "geometry": {
+      "sealedConstructionSeams": [],
+      "status": "NoError",
+      "volume": 4094.116898760107,
+      "bounds": {
+        "min": [
+          -26.11665916442871,
+          -19.41312026977539,
+          0.8745200037956238
+        ],
+        "max": [
+          26.098390579223633,
+          0.23276999592781067,
+          39.13039016723633
+        ]
+      },
+      "shellVolumes": [
+        4094.116898760107
+      ],
+      "outside": 0,
+      "sourceOutside": 0,
+      "sourceCount": 7,
+      "beforeSerializationShellVolumes": [
+        4094.1154773964677
+      ],
+      "serializationVolumeDelta": 0.0014213636391104956,
+      "numericalCutClearance": 0.0001,
+      "exportGrid": 0.00001,
+      "sourceFocusOverlap": 0.7777334073370112,
+      "clipped": 0
+    }
+  },
+  {
+    "id": "target-13",
+    "status": 0,
+    "study": {
+      "requestedPopulation": 13,
+      "actualPopulation": 13,
+      "preferredSize": 11,
+      "counts": {
+        "L": 6,
+        "U": 3,
+        "V": 4
+      },
+      "capacity": {
+        "terracesByPlan": 12,
+        "terracesByHeight": 17
+      },
+      "desired": {
+        "L": 12,
+        "U": 5,
+        "V": 11
+      },
+      "enclosureSupportLength": 92.41092862110978,
+      "measuredUArcLength": 19.238708560009563,
+      "uprightVHeight": 11.000000199545983,
+      "sourceRegistration": [
+        20,
+        20,
+        20
+      ],
+      "minorRise": 1.6739130434782605,
+      "run": 1.9445436482630056,
+      "displacement": 2.75,
+      "majorLevelSpacing": 12,
+      "runtimeMs": 1086.0365
+    },
+    "geometry": {
+      "sealedConstructionSeams": [],
+      "status": "NoError",
+      "volume": 4683.826759298202,
+      "bounds": {
+        "min": [
+          -26.253719329833984,
+          -19.41312026977539,
+          0.7767999768257141
+        ],
+        "max": [
+          26.175519943237305,
+          6.076479911804199,
+          39.08018112182617
+        ]
+      },
+      "shellVolumes": [
+        4683.826759298202
+      ],
+      "outside": 0,
+      "sourceOutside": 0,
+      "sourceCount": 13,
+      "beforeSerializationShellVolumes": [
+        4683.825604195062
+      ],
+      "serializationVolumeDelta": 0.0011551031402632361,
+      "numericalCutClearance": 0.0001,
+      "exportGrid": 0.00001,
+      "sourceFocusOverlap": 8.16156272402782,
+      "clipped": 0
+    }
+  },
+  {
+    "id": "target-31",
+    "status": 0,
+    "study": {
+      "requestedPopulation": 31,
+      "actualPopulation": 31,
+      "preferredSize": 11,
+      "counts": {
+        "L": 12,
+        "U": 8,
+        "V": 11
+      },
+      "capacity": {
+        "terracesByPlan": 12,
+        "terracesByHeight": 17
+      },
+      "desired": {
+        "L": 12,
+        "U": 5,
+        "V": 11
+      },
+      "enclosureSupportLength": 92.41092862110978,
+      "measuredUArcLength": 19.238708560009563,
+      "uprightVHeight": 11.000000199545983,
+      "sourceRegistration": [
+        20,
+        20,
+        20
+      ],
+      "minorRise": 1.6739130434782605,
+      "run": 1.9445436482630056,
+      "displacement": 2.75,
+      "majorLevelSpacing": 12,
+      "runtimeMs": 2380.0492000000004
+    },
+    "geometry": {
+      "sealedConstructionSeams": [
+        {
+          "volume": -0.001078603180735312,
+          "bounds": {
+            "min": [
+              21.206356631251772,
+              10.16249482410341,
+              18.389414300502924
+            ],
+            "max": [
+              21.472169914579045,
+              10.388145243642175,
+              18.631533709603854
+            ]
+          }
+        },
+        {
+          "volume": -6.028842351057966e-26,
+          "bounds": {
+            "min": [
+              22.757728167057365,
+              11.77858865248656,
+              18.413043478260867
+            ],
+            "max": [
+              22.757728175868497,
+              11.778588658914897,
+              18.413043490729407
+            ]
+          }
+        }
+      ],
+      "status": "NoError",
+      "volume": 5110.853636341629,
+      "bounds": {
+        "min": [
+          -26.217620849609375,
+          -19.41312026977539,
+          0.7501199841499329
+        ],
+        "max": [
+          26.221410751342773,
+          17.740659713745117,
+          39.227230072021484
+        ]
+      },
+      "shellVolumes": [
+        5110.853636341629
+      ],
+      "outside": 0,
+      "sourceOutside": 0,
+      "sourceCount": 31,
+      "beforeSerializationShellVolumes": [
+        5110.854177047066
+      ],
+      "serializationVolumeDelta": -0.0005407054368333775,
+      "numericalCutClearance": 0.0001,
+      "exportGrid": 0.00001,
+      "sourceFocusOverlap": 31.96568724658529,
+      "clipped": 0
+    }
+  }
+]

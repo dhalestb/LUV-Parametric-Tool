@@ -1,0 +1,703 @@
+{
+  "sourceGeometryChecks": [
+    {
+      "id": "L-0",
+      "sourceIndex": 0,
+      "transformedBoundsError": 3.3974647450918383e-7
+    },
+    {
+      "id": "L-1",
+      "sourceIndex": 3,
+      "transformedBoundsError": 2.583838831782259e-7
+    },
+    {
+      "id": "L-2",
+      "sourceIndex": 0,
+      "transformedBoundsError": 1.4868767195252985e-7
+    },
+    {
+      "id": "L-3",
+      "sourceIndex": 3,
+      "transformedBoundsError": 2.583838831782259e-7
+    },
+    {
+      "id": "L-4",
+      "sourceIndex": 0,
+      "transformedBoundsError": 2.4522128505566343e-7
+    },
+    {
+      "id": "L-5",
+      "sourceIndex": 3,
+      "transformedBoundsError": 2.583838831782259e-7
+    },
+    {
+      "id": "L-6",
+      "sourceIndex": 0,
+      "transformedBoundsError": 2.1088382773370995e-7
+    },
+    {
+      "id": "L-7",
+      "sourceIndex": 3,
+      "transformedBoundsError": 2.583838831782259e-7
+    },
+    {
+      "id": "L-8",
+      "sourceIndex": 0,
+      "transformedBoundsError": 1.2795562653877823e-7
+    },
+    {
+      "id": "L-9",
+      "sourceIndex": 3,
+      "transformedBoundsError": 9.157735334497374e-7
+    },
+    {
+      "id": "L-10",
+      "sourceIndex": 0,
+      "transformedBoundsError": 9.086468928387603e-7
+    },
+    {
+      "id": "L-11",
+      "sourceIndex": 3,
+      "transformedBoundsError": 9.08646896391474e-7
+    },
+    {
+      "id": "U-0",
+      "sourceIndex": 1,
+      "transformedBoundsError": 5.355646841564976e-7
+    },
+    {
+      "id": "U-1",
+      "sourceIndex": 4,
+      "transformedBoundsError": 4.940058850877449e-7
+    },
+    {
+      "id": "U-2",
+      "sourceIndex": 1,
+      "transformedBoundsError": 6.669889316412991e-7
+    },
+    {
+      "id": "U-3",
+      "sourceIndex": 4,
+      "transformedBoundsError": 0.0000011188032971176654
+    },
+    {
+      "id": "U-4",
+      "sourceIndex": 1,
+      "transformedBoundsError": 0.000001820857107759366
+    },
+    {
+      "id": "V-0",
+      "sourceIndex": 2,
+      "transformedBoundsError": 5.669827061183241e-7
+    },
+    {
+      "id": "V-1",
+      "sourceIndex": 5,
+      "transformedBoundsError": 2.7340391461905256e-7
+    },
+    {
+      "id": "V-2",
+      "sourceIndex": 2,
+      "transformedBoundsError": 5.669827061183241e-7
+    },
+    {
+      "id": "V-3",
+      "sourceIndex": 5,
+      "transformedBoundsError": 7.631985994294155e-7
+    },
+    {
+      "id": "V-4",
+      "sourceIndex": 2,
+      "transformedBoundsError": 5.669827061183241e-7
+    },
+    {
+      "id": "V-5",
+      "sourceIndex": 5,
+      "transformedBoundsError": 8.46126802400704e-7
+    },
+    {
+      "id": "V-6",
+      "sourceIndex": 2,
+      "transformedBoundsError": 5.669827061183241e-7
+    },
+    {
+      "id": "V-7",
+      "sourceIndex": 5,
+      "transformedBoundsError": 9.290550053719926e-7
+    },
+    {
+      "id": "V-8",
+      "sourceIndex": 2,
+      "transformedBoundsError": 5.669827061183241e-7
+    },
+    {
+      "id": "V-9",
+      "sourceIndex": 5,
+      "transformedBoundsError": 0.0000010119832012378538
+    },
+    {
+      "id": "V-10",
+      "sourceIndex": 2,
+      "transformedBoundsError": 6.534742276187444e-7
+    }
+  ],
+  "independentSourceObjectIDs": [
+    "L-0",
+    "L-1",
+    "L-2",
+    "L-3",
+    "L-4",
+    "L-5",
+    "L-6",
+    "L-7",
+    "L-8",
+    "L-9",
+    "L-10",
+    "L-11",
+    "U-0",
+    "U-1",
+    "U-2",
+    "U-3",
+    "U-4",
+    "V-0",
+    "V-1",
+    "V-2",
+    "V-3",
+    "V-4",
+    "V-5",
+    "V-6",
+    "V-7",
+    "V-8",
+    "V-9",
+    "V-10"
+  ],
+  "ascendingTerraces": 12,
+  "logicalElevations": [
+    1.6739130434782605,
+    3.347826086956521,
+    5.021739130434781,
+    6.695652173913042,
+    8.369565217391303,
+    10.043478260869563,
+    11.717391304347823,
+    13.391304347826084,
+    15.065217391304344,
+    16.739130434782606,
+    18.413043478260867,
+    20.08695652173913
+  ],
+  "sourceAnchorDisplacements": [
+    2.75,
+    2.7499999999999996,
+    2.75,
+    2.75,
+    2.7500000000000004,
+    2.75,
+    2.75,
+    2.75,
+    2.75,
+    2.750000000000001,
+    2.7499999999999987
+  ],
+  "horizontalDisplacements": [
+    2.751846255177379,
+    2.751846255177379,
+    2.751743858491945,
+    2.7514366912406776,
+    2.751436691240678,
+    2.748977705482713,
+    2.74652092061691,
+    2.7465209206169106,
+    2.7513283878431314,
+    2.7529327454728385,
+    2.752932745472836
+  ],
+  "nominalMinorRise": 1.6739130434782605,
+  "risers": [
+    {
+      "id": "riser-1",
+      "contacts": [
+        3.2492384375379015,
+        2.646162001710435
+      ]
+    },
+    {
+      "id": "riser-2",
+      "contacts": [
+        3.2228471250691,
+        2.778831836178146
+      ]
+    },
+    {
+      "id": "riser-3",
+      "contacts": [
+        3.249279228040491,
+        2.646272368416221
+      ]
+    },
+    {
+      "id": "riser-4",
+      "contacts": [
+        3.2236922504294014,
+        2.8009926086475567
+      ]
+    },
+    {
+      "id": "riser-5",
+      "contacts": [
+        3.223642834513702,
+        2.8010240776541204
+      ]
+    },
+    {
+      "id": "riser-6",
+      "contacts": [
+        3.22817127226513,
+        2.80553821354097
+      ]
+    },
+    {
+      "id": "riser-7",
+      "contacts": [
+        3.2593108715592414,
+        2.6561673132663604
+      ]
+    },
+    {
+      "id": "riser-8",
+      "contacts": [
+        3.2593254285188906,
+        2.656390447315907
+      ]
+    },
+    {
+      "id": "riser-9",
+      "contacts": [
+        3.2502119341158804,
+        2.6471218186856715
+      ]
+    },
+    {
+      "id": "riser-10",
+      "contacts": [
+        3.157941869994077,
+        3.163084338515053
+      ]
+    },
+    {
+      "id": "riser-11",
+      "contacts": [
+        3.1579775788071647,
+        3.1631754260581517
+      ]
+    }
+  ],
+  "backing": [
+    {
+      "id": "recess-enclosure-left-U-0",
+      "nominalBacking": 1.1724943718623162,
+      "probe": [
+        -20.59595398546705,
+        -6.93345848273008,
+        7.439394082399289
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-enclosure-left-U-1",
+      "nominalBacking": 1.403937120410557,
+      "probe": [
+        -19.700331020192248,
+        -2.4179201120424345,
+        13.426959686043983
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-enclosure-left-U-2",
+      "nominalBacking": 1.4644137336935645,
+      "probe": [
+        -19.536491320617895,
+        1.4095566415099123,
+        17.56147915316591
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-enclosure-left-U-3",
+      "nominalBacking": 1.336463478369084,
+      "probe": [
+        -20.195857785443746,
+        8.71605765093778,
+        23.91058857322489
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-enclosure-right-U-0",
+      "nominalBacking": 1.1724943718623162,
+      "probe": [
+        20.339465582947053,
+        -7.96245899996741,
+        7.193591909386414
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-enclosure-right-U-1",
+      "nominalBacking": 1.403937120410557,
+      "probe": [
+        19.980742391045755,
+        -1.1829113346680442,
+        13.754362725146247
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-enclosure-right-U-2",
+      "nominalBacking": 1.4644137336935645,
+      "probe": [
+        19.828465451574008,
+        2.74281552830794,
+        17.88139048108657
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-enclosure-right-U-3",
+      "nominalBacking": 1.336463478369084,
+      "probe": [
+        19.946061659207587,
+        7.389959436771519,
+        23.682592819866798
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-rear-enclosure",
+      "nominalBacking": 2.531147743816397,
+      "probe": [
+        16.74897023953523,
+        12.164716908728611,
+        28.788043478260867
+      ],
+      "backingMaterialAtProbe": true
+    }
+  ],
+  "constructionContributors": [
+    {
+      "id": "L-0",
+      "components": [
+        "terrace-0",
+        "riser-1",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0",
+        "presentation-focus-surface",
+        "focus-terrace-threshold"
+      ]
+    },
+    {
+      "id": "L-1",
+      "components": [
+        "terrace-1",
+        "riser-1",
+        "riser-2",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0"
+      ]
+    },
+    {
+      "id": "L-2",
+      "components": [
+        "terrace-2",
+        "riser-2",
+        "riser-3",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0"
+      ]
+    },
+    {
+      "id": "L-3",
+      "components": [
+        "terrace-3",
+        "riser-3",
+        "riser-4",
+        "enclosure-left-U-0",
+        "enclosure-left-U-1",
+        "enclosure-right-U-0",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "L-4",
+      "components": [
+        "terrace-4",
+        "riser-4",
+        "riser-5",
+        "enclosure-left-U-1",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "L-5",
+      "components": [
+        "terrace-5",
+        "riser-5",
+        "riser-6",
+        "enclosure-left-U-1",
+        "enclosure-left-U-2",
+        "enclosure-right-U-1",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "L-6",
+      "components": [
+        "terrace-6",
+        "riser-6",
+        "riser-7",
+        "enclosure-left-U-2",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "L-7",
+      "components": [
+        "terrace-7",
+        "riser-7",
+        "riser-8",
+        "enclosure-left-U-2",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "L-8",
+      "components": [
+        "terrace-8",
+        "riser-8",
+        "riser-9",
+        "enclosure-left-U-2",
+        "enclosure-left-U-3",
+        "enclosure-right-U-2",
+        "enclosure-right-U-3"
+      ]
+    },
+    {
+      "id": "L-9",
+      "components": [
+        "terrace-9",
+        "riser-9",
+        "riser-10",
+        "enclosure-left-U-3",
+        "enclosure-right-U-3"
+      ]
+    },
+    {
+      "id": "L-10",
+      "components": [
+        "terrace-10",
+        "riser-10",
+        "riser-11",
+        "enclosure-left-U-3",
+        "enclosure-right-U-3"
+      ]
+    },
+    {
+      "id": "L-11",
+      "components": [
+        "terrace-11",
+        "riser-11",
+        "enclosure-left-U-3",
+        "enclosure-right-U-3",
+        "rear-enclosure"
+      ]
+    },
+    {
+      "id": "U-0",
+      "components": [
+        "terrace-0",
+        "terrace-1",
+        "riser-1",
+        "terrace-2",
+        "riser-2",
+        "riser-3",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0",
+        "presentation-focus-surface",
+        "focus-terrace-threshold"
+      ]
+    },
+    {
+      "id": "U-1",
+      "components": [
+        "terrace-1",
+        "riser-1",
+        "terrace-2",
+        "riser-2",
+        "terrace-3",
+        "riser-3",
+        "terrace-4",
+        "riser-4",
+        "terrace-5",
+        "riser-5",
+        "riser-6",
+        "enclosure-left-U-0",
+        "enclosure-left-U-1",
+        "enclosure-left-U-2",
+        "enclosure-right-U-0",
+        "enclosure-right-U-1",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "U-2",
+      "components": [
+        "terrace-3",
+        "riser-3",
+        "terrace-4",
+        "riser-4",
+        "terrace-5",
+        "riser-5",
+        "terrace-6",
+        "riser-6",
+        "terrace-7",
+        "riser-7",
+        "terrace-8",
+        "riser-8",
+        "riser-9",
+        "enclosure-left-U-0",
+        "enclosure-left-U-1",
+        "enclosure-left-U-2",
+        "enclosure-left-U-3",
+        "enclosure-right-U-0",
+        "enclosure-right-U-1",
+        "enclosure-right-U-2",
+        "enclosure-right-U-3"
+      ]
+    },
+    {
+      "id": "U-3",
+      "components": [
+        "terrace-6",
+        "riser-6",
+        "terrace-7",
+        "riser-7",
+        "terrace-8",
+        "riser-8",
+        "terrace-9",
+        "riser-9",
+        "terrace-10",
+        "riser-10",
+        "riser-11",
+        "enclosure-left-U-2",
+        "enclosure-left-U-3",
+        "enclosure-right-U-2",
+        "enclosure-right-U-3"
+      ]
+    },
+    {
+      "id": "U-4",
+      "components": [
+        "terrace-9",
+        "riser-9",
+        "terrace-10",
+        "riser-10",
+        "terrace-11",
+        "riser-11",
+        "enclosure-left-U-3",
+        "enclosure-right-U-3",
+        "rear-enclosure"
+      ]
+    },
+    {
+      "id": "V-0",
+      "components": [
+        "riser-1",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0"
+      ]
+    },
+    {
+      "id": "V-1",
+      "components": [
+        "riser-2",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0"
+      ]
+    },
+    {
+      "id": "V-2",
+      "components": [
+        "riser-3",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0"
+      ]
+    },
+    {
+      "id": "V-3",
+      "components": [
+        "riser-4",
+        "enclosure-left-U-1",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "V-4",
+      "components": [
+        "enclosure-left-U-1",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "V-5",
+      "components": [
+        "riser-5",
+        "riser-6",
+        "enclosure-left-U-2",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "V-6",
+      "components": [
+        "riser-7",
+        "enclosure-left-U-2",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "V-7",
+      "components": [
+        "enclosure-left-U-2",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "V-8",
+      "components": [
+        "riser-8",
+        "riser-9",
+        "enclosure-left-U-3",
+        "enclosure-right-U-3"
+      ]
+    },
+    {
+      "id": "V-9",
+      "components": [
+        "enclosure-left-U-3",
+        "enclosure-right-U-3"
+      ]
+    },
+    {
+      "id": "V-10",
+      "components": [
+        "riser-10",
+        "riser-11",
+        "enclosure-left-U-3",
+        "enclosure-right-U-3"
+      ]
+    }
+  ],
+  "majorLevelSpacingIsSeparate": 12,
+  "sourceObjects": 28
+}
