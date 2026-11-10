@@ -29,7 +29,7 @@ function derive(r){
  return {nodes,edges,letters};
 }
 async function buildSource(r,out){
- if(r.source.length<2||r.source.length>32)throw Error('Use 2–32 original letters for cross-letter development.');
+ if(r.source.length<2)throw Error('Use at least two original letters for cross-letter development.');
  const {nodes,edges,letters}=derive(r),w=await require('manifold-3d/manifold.js').default();w.setup();const M=w.Manifold;
  const {width:W,depth:D,height:H}=r.field,pitch=.5,paths=[],bands=[];
  for(const e of edges){
@@ -57,7 +57,7 @@ async function buildSource(r,out){
  const primary=M.union(bands.map(b=>b.solid));
  const degree=r.articulation??0;
  if(!Number.isFinite(degree)||degree<0||degree>1)throw Error('Articulation must be between 0 and 1');
- const {solid,tools,projections,report}=require('./source-articulation.cjs').articulate(M,primary,nodes,edges,degree,r.field);
+ const {solid,tools,projections,report}=require('./source-articulation.cjs').articulate(M,primary,nodes,edges,degree,r.field,r.articulationElevation);
  for(const band of bands)for(const tool of tools)band.solid=band.solid.subtract(tool.solid);
  for(const p of projections)bands.push({id:p.id,sources:p.sources,solid:p.solid.intersect(solid)});
  const bounds=solid.boundingBox(),shellVolumes=solid.decompose().map(s=>s.volume());

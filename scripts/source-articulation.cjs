@@ -1,5 +1,5 @@
 // Measure bays on the actual stepped solid at the elevation of each candidate.
-function articulate(M, primary, nodes, edges, degree, field) {
+function articulate(M, primary, nodes, edges, degree, field, elevationMode) {
   const operations = [], tools = [], skipped = [], projections=[];
   let final = primary;
   for (const edge of degree ? edges : []) {
@@ -13,7 +13,7 @@ function articulate(M, primary, nodes, edges, degree, field) {
       const sign = coords[axis] >= [node.p.x,node.p.y][axis] ? 1 : -1;
       const point = (along, across, z) => axis === 0 ? [sign*along,across,z] : [across,sign*along,z];
       const center = Math.round(coords[cross]*4)/4 + .0625;
-      const floor = Math.max(.625, Math.floor(anchor.z*.19)+.125);
+      const floor = Math.max(.625, Math.floor(elevationMode==='feature'?Math.max(anchor.z*.19,Math.min(anchor.z, (edge.q.z+edge.s.z)/2)*.70-node.p.scale*.70):anchor.z*.19)+.125);
       const ray = (solid, across, z) => solid.rayCast(point(80,across,z),point(-80,across,z))
         .map(hit=>sign*hit.position[axis]);
       const hits = ray(final,center,floor+.25);
@@ -67,13 +67,13 @@ function articulate(M, primary, nodes, edges, degree, field) {
         const added=grown.volume()-final.volume();
         if(bearing>.5 && added>.5 && grown.status()==='NoError' && grown.decompose().length===1 &&
            tools.every(t=>t.solid.intersect(canopy).volume()<1e-8)){
-           projections.push({id:id+'-lintel',sources,solid:canopy,added,extension});final=grown;
+           projections.push({id:id+'-lintel',elevation:lintelFloor,sources,solid:canopy,added,extension});final=grown;
         }
       }
     }
   }
   // Recheck each approved void against the final solid.
   for(const tool of tools)if(!tool.verify(final)||final.intersect(tool.solid).volume()>1e-8)throw Error('Obstructed '+tool.id);
-  return {solid:final,tools,projections,report:{degree,before:primary.volume(),after:final.volume(),removed:tools.reduce((sum,t)=>sum+t.removed,0),added:projections.reduce((sum,p)=>sum+p.added,0),projections:projections.map(({id,sources,added,extension})=>({id,sources,added,extension})),operations,skipped,components:final.decompose().length,overhangs:operations.length,addedProjections:projections.length}};
+  return {solid:final,tools,projections,report:{degree,before:primary.volume(),after:final.volume(),removed:tools.reduce((sum,t)=>sum+t.removed,0),added:projections.reduce((sum,p)=>sum+p.added,0),projections:projections.map(({id,sources,added,extension,elevation})=>({id,sources,added,extension,elevation})),operations,skipped,components:final.decompose().length,overhangs:operations.length,addedProjections:projections.length}};
 }
 module.exports={articulate};

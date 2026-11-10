@@ -1,0 +1,170 @@
+{
+  "passed": true,
+  "broadPhaseFlags": 24,
+  "preciseMethod": "all nonadjacent BVH pairs tested with independent segment/triangle crossings and coplanar polygon clipping; original preflight retained separately",
+  "exports": [
+    {
+      "file": "combined-envelope.obj",
+      "status": "NoError",
+      "volume": 39985.90519209634,
+      "vertices": 8675,
+      "triangles": 17350
+    },
+    {
+      "file": "bank-1.obj",
+      "status": "NoError",
+      "volume": 14351.863655022458,
+      "vertices": 2907,
+      "triangles": 5814
+    },
+    {
+      "file": "bank-2.obj",
+      "status": "NoError",
+      "volume": 15881.064393270042,
+      "vertices": 2996,
+      "triangles": 5992
+    },
+    {
+      "file": "bank-3.obj",
+      "status": "NoError",
+      "volume": 7183.960675592337,
+      "vertices": 1680,
+      "triangles": 3356
+    },
+    {
+      "file": "bank-4.obj",
+      "status": "NoError",
+      "volume": 10143.553993703956,
+      "vertices": 2009,
+      "triangles": 4010
+    },
+    {
+      "file": "bank-5.obj",
+      "status": "NoError",
+      "volume": 10395.617940803584,
+      "vertices": 2217,
+      "triangles": 4426
+    },
+    {
+      "file": "bank-6.obj",
+      "status": "NoError",
+      "volume": 10940.955366843005,
+      "vertices": 2310,
+      "triangles": 4616
+    },
+    {
+      "file": "bank-7.obj",
+      "status": "NoError",
+      "volume": 12923.479871616335,
+      "vertices": 2403,
+      "triangles": 4806
+    },
+    {
+      "file": "bank-8.obj",
+      "status": "NoError",
+      "volume": 9484.269476940248,
+      "vertices": 1820,
+      "triangles": 3636
+    },
+    {
+      "file": "bank-9.obj",
+      "status": "NoError",
+      "volume": 11529.738148511971,
+      "vertices": 2416,
+      "triangles": 4824
+    },
+    {
+      "file": "bank-10.obj",
+      "status": "NoError",
+      "volume": 14453.611885994387,
+      "vertices": 2823,
+      "triangles": 5646
+    },
+    {
+      "file": "bank-11.obj",
+      "status": "NoError",
+      "volume": 19015.742579050104,
+      "vertices": 2697,
+      "triangles": 5394
+    },
+    {
+      "file": "bay-1.obj",
+      "status": "NoError",
+      "volume": 1286.9133775657758,
+      "vertices": 10,
+      "triangles": 16
+    },
+    {
+      "file": "bay-2.obj",
+      "status": "NoError",
+      "volume": 413.5170321571019,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "bay-3.obj",
+      "status": "NoError",
+      "volume": 456.4093063491832,
+      "vertices": 22,
+      "triangles": 40
+    },
+    {
+      "file": "bay-4.obj",
+      "status": "NoError",
+      "volume": 393.4806422403639,
+      "vertices": 10,
+      "triangles": 16
+    },
+    {
+      "file": "bay-5.obj",
+      "status": "NoError",
+      "volume": 393.4806422403639,
+      "vertices": 10,
+      "triangles": 16
+    },
+    {
+      "file": "bay-6.obj",
+      "status": "NoError",
+      "volume": 401.276765290339,
+      "vertices": 22,
+      "triangles": 40
+    },
+    {
+      "file": "bay-7.obj",
+      "status": "NoError",
+      "volume": 524.6408886569525,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "bay-8.obj",
+      "status": "NoError",
+      "volume": 393.48067751651286,
+      "vertices": 10,
+      "triangles": 16
+    },
+    {
+      "file": "bay-9.obj",
+      "status": "NoError",
+      "volume": 524.6408886569525,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "bay-10.obj",
+      "status": "NoError",
+      "volume": 275.3518201002165,
+      "vertices": 8,
+      "triangles": 12
+    }
+  ],
+  "coplanarAreas": [],
+  "nonAdjacentTriangleChecks": 602615,
+  "selfIntersectionPairs": 0,
+  "coplanar": 0,
+  "nonCoplanar": 0,
+  "examples": [],
+  "shellVolumes": [
+    39985.90493137803
+  ]
+}
