@@ -13,7 +13,7 @@ function articulate(M, primary, nodes, edges, degree, field, elevationMode) {
       const sign = coords[axis] >= [node.p.x,node.p.y][axis] ? 1 : -1;
       const point = (along, across, z) => axis === 0 ? [sign*along,across,z] : [across,sign*along,z];
       const center = Math.round(coords[cross]*4)/4 + .0625;
-      const floor = Math.max(.625, Math.floor(elevationMode==='feature'?Math.max(anchor.z*.19,Math.min(anchor.z, (edge.q.z+edge.s.z)/2)*.70-node.p.scale*.70):anchor.z*.19)+.125);
+      const floor = elevationMode==='bounded'?Math.max(.625,Math.floor((anchor.z-1.5)*4)/4+.125):Math.max(.625, Math.floor(elevationMode==='feature'?Math.max(anchor.z*.19,Math.min(anchor.z, (edge.q.z+edge.s.z)/2)*.70-node.p.scale*.70):anchor.z*.19)+.125);
       const ray = (solid, across, z) => solid.rayCast(point(80,across,z),point(-80,across,z))
         .map(hit=>sign*hit.position[axis]);
       const hits = ray(final,center,floor+.25);
@@ -21,7 +21,7 @@ function articulate(M, primary, nodes, edges, degree, field, elevationMode) {
       if (bayIndex<0) continue;
       const face=hits[bayIndex], rear=hits[bayIndex+1], bay=face-rear;
       const width=Math.min(node.p.scale*.45,bay*.75)*(0.65+degree*.35);
-      const height=Math.min(node.p.scale*.55,anchor.z*.33)*(0.65+degree*.35);
+      const height=Math.min(node.p.scale*.55,anchor.z*.33,elevationMode==='bounded'?3.5:Infinity)*(0.65+degree*.35);
       const through=node.p.letter==='V' && Math.abs(edge.u.dot(edge.v))<.94;
       const depth=through?bay:bay*(.15+.20*degree);
       if(width<2 || height<2 || depth<1) continue;
