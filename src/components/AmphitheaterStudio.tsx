@@ -1,6 +1,7 @@
 "use client";
 import { useCallback,useEffect,useMemo,useState } from 'react';
 import * as THREE from 'three';
+import {toCreasedNormals} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { OrbitControls } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { BoardCanvas } from './BoardCanvas';
@@ -30,8 +31,8 @@ function Camera({field,view,reset}:{field:AmphitheaterRequest['field'];view:View
  const position:[number,number,number]=view==='plan'?[0,0,field.height/2+span*3]:view==='section'?[-span*3,0,field.height/2]:view==='elevation'?[0,-span*3,field.height/2]:[span*2,-span*2,field.height/2+span*2];
  return <><BoardOrthographicCamera key={view+reset+parameterKey({field,preferredFeet:0} as AmphitheaterRequest)} makeDefault position={position} up={view==='plan'?[0,1,0]:[0,0,1]} zoom={Math.min(size.width,size.height)*.82/frameSpan} near={.01} far={span*20}/><OrbitControls key={view+reset+span} makeDefault target={target} enableRotate={view==='isometric'} enablePan enableZoom/></>;
 }
-function Surface({mesh,tint,opacity=1,planes,selected,onPick,wire=false}:{mesh:ProofMesh;tint:THREE.ColorRepresentation;opacity?:number;planes:THREE.Plane[];selected?:boolean;onPick?:()=>void;wire?:boolean}){
- const geometry=useMemo(()=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(mesh.positions,3));g.setIndex(mesh.indices);g.computeVertexNormals();return g;},[mesh]);
+function Surface({mesh,tint,opacity=1,planes,selected,onPick,wire=false,sharp=false}:{mesh:ProofMesh;tint:THREE.ColorRepresentation;opacity?:number;planes:THREE.Plane[];selected?:boolean;onPick?:()=>void;wire?:boolean;sharp?:boolean}){
+ const geometry=useMemo(()=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(mesh.positions,3));g.setIndex(mesh.indices);if(sharp){const creased=toCreasedNormals(g,Math.PI/6);if(creased!==g)g.dispose();return creased;}g.computeVertexNormals();return g;},[mesh,sharp]);
  useEffect(()=>()=>geometry.dispose(),[geometry]);
  return <mesh geometry={geometry} onClick={e=>{if(onPick){e.stopPropagation();onPick();}}}><meshStandardMaterial color={selected?'#ffe374':tint} transparent={opacity<1} opacity={opacity} side={THREE.DoubleSide} clippingPlanes={planes} clipShadows wireframe={wire} polygonOffset={wire} polygonOffsetFactor={wire?-2:0}/></mesh>;
 }
@@ -44,12 +45,13 @@ function Viewer({result,draft,field,mode,view,cut,selected,onPick,isolate,reset}
  const planes=useMemo(()=>view==='section'?[new THREE.Plane(new THREE.Vector3(1,0,0),-cut)]:[],[view,cut]);
  const picked=result?.components.find(c=>c.id===selected);
  return <div style={{height:580,background:'#080b10',borderRadius:8}}><BoardCanvas dpr={[1,1.5]} gl={{antialias:true,preserveDrawingBuffer:true}} onCreated={({gl})=>{gl.localClippingEnabled=true;}}><color attach="background" args={['#080b10']}/><ambientLight intensity={1.1}/><directionalLight position={[50,-60,90]} intensity={2}/><directionalLight position={[-40,30,50]} intensity={1}/><Camera field={field} view={view} reset={reset}/><FieldOutline field={field}/>{mode==='A'&&draft?.map((p,i)=><mesh dispose={null} key={i} geometry={getLetterVolumeGeometry(p.letter,12)} position={[p.x,p.y,p.z+field.height/2]} rotation={[p.rx*Math.PI/180,p.ry*Math.PI/180,p.rz*Math.PI/180]} scale={[p.scale*p.scaleX,p.scale*p.scaleY,p.scale*p.scaleZ]}><meshStandardMaterial color={color(i)} clippingPlanes={planes}/></mesh>)}{result&&<>
- {(mode==='B'||mode==='C')&&(isolate&&picked?<Surface mesh={picked.mesh} tint="#e2d5b9" planes={planes}/>:<Surface mesh={result.architecture} tint="#e2d5b9" planes={planes}/>)}
+ {(mode==='B'||mode==='C')&&(isolate&&picked?<Surface sharp={result.request.envelopeVersion==='profiles'} mesh={picked.mesh} tint="#e2d5b9" planes={planes}/>:<Surface sharp={result.request.envelopeVersion==='profiles'} mesh={result.architecture} tint="#e2d5b9" planes={planes}/>)}
  {((mode==='A'&&!draft)||mode==='B')&&result.letters.filter(l=>!isolate||!selected||l.id===selected).map(l=><Surface key={l.id} mesh={l.mesh} tint={color(result.letters.findIndex(item=>item.id===l.id))} opacity={mode==='B'?.7:1} planes={planes} selected={l.id===selected} onPick={()=>onPick(l.id)}/>)}
  {!isolate&&picked&&mode!=='A'&&<Surface mesh={picked.mesh} tint="#ffe374" planes={planes} wire/>}
  </>}<AxisIndicator/></BoardCanvas></div>;
 }
 export default function AmphitheaterStudio(){
+ const [sourceTransitions,setSourceTransitions]=useState(false);
  const [editing,setEditing]=useState(false),[seed,setSeed]=useState<number|undefined>();
  const [field,setField]=useState({width:40,depth:40,height:60}),[preferred,setPreferred]=useState(13),[population,setPopulation]=useState('auto');
  const [articulation,setArticulation]=useState(.75),[primary,setPrimary]=useState(false);
@@ -80,7 +82,7 @@ export default function AmphitheaterStudio(){
   }).catch(e=>setError(String(e)));
   return()=>{active=false;};
  },[displayStudy]);
- const currentRequest=useMemo(()=>source?{generator,envelopeVersion:'levels' as const,articulationElevation:elevationMode,articulation,organization,field,preferredFeet:preferred,population:generator==='source-preserving'||population==='auto'?'auto' as const:Number(population),sourceId:source.id,sourceName:source.name,source:source.source,sourceSnapshot:source.snapshot}:null,[source,field,preferred,population,generator,organization,articulation,elevationMode]);
+ const currentRequest=useMemo(()=>source?{generator,envelopeVersion:'profiles' as const,articulationElevation:elevationMode,articulation,organization,field,preferredFeet:preferred,population:generator==='source-preserving'||population==='auto'?'auto' as const:Number(population),sourceId:source.id,sourceName:source.name,source:source.source,sourceSnapshot:source.snapshot}:null,[source,field,preferred,population,generator,organization,articulation,elevationMode]);
  const stale=result&&JSON.stringify(result.request)!==JSON.stringify(currentRequest);
  async function generate(request:AmphitheaterRequest|null=currentRequest){if(!request)return;setBusy(true);setError('');setMessage('Generating actual meshes and running exported-solid / triangle checks…');
   try{const response=await fetch('/api/amphitheater',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(request)});const payload=await response.json();if(!response.ok)throw Error(payload.error??'Generation failed');setMessage('Loading validated, saved architecture…');const data:AmphitheaterResult=payload.architecture?payload:await fetch('/api/amphitheater?id='+payload.id).then(async r=>{if(!r.ok)throw Error('Saved result could not be loaded. Retry opening study '+payload.id);return r.json();});displayStudy(data);setStudies(s=>[{id:data.id,created:data.created,request:data.request,sourceCount:data.sourceCount,volume:data.volume},...s]);setSelected('');setComparison(undefined);setMessage('New study generated. Mesh checks passed; review architectural limitations below.');}
@@ -92,9 +94,9 @@ export default function AmphitheaterStudio(){
    const arrangementSeed=seed??crypto.getRandomValues(new Uint32Array(1))[0];
    const count=population==='auto'?suggestedCount(field,preferred):Number(population);
    if(!Number.isSafeInteger(count)||count<2)throw Error('Enter Automatic or a whole letter quantity of at least 2.');
-   const placements=populate([],count,field,preferred,arrangementSeed);
+   const placements=populate([],count,field,preferred,arrangementSeed,{transitions:sourceTransitions});
    const id=crypto.randomUUID(),name='Design · '+placements.length+' letters · seed '+arrangementSeed;
-   const request:AmphitheaterRequest={generator:'source-preserving',envelopeVersion:'levels',articulationElevation:'feature',articulation,organization,field,preferredFeet:preferred,population:population==='auto'?'auto':count,sourceId:id,sourceName:name,source:placements,sourceSnapshot:{arrangementSeed}};
+   const request:AmphitheaterRequest={generator:'source-preserving',envelopeVersion:'profiles',articulationElevation:'feature',articulation,organization,field,preferredFeet:preferred,population:population==='auto'?'auto':count,sourceId:id,sourceName:name,source:placements,sourceSnapshot:{arrangementSeed,sourceTransitions,orientationVersion:2}};
    setSources(items=>[...items,{id,name,source:placements}]);setSourceId(id);setEditing(false);setMode('C');
    void generate(request);
   }catch(e){setError(e instanceof Error?e.message:String(e));setMessage('Adjust the selected settings and try again.');}
@@ -116,7 +118,7 @@ export default function AmphitheaterStudio(){
  <p role="status">{message}</p>{error&&<p role="alert" style={{color:'#ed8989',whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{error}</p>}
  {editing&&generator==='source-preserving'&&<fieldset disabled={busy}><SourcePopulationEditor showPopulation={false} source={source?.source??[]} field={field} preferred={preferred} onApply={updateDraft} onRestore={s=>{setField(s.field);setPreferred(s.preferred);updateDraft(s.source,s.name);}}/></fieldset>}
  <details><summary>Advanced Settings</summary>
- <label>Arrangement seed<input aria-label="Arrangement seed" type="number" value={seed??''} placeholder="New seed each design" onChange={e=>setSeed(e.target.value===''?undefined:+e.target.value)}/></label>
+ <label className="block"><input type="checkbox" checked={sourceTransitions} onChange={e=>setSourceTransitions(e.target.checked)}/> Allow ±30° source transitions</label><p className="text-xs">New sources use a common yaw axis with 0° and ±15° variations and horizontal faces. Edit Letters permits intentional upright boundaries. Regeneration preserves all edited poses.</p><label>Arrangement seed<input aria-label="Arrangement seed" type="number" value={seed??''} placeholder="New seed each design" onChange={e=>setSeed(e.target.value===''?undefined:+e.target.value)}/></label>
   {generator==='source-preserving'&&<label className="block">Envelope articulation · {Math.round(articulation*100)}%<input type="range" min="0" max="1" step=".05" value={articulation} disabled={busy} onChange={e=>setArticulation(+e.target.value)}/></label>}{generator==='source-preserving'&&<label>Relationship priority<select value={organization} onChange={e=>setOrganization(e.target.value as typeof organization)}><option value="proximity">Proximity</option><option value="alignment">Proximity and tangent alignment</option></select></label>}<label className="block">Generator<select aria-label="Generator" className="block w-full" value={generator} disabled={busy} onChange={e=>setGenerator(e.target.value as AmphitheaterRequest['generator'])}><option value="source-preserving">Source-preserving — original relationships</option><option value="typology-baseline">Typology-driven comparison baseline</option></select></label>
  <label className="block">Source composition<select aria-label="Source composition" className="block w-full" value={sourceId} disabled={busy} onChange={e=>setSourceId(e.target.value)}>{sources.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label><button className="border p-1" disabled={busy} onClick={refreshSources}>Refresh Composition source list</button><p role="status" className="text-xs">{sourceMessage}</p><a className="underline text-sm" href="/composition" target="_blank" rel="noreferrer">Open Composition to create a study</a><p className="text-xs">Reads current and saved alternatives from Composition on this app origin. Selected windows are localized by translation only before submission. The baseline then rearranges them.</p>
 

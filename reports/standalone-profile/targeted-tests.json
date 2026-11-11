@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "maximumCurveErrorFeet": 0.008308007274937947,
+  "curveToleranceFeet": 0.01,
+  "rows": [
+    {
+      "name": "nine",
+      "before": {
+        "wallArea": 6241.136370327344,
+        "axisArea": 6208.03300780151,
+        "axisWallPercent": 99.46959398799201,
+        "horizontalArea": 4110.400663022263,
+        "minimumArea": 0.00003750319046957884
+      },
+      "after": {
+        "wallArea": 4859.796578787624,
+        "axisArea": 818.1299562265438,
+        "axisWallPercent": 16.834654351533434,
+        "horizontalArea": 3889.589833657531,
+        "minimumArea": 0.000009086941417990602
+      },
+      "cutCountBefore": 8,
+      "cutCountAfter": 8
+    },
+    {
+      "name": "twelve",
+      "before": {
+        "wallArea": 8950.323908268654,
+        "axisArea": 8935.472258216485,
+        "axisWallPercent": 99.83406578125683,
+        "horizontalArea": 4883.340841740604,
+        "minimumArea": 0.000025024794013006613
+      },
+      "after": {
+        "wallArea": 7907.122023805837,
+        "axisArea": 747.6911918699052,
+        "axisWallPercent": 9.455920746117792,
+        "horizontalArea": 4329.695709807422,
+        "minimumArea": 0.000003300815478723962
+      },
+      "cutCountBefore": 9,
+      "cutCountAfter": 8
+    }
+  ]
+}

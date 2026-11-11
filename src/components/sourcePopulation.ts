@@ -9,7 +9,7 @@ export function suggestedCount(field:Field,size:number){
 function rotation(p:AmphitheaterSource){
   return new THREE.Euler(...[p.rx,p.ry,p.rz].map(THREE.MathUtils.degToRad) as [number,number,number]);
 }
-export function populate(existing:AmphitheaterSource[],count:number,field:Field,size:number,seed:number){
+export function populate(existing:AmphitheaterSource[],count:number,field:Field,size:number,seed:number,options:{transitions?:boolean;legacyOrientations?:boolean}={}){
   if(!Number.isSafeInteger(count)||count<1||!(size>0))throw Error('Enter a positive whole population and a positive letter size.');
   let state=seed>>>0;
   const random=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};
@@ -21,6 +21,7 @@ export function populate(existing:AmphitheaterSource[],count:number,field:Field,
     for(let j=0;j<48;j++){
       const parent=result[Math.floor(random()*result.length)],letter=role[Math.floor(random()*3)];
       const p={letter,x:0,y:0,z:0,rx:Math.round(random()*120-60)||0,ry:Math.round(random()*100-50)||0,rz:Math.round(random()*360-180)||0,scale:size/.92,scaleX:1,scaleY:1,scaleZ:1};
+      if(!options.legacyOrientations){const axis=existing[0]?.rz??0;const choices=options.transitions?[0,0,0,-15,15,-30,30]:[0,0,0,-15,15];const choice=Math.abs(Math.round(p.rz))%choices.length;p.rx=0;p.ry=0;p.rz=axis+choices[choice];}
       if(parent){
         const points=getLetterShape(parent.letter).getPoints(5),i=1+Math.floor(random()*(points.length-1)),q=points[i],d=q.clone().sub(points[i-1]).normalize();
         const target=new THREE.Vector3(q.x*parent.scaleX+d.x*.35,q.y*parent.scaleY+d.y*.35,(random()-.5)*1.6).multiplyScalar(parent.scale).applyEuler(rotation(parent));
