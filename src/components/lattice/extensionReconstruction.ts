@@ -280,6 +280,47 @@ function nearestTrianglePoint(p:Vec3,t:[Vec3,Vec3,Vec3]):Vec3 {
 /** Correct only emitted Float32 rounding at shared cap vertices. Each moved
  * vertex must satisfy ALL incident original triangles under the unchanged
  * contact predicate. No disconnected per-face snapping or source edits. */
+type FaceIds = [number, number, number];
+
+/** Refit only the projected vertex's triangle fan. A collapsed ear on a
+ * neighbor's edge can be retiled as two triangles of that neighbor. */
+function capProjectionPatch(mesh:Mesh,vertex:number,projected:Vec3,incident:Set<number>,
+  facesAt:Set<number>[],owner:number[],sourceFace:ArrayLike<number>,sourceOwners:Set<number>) {
+  const ids=(face:number)=>mesh.indices.slice(face*3,face*3+3) as FaceIds;
+  const point=(i:number)=>Array.from(mesh.positions.slice(i*3,i*3+3)) as Vec3;
+  const after=(i:number)=>i===vertex?projected:point(i);
+  const areaVector=(tri:FaceIds,get:(i:number)=>Vec3)=>cross(sub(get(tri[1]),get(tri[0])),sub(get(tri[2]),get(tri[0])));
+  const oriented=(a:Vec3,b:Vec3)=>Math.hypot(...a)>1e-12&&dot(a,b)>0;
+  const edits=new Map<number,FaceIds>();
+  for(const face of incident){
+    if(edits.has(face))continue;
+    const tri=ids(face),old=areaVector(tri,point),next=areaVector(tri,after);
+    if(oriented(next,old))continue;
+    // Inverted or non-collinear patches need a different cap construction.
+    // Only the redundant collinear ear has a unique area-preserving repair.
+    if(Math.hypot(...next)!==0)return;
+    let repaired=false;
+    for(let j=0;j<3;j++){
+      const a=tri[j],b=tri[(j+1)%3],mid=tri[(j+2)%3];
+      if(dot(sub(after(mid),after(a)),sub(after(mid),after(b)))>=0)continue;
+      const common=[...facesAt[a]].filter(f=>facesAt[b].has(f));
+      if(common.length!==2)continue;
+      const other=common.find(f=>f!==face);
+      if(other===undefined||edits.has(other)||owner[other]!==owner[face])continue;
+      if(sourceOwners.has(owner[face])&&sourceFace[face]!==sourceFace[other])continue;
+      const neighbor=ids(other),k=neighbor.indexOf(b);
+      if(k<0||neighbor[(k+1)%3]!==a)continue;
+      const tip=neighbor[(k+2)%3];
+      if([...facesAt[mid]].some(f=>facesAt[tip].has(f)))continue;
+      const first:FaceIds=[b,mid,tip],second:FaceIds=[mid,a,tip],reference=areaVector(neighbor,point);
+      if(!oriented(areaVector(first,after),reference)||!oriented(areaVector(second,after),reference))continue;
+      edits.set(face,first);edits.set(other,second);repaired=true;break;
+    }
+    if(!repaired)return;
+  }
+  return edits;
+}
+
 function alignCapVertices(mesh:Mesh,runs:ReturnType<Manifold["getMesh"]>,sources:ReturnType<typeof sourceSolid>[]) {
   const constraints=new Map<number,Array<{triangle:[Vec3,Vec3,Vec3];outward:Vec3}>>();
   for(let run=0;run<runs.runOriginalID.length;run++){
@@ -294,7 +335,12 @@ function alignCapVertices(mesh:Mesh,runs:ReturnType<Manifold["getMesh"]>,sources
       }
     }
   }
-  let corrected=0,unresolved=0,maxDisplacement=0;
+  const facesAt=Array.from({length:mesh.positions.length/3},()=>new Set<number>());
+  mesh.indices.forEach((v,i)=>facesAt[v].add(Math.floor(i/3)));
+  const owner:number[]=[];
+  for(let run=0;run<runs.runOriginalID.length;run++)for(let face=runs.runIndex[run]/3;face<runs.runIndex[run+1]/3;face++)owner[face]=runs.runOriginalID[run];
+  const sourceOwners=new Set(sources.map(s=>s.original));
+  let corrected=0,unresolved=0,maxDisplacement=0,retriangulatedFaces=0;
   for(const [vertex,triangles]of constraints){
     const point=Array.from(mesh.positions.slice(vertex*3,vertex*3+3)) as Vec3;
     // Preserve native vertices already satisfying the unchanged public contact
@@ -310,9 +356,17 @@ function alignCapVertices(mesh:Mesh,runs:ReturnType<Manifold["getMesh"]>,sources
     for(let pass=0;pass<16;pass++)for(const t of triangles)projected=nearestTrianglePoint(projected,t.triangle);
     const distance=Math.hypot(...sub(projected,point));
     if(distance>1e-5||!qualifies(projected)){unresolved++;continue;}
+    const patch=capProjectionPatch(mesh,vertex,projected,facesAt[vertex],facesAt,owner,runs.faceID,sourceOwners);
+    if(!patch){unresolved++;continue;}
+    for(const [face,tri] of patch){
+      for(const i of mesh.indices.slice(face*3,face*3+3))facesAt[i].delete(face);
+      mesh.indices.splice(face*3,3,...tri);
+      for(const i of tri)facesAt[i].add(face);
+    }
+    retriangulatedFaces+=patch.size;
     mesh.positions.set(projected,vertex*3);corrected++;maxDisplacement=Math.max(maxDisplacement,distance);
   }
-  return {corrected,unresolved,maxDisplacement};
+  return {corrected,unresolved,maxDisplacement,retriangulatedFaces};
 }
 /** Every raw walking facet must remain covered by actual emitted tops or
  * coplanar original walking surfaces. A Boolean subtraction cannot create a gap. */
@@ -570,10 +624,16 @@ export function reconstructExtension(pair:PortPair,models:TileModel[],tiles:Plac
       // nativeMeshPositions proved the index correspondence. Apply the actual
       // emitted coordinates to a private identity copy, avoiding a Float32
       // round trip that can collapse distinct Boolean intersection vertices.
-      const actual=body.warpBatch((vertices,count)=>{
+      let comparisonBody=body;
+      if(alignment.retriangulatedFaces){
+        const input=new api!.Mesh({numProp:3,vertProperties:Float32Array.from(mesh.positions),triVerts:Uint32Array.from(mesh.indices)});
+        const rebuilt=new api!.Manifold(input);owned.push(rebuilt);
+        comparisonBody=preciseKernelCopy(rebuilt,mesh.positions);owned.push(comparisonBody);
+      }
+      const actual=alignment.retriangulatedFaces?comparisonBody:body.warpBatch((vertices,count)=>{
         if(vertices.length!==mesh.positions.length||count*3!==mesh.positions.length)throw new Error("emitted native vertex correspondence UNVERIFIED");
         vertices.set(mesh.positions);
-      });owned.push(actual);
+      });if(!alignment.retriangulatedFaces)owned.push(actual);
       if(actual.status()!=="NoError"||!(actual.volume()>0))throw new Error("emitted reconstruction is not a closed valid solid");
       const components=actual.decompose();
       const connected=components.length===1;components.forEach(c=>c.delete());
