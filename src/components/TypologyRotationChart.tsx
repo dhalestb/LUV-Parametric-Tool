@@ -10,7 +10,6 @@ type RotationGroup = {
   yz: string;
 };
 
-const byId = new Map(TYPOLOGY_RULES.map((rule) => [rule.id, rule]));
 const familyLabel: Record<OrientationFamily, string> = {
   rigid: "Rigid grid",
   continuous: "Continuous",
@@ -60,33 +59,20 @@ export function TypologyRotationChart() {
   return (
     <section aria-labelledby="typology-rotation-chart-title" className="rounded border p-3" style={{ borderColor: "var(--line)", background: "var(--input-background)" }}>
       <h3 id="typology-rotation-chart-title" className="text-sm font-semibold" style={{ color: "#43A9CF" }}>Typologies by Letter Rotation</h3>
-      <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>Typologies are grouped by their rotation pattern, then listed by architectural category. Rotation values are increments unless labeled as a progressive tilt.</p>
-      <div className="mt-2 overflow-x-auto">
-        <table className="w-full min-w-[1000px] border-collapse text-left text-xs">
-          <thead>
-            <tr className="border" style={{ borderColor: "var(--line)", color: "#ffffff" }}>
-              <th scope="col" className="px-3 py-2">Rotation category</th>
-              <th scope="col" className="px-3 py-2">XY</th>
-              <th scope="col" className="px-3 py-2">XZ</th>
-              <th scope="col" className="px-3 py-2">YZ</th>
-              {categories.map((category) => <th key={category} scope="col" className="px-3 py-2">{CATEGORY_DEFINITIONS[category].name} typologies</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {rotationGroups.map((group) => (
-              <tr key={group.key} className="border align-top" style={{ borderColor: "var(--line)" }}>
-                <th scope="row" className="px-3 py-2 font-medium" style={{ color: "#71beda" }}>{group.label}</th>
-                <td className="px-3 py-2">{group.xy}</td>
-                <td className="px-3 py-2">{group.xz}</td>
-                <td className="px-3 py-2">{group.yz}</td>
-                {categories.map((category) => {
-                  const names = group.members.map((id) => byId.get(id)).filter((rule) => rule?.category === category).map((rule) => rule!.name);
-                  return <td key={category} className="px-3 py-2">{names.length ? names.join(", ") : "—"}</td>;
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>Each typology has its own row. Rotation values are increments unless labeled as a progressive tilt.</p>
+      <div className="mt-2 space-y-4">
+        {categories.map((category) => (
+          <section key={category} aria-label={CATEGORY_DEFINITIONS[category].name + " typologies"}>
+            <h4 className="mb-1 text-xs font-semibold" style={{ color: "#d8b96b" }}>{CATEGORY_DEFINITIONS[category].name}</h4>
+            <div className="overflow-x-auto"><table className="w-full min-w-[600px] border-collapse text-left text-xs">
+              <thead><tr className="border" style={{ borderColor: "var(--line)", color: "#ffffff" }}><th scope="col" className="px-3 py-2">Typology</th><th scope="col" className="px-3 py-2">XY</th><th scope="col" className="px-3 py-2">XZ</th><th scope="col" className="px-3 py-2">YZ</th></tr></thead>
+              <tbody>{TYPOLOGY_RULES.filter(rule => rule.category === category).map(rule => {
+                const group = rotationGroups.find(item => item.members.includes(rule.id));
+                return <tr key={rule.id} className="border align-top" style={{ borderColor: "var(--line)" }}><th scope="row" className="px-3 py-2 font-medium" style={{ color: "#71beda" }}>{rule.name}</th><td className="px-3 py-2">{group?.xy ?? "—"}</td><td className="px-3 py-2">{group?.xz ?? "—"}</td><td className="px-3 py-2">{group?.yz ?? "—"}</td></tr>;
+              })}</tbody>
+            </table></div>
+          </section>
+        ))}
       </div>
       <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Topographic Ground-Field uses letter-specific 15° tilt bands around the center Z-axis: L 0°–45°, U 45°–90°, and V 90°–120°. Folded forms retain their existing 0°–90° progression.</p>
     </section>

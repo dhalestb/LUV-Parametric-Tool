@@ -31,7 +31,6 @@ import {
 import { optimizeSpatial } from "./spatialOptimizer";
 import { placementCenterInSelection, selectionEvaluationGrid } from "./selectionSearch";
 import PrototypeDemonstration from "./UnifiedPrototype";
-import { TypologyRotationChart } from "./TypologyRotationChart";
 import { DEFAULT_TYPOLOGY_BY_CATEGORY, type PrototypeCategory, type PrototypeGeometryMode, type PrototypeTypologyId } from "./amphitheaterPrototype";
 import { OPTIMIZER_SESSION_KEY, readJson, writeJson } from "./browserSession";
 import type { Letter } from "./letterTypes";
@@ -1023,7 +1022,6 @@ export default function CompositionStudio() {
       onSelectedCategoryChange={(category: PrototypeCategory) => { setPrototypeCategory(category); setPrototypeTypology(DEFAULT_TYPOLOGY_BY_CATEGORY[category]); }}
       onSelectedTypologyChange={setPrototypeTypology}
     />
-    <TypologyRotationChart />
   </div></main>;
 }
 

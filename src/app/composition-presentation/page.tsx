@@ -19,6 +19,7 @@ const rows: { category: PrototypeCategory; title: string; typologies: { id: Prot
   ] },
 ];
 type DisplayGraphic = { name: string; url: string };
+const walkthroughUrl = "/tutorials/vertical-void-walkthrough.mp4";
 
 export default function CompositionPresentationPage() {
   const presentationMode = useBoardMode();
@@ -43,6 +44,7 @@ export default function CompositionPresentationPage() {
   const isPdfBoard = board !== 'geometry' && board !== 'rules' && board !== 'video';
   useEffect(() => { void loadPdfBoards().then(boards => { setPdfBoards(boards); setBoard(current => boards.some(item => item.id === current) ? current : boards[0]?.id ?? 'geometry'); }).catch(() => setError('Could not load board titles.')); }, []);
   const [pdfUrl, setPdfUrl] = useState('');
+  const [boardImage, setBoardImage] = useState(false);
   const [pdfError, setPdfError] = useState('');
   const [draggingPdf, setDraggingPdf] = useState(false);
   useEffect(() => {
@@ -69,15 +71,15 @@ export default function CompositionPresentationPage() {
     setPdfUrl('');
     if (isPdfBoard) void loadPresentationPdf(board).then(file => {
       if (!active || !file) return;
-      url = URL.createObjectURL(file); setPdfUrl(url);
+      url = URL.createObjectURL(file); setBoardImage(file.type.startsWith('image/')); setPdfUrl(url);
     }).catch(() => setPdfError('Could not load the PDF board.'));
     else setPdfUrl('');
     return () => { active = false; if (url) URL.revokeObjectURL(url); };
   }, [board, boardRevision]);
   const addPdf = async (file?: File) => {
     if (!file) return;
-    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) { setPdfError('Drop a PDF file onto the board.'); return; }
-    try { setPdfError(''); await savePresentationPdf(file, board); setPdfUrl(current => { if (current) URL.revokeObjectURL(current); return URL.createObjectURL(file); }); }
+    if (!['application/pdf', 'image/png', 'image/webp', 'image/jpeg'].includes(file.type)) { setPdfError('Choose a PDF, PNG, WebP, or JPEG file.'); return; }
+    try { setPdfError(''); await savePresentationPdf(file, board); setBoardImage(file.type.startsWith('image/')); setPdfUrl(current => { if (current) URL.revokeObjectURL(current); return URL.createObjectURL(file); }); }
     catch { setPdfError('Could not add this PDF to the board.'); }
   };
   const boardOrder = [...pdfBoards.map(item => item.id), 'geometry', 'rules', 'video'];
@@ -150,6 +152,7 @@ export default function CompositionPresentationPage() {
         <span aria-live="polite" className="min-w-32 text-center font-semibold" style={{color:"#d6ad4f"}}>{isPdfBoard ? currentTitle : board === 'video' ? 'Demo' : board === 'rules' ? 'Graphic Rules Board' : 'Geometry Board'}</span>
         <button type="button" aria-label="Next board" disabled={boardIndex === boardOrder.length - 1} onClick={() => setBoard(boardOrder[boardIndex + 1])} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor:"var(--line)"}}>→</button></>}
         <label className="flex items-center gap-1">Zoom <select aria-label="Board zoom percentage" value={zoom} onChange={event => setZoom(Number(event.target.value))} className="rounded border bg-black px-2 py-1 text-white" style={{borderColor:'var(--line)'}}>{[0,25,50,75,100,200,300,400,500,600,700,800,900,1000].map(value => <option key={value} value={value}>{value}%</option>)}</select></label>
+        {board === 'video' && <a href={walkthroughUrl} download className="rounded border px-3 py-1" style={{borderColor:'var(--line)',color:'#d6ad4f'}}>Download video</a>}
         {presentationMode && <button data-board-edit-control type="button" onClick={() => setPresentationMode(false)} className="rounded border px-3 py-1" style={{borderColor:'var(--line)',color:'#d6ad4f'}}>Exit presentation mode</button>}
       </div></div>
       {!presentationMode && <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
@@ -159,8 +162,8 @@ export default function CompositionPresentationPage() {
         {isPdfBoard && <button type="button" onClick={() => void removeCurrentBoard()} className="rounded border px-3 py-1" style={{borderColor:'var(--line)'}}>Delete board</button>}
       </div>}
       <div className={`presentation-board-viewport mt-2 max-h-[75vh] overflow-auto ${isPdfBoard ? 'pdf-board-viewport' : ''} ${board === 'geometry' || board === 'rules' ? 'graphic-board-viewport' : ''}`} aria-label="Presentation board viewport">
-      {board === 'video' ? <div className="flex w-full items-center justify-center bg-black" style={{aspectRatio:'33 / 12.5',width:zoom+'%',minWidth:(11*zoom)+'px'}}><video className="h-full max-w-full" controls preload="metadata" playsInline aria-label="Vertical Void Lobby walkthrough"><source src="/tutorials/vertical-void-walkthrough.mp4" type="video/mp4" />Your browser does not support video playback.</video></div> : isPdfBoard ? <div onDragEnter={event => {event.preventDefault();setDraggingPdf(true);}} onDragOver={event => event.preventDefault()} onDragLeave={event => {if(!event.currentTarget.contains(event.relatedTarget as Node|null))setDraggingPdf(false);}} onDrop={event => {event.preventDefault();setDraggingPdf(false);void addPdf(event.dataTransfer.files[0]);}} className="presentation-pdf-board relative flex items-center justify-center overflow-hidden border border-dashed" style={{aspectRatio:'7407 / 2160',width:zoom+'%',minWidth:(11*zoom)+'px',borderColor:draggingPdf?'#d6ad4f':'#b9bec6',background:'#050709'}}>
-        {pdfUrl ? <><iframe title="PDF presentation board" src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&${presentationMode ? 'zoom=100' : 'view=Fit'}`} className="absolute inset-0 h-full w-full border-0" /><div aria-hidden="true" className="absolute inset-0 z-10" /></> : <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-2 text-center text-xs text-white"><span>Drop a PDF here to place it on this board</span><span className="text-[#d6ad4f]">or choose a PDF</span><input type="file" accept="application/pdf,.pdf" className="sr-only" onChange={event => void addPdf(event.target.files?.[0])}/></label>}
+      {board === 'video' ? <div className="flex w-full items-center justify-center bg-black" style={{aspectRatio:'33 / 12.5',width:zoom+'%',minWidth:(11*zoom)+'px'}}><video className="h-full max-w-full" controls preload="metadata" playsInline aria-label="Vertical Void Lobby walkthrough"><source src={walkthroughUrl} type="video/mp4" />Your browser does not support video playback.</video></div> : isPdfBoard ? <div onDragEnter={event => {event.preventDefault();setDraggingPdf(true);}} onDragOver={event => event.preventDefault()} onDragLeave={event => {if(!event.currentTarget.contains(event.relatedTarget as Node|null))setDraggingPdf(false);}} onDrop={event => {event.preventDefault();setDraggingPdf(false);void addPdf(event.dataTransfer.files[0]);}} className="presentation-pdf-board relative flex items-center justify-center overflow-hidden border border-dashed" style={{aspectRatio:'7407 / 2160',width:zoom+'%',minWidth:(11*zoom)+'px',borderColor:draggingPdf?'#d6ad4f':'#b9bec6',background:'#050709'}}>
+        {pdfUrl ? <>{boardImage ? <img alt="Presentation board" src={pdfUrl} className="absolute inset-0 h-full w-full object-contain" /> : <iframe title="PDF presentation board" src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&${presentationMode ? 'zoom=100' : 'view=Fit'}`} className="absolute inset-0 h-full w-full border-0" />}<div aria-hidden="true" className="absolute inset-0 z-10" /></> : <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-2 text-center text-xs text-white"><span>Drop a PDF, PNG, WebP, or JPEG here</span><span className="text-[#d6ad4f]">or choose a file</span><input type="file" accept="application/pdf,image/png,image/webp,image/jpeg,.pdf,.png,.webp,.jpg,.jpeg" className="sr-only" onChange={event => void addPdf(event.target.files?.[0])}/></label>}
         {pdfError && <p role="alert" className="absolute bottom-2 left-2 bg-black/80 p-2 text-xs text-red-300">{pdfError}</p>}
       </div> : <div className={`space-y-2 ${presentationMode ? 'mx-auto' : ''}`} style={{width: zoom + "%", minWidth: (11 * zoom) + "px"}}>
         {rows.map((row) => <section key={row.category} aria-label={`${row.title} typologies`}>
