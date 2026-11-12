@@ -1,0 +1,151 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "seed": 19,
+      "count": 8,
+      "milliseconds": 2431.209,
+      "triangles": 4690,
+      "volume": 12459.938924724935,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 148853,
+        "legacyFlags": 88
+      },
+      "openings": [
+        {
+          "source": "L-3",
+          "yaw": 90,
+          "tilt": 90,
+          "axis": [
+            0.9999999999999999,
+            -2.2204460492503128e-16,
+            2.2204460492503128e-16
+          ],
+          "removed": 403.13997613514584,
+          "alcove": true
+        },
+        {
+          "source": "V-6",
+          "yaw": 105,
+          "tilt": 90,
+          "axis": [
+            0.9659258262890682,
+            0.25881904510252074,
+            1.1102230246251564e-16
+          ],
+          "removed": 54.810967426927164,
+          "alcove": false
+        }
+      ]
+    },
+    {
+      "seed": 21,
+      "count": 8,
+      "milliseconds": 1995.7697000000003,
+      "triangles": 3772,
+      "volume": 11764.715471349386,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 136920,
+        "legacyFlags": 48
+      },
+      "openings": [
+        {
+          "source": "U-3",
+          "yaw": 90,
+          "tilt": 90,
+          "axis": [
+            -0.9999999999999999,
+            2.2204460492503128e-16,
+            2.2204460492503128e-16
+          ],
+          "removed": 229.8960076865078,
+          "alcove": true
+        },
+        {
+          "source": "V-6",
+          "yaw": 75,
+          "tilt": 90,
+          "axis": [
+            0.9659258262890682,
+            -0.25881904510252074,
+            1.1102230246251564e-16
+          ],
+          "removed": 54.810967426927164,
+          "alcove": false
+        }
+      ]
+    },
+    {
+      "seed": 24,
+      "count": 12,
+      "milliseconds": 3564.8061000000007,
+      "triangles": 6900,
+      "volume": 16604.580194046757,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 225212,
+        "legacyFlags": 94
+      },
+      "openings": [
+        {
+          "source": "L-3",
+          "yaw": 90,
+          "tilt": 90,
+          "axis": [
+            0.9999999999999999,
+            -2.2204460492503128e-16,
+            2.2204460492503128e-16
+          ],
+          "removed": 399.0642890124291,
+          "alcove": true
+        },
+        {
+          "source": "V-6",
+          "yaw": 0,
+          "tilt": 90,
+          "axis": [
+            0,
+            -0.9999999999999999,
+            2.2204460492503128e-16
+          ],
+          "removed": 103.15847385748202,
+          "alcove": false
+        },
+        {
+          "source": "U-9",
+          "yaw": 105,
+          "tilt": 90,
+          "axis": [
+            0.9659258262890682,
+            0.25881904510252074,
+            1.1102230246251564e-16
+          ],
+          "removed": 229.8967287535088,
+          "alcove": true
+        },
+        {
+          "source": "L-12",
+          "yaw": 0,
+          "tilt": 90,
+          "axis": [
+            0,
+            -0.9999999999999999,
+            2.2204460492503128e-16
+          ],
+          "removed": 203.78435630624153,
+          "alcove": false
+        }
+      ]
+    }
+  ],
+  "depthEdit": {
+    "identicalSources": true,
+    "changedArchitecture": true,
+    "depth": 4
+  }
+}

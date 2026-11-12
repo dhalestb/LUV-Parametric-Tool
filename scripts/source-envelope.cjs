@@ -5,12 +5,12 @@ const {getLetterShape,getLetterVolumeGeometry}=require('../src/components/letter
 const v=(x,y,z)=>new T.Vector3(x,y,z),distance=(a,b)=>a.distanceTo(b);
 function derive(r){
  const letters=[],nodes=r.source.map((p,i)=>{
- const matrix=new T.Matrix4().compose(v(p.x,p.y,p.z+r.field.height/2),new T.Quaternion().setFromEuler(new T.Euler(...[p.rx,p.ry,p.rz].map(T.MathUtils.degToRad))),v(p.scale*p.scaleX,p.scale*p.scaleY,p.scale*p.scaleZ));
+ const matrix=new T.Matrix4().compose(v(p.x,p.y,p.z+r.field.height/2),new T.Quaternion().setFromEuler(new T.Euler(...[p.rx,p.ry,p.rz].map(T.MathUtils.degToRad),p.rotationOrder??'XYZ')),v(p.scale*p.scaleX,p.scale*p.scaleY,p.scale*p.scaleZ));
  const g=getLetterVolumeGeometry(p.letter,12),attr=g.getAttribute('position'),positions=[],indices=[];
  for(let k=0;k<attr.count;k++){const q=new T.Vector3().fromBufferAttribute(attr,k).applyMatrix4(matrix);if(Math.abs(q.x)>r.field.width/2||Math.abs(q.y)>r.field.depth/2||q.z<0||q.z>r.field.height)throw Error('Letter '+(i+1)+' extends outside the selected field. Edit its pose or enlarge the field.');positions.push(...q.toArray());}
  for(let k=0;k<(g.index?.count??attr.count);k++)indices.push(g.index?g.index.getX(k):k);
  const id=p.letter+'-'+(i+1);letters.push({id,mesh:{positions,indices}});
- const shape=getLetterShape(p.letter),raw=r.envelopeVersion==='profiles'?require('./source-profile-envelope.cjs').featurePoints(shape,p.scale*Math.max(p.scaleX,p.scaleY,p.scaleZ)):shape.getPoints(6),center=new T.Box2().setFromPoints(shape.getPoints(16)).getCenter(new T.Vector2());
+ const shape=getLetterShape(p.letter),raw=['profiles','vertical-walls'].includes(r.envelopeVersion)?require('./source-profile-envelope.cjs').featurePoints(shape,p.scale*Math.max(p.scaleX,p.scaleY,p.scaleZ)):shape.getPoints(6),center=new T.Box2().setFromPoints(shape.getPoints(16)).getCenter(new T.Vector2());
  const line=raw.map(pt=>v(pt.x-center.x,pt.y-center.y,0).applyMatrix4(matrix));
  return {id,line,relationshipLine:shape.getPoints(6).map(pt=>v(pt.x-center.x,pt.y-center.y,0).applyMatrix4(matrix)),matrix:matrix.toArray(),p};
  });
@@ -32,7 +32,9 @@ async function buildSource(r,out){
  if(r.source.length<2)throw Error('Use at least two original letters for cross-letter development.');
  const {nodes,edges,letters}=derive(r),w=await require('manifold-3d/manifold.js').default();w.setup();const M=w.Manifold;
  const {width:W,depth:D,height:H}=r.field,pitch=.5,paths=[],bands=[];
- for(const e of ['levels','profiles'].includes(r.envelopeVersion)?[]:edges){
+ const vertical=r.envelopeVersion==='vertical-walls'?require('./source-vertical-envelope.cjs').verticalEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet):null;
+ if(vertical)bands.push(...vertical.bands);
+ for(const e of ['levels','profiles','vertical-walls'].includes(r.envelopeVersion)?[]:edges){
  const dir=e.s.clone().sub(e.q),reach=Math.min(r.preferredFeet*.4,e.d*.4);
  const orient=t=>t.clone().multiplyScalar(t.dot(dir)<0?-reach:reach);
  const c=new T.CubicBezierCurve3(e.q,e.q.clone().add(orient(e.u)),e.s.clone().sub(orient(e.v)),e.s);
@@ -54,15 +56,15 @@ async function buildSource(r,out){
  }}
  const solid=M.union(cells);bands.push({solid,id:'bank-'+(bands.length+1),sources:paths.at(-1).sources});
  }
- if(['levels','profiles'].includes(r.envelopeVersion))for(const e of edges)paths.push({sources:[nodes[e.i].id,nodes[e.j].id],line:[e.q.toArray(),e.s.toArray()]});
+ if(['levels','profiles','vertical-walls'].includes(r.envelopeVersion))for(const e of edges)paths.push({sources:[nodes[e.i].id,nodes[e.j].id],line:[e.q.toArray(),e.s.toArray()]});
  if(r.envelopeVersion==='levels')bands.push(...require('./source-level-envelope.cjs').levelEnvelope(M,nodes,edges,r.field,r.preferredFeet));
  if(r.envelopeVersion==='profiles')bands.push(...require('./source-profile-envelope.cjs').profileEnvelope(w,nodes,edges,r.field,r.preferredFeet));
  const joined=M.union(bands.map(b=>b.solid));
- const primary=['levels','profiles'].includes(r.envelopeVersion)?M.compose(joined.decompose().filter(part=>part.volume()>0)):joined;
+ const primary=vertical?.primary??(['levels','profiles','vertical-walls'].includes(r.envelopeVersion)?M.compose(joined.decompose().filter(part=>part.volume()>0)):joined);
  const degree=r.articulation??0;
  if(!Number.isFinite(degree)||degree<0||degree>1)throw Error('Articulation must be between 0 and 1');
- const {solid,tools,projections,report}=require('./source-articulation.cjs').articulate(M,primary,nodes,edges,degree,r.field,['levels','profiles'].includes(r.envelopeVersion)?'bounded':r.articulationElevation);
- for(const band of bands)for(const tool of tools)band.solid=band.solid.subtract(tool.solid);
+ const {solid,tools,projections,report}=vertical??require('./source-articulation.cjs').articulate(M,primary,nodes,edges,degree,r.field,['levels','profiles','vertical-walls'].includes(r.envelopeVersion)?'bounded':r.articulationElevation);
+ if(!vertical)for(const band of bands)for(const tool of tools)band.solid=band.solid.subtract(tool.solid);
  for(const p of projections)bands.push({id:p.id,sources:p.sources,solid:p.solid.intersect(solid)});
  const bounds=solid.boundingBox(),shellVolumes=solid.decompose().map(s=>s.volume());
  const mesh=s=>{const m=s.getMesh();return {positions:Array.from(m.vertProperties),indices:Array.from(m.triVerts)}};
@@ -72,8 +74,8 @@ async function buildSource(r,out){
  obj('combined-envelope.obj',architecture);dump('combined-envelope.json',architecture);
  const outside=solid.subtract(M.cube([W,D,H]).translate([-W/2,-D/2,0])).volume();
  dump('manifest.json',{generator:r.generator,validation:{status:solid.status(),outside,sourceOutside:0,shellVolumes},instances:nodes.map(n=>({pose:n.p,matrix:n.matrix})),components:components.map((c,i)=>{const file=c.id+'.obj';obj(file,c.mesh);return {file,sources:c.sources,finalVolume:bands[i].solid.volume()}}),tools:tools.map(t=>{const file=t.id+'.obj';obj(file,mesh(t.solid));return {file,removed:t.removed,finalObstruction:solid.intersect(t.solid).volume()}})});
- const contributions=['levels','profiles'].includes(r.envelopeVersion)?require('./source-level-envelope.cjs').contributionReport(solid,bands,nodes):undefined;
+ const contributions=['levels','profiles','vertical-walls'].includes(r.envelopeVersion)?require('./source-level-envelope.cjs').contributionReport(solid,[...bands,...(vertical?tools.filter(t=>nodes.find(n=>n.id===t.source)?.p.lift).map(t=>({owner:t.source,id:'void-'+t.source,sources:[t.source],solid:t.cuttingSolid})):[])],nodes):undefined;
  if(contributions?.some(c=>c.exposedArea<1))throw Error('A source lacks a visible contour surface: '+JSON.stringify(contributions));
- return {contributions,primary:mesh(primary),articulationReport:report,architecture,letters,components,paths,features:nodes.map(n=>({id:n.id,line:n.line.map(p=>p.toArray())})),bounds,volume:solid.volume(),sourceCount:letters.length};
+ return {boundaryReport:vertical?.boundaryReport,contributions,primary:mesh(primary),articulationReport:report,architecture,letters,components,paths,features:nodes.map(n=>({id:n.id,line:n.line.map(p=>p.toArray())})),bounds,volume:solid.volume(),sourceCount:letters.length};
 }
 module.exports={derive,buildSource};

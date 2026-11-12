@@ -1,0 +1,23 @@
+{
+  "checkpoint": "f5eb105698143f2d255adcc8290b4fcc667450b8",
+  "originalClean": true,
+  "backupBranchUnchanged": true,
+  "experimentalBranch": "experiment/gathering-envelope",
+  "noNewCommit": true,
+  "modifiedFiles": [
+    "scripts/source-envelope.cjs",
+    "src/components/AmphitheaterStudio.tsx",
+    "src/components/SourcePopulationEditor.tsx",
+    "src/components/amphitheaterInteractiveTypes.ts",
+    "src/components/sourcePopulation.ts"
+  ],
+  "geometryValidation": "three primary cases plus L/V interiors, support and rejection cases pass",
+  "typescript": "pass",
+  "focusedLint": "pass",
+  "productionBuild": "pass with existing unrelated warnings",
+  "experimentalAutomaticPopulation": "seed37 rejected NotManifold; unresolved",
+  "preservedOneClickStudy": "70d971f2-1944-4819-870f-293fa39f890c",
+  "pushed": false,
+  "merged": false,
+  "deployed": false
+}

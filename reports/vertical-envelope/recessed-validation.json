@@ -1,0 +1,88 @@
+{
+  "generatedStudies": [
+    {
+      "seed": 37,
+      "sourceCount": 12,
+      "volume": 14594.724300055748,
+      "triangles": 6132,
+      "components": 1,
+      "selfIntersections": 0,
+      "trianglePairs": 226141,
+      "openingKinds": [
+        [
+          "L-3",
+          "recessed alcove",
+          5.934782608695651
+        ],
+        [
+          "U-6",
+          "directional through void",
+          34.98926217929849
+        ],
+        [
+          "U-9",
+          "recessed alcove",
+          5.934782608695651
+        ],
+        [
+          "V-12",
+          "directional through void",
+          31.540747132960938
+        ]
+      ],
+      "minimumExposedArea": 6.631043072830201
+    },
+    {
+      "seed": 1486017266,
+      "sourceCount": 8,
+      "volume": 10670.78922314049,
+      "triangles": 4172,
+      "components": 1,
+      "selfIntersections": 0,
+      "trianglePairs": 130888,
+      "openingKinds": [
+        [
+          "U-3",
+          "recessed alcove",
+          5.934782608695651
+        ],
+        [
+          "L-6",
+          "directional through void",
+          27.351953597824625
+        ]
+      ],
+      "minimumExposedArea": 95.69475326409074
+    },
+    {
+      "seed": 19,
+      "sourceCount": 8,
+      "volume": 13922.102406431983,
+      "triangles": 2728,
+      "components": 1,
+      "selfIntersections": 0,
+      "trianglePairs": 99186,
+      "openingKinds": [
+        [
+          "L-3",
+          "recessed alcove",
+          5.934782608695651
+        ],
+        [
+          "L-6",
+          "directional through void",
+          36.385339342489345
+        ]
+      ],
+      "minimumExposedArea": 90.79076946677286
+    }
+  ],
+  "depthEdit": {
+    "previous": 5.934782608695651,
+    "edited": 4,
+    "identicalSourceMeshes": true,
+    "previousVolume": 14594.724300055748,
+    "editedVolume": 14632.571711952805,
+    "selfIntersections": 0
+  }
+}

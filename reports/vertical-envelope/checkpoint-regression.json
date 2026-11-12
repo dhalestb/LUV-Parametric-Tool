@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "checkpoint": "f5eb105698143f2d255adcc8290b4fcc667450b8",
+  "profileArchitectureExact": true,
+  "sourceMeshesExact": true,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 253006,
+    "legacyFlags": 102
+  }
+}

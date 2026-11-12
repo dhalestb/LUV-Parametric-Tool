@@ -1,0 +1,41 @@
+{
+  "original": "59cf8022-3e8c-42a5-a843-52d1c3139925",
+  "edited": "909c5173-5107-45b0-b7a1-c3452eb03c2d",
+  "sourcePosesPreserved": true,
+  "editedLetter": 11,
+  "deltaX": 0.5,
+  "previousVolume": 15658.668030292338,
+  "editedVolume": 15660.19120224784,
+  "field": {
+    "width": 40,
+    "depth": 40,
+    "height": 60
+  },
+  "preferredFeet": 13,
+  "sourceCount": 12,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 400109,
+    "legacyFlags": 227
+  },
+  "originalBounds": {
+    "min": [
+      -16.88245964050293,
+      -20,
+      0
+    ],
+    "max": [
+      20,
+      20,
+      37.927886962890625
+    ]
+  },
+  "modesChecked": [
+    "A",
+    "B",
+    "C",
+    "section"
+  ],
+  "reopened": true
+}

@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "id": "216d05b5-8785-4c63-ac01-3119e11c2477",
+  "exactSourcePoses": true,
+  "exactDeterministicArchitecture": true,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 90048,
+    "legacyFlags": 27
+  }
+}

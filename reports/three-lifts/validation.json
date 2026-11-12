@@ -1,0 +1,634 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "seed": 19,
+      "passed": true,
+      "lifts": [
+        {
+          "lift": "lower",
+          "count": 4,
+          "minZ": 1.0097665249420085,
+          "maxZ": 5.2435948821553975
+        },
+        {
+          "lift": "middle",
+          "count": 4,
+          "minZ": 12.219999882086466,
+          "maxZ": 27.300000117913537
+        },
+        {
+          "lift": "top",
+          "count": 4,
+          "minZ": 33.44346165683666,
+          "maxZ": 37.927887744357946
+        }
+      ],
+      "volume": 15658.668030292338,
+      "triangles": 10620,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 423976,
+        "legacyFlags": 228
+      },
+      "voids": [
+        {
+          "source": "V-11",
+          "axis": [
+            0.9999999999999999,
+            -2.2204460492503128e-16,
+            2.2204460492503128e-16
+          ],
+          "removedVolume": 94.7682737884843
+        },
+        {
+          "source": "V-12",
+          "axis": [
+            0,
+            -0.9999999999999999,
+            2.2204460492503128e-16
+          ],
+          "removedVolume": 307.26005786665337
+        }
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -27.136976023213936,
+          "exposedArea": 498.18016986769817,
+          "component": "contour-L-1",
+          "relationships": [
+            "contour-L-1",
+            "contour-U-2",
+            "transition-20"
+          ]
+        },
+        {
+          "letter": "U-2",
+          "sourceCenterZ": -26.372681448431685,
+          "exposedArea": 481.43223959087493,
+          "component": "contour-U-2",
+          "relationships": [
+            "contour-L-1",
+            "contour-U-2",
+            "contour-L-3",
+            "contour-L-4",
+            "transition-15",
+            "transition-17",
+            "transition-20"
+          ]
+        },
+        {
+          "letter": "L-3",
+          "sourceCenterZ": -25.774755483483894,
+          "exposedArea": 662.4261045769218,
+          "component": "contour-L-3",
+          "relationships": [
+            "contour-U-2",
+            "contour-L-3",
+            "contour-V-11",
+            "transition-15",
+            "transition-23"
+          ]
+        },
+        {
+          "letter": "L-4",
+          "sourceCenterZ": -25.912957477001473,
+          "exposedArea": 615.0203859912592,
+          "component": "contour-L-4",
+          "relationships": [
+            "contour-U-2",
+            "contour-L-4",
+            "transition-17"
+          ]
+        },
+        {
+          "letter": "V-5",
+          "sourceCenterZ": -10.452182393977417,
+          "exposedArea": 1436.6574749982108,
+          "component": "contour-V-5",
+          "relationships": [
+            "contour-V-5",
+            "contour-V-11",
+            "contour-V-12",
+            "transition-13",
+            "transition-16"
+          ]
+        },
+        {
+          "letter": "U-6",
+          "sourceCenterZ": -10.578000229746102,
+          "exposedArea": 1709.68493675486,
+          "component": "contour-U-6",
+          "relationships": [
+            "contour-U-6",
+            "contour-V-11",
+            "transition-19"
+          ]
+        },
+        {
+          "letter": "U-7",
+          "sourceCenterZ": 5.4294521815236685,
+          "exposedArea": 2064.949254343775,
+          "component": "contour-U-7",
+          "relationships": [
+            "contour-U-7",
+            "contour-V-8",
+            "contour-U-10",
+            "contour-V-12",
+            "transition-14",
+            "transition-21",
+            "transition-22"
+          ]
+        },
+        {
+          "letter": "V-8",
+          "sourceCenterZ": 5.685674700597303,
+          "exposedArea": 1635.6641415761037,
+          "component": "contour-V-8",
+          "relationships": [
+            "contour-U-7",
+            "contour-V-8",
+            "contour-V-9",
+            "transition-14",
+            "transition-18"
+          ]
+        },
+        {
+          "letter": "V-9",
+          "sourceCenterZ": 6.109937362074855,
+          "exposedArea": 1871.093835537114,
+          "component": "contour-V-9",
+          "relationships": [
+            "contour-V-8",
+            "contour-V-9",
+            "transition-18"
+          ]
+        },
+        {
+          "letter": "U-10",
+          "sourceCenterZ": 5.682710159355777,
+          "exposedArea": 2496.11400435533,
+          "component": "contour-U-10",
+          "relationships": [
+            "contour-U-7",
+            "contour-U-10",
+            "transition-21"
+          ]
+        },
+        {
+          "letter": "V-11",
+          "sourceCenterZ": -11.279999999999998,
+          "exposedArea": 150.91772495985128,
+          "component": "contour-V-11",
+          "relationships": [
+            "contour-L-3",
+            "contour-V-5",
+            "contour-U-6",
+            "contour-V-11",
+            "transition-16",
+            "transition-19",
+            "transition-23",
+            "void-V-11"
+          ]
+        },
+        {
+          "letter": "V-12",
+          "sourceCenterZ": -9.2,
+          "exposedArea": 420.1148511595472,
+          "component": "contour-V-12",
+          "relationships": [
+            "contour-V-5",
+            "contour-U-7",
+            "contour-V-12",
+            "transition-13",
+            "transition-22",
+            "void-V-12"
+          ]
+        }
+      ]
+    },
+    {
+      "seed": 21,
+      "passed": true,
+      "lifts": [
+        {
+          "lift": "lower",
+          "count": 4,
+          "minZ": 1.3636078308624295,
+          "maxZ": 6.433797705564331
+        },
+        {
+          "lift": "middle",
+          "count": 4,
+          "minZ": 12.008012820741406,
+          "maxZ": 27.300000117913537
+        },
+        {
+          "lift": "top",
+          "count": 4,
+          "minZ": 33.58490311312337,
+          "maxZ": 38.35410129623497
+        }
+      ],
+      "volume": 14067.866291163335,
+      "triangles": 9608,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 369570,
+        "legacyFlags": 177
+      },
+      "voids": [
+        {
+          "source": "U-11",
+          "axis": [
+            0.9999999999999999,
+            -2.2204460492503128e-16,
+            2.2204460492503128e-16
+          ],
+          "removedVolume": 385.6302545341932
+        },
+        {
+          "source": "L-12",
+          "axis": [
+            0,
+            -0.9999999999999999,
+            2.2204460492503128e-16
+          ],
+          "removedVolume": 529.5699578638942
+        }
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -26.85398027590476,
+          "exposedArea": 362.0091800222562,
+          "component": "contour-L-1",
+          "relationships": [
+            "contour-L-1",
+            "contour-U-3",
+            "transition-15"
+          ]
+        },
+        {
+          "letter": "L-2",
+          "sourceCenterZ": -25.616489643631503,
+          "exposedArea": 511.8675679089184,
+          "component": "contour-L-2",
+          "relationships": [
+            "contour-L-2",
+            "contour-U-3",
+            "contour-U-4",
+            "transition-13",
+            "transition-14"
+          ]
+        },
+        {
+          "letter": "U-3",
+          "sourceCenterZ": -26.02577752443962,
+          "exposedArea": 743.5050021807504,
+          "component": "contour-U-3",
+          "relationships": [
+            "contour-L-1",
+            "contour-L-2",
+            "contour-U-3",
+            "transition-13",
+            "transition-15"
+          ]
+        },
+        {
+          "letter": "U-4",
+          "sourceCenterZ": -25.890811842940746,
+          "exposedArea": 583.0723026514736,
+          "component": "contour-U-4",
+          "relationships": [
+            "contour-L-2",
+            "contour-U-4",
+            "contour-U-11",
+            "transition-14",
+            "transition-22"
+          ]
+        },
+        {
+          "letter": "V-5",
+          "sourceCenterZ": -10.334386133113874,
+          "exposedArea": 1447.888681047339,
+          "component": "contour-V-5",
+          "relationships": [
+            "contour-V-5",
+            "contour-V-6",
+            "contour-U-11",
+            "transition-16",
+            "transition-21"
+          ]
+        },
+        {
+          "letter": "V-6",
+          "sourceCenterZ": -9.900236766142768,
+          "exposedArea": 1372.0980901389134,
+          "component": "contour-V-6",
+          "relationships": [
+            "contour-V-5",
+            "contour-V-6",
+            "transition-21"
+          ]
+        },
+        {
+          "letter": "U-7",
+          "sourceCenterZ": 6.256772227054465,
+          "exposedArea": 2221.7594572452513,
+          "component": "contour-U-7",
+          "relationships": [
+            "contour-U-7",
+            "contour-U-9",
+            "transition-17"
+          ]
+        },
+        {
+          "letter": "L-8",
+          "sourceCenterZ": 5.422470996519554,
+          "exposedArea": 496.0012951479525,
+          "component": "contour-L-8",
+          "relationships": [
+            "contour-L-8",
+            "contour-U-9",
+            "contour-V-10",
+            "contour-L-12",
+            "transition-18",
+            "transition-20",
+            "transition-23"
+          ]
+        },
+        {
+          "letter": "U-9",
+          "sourceCenterZ": 6.253577571529898,
+          "exposedArea": 1997.2017755244913,
+          "component": "contour-U-9",
+          "relationships": [
+            "contour-U-7",
+            "contour-L-8",
+            "contour-U-9",
+            "transition-17",
+            "transition-20"
+          ]
+        },
+        {
+          "letter": "V-10",
+          "sourceCenterZ": 5.356013354351747,
+          "exposedArea": 2051.754652843902,
+          "component": "contour-V-10",
+          "relationships": [
+            "contour-L-8",
+            "contour-V-10",
+            "transition-18"
+          ]
+        },
+        {
+          "letter": "U-11",
+          "sourceCenterZ": -11.279999999999998,
+          "exposedArea": 248.31918126532813,
+          "component": "contour-U-11",
+          "relationships": [
+            "contour-U-4",
+            "contour-V-5",
+            "contour-U-11",
+            "contour-L-12",
+            "transition-16",
+            "transition-19",
+            "transition-22",
+            "void-U-11"
+          ]
+        },
+        {
+          "letter": "L-12",
+          "sourceCenterZ": -9.2,
+          "exposedArea": 465.7979729971574,
+          "component": "contour-L-12",
+          "relationships": [
+            "contour-L-8",
+            "contour-U-11",
+            "contour-L-12",
+            "transition-19",
+            "transition-23",
+            "void-L-12"
+          ]
+        }
+      ]
+    },
+    {
+      "seed": 37,
+      "passed": true,
+      "lifts": [
+        {
+          "lift": "lower",
+          "count": 4,
+          "minZ": 1.9521990958107953,
+          "maxZ": 5.747772309326538
+        },
+        {
+          "lift": "middle",
+          "count": 4,
+          "minZ": 12.219999882086466,
+          "maxZ": 27.511987179258597
+        },
+        {
+          "lift": "top",
+          "count": 4,
+          "minZ": 33.671705831299775,
+          "maxZ": 37.97935852206671
+        }
+      ],
+      "volume": 14713.616450211865,
+      "triangles": 9792,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 379550,
+        "legacyFlags": 138
+      },
+      "voids": [
+        {
+          "source": "V-11",
+          "axis": [
+            0.9999999999999999,
+            -2.2204460492503128e-16,
+            2.2204460492503128e-16
+          ],
+          "removedVolume": 144.22012569969775
+        },
+        {
+          "source": "U-12",
+          "axis": [
+            0,
+            -0.9999999999999999,
+            2.2204460492503128e-16
+          ],
+          "removedVolume": 159.10938982779226
+        }
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -26.150014297431333,
+          "exposedArea": 372.0042698773687,
+          "component": "contour-L-1",
+          "relationships": [
+            "contour-L-1",
+            "contour-V-4",
+            "transition-16"
+          ]
+        },
+        {
+          "letter": "V-2",
+          "sourceCenterZ": -26.197471263334155,
+          "exposedArea": 722.2153950985364,
+          "component": "contour-V-2",
+          "relationships": [
+            "contour-V-2",
+            "contour-V-3",
+            "transition-15"
+          ]
+        },
+        {
+          "letter": "V-3",
+          "sourceCenterZ": -26.073572731791064,
+          "exposedArea": 526.8385270931974,
+          "component": "contour-V-3",
+          "relationships": [
+            "contour-V-2",
+            "contour-V-3",
+            "contour-V-4",
+            "transition-13",
+            "transition-15"
+          ]
+        },
+        {
+          "letter": "V-4",
+          "sourceCenterZ": -25.795661834301427,
+          "exposedArea": 562.4505297736748,
+          "component": "contour-V-4",
+          "relationships": [
+            "contour-L-1",
+            "contour-V-3",
+            "contour-V-4",
+            "contour-V-11",
+            "transition-13",
+            "transition-16",
+            "transition-22"
+          ]
+        },
+        {
+          "letter": "V-5",
+          "sourceCenterZ": -9.703080060072242,
+          "exposedArea": 1366.9310566786587,
+          "component": "contour-V-5",
+          "relationships": [
+            "contour-V-5",
+            "contour-U-12",
+            "transition-20"
+          ]
+        },
+        {
+          "letter": "L-6",
+          "sourceCenterZ": -9.92223633078858,
+          "exposedArea": 1227.8495473745315,
+          "component": "contour-L-6",
+          "relationships": [
+            "contour-L-6",
+            "contour-U-12",
+            "transition-21"
+          ]
+        },
+        {
+          "letter": "U-7",
+          "sourceCenterZ": 6.466761808404701,
+          "exposedArea": 1706.6968537738417,
+          "component": "contour-U-7",
+          "relationships": [
+            "contour-U-7",
+            "contour-V-8",
+            "contour-U-9",
+            "contour-U-10",
+            "transition-17",
+            "transition-18",
+            "transition-19"
+          ]
+        },
+        {
+          "letter": "V-8",
+          "sourceCenterZ": 6.566358391726392,
+          "exposedArea": 2079.210604498772,
+          "component": "contour-V-8",
+          "relationships": [
+            "contour-U-7",
+            "contour-V-8",
+            "contour-U-12",
+            "transition-17",
+            "transition-23"
+          ]
+        },
+        {
+          "letter": "U-9",
+          "sourceCenterZ": 6.029690355397763,
+          "exposedArea": 1955.243775038736,
+          "component": "contour-U-9",
+          "relationships": [
+            "contour-U-7",
+            "contour-U-9",
+            "transition-18"
+          ]
+        },
+        {
+          "letter": "U-10",
+          "sourceCenterZ": 5.733594036223369,
+          "exposedArea": 2012.9069113942635,
+          "component": "contour-U-10",
+          "relationships": [
+            "contour-U-7",
+            "contour-U-10",
+            "transition-19"
+          ]
+        },
+        {
+          "letter": "V-11",
+          "sourceCenterZ": -11.279999999999998,
+          "exposedArea": 226.80325132175287,
+          "component": "contour-V-11",
+          "relationships": [
+            "contour-V-4",
+            "contour-V-11",
+            "contour-U-12",
+            "transition-14",
+            "transition-22",
+            "void-V-11"
+          ]
+        },
+        {
+          "letter": "U-12",
+          "sourceCenterZ": -9.2,
+          "exposedArea": 241.79034003746762,
+          "component": "contour-U-12",
+          "relationships": [
+            "contour-V-5",
+            "contour-L-6",
+            "contour-V-8",
+            "contour-V-11",
+            "contour-U-12",
+            "transition-14",
+            "transition-20",
+            "transition-21",
+            "transition-23",
+            "void-U-12"
+          ]
+        }
+      ]
+    }
+  ],
+  "editing": {
+    "sourcePosesPreserved": true,
+    "editedLetter": 11,
+    "changedArchitecture": true
+  }
+}
