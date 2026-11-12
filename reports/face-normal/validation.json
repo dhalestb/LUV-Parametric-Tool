@@ -1,0 +1,214 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "spacing": 12,
+      "volumeBefore": 4674.921177231866,
+      "volumeAfter": 4648.643613663322,
+      "trianglesBefore": 13722,
+      "trianglesAfter": 13406,
+      "elapsedBefore": 6062,
+      "elapsedAfter": 9147,
+      "sourcePosesIdentical": true,
+      "sourceMeshesIdentical": true,
+      "floorsIdentical": true,
+      "facades": [
+        {
+          "source": "L-1",
+          "normal": [
+            -0.04231637483128152,
+            0.15792686086247154,
+            0.9865436792353718
+          ],
+          "maximumPlanShift": 0.9372670926285,
+          "fieldTrimVolume": 0,
+          "floorContactCount": 1,
+          "sectionDifferenceFt2": 0.000004192739930547473,
+          "float32AreaBound": 0.0001733921861249821,
+          "roofProbes": 3
+        },
+        {
+          "source": "U-2",
+          "normal": [
+            0,
+            -0.09744696885791937,
+            0.9952407187511993
+          ],
+          "maximumPlanShift": 0.5154839518764519,
+          "fieldTrimVolume": 0,
+          "floorContactCount": 1,
+          "sectionDifferenceFt2": 0.00000928564319041536,
+          "float32AreaBound": 0.000250915951995346,
+          "roofProbes": 28
+        },
+        {
+          "source": "L-5",
+          "normal": [
+            -0.06092693046153556,
+            -0.10552853910859553,
+            0.9925480525285115
+          ],
+          "maximumPlanShift": 2.1357573422609732,
+          "fieldTrimVolume": 1.8939502518157383,
+          "floorContactCount": 2,
+          "sectionDifferenceFt2": 0.000005428026957715604,
+          "float32AreaBound": 0.00014094757637650289,
+          "roofProbes": 2
+        },
+        {
+          "source": "U-6",
+          "normal": [
+            0,
+            -0.10147324590834392,
+            0.9948382684460951
+          ],
+          "maximumPlanShift": 2.9876513001266822,
+          "fieldTrimVolume": 0,
+          "floorContactCount": 3,
+          "sectionDifferenceFt2": 0.000013833881562785866,
+          "float32AreaBound": 0.0002051674638928569,
+          "roofProbes": 31
+        },
+        {
+          "source": "V-9",
+          "normal": [
+            0.04330227295926421,
+            -0.16160628276719002,
+            0.9859048242739927
+          ],
+          "maximumPlanShift": 5.036506198105863,
+          "fieldTrimVolume": 69.73609384897485,
+          "floorContactCount": 3,
+          "sectionDifferenceFt2": 0.0000047086013845731856,
+          "float32AreaBound": 0.00018726487444778767,
+          "roofProbes": 3
+        }
+      ],
+      "floorViews": [
+        4,
+        4,
+        4
+      ],
+      "crossLevel": [
+        3,
+        3,
+        3
+      ],
+      "skyPaths": 3,
+      "independentRays": 168,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 585433,
+        "legacyFlags": 162
+      }
+    },
+    {
+      "spacing": 15,
+      "volumeBefore": 5214.919340015359,
+      "volumeAfter": 5145.37302505122,
+      "trianglesBefore": 13722,
+      "trianglesAfter": 13386,
+      "elapsedBefore": 9698,
+      "elapsedAfter": 9651,
+      "sourcePosesIdentical": true,
+      "sourceMeshesIdentical": true,
+      "floorsIdentical": true,
+      "facades": [
+        {
+          "source": "L-1",
+          "normal": [
+            -0.04231637483128152,
+            0.15792686086247154,
+            0.9865436792353718
+          ],
+          "maximumPlanShift": 0.9372670926285,
+          "fieldTrimVolume": 0,
+          "floorContactCount": 1,
+          "sectionDifferenceFt2": 0.000004192739930547473,
+          "float32AreaBound": 0.0001733921861249821,
+          "roofProbes": 3
+        },
+        {
+          "source": "U-2",
+          "normal": [
+            0,
+            -0.09744696885791937,
+            0.9952407187511993
+          ],
+          "maximumPlanShift": 0.5154839518764519,
+          "fieldTrimVolume": 0,
+          "floorContactCount": 1,
+          "sectionDifferenceFt2": 0.00000928564319041536,
+          "float32AreaBound": 0.000250915951995346,
+          "roofProbes": 28
+        },
+        {
+          "source": "L-5",
+          "normal": [
+            -0.06092693046153556,
+            -0.10552853910859553,
+            0.9925480525285115
+          ],
+          "maximumPlanShift": 2.5040635233450494,
+          "fieldTrimVolume": 5.150880241787696,
+          "floorContactCount": 2,
+          "sectionDifferenceFt2": 0.00000526685266841187,
+          "float32AreaBound": 0.0001409475764390973,
+          "roofProbes": 2
+        },
+        {
+          "source": "U-6",
+          "normal": [
+            0,
+            -0.10147324590834392,
+            0.9948382684460951
+          ],
+          "maximumPlanShift": 3.5996497472723186,
+          "fieldTrimVolume": 0,
+          "floorContactCount": 3,
+          "sectionDifferenceFt2": 0.000014292592926512526,
+          "float32AreaBound": 0.0002051674638773995,
+          "roofProbes": 31
+        },
+        {
+          "source": "V-9",
+          "normal": [
+            0.04330227295926421,
+            -0.16160628276719002,
+            0.9859048242739927
+          ],
+          "maximumPlanShift": 6.054700638588641,
+          "fieldTrimVolume": 116.20509850454316,
+          "floorContactCount": 3,
+          "sectionDifferenceFt2": 0.000004685973254148212,
+          "float32AreaBound": 0.00017530139084794003,
+          "roofProbes": 3
+        }
+      ],
+      "floorViews": [
+        4,
+        4,
+        4
+      ],
+      "crossLevel": [
+        3,
+        3,
+        3
+      ],
+      "skyPaths": 3,
+      "independentRays": 168,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 589807,
+        "legacyFlags": 249
+      }
+    }
+  ],
+  "horizontalControl": {
+    "symmetricDifferenceFt3": 0
+  },
+  "parallelSupportRejected": true,
+  "thresholdsUnchanged": true
+}

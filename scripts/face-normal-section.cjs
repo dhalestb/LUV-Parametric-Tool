@@ -1,0 +1,20 @@
+
+const fs=require('fs'),T=require('three');
+(async()=>{
+ const before=JSON.parse(fs.readFileSync('proof/interactive-check/face-normal/vertical-15/result.json')),after=JSON.parse(fs.readFileSync('proof/interactive-check/face-normal/native-15/result.json'));
+ const wall=after.boundaryReport.walls.find(x=>x.source==='U-6'),trace=wall.trace.reduce((a,b)=>a.roof[2]>b.roof[2]?a:b),n=wall.normal,l=Math.hypot(n[0],n[1]),u=[-n[0]/l,-n[1]/l],origin=trace.roof;
+ const frame=new T.Matrix4().set(u[0],u[1],0,-u[0]*origin[0]-u[1]*origin[1],0,0,1,0,u[1],-u[0],0,-u[1]*origin[0]+u[0]*origin[1],0,0,0,1);
+ const w=await require('manifold-3d/manifold.js').default();w.setup();const make=m=>new w.Manifold(new w.Mesh({numProp:3,vertProperties:new Float32Array(m.positions),triVerts:new Uint32Array(m.indices)}));
+ const slice=m=>make(m).transform(frame.elements).slice(0).toPolygons(),slices=[before,after].map(r=>slice(r.architecture)),facades=[before,after].map(r=>slice(r.boundaryReport.walls.find(x=>x.source==='U-6').finalMesh));
+ const project=p=>new T.Vector3(...p).applyMatrix4(frame).toArray(),all=slices.flat(2),min=Math.min(...all.map(p=>p[0]))-1,max=Math.max(...all.map(p=>p[0]))+1,scale=Math.min(800/(max-min),850/42),point=(p,x)=>[x+(p[0]-min)*scale,1080-p[1]*scale];
+ const path=polys=>polys.map(p=>'M '+p.map(q=>point(q,0).join(',')).join(' L ')+' Z').join(' '),text=(v,x,y,size=25,c='#F7F6F5')=>'<text x="'+x+'" y="'+y+'" font-size="'+size+'" fill="'+c+'" font-family="Arial,sans-serif">'+v+'</text>';
+ const source=after.letters.find(l=>l.id==='U-6').mesh,lines=[];
+ for(let i=0;i<source.indices.length;i+=3){const t=[0,1,2].map(k=>project(source.positions.slice(source.indices[i+k]*3,source.indices[i+k]*3+3))),hits=[];for(let k=0;k<3;k++){const a=t[k],b=t[(k+1)%3];if(a[2]*b[2]<0){const f=a[2]/(a[2]-b[2]);hits.push(a.map((v,j)=>v+f*(b[j]-v)));}}if(hits.length===2)lines.push(hits);}
+ let svg='<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1310"><rect width="2000" height="1310" fill="#080B10"/>'+text('VOID FIELD GATHERING — FACE-NORMAL FAÇADE',60,65,42)+text('Exact generated-mesh sections · same nine letters · 40 × 40 × 60 ft field · 13 ft preferred letters',60,115,26);
+ for(let side=0;side<2;side++){const x=60+side*1000;svg+=text(side?'AFTER — SOURCE-PERPENDICULAR SWEEP':'BEFORE — GLOBAL-Z SWEEP',x,180,28,'#D6AD4F');svg+='<g transform="translate('+x+',0)"><path d="'+path(slices[side])+'" fill="#F7F6F5" fill-rule="evenodd"/><path d="'+path(facades[side])+'" fill="#71BEDA" fill-rule="evenodd"/></g>';
+ for(const f of after.voidFieldReport.floors){const y=point([0,f.topZ],x)[1];svg+='<line x1="'+x+'" x2="'+(x+790)+'" y1="'+y+'" y2="'+y+'" stroke="#71BEDA" stroke-opacity=".3" stroke-dasharray="7 8"/>';svg+=text(f.topZ.toFixed(2)+' ft',x+800,y+7,21,'#71BEDA');}
+ for(const line of lines){const a=point(line[0],x),b=point(line[1],x);svg+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="#D6AD4F" stroke-width="4"/>';}
+ const a=point(project(trace.roof),x),b=point(project(side?trace.support:[trace.roof[0],trace.roof[1],0]),x);svg+='<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="#D6AD4F" stroke-dasharray="10 7" stroke-width="2"/>';svg+=text(side?'U-6: 3.60 ft maximum lateral travel':'U-6: 0 ft lateral travel',x,1140,26);}
+ svg+=text('Blue: actual U-6 façade section after protected cuts · Gold: unchanged source cap and sweep direction',60,1200,26)+text('Horizontal floors and open atrium retained · geometric tests do not certify structural or daylight performance',60,1255,24)+'</svg>';
+ fs.writeFileSync('reports/face-normal/section-comparison.svg',svg);await require('sharp')(Buffer.from(svg)).resize(3000).png().toFile('reports/face-normal/section-comparison.png');fs.writeFileSync('reports/face-normal/section-provenance.json',JSON.stringify({source:'U-6',frame:frame.elements,before:'vertical-15',after:'native-15',method:'Exact Manifold sections of generated exported meshes; original source triangle-plane intersections.'},null,2));console.log('Section rendered',slices.map(s=>s.length));
+})().catch(e=>{console.error(e);process.exitCode=1;});

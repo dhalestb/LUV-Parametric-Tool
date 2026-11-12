@@ -24,7 +24,7 @@ function sourceObjects(file){
  const check=spawnSync(process.execPath,[path.join(__dirname,'../proof/rule-validation.cjs'),out],{encoding:'utf8'});
  if(check.status!==0)throw Error('Exported geometry rejected: '+check.stderr);
  const v=JSON.parse(fs.readFileSync(path.join(out,'validation.json')));
- fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({...data,id:path.basename(out),created:new Date().toISOString(),request,generator:request.generator,validation:{passed:true,selfIntersectionPairs:v.selfIntersectionPairs,nonAdjacentTriangleChecks:v.nonAdjacentTriangleChecks,legacyFlags:v.broadPhaseFlags},warnings:['Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.']}));
+ fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({...data,id:path.basename(out),created:new Date().toISOString(),request,generator:request.generator,validation:{passed:true,selfIntersectionPairs:v.selfIntersectionPairs,nonAdjacentTriangleChecks:v.nonAdjacentTriangleChecks,legacyFlags:v.broadPhaseFlags},warnings:[request.envelopeVersion==='void-field'?'Nine-letter Void Field proof. Source plan concavities generate vertical canyons. Circulation, access and occupancy require architectural review.':'Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.']}));
  return;
  }
  if(request.generator!=='typology-baseline')throw Error('Source-preserving generation is not implemented. No automatic fallback is permitted.');

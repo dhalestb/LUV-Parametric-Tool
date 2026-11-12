@@ -95,3 +95,7 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## Standalone Gathering envelope experiment
+
+See [pull, startup, portable studies, and validation instructions](docs/ENVELOPE_EXPERIMENT.md).

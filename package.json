@@ -7,7 +7,9 @@
     "build": "node scripts/patch-next-eisdir.js && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "node scripts/patch-next-eisdir.js"
+    "postinstall": "node scripts/patch-next-eisdir.js",
+    "envelope:studies": "node scripts/prepare-envelope-studies.cjs",
+    "test:envelope": "node scripts/envelope-regression-tests.cjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",

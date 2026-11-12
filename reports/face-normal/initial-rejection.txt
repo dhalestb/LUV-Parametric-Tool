@@ -1,0 +1,4 @@
+Error: Void field envelope is disconnected: [5130.980625637349,0.10483960995505726,0.10005185076544265,2.220446049250313e-16,-2.6861195746852307e-8,-8.881784197001252e-16,-1.7265665024610257,-0.07384338007364999,9.658097455123027e-8,0,3.416396388011833e-8,-2.808646891450106e-9,0.000012263033832893289,-0.006045751305408187,-0.017616056817488457,-0.03421579836179933,-0.05537630358677448,-6.392974673946616e-10]
+    at Object.voidFieldEnvelope (C:\Users\DHale\Documents\Codex\LUV-Gathering-Envelope-Experiment\scripts\source-void-field.cjs:143:40)
+    at Object.buildSource (C:\Users\DHale\Documents\Codex\LUV-Gathering-Envelope-Experiment\scripts\source-envelope.cjs:35:85)
+    at async C:\Users\DHale\Documents\Codex\LUV-Gathering-Envelope-Experiment\scripts\amphitheater-interactive-worker.cjs:23:13
