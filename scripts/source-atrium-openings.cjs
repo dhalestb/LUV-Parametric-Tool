@@ -39,7 +39,9 @@ function buildAtriumBays(w,entry,occupied,floors,top){
    const record={id,source:entry.node.id,neighbor:neighbor.id,floor:floor.id,sourceBoundary:path.kind,curveIndex:path.curveIndex,sourcePath:path.points.map(p=>[p[0]+entry.origin[0],p[1]+entry.origin[1],entry.node.p.z+entry.fieldHeight/2]),width:trimmed.length,bottomZ:bottom,topZ:ceiling,edgeRise:.25,cutterMesh:pack(solid),status:'cut'};
    tools.push({id,source:entry.node.id,solid,cuttingSolid:loft(plan.offset(.001,'Round',2,32),bottom-.001,ceiling+.001),width:trimmed.length,height:ceiling-bottom,depth:halfWidth*2,alcove:false});
    records.push(record);
-   for(const setback of [1.05,1.25,1.5,1.75]){
+   // Four-level rays can cross the upper slab before reaching distant gallery probes.
+   // Also test nearer material-backed edge positions; all ray/foot thresholds remain unchanged.
+   for(const setback of (floors.length>3?[.35,.5,.75,1.05,1.25,1.5,1.75]:[1.05,1.25,1.5,1.75])){
     const xy=mid.map((v,j)=>entry.origin[j]+v*at(floor.topZ+4)+normal[j]*setback),inside=mid.map((v,j)=>entry.origin[j]+v*at(floor.topZ+4)-normal[j]*.55);
     galleryCandidates.push({floor:floor.id,level,portal:id,source:entry.node.id,neighbor:neighbor.id,eye:[...xy,floor.topZ+4],foot:[...xy,(floor.bottomZ+floor.topZ)/2],inside:[...inside,floor.topZ+4],setback});
    }

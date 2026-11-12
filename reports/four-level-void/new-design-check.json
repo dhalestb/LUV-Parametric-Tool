@@ -1,0 +1,28 @@
+[
+  {
+    "seed": 37,
+    "accepted": true,
+    "volume": 9188.548241670404,
+    "triangles": 17496,
+    "floors": [
+      2.6400000000000006,
+      17.64,
+      32.64,
+      47.64000000000001
+    ],
+    "sightlines": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    "validation": {
+      "passed": true,
+      "selfIntersectionPairs": 0,
+      "nonAdjacentTriangleChecks": 784464,
+      "legacyFlags": 350
+    }
+  }
+]

@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "name": "void-field-tests",
+      "passed": true,
+      "elapsedMs": 27337
+    },
+    {
+      "name": "void-field-spacing-tests",
+      "passed": true,
+      "elapsedMs": 9919
+    },
+    {
+      "name": "three-lift-tests",
+      "passed": true,
+      "elapsedMs": 15475
+    },
+    {
+      "name": "upright-opening-tests",
+      "passed": true,
+      "elapsedMs": 10261
+    },
+    {
+      "name": "recessed-study-tests",
+      "passed": true,
+      "elapsedMs": 7673
+    },
+    {
+      "name": "vertical-envelope-constraints-tests",
+      "passed": true,
+      "elapsedMs": 5327
+    },
+    {
+      "name": "amphitheater-presentation-export-tests",
+      "passed": true,
+      "elapsedMs": 4296
+    },
+    {
+      "name": "open-atrium-tests",
+      "passed": true,
+      "elapsedMs": 31091
+    },
+    {
+      "name": "face-normal-tests",
+      "passed": true,
+      "elapsedMs": 39042
+    },
+    {
+      "name": "inserted-plate-tests",
+      "passed": true,
+      "elapsedMs": 12440
+    },
+    {
+      "name": "void-field-population-tests",
+      "passed": true,
+      "elapsedMs": 39502
+    },
+    {
+      "name": "four-level-void-tests",
+      "passed": true,
+      "elapsedMs": 19151
+    },
+    {
+      "name": "four-level-face-normal-tests",
+      "passed": true,
+      "elapsedMs": 20451
+    }
+  ]
+}

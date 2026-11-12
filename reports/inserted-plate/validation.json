@@ -1,0 +1,395 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "seed": 19,
+      "volume": 2781.81612804401,
+      "triangles": 3734,
+      "elapsedMs": 1880,
+      "floors": [
+        3.6400000000000006,
+        15.64,
+        27.64
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 343.3457294922135,
+          "component": "contour-L-1",
+          "relationships": [
+            "plate-L-1",
+            "boundary-U-2",
+            "boundary-V-3",
+            "boundary-V-6"
+          ]
+        },
+        {
+          "letter": "U-2",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 392.5877423473011,
+          "component": "contour-U-2",
+          "relationships": [
+            "plate-L-1",
+            "boundary-U-2",
+            "boundary-V-3",
+            "void-U-2"
+          ]
+        },
+        {
+          "letter": "V-3",
+          "sourceCenterZ": -21.81,
+          "exposedArea": 435.137893937223,
+          "component": "contour-V-3",
+          "relationships": [
+            "plate-L-1",
+            "boundary-V-3"
+          ]
+        },
+        {
+          "letter": "L-4",
+          "sourceCenterZ": -14.36,
+          "exposedArea": 444.8811973782505,
+          "component": "contour-L-4",
+          "relationships": [
+            "plate-L-4",
+            "boundary-U-5",
+            "boundary-V-6",
+            "boundary-V-9"
+          ]
+        },
+        {
+          "letter": "U-5",
+          "sourceCenterZ": -14.36,
+          "exposedArea": 359.8783971365917,
+          "component": "contour-U-5",
+          "relationships": [
+            "plate-L-4",
+            "boundary-U-5",
+            "boundary-V-6",
+            "boundary-V-9",
+            "void-U-5"
+          ]
+        },
+        {
+          "letter": "V-6",
+          "sourceCenterZ": -9.809999999999999,
+          "exposedArea": 590.9292575074367,
+          "component": "contour-V-6",
+          "relationships": [
+            "plate-L-1",
+            "plate-L-4",
+            "boundary-V-6",
+            "boundary-V-9"
+          ]
+        },
+        {
+          "letter": "L-7",
+          "sourceCenterZ": -2.3599999999999994,
+          "exposedArea": 350.71142474663725,
+          "component": "contour-L-7",
+          "relationships": [
+            "plate-L-7",
+            "boundary-U-8",
+            "boundary-V-9"
+          ]
+        },
+        {
+          "letter": "U-8",
+          "sourceCenterZ": -2.3599999999999994,
+          "exposedArea": 403.31972714197184,
+          "component": "contour-U-8",
+          "relationships": [
+            "plate-L-7",
+            "boundary-U-8",
+            "void-U-8"
+          ]
+        },
+        {
+          "letter": "V-9",
+          "sourceCenterZ": 2.1899999999999977,
+          "exposedArea": 571.4360254274893,
+          "component": "contour-V-9",
+          "relationships": [
+            "plate-L-4",
+            "plate-L-7",
+            "boundary-V-9"
+          ]
+        }
+      ],
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 117527,
+        "legacyFlags": 47
+      }
+    },
+    {
+      "spacing": 15,
+      "volume": 2939.7067060728036,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 115902,
+        "legacyFlags": 46
+      }
+    },
+    {
+      "height": 40,
+      "volume": 2781.8161280440077,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 117537,
+        "legacyFlags": 47
+      }
+    },
+    {
+      "editPreserved": true,
+      "geometryChanged": true
+    },
+    {
+      "seed": 37,
+      "volume": 2870.4727682023527,
+      "triangles": 3546,
+      "elapsedMs": 1764,
+      "floors": [
+        3.6400000000000006,
+        15.64,
+        27.64
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 375.20281499704424,
+          "component": "contour-L-1",
+          "relationships": [
+            "plate-L-1",
+            "boundary-U-2",
+            "boundary-V-3",
+            "boundary-V-6"
+          ]
+        },
+        {
+          "letter": "U-2",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 394.2627172868804,
+          "component": "contour-U-2",
+          "relationships": [
+            "plate-L-1",
+            "boundary-U-2",
+            "boundary-V-6",
+            "void-U-2"
+          ]
+        },
+        {
+          "letter": "V-3",
+          "sourceCenterZ": -21.81,
+          "exposedArea": 469.99941250585636,
+          "component": "contour-V-3",
+          "relationships": [
+            "plate-L-1",
+            "boundary-V-3"
+          ]
+        },
+        {
+          "letter": "L-4",
+          "sourceCenterZ": -14.36,
+          "exposedArea": 295.21747126787136,
+          "component": "contour-L-4",
+          "relationships": [
+            "plate-L-4",
+            "boundary-U-5",
+            "boundary-V-6",
+            "boundary-V-9"
+          ]
+        },
+        {
+          "letter": "U-5",
+          "sourceCenterZ": -14.36,
+          "exposedArea": 388.4225444977382,
+          "component": "contour-U-5",
+          "relationships": [
+            "plate-L-4",
+            "boundary-U-5",
+            "boundary-V-6",
+            "void-U-5"
+          ]
+        },
+        {
+          "letter": "V-6",
+          "sourceCenterZ": -9.809999999999999,
+          "exposedArea": 692.2349327671758,
+          "component": "contour-V-6",
+          "relationships": [
+            "plate-L-1",
+            "plate-L-4",
+            "boundary-V-6"
+          ]
+        },
+        {
+          "letter": "L-7",
+          "sourceCenterZ": -2.3599999999999994,
+          "exposedArea": 290.69591859040594,
+          "component": "contour-L-7",
+          "relationships": [
+            "plate-L-7",
+            "boundary-U-8",
+            "boundary-V-9"
+          ]
+        },
+        {
+          "letter": "U-8",
+          "sourceCenterZ": -2.3599999999999994,
+          "exposedArea": 373.72415576860976,
+          "component": "contour-U-8",
+          "relationships": [
+            "plate-L-7",
+            "boundary-U-8",
+            "boundary-V-9",
+            "void-U-8"
+          ]
+        },
+        {
+          "letter": "V-9",
+          "sourceCenterZ": 2.1899999999999977,
+          "exposedArea": 710.6169504552571,
+          "component": "contour-V-9",
+          "relationships": [
+            "plate-L-4",
+            "plate-L-7",
+            "boundary-V-9"
+          ]
+        }
+      ],
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 109142,
+        "legacyFlags": 59
+      }
+    },
+    {
+      "seed": 73,
+      "volume": 2940.77703047325,
+      "triangles": 4022,
+      "elapsedMs": 1880,
+      "floors": [
+        3.6400000000000006,
+        15.64,
+        27.64
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 520.724510246477,
+          "component": "contour-L-1",
+          "relationships": [
+            "plate-L-1",
+            "boundary-U-2",
+            "boundary-V-3",
+            "boundary-V-6"
+          ]
+        },
+        {
+          "letter": "U-2",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 406.5967569500868,
+          "component": "contour-U-2",
+          "relationships": [
+            "plate-L-1",
+            "boundary-U-2",
+            "void-U-2"
+          ]
+        },
+        {
+          "letter": "V-3",
+          "sourceCenterZ": -21.81,
+          "exposedArea": 472.33829945045164,
+          "component": "contour-V-3",
+          "relationships": [
+            "plate-L-1",
+            "boundary-V-3"
+          ]
+        },
+        {
+          "letter": "L-4",
+          "sourceCenterZ": -14.36,
+          "exposedArea": 341.09544349132614,
+          "component": "contour-L-4",
+          "relationships": [
+            "plate-L-4",
+            "boundary-U-5",
+            "boundary-V-6",
+            "boundary-V-9"
+          ]
+        },
+        {
+          "letter": "U-5",
+          "sourceCenterZ": -14.36,
+          "exposedArea": 399.7572772596848,
+          "component": "contour-U-5",
+          "relationships": [
+            "plate-L-4",
+            "boundary-U-5",
+            "boundary-V-9",
+            "void-U-5"
+          ]
+        },
+        {
+          "letter": "V-6",
+          "sourceCenterZ": -9.809999999999999,
+          "exposedArea": 741.7045005488309,
+          "component": "contour-V-6",
+          "relationships": [
+            "plate-L-1",
+            "plate-L-4",
+            "boundary-V-6"
+          ]
+        },
+        {
+          "letter": "L-7",
+          "sourceCenterZ": -2.3599999999999994,
+          "exposedArea": 398.846844227927,
+          "component": "contour-L-7",
+          "relationships": [
+            "plate-L-7",
+            "boundary-U-8",
+            "boundary-V-9"
+          ]
+        },
+        {
+          "letter": "U-8",
+          "sourceCenterZ": -2.3599999999999994,
+          "exposedArea": 399.99341970122737,
+          "component": "contour-U-8",
+          "relationships": [
+            "plate-L-7",
+            "boundary-U-8",
+            "boundary-V-9",
+            "void-U-8"
+          ]
+        },
+        {
+          "letter": "V-9",
+          "sourceCenterZ": 2.1899999999999977,
+          "exposedArea": 676.0729732067934,
+          "component": "contour-V-9",
+          "relationships": [
+            "plate-L-4",
+            "plate-L-7",
+            "boundary-V-9"
+          ]
+        }
+      ],
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 122840,
+        "legacyFlags": 81
+      }
+    }
+  ]
+}

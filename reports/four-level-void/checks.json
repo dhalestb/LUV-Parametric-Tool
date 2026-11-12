@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "study": "44abffe5-966f-4e12-8a0e-c8970f0d5dba",
+  "originalStudy": "42536cbc-756c-4082-a9bd-0806a3dd6847",
+  "original12PosesAndMeshesIdentical": true,
+  "apiArchitectureMatchesWorker": true,
+  "fieldAndPreferredSizeUnchanged": true,
+  "planarAreas": [
+    {
+      "floor": "occupied-level-1",
+      "z": 2.6400000000000006,
+      "planarTopArea": 720.9398782681029
+    },
+    {
+      "floor": "occupied-level-2",
+      "z": 17.64,
+      "planarTopArea": 745.3135306338501
+    },
+    {
+      "floor": "occupied-level-3",
+      "z": 32.64,
+      "planarTopArea": 783.3653544340103
+    },
+    {
+      "floor": "occupied-level-4",
+      "z": 47.64000000000001,
+      "planarTopArea": 784.0261129000659
+    }
+  ],
+  "twelveRegressionSuitesPassed": true,
+  "typescript": true,
+  "targetedLint": true,
+  "productionBuild": true,
+  "browserAddOperationPassed": true,
+  "browserSectionPassed": true,
+  "independentTriangleRays": 231,
+  "noPushMergeDeploy": true
+}

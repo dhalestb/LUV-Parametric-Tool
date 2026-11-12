@@ -71,6 +71,62 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     scene.add(new THREE.AmbientLight(0xffffff,.85));
     const light=new THREE.DirectionalLight(0xffffff,1.65);light.position.set(40,-60,90);scene.add(light);
   }
+  async function voidFieldGenerationDetail(x:number,y:number,width:number){
+    text('GENERATION RULES',x,y+width*.045,width*.036,PRESENTATION_COLORS.letters);
+    const allWalls=result.voidFieldReport?.walls??[];
+    const walls=allWalls.filter(wall=>!options.ruleSource||wall.source===options.ruleSource);
+    const wall=[...walls].sort((a,b)=>(b.maximumPlanShift??0)-(a.maximumPlanShift??0))[0];
+    const record=selectedVoids[0];
+    const rows:('void'|'wall')[]=record&&wall?['void','wall']:wall?['wall']:record?['void']:[];
+    if(!rows.length){text('This source has no saved void or façade operation.',x,y+width*.2,width*.026);return;}
+    for(const [row,kind] of rows.entries()){
+      const id=kind==='wall'?wall!.source:record!.source;
+      const letter=result.letters.find(item=>item.id===id);if(!letter)continue;
+      const sourceBox=new THREE.Box3().setFromBufferAttribute(new THREE.Float32BufferAttribute(letter.mesh.positions,3));
+      const box=sourceBox.clone();
+      const operation=kind==='wall'?wall!.mesh:record!.cutterMesh;
+      if(operation)box.union(new THREE.Box3().setFromBufferAttribute(new THREE.Float32BufferAttribute(operation.positions,3)));
+      box.expandByScalar(result.request.preferredFeet*.12);
+      const planes=[new THREE.Plane(new THREE.Vector3(1,0,0),-box.min.x),new THREE.Plane(new THREE.Vector3(-1,0,0),box.max.x),new THREE.Plane(new THREE.Vector3(0,1,0),-box.min.y),new THREE.Plane(new THREE.Vector3(0,-1,0),box.max.y)];
+      const rowY=y+width*(.11+row*.37),cellWidth=width*.31,cellHeight=width*.26;
+      text(id+' · '+(kind==='wall'?'EXTRUSION':'SUBTRACTION'),x,rowY,width*.029,PRESENTATION_COLORS.rules);
+      const normal=wall?.normal;
+      for(let stage=0;stage<3;stage++){
+        await new Promise(resolve=>setTimeout(resolve,0));
+        const scene=new THREE.Scene();lighting(scene);
+        const px=x+stage*width*.345;
+        const label=stage===0?'Original source':kind==='wall'?(stage===1?'Sweep from source face':'Trimmed exterior façade'):(stage===1?'Inner contour + cutter':'Void through actual form');
+        text(label,px,rowY+width*.04,width*.022);
+        addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,stage===0?1:.75);
+        if(stage>0&&operation){
+          if(stage===2)addMesh(scene,result.architecture,PRESENTATION_COLORS.form,.22,planes);
+          addMesh(scene,kind==='wall'&&stage===2?(wall!.finalMesh??operation):operation,PRESENTATION_COLORS.rules,.7);
+        }
+        if(kind==='wall'){
+          const traces=wall!.trace??[];
+          if(stage===0&&normal){const center=sourceBox.getCenter(new THREE.Vector3());arrow(scene,center,new THREE.Vector3(...normal as [number,number,number]),result.request.preferredFeet*.45);}
+          if(stage>0)for(const trace of traces.slice(0,4)){
+            const start=new THREE.Vector3(...trace.roof as [number,number,number]),end=new THREE.Vector3(...trace.support as [number,number,number]);
+            arrow(scene,start,end.clone().sub(start),start.distanceTo(end));
+          }
+        }else if(record?.sourceContour?.length){
+          const contour=(record.closedContour??record.sourceContour).map(p=>new THREE.Vector3(...p as [number,number,number]));line(scene,[...contour,contour[0]]);
+          if(stage>0)arrow(scene,sourceBox.getCenter(new THREE.Vector3()),new THREE.Vector3(...record.axis as [number,number,number]),result.request.preferredFeet*.5);
+        }
+        renderer.setSize(Math.round(cellWidth),Math.round(cellHeight),false);renderer.setClearColor('#000000',0);
+        renderer.render(scene,fitCamera(box,cellWidth,cellHeight,options.iso));ctx!.drawImage(renderer.domElement,px,rowY+width*.06,cellWidth,cellHeight);scene.clear();
+      }
+    }
+    const faceNormal=wall?.mode==='face-normal';
+    text(wall?(faceNormal?'Façade sweeps perpendicular to its saved source face.':'Façade uses global Z (vertical comparison).'):'Void follows the actual source concavity; subtract through levels.',x,y+width*.86,width*.025);
+    if(wall){
+      const n=wall.normal;
+      text(faceNormal&&n?'Face normal n = ('+n.map(v=>v.toFixed(3)).join(', ')+'); sweep direction = −n.':'Source upper geometry caps the vertical sweep.',x,y+width*.90,width*.024);
+      text('Support Z '+(wall.supportZ??0).toFixed(2)+' ft · '+(wall.supportRule??'saved support')+'.',x,y+width*.94,width*.024);
+    }else text('Blue: subtractive cutter · gold: unchanged source letter.',x,y+width*.90,width*.024);
+    text('Trim to field + protected voids. Floors stay horizontal.',x,y+width*.98,width*.024);
+  }
+
   async function generationDetail(x:number,y:number,width:number){
     text('GENERATION RULES',x,y+width*.045,width*.036,PRESENTATION_COLORS.letters);
     const records=selectedVoids.filter(v=>v.sourceContour?.length&&v.cutterMesh?.indices.length).slice(0,2);
@@ -149,8 +205,28 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     text('Open to sky; daylight performance and guarding are not verified.',x,y+width*.95,width*.023);
   }
 
+  async function insertedPlateDetail(x:number,y:number,width:number){
+    const report=result.plateReport!;
+    const cell=Math.round(width*.31),height=Math.round(width*.62);
+    for(let stage=0;stage<3;stage++){
+      renderer.setSize(cell,height,false);renderer.setClearColor('#000000',0);
+      const scene=new THREE.Scene();scene.add(new THREE.AmbientLight(0xffffff,.9));const light=new THREE.DirectionalLight(0xffffff,1.5);light.position.set(40,-60,90);scene.add(light);
+      if(stage===0)result.letters.forEach(l=>addMesh(scene,l.mesh,PRESENTATION_COLORS.letters));
+      else {addMesh(scene,result.architecture,PRESENTATION_COLORS.form,.4);const ids=stage===1?report.floors.map(f=>f.id):result.components.filter(c=>c.id.startsWith('boundary-')).map(c=>c.id);for(const id of ids){const c=result.components.find(c=>c.id===id);if(c)addMesh(scene,c.mesh,PRESENTATION_COLORS.rules,.9);}}
+      renderer.render(scene,fitCamera(bounds,cell,height,options.iso));ctx!.drawImage(renderer.domElement,x+stage*width*.34,y+width*.12,cell,height);scene.clear();
+      text(['Original sources','Horizontal plates','Edges + boundaries'][stage],x+stage*width*.34,y+width*.10,width*.022);
+    }
+    text('INSERTED PLATE — ACTUAL COMPONENTS',x,y+width*.045,width*.035,PRESENTATION_COLORS.letters);
+    text('L outlines → planar plates → connections to U/V boundaries',x,y+width*.80,width*.026);
+    text('U inside contours retain open recesses above the plates.',x,y+width*.85,width*.026);
+    text('V source caps define vertical walls to the previous plate support.',x,y+width*.90,width*.024);
+    text('Plate links are geometric; circulation and structural support are not certified.',x,y+width*.95,width*.021);
+  }
+
   async function panel(view:PlateView,x:number,y:number,width:number){
     await new Promise(resolve=>setTimeout(resolve,0));
+    if(view==='generation'&&result.plateReport){await insertedPlateDetail(x,y,width);return;}
+    if(view==='generation'&&result.voidFieldReport){await voidFieldGenerationDetail(x,y,width);return;}
     if(view==='generation'){await generationDetail(x,y,width);return;}
     const scene=new THREE.Scene();
     const details=view==='orientation';
@@ -166,7 +242,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     if(view==='letters'||view==='orientation'){
       result.letters.forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,1));
     }
-    const annotationSources=details?(selectedVoids.length?selectedVoids.map(v=>v.source):
+    const annotationSources=details?(result.plateReport?result.letters.slice(0,3).map(l=>l.id):selectedVoids.length?selectedVoids.map(v=>v.source):
       result.letters.filter((_,i)=>result.request.source[i]?.architecturalRole==='interior').map(v=>v.id)):[];
     if(view==='orientation'){
       for(const id of annotationSources){
@@ -210,10 +286,10 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     const captions:Record<PlateView,string[]> = {
       letters:['Original source identities and transformations'],
       form:['Validated architectural mesh · '+result.sourceCount+' source letters'],
-      orientation:result.request.envelopeVersion==='void-field'?['Horizontal interior letters · global Z plan rotation','Blue contours define vertical source-derived voids']:result.request.source.some(p=>p.lift)?['Lower / top terraces · middle interior uprights',
+      orientation:result.request.envelopeVersion==='inserted-plate'?['Horizontal L/U sources · upright V boundary sources','Blue arcs show actual saved source rotations']:result.request.envelopeVersion==='void-field'?['Horizontal interior letters · global Z plan rotation','Blue contours define vertical source-derived voids']:result.request.source.some(p=>p.lift)?['Lower / top terraces · middle interior uprights',
         'Blue arcs show actual X tilt and Z rotation']:
         ['Blue arcs show actual X tilt and Z rotation'],
-      generation:selectedVoids.some(v=>v.cutterMesh?.indices.length)?
+      generation:result.request.envelopeVersion==='inserted-plate'?['L-derived plates intersect U edges and upright V boundaries','Plate elevations and connecting strips follow source relationships']:selectedVoids.some(v=>v.cutterMesh?.indices.length)?
         ['Gold letter contours guide terrace setbacks and vertical exterior walls',
           'Blue inner contours sweep horizontally to carve architectural openings']:
         ['This saved study has no recorded cutter meshes.','Regenerate architecture to create source correspondence data.']

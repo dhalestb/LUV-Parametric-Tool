@@ -51,7 +51,7 @@
       ],
       "volume": 5143.047715568951,
       "triangles": 12938,
-      "elapsedMs": 4658,
+      "elapsedMs": 4863,
       "validation": {
         "passed": true,
         "selfIntersectionPairs": 0,

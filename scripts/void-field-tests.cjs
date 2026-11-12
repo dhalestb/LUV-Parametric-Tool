@@ -54,9 +54,9 @@ function make(height,seed,mode='neighbor-taper'){
  assert.deepEqual(regenerated.request.source,edited.source);
  base.letters.forEach((l,i)=>{if(i!==index)assert.deepEqual(l,regenerated.letters[i]);});
  assert.notDeepEqual(base.architecture,regenerated.architecture);
- const invalid=structuredClone(base.request);invalid.source.push({...invalid.source[0]});
- await assert.rejects(()=>require('./source-envelope.cjs').buildSource(invalid,'proof/interactive-check/void-field'),/exactly nine/);
+ const invalid=structuredClone(base.request);while(invalid.source.length<16)invalid.source.push({...invalid.source[0]});
+ await assert.rejects(()=>require('./source-envelope.cjs').buildSource(invalid,'proof/interactive-check/void-field'),/9–15/);
  const rejected=make(60,21);assert.throws(()=>worker(rejected,'rejected-cavity-21'),/disconnected/);
- const report={passed:true,rejectedCases:[{seed:21,reason:'Unintended enclosed cavity; rejected without publishing a study.'}],rows,editing:{changedLetter:index+1,manualYaw:edited.source[index].rz,posesPreserved:true,architectureChanged:true},twelveLetterGate:true};
+ const report={passed:true,rejectedCases:[{seed:21,reason:'Unintended enclosed cavity; rejected without publishing a study.'}],rows,editing:{changedLetter:index+1,manualYaw:edited.source[index].rz,posesPreserved:true,architectureChanged:true},outOfRangePopulationGate:true};
  fs.mkdirSync('reports/void-field',{recursive:true});fs.writeFileSync('reports/void-field/validation.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
 })().catch(e=>{console.error(e);process.exitCode=1;});

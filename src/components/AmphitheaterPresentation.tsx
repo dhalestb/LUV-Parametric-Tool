@@ -16,7 +16,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
   const [exporting,setExporting]=useState(false);
   const [previewing,setPreviewing]=useState(false);
   const rules=presentationRules(result);
-  const sources=result.letters.filter((_,i)=>result.request.source[i]?.architecturalRole==='interior');
+  const sources=result.letters.filter((letter,i)=>result.request.source[i]?.architecturalRole==='interior'||result.voidFieldReport?.walls?.some(wall=>wall.source===letter.id));
   const activeSource=sources.some(source=>source.id===ruleSource)?ruleSource:'';
   useEffect(()=>{
     let active=true,url='';
@@ -62,7 +62,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
       <label><input type="checkbox" checked={transparent} disabled={blocked} onChange={e=>setTransparent(e.target.checked)}/> Transparent PNG background</label>
     </div>
     {(view==='orientation'||view==='generation'||view==='board')&&sources.length>0&&<label>Rule source<select aria-label="Rule source" value={activeSource} disabled={blocked} onChange={e=>setRuleSource(e.target.value)}>
-      <option value="">All interior sources</option>{sources.map(source=><option key={source.id} value={source.id}>{source.id}</option>)}
+      <option value="">All source operations</option>{sources.map(source=><option key={source.id} value={source.id}>{source.id}</option>)}
     </select></label>}
     <details><summary>Measured orientation and terracing rules</summary>
       <div className="space-y-2 py-2">{[...rules.orientation,...rules.terraces].map(rule=><p key={rule}>{rule}</p>)}

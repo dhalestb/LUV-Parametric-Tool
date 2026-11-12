@@ -4,7 +4,7 @@
     {
       "seed": 19,
       "count": 8,
-      "milliseconds": 2237.6524,
+      "milliseconds": 2529.7181,
       "triangles": 4690,
       "volume": 12459.938924724935,
       "validation": {
@@ -43,7 +43,7 @@
     {
       "seed": 21,
       "count": 8,
-      "milliseconds": 1854.5153,
+      "milliseconds": 1858.4501999999998,
       "triangles": 3772,
       "volume": 11764.715471349386,
       "validation": {
@@ -82,7 +82,7 @@
     {
       "seed": 24,
       "count": 12,
-      "milliseconds": 3691.195099999999,
+      "milliseconds": 3416.7877000000008,
       "triangles": 6900,
       "volume": 16604.580194046757,
       "validation": {

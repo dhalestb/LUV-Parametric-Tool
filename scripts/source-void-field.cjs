@@ -27,7 +27,7 @@ function innerProfile(w,node){
 }
 function voidFieldEnvelope(w,nodes,edges,letters,field,preferred,config={}){
  const M=w.Manifold,CS=w.CrossSection;
- if(nodes.length!==9)throw Error('Void Field review stage requires exactly nine source letters. Twelve-letter expansion is pending review.');
+ if(nodes.length<9||nodes.length>15)throw Error('Void Field requires 9–15 source letters.');
  if(config.profileMode!==undefined&&!['straight','neighbor-taper'].includes(config.profileMode))throw Error('Unknown Void Field profile mode.');
  if(config.connectivity!==undefined&&!['adjacent','none'].includes(config.connectivity))throw Error('Unknown Void Field connection mode.');
  if(config.atriumBoundary!==undefined&&!['open','enclosed'].includes(config.atriumBoundary))throw Error('Unknown atrium boundary mode.');
@@ -52,11 +52,14 @@ function voidFieldEnvelope(w,nodes,edges,letters,field,preferred,config={}){
  const neighbors=id=>{const i=nodes.findIndex(n=>n.id===id);return edges.filter(e=>e.i===i||e.j===i).map(e=>nodes[e.i===i?e.j:e.i].id);};
  const add=(id,owner,solid,sources)=>{if(!solid.isEmpty())bands.push({id,owner,sources:[...new Set([owner,...sources].filter(Boolean))],solid:solid.intersect(clip)});};
  // Floor levels are measured from surrounding source undersides, grouped by lift.
- const levels=[...new Set(['lower','middle','top'].map(lift=>{
-  const group=occupied.filter(n=>n.p.lift===lift);if(!group.length)return undefined;
+ const levelCount=config.levelCount??3;
+ if(![3,4].includes(levelCount)||levelCount===4&&nodes.length!==15)throw Error('Four-level Void Field requires 15 source letters.');
+ const levelIndex=n=>n.p.levelIndex??['lower','middle','top'].indexOf(n.p.lift);
+ const levels=[...new Set(Array.from({length:levelCount},(_,i)=>i).map(index=>{
+  const group=occupied.filter(n=>levelIndex(n)===index);if(!group.length)return undefined;
   return Math.max(support+.75,group.reduce((sum,n)=>sum+n.p.z+field.height/2,0)/group.length-1);
  }).filter(z=>z!==undefined&&z<top-.8))].sort((a,b)=>a-b);
- if(!levels.length)throw Error('No occupied horizontal levels fit the void extent.');
+ if(!levels.length||(levelCount===4&&levels.length!==4))throw Error('Every requested occupied level must fit the void extent and have source letters.');
  // Narrow adjacency strips join actual source footprints, not a bounding block.
  const strips=edges.map(e=>CS.hull([CS.circle(1.4,32).translate([nodes[e.i].p.x,nodes[e.i].p.y]),CS.circle(1.4,32).translate([nodes[e.j].p.x,nodes[e.j].p.y])]));
  const floorPlan=CS.union([...footprints.map(p=>p.offset(.9,'Round',2,48)),...strips]);
@@ -69,7 +72,10 @@ function voidFieldEnvelope(w,nodes,edges,letters,field,preferred,config={}){
  for(const [i,node] of nodes.entries()){
   if(roles[i]==='interior')continue;
   const triangles=upperTriangles(letters[i].mesh),low=Math.min(...letters[i].mesh.positions.filter((_,k)=>k%3===2));
-  const wallSupport=node.p.supportZ??support;
+  // Upper copied sources must not create a second full-height leaning shell.
+  // In four-level Face-Normal mode, their automatic support is the preceding floor.
+  const automaticSupport=config.facadeMode==='face-normal'&&levelCount===4&&levelIndex(node)===3?floorRecords[2].bottomZ:support;
+  const wallSupport=node.p.supportZ??automaticSupport;
   if(!Number.isFinite(wallSupport)||wallSupport<0||wallSupport>=low)throw Error(node.id+': wall support must be below the source underside.');
   const plateZ=Math.max(wallSupport+.75,low);
   const parts=[footprints[i].offset(.9,'Round',2,48).extrude(.75).translate([0,0,plateZ-.75])];
@@ -88,7 +94,7 @@ function voidFieldEnvelope(w,nodes,edges,letters,field,preferred,config={}){
    // Horizontal source normals use the identical global-Z Boolean construction to avoid roundoff.
    const wall=(native&&Math.hypot(native.report.normal[0],native.report.normal[1])>1e-12?native.wall:null)??M.union(triangles.map(t=>M.hull([...t,...t.map(p=>[p[0],p[1],wallSupport])]))).intersect(plan.extrude(top-wallSupport).translate([0,0,wallSupport]));
    facadeSolids.push({source:node.id,solid:wall});
-   parts.push(wall);walls.push({...native?.report,mode:native?'face-normal':'vertical',source:node.id,supportZ:wallSupport,segments:selected,upperTriangles:triangles,probes:selected.map(s=>{const xy=[(s.a[0]+s.b[0])/2-s.normal[0]*.1,(s.a[1]+s.b[1])/2-s.normal[1]*.1];return {xy,...heightAt(triangles,...xy)};}),mesh:pack(wall)});
+   parts.push(wall);walls.push({...native?.report,mode:native?'face-normal':'vertical',source:node.id,supportZ:wallSupport,supportRule:node.p.supportZ!==undefined?'explicit source support':automaticSupport!==support?'preceding floor underside':'field floor default',segments:selected,upperTriangles:triangles,probes:selected.map(s=>{const xy=[(s.a[0]+s.b[0])/2-s.normal[0]*.1,(s.a[1]+s.b[1])/2-s.normal[1]*.1];return {xy,...heightAt(triangles,...xy)};}),mesh:pack(wall)});
   }
   add('source-envelope-'+node.id,node.id,M.union(parts),neighbors(node.id));
  }
@@ -144,6 +150,6 @@ function voidFieldEnvelope(w,nodes,edges,letters,field,preferred,config={}){
  if(solid.decompose().length!==1)throw Error('Void field envelope is disconnected: '+JSON.stringify(solid.decompose().map(s=>s.volume())));
  for(const facade of facadeSolids){let remaining=facade.solid;for(const tool of tools)remaining=remaining.subtract(tool.cuttingSolid);const record=walls.find(w=>w.source===facade.source);record.finalMesh=pack(remaining);record.finalVolume=remaining.volume();record.floorContacts=floorRecords.map(f=>({floor:f.id,volume:remaining.intersect(bands.find(b=>b.id===f.id).solid).volume()}));}
  const visibility=atrium?require('./source-atrium-openings.cjs').validateAtriumViews(w,solid,entries[0],floorRecords,atrium,field):undefined;
- return {bands,primary,solid,tools,projections:[],report:{before:primary.volume(),after:solid.volume(),removed:primary.volume()-solid.volume(),added:0,components:1,overhangs:0,addedProjections:0,operations},boundaryReport:{facadeMode:config.facadeMode??'vertical',atriumBoundary:config.atriumBoundary??'enclosed',atriumOpenings:atrium?.records,visibility,typology:'Void Field Gathering',walls,voids,connections,floors:floorRecords,roles:nodes.map((n,i)=>({source:n.id,role:roles[i]})),ambiguities:[],minimumWallThickness:thickness,profileTolerance:.01,extent:[support,top],limitations:['Geometric connections only; circulation dimensions and occupancy are not verified.','Homothetic source-related taper only. Profile shifts, splits and merges are deferred.','Nine-letter review stage. Final local thickness and usable circulation are not certified.']}};
+ return {bands,primary,solid,tools,projections:[],report:{before:primary.volume(),after:solid.volume(),removed:primary.volume()-solid.volume(),added:0,components:1,overhangs:0,addedProjections:0,operations},boundaryReport:{facadeMode:config.facadeMode??'vertical',atriumBoundary:config.atriumBoundary??'enclosed',atriumOpenings:atrium?.records,visibility,typology:'Void Field Gathering',walls,voids,connections,floors:floorRecords,roles:nodes.map((n,i)=>({source:n.id,role:roles[i]})),ambiguities:[],minimumWallThickness:thickness,profileTolerance:.01,extent:[support,top],limitations:['Geometric connections only; circulation dimensions and occupancy are not verified.','Homothetic source-related taper only. Profile shifts, splits and merges are deferred.','Bounded 9–15-letter development. Final local thickness and usable circulation are not certified.']}};
 }
 module.exports={voidFieldEnvelope,innerProfile};

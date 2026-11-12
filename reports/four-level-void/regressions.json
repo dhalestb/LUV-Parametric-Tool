@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "name": "void-field-tests",
+      "passed": true,
+      "elapsedMs": 28839
+    },
+    {
+      "name": "void-field-spacing-tests",
+      "passed": true,
+      "elapsedMs": 10845
+    },
+    {
+      "name": "three-lift-tests",
+      "passed": true,
+      "elapsedMs": 16245
+    },
+    {
+      "name": "upright-opening-tests",
+      "passed": true,
+      "elapsedMs": 10419
+    },
+    {
+      "name": "recessed-study-tests",
+      "passed": true,
+      "elapsedMs": 8177
+    },
+    {
+      "name": "vertical-envelope-constraints-tests",
+      "passed": true,
+      "elapsedMs": 5267
+    },
+    {
+      "name": "amphitheater-presentation-export-tests",
+      "passed": true,
+      "elapsedMs": 4201
+    },
+    {
+      "name": "open-atrium-tests",
+      "passed": true,
+      "elapsedMs": 44937
+    },
+    {
+      "name": "face-normal-tests",
+      "passed": true,
+      "elapsedMs": 64291
+    },
+    {
+      "name": "inserted-plate-tests",
+      "passed": true,
+      "elapsedMs": 12061
+    },
+    {
+      "name": "void-field-population-tests",
+      "passed": true,
+      "elapsedMs": 60524
+    },
+    {
+      "name": "four-level-void-tests",
+      "passed": true,
+      "elapsedMs": 18752
+    }
+  ]
+}

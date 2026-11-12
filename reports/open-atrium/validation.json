@@ -10,8 +10,8 @@
       "volumeAfter": 4674.921177231866,
       "trianglesBefore": 12938,
       "trianglesAfter": 13722,
-      "elapsedBefore": 4606,
-      "elapsedAfter": 6413,
+      "elapsedBefore": 4509,
+      "elapsedAfter": 5904,
       "independentTriangleRays": 168,
       "previouslyBlockedRays": 147,
       "floorViewCounts": [
@@ -41,8 +41,8 @@
       "volumeAfter": 5214.919340015359,
       "trianglesBefore": 12934,
       "trianglesAfter": 13722,
-      "elapsedBefore": 4530,
-      "elapsedAfter": 5667,
+      "elapsedBefore": 4535,
+      "elapsedAfter": 5809,
       "independentTriangleRays": 168,
       "previouslyBlockedRays": 147,
       "floorViewCounts": [

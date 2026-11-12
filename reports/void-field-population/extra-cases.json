@@ -1,0 +1,32 @@
+[
+  {
+    "count": 12,
+    "seed": 149,
+    "spacing": 12,
+    "mode": "face-normal",
+    "accepted": true,
+    "volume": 4781.052833065091,
+    "triangles": 12594,
+    "validation": {
+      "passed": true,
+      "selfIntersectionPairs": 0,
+      "nonAdjacentTriangleChecks": 578515,
+      "legacyFlags": 169
+    }
+  },
+  {
+    "count": 15,
+    "seed": 37,
+    "spacing": 15,
+    "mode": "vertical",
+    "accepted": true,
+    "volume": 6834.959909852693,
+    "triangles": 14476,
+    "validation": {
+      "passed": true,
+      "selfIntersectionPairs": 0,
+      "nonAdjacentTriangleChecks": 656695,
+      "legacyFlags": 301
+    }
+  }
+]

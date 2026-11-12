@@ -11,7 +11,7 @@
       "height": 20,
       "seed": 19,
       "mode": "neighbor-taper",
-      "elapsedMs": 5062,
+      "elapsedMs": 4654,
       "volume": 4048.681938854127,
       "removed": 1946.5922176054146,
       "triangles": 10726,
@@ -181,7 +181,7 @@
       "height": 40,
       "seed": 19,
       "mode": "neighbor-taper",
-      "elapsedMs": 4139,
+      "elapsedMs": 4892,
       "volume": 4258.740343666342,
       "removed": 2204.104053771982,
       "triangles": 10718,
@@ -351,7 +351,7 @@
       "height": 60,
       "seed": 19,
       "mode": "neighbor-taper",
-      "elapsedMs": 4002,
+      "elapsedMs": 4437,
       "volume": 4258.740343666342,
       "removed": 2204.10405377198,
       "triangles": 10716,
@@ -521,7 +521,7 @@
       "height": 60,
       "seed": 19,
       "mode": "straight",
-      "elapsedMs": 4143,
+      "elapsedMs": 4439,
       "volume": 4258.727970142167,
       "removed": 2203.1798349507353,
       "triangles": 10674,
@@ -691,7 +691,7 @@
       "height": 60,
       "seed": 37,
       "mode": "neighbor-taper",
-      "elapsedMs": 4059,
+      "elapsedMs": 4387,
       "volume": 3850.5483215104055,
       "removed": 2430.343624898844,
       "triangles": 8600,
@@ -865,5 +865,5 @@
     "posesPreserved": true,
     "architectureChanged": true
   },
-  "twelveLetterGate": true
+  "outOfRangePopulationGate": true
 }

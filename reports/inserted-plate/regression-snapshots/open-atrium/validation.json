@@ -1,0 +1,82 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "spacing": 12,
+      "sourcePosesPreserved": true,
+      "sourceMeshesIdentical": true,
+      "floorElevationsUnchanged": true,
+      "volumeBefore": 5143.047715568951,
+      "volumeAfter": 4674.921177231866,
+      "trianglesBefore": 12938,
+      "trianglesAfter": 13722,
+      "elapsedBefore": 4362,
+      "elapsedAfter": 5683,
+      "independentTriangleRays": 168,
+      "previouslyBlockedRays": 147,
+      "floorViewCounts": [
+        4,
+        4,
+        4
+      ],
+      "crossLevelCounts": [
+        3,
+        3,
+        3
+      ],
+      "skyPaths": 3,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 579131,
+        "legacyFlags": 188
+      }
+    },
+    {
+      "spacing": 15,
+      "sourcePosesPreserved": true,
+      "sourceMeshesIdentical": true,
+      "floorElevationsUnchanged": true,
+      "volumeBefore": 5787.034915722702,
+      "volumeAfter": 5214.919340015359,
+      "trianglesBefore": 12934,
+      "trianglesAfter": 13722,
+      "elapsedBefore": 4471,
+      "elapsedAfter": 5859,
+      "independentTriangleRays": 168,
+      "previouslyBlockedRays": 147,
+      "floorViewCounts": [
+        4,
+        4,
+        4
+      ],
+      "crossLevelCounts": [
+        3,
+        3,
+        3
+      ],
+      "skyPaths": 3,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 568084,
+        "legacyFlags": 280
+      }
+    }
+  ],
+  "additionalCases": [
+    {
+      "seed": 19,
+      "primary": "L-8",
+      "passed": true
+    },
+    {
+      "seed": 19,
+      "primary": "U-3",
+      "accepted": false,
+      "expectedRejection": true,
+      "reason": "Narrow U-primary arrangement has floor-facing views but no verified cross-level views; validation preserved."
+    }
+  ],
+  "unchangedValidationThresholds": true
+}

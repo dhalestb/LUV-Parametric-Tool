@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "counts": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "elevenSuitesPassed": true,
+  "typescript": true,
+  "targetedLint": true,
+  "build": true,
+  "browserActualSourceCount": 12,
+  "browserMatchesWorkerExactly": true,
+  "checkpoint": "9c01558f11ff8ea7824f640f108fb588d9198b6a",
+  "study": "6546a87c-b6e9-48cc-94d8-ef2bafdb1ae2",
+  "noPushMergeDeploy": true
+}

@@ -73,13 +73,17 @@ export function presentationRules(result:AmphitheaterResult){
     return (lift==='top'?'Upper':lift==='middle'?'Middle interior':'Lower')+' · X '+tilt+' · Z '+yaw;
   };
   const orientation=(['lower','middle','top'] as const).map(describe).filter(Boolean);
+  if(result.request.envelopeVersion==='inserted-plate')orientation.splice(0,orientation.length,'L plates and U edge sources: horizontal faces; X/Y tilt 0°.', 'V boundaries: upright faces; X tilt 90°. Z rotation follows each saved source.');
   if(!orientation.length)orientation.push('Source labels show actual saved X tilt and Z plan rotation.');
   orientation.push('X tilt is measured from horizontal; Z turns the letter in plan.');
   const size=result.request.preferredFeet;
-  const terraces=result.request.envelopeVersion==='void-field'?[
+  const terraces=result.request.envelopeVersion==='inserted-plate'?['L outlines define .75-ft planar plates with .50-ft edge offset.','2.40-ft geometric links connect source boundaries at each plate elevation.','U channels remain open edge recesses; V upper surfaces define vertical boundary caps.']:result.request.envelopeVersion==='void-field'?[
     'Actual source plan concavities form subtractive volumes along global Z.',
     'Horizontal source-derived floors remain around the protected void network.',
-    'Neighbor profile area controls bounded taper; exterior walls remain vertical.'
+    result.request.voidField?.facadeMode==='face-normal'?'Extract exterior source boundaries; sweep along the negative source-face normal to support Z.':'Extract exterior source boundaries; extend along global Z to support Z.',
+    'Source upper surfaces cap the sweep; trim to the field and protected voids.',
+    result.request.voidField?.levelCount===4&&result.request.voidField?.facadeMode==='face-normal'?'Automatic upper façades stop at the preceding floor; explicit support Z overrides remain.':'Façades use the saved support elevations; source transformations remain unchanged.',
+    result.request.voidField?.facadeMode==='face-normal'?'Neighbor profiles control void taper; exterior façades follow source-face normals.':'Neighbor profiles control void taper; exterior walls follow global Z.'
   ]:result.request.envelopeVersion==='vertical-walls'?[
     'Platforms follow projected letter outlines, offset outward 0.80 ft, with 0.75 ft thickness.',
     'Two stepped bands add '+(size*.075).toFixed(3)+' ft of outward offset per band; vertical steps are capped at '+(size*.12).toFixed(2)+' ft.',

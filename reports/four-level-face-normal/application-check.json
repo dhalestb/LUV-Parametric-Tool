@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "id": "c1fbdb4a-6f45-4b98-86d3-0255b7fdab01",
+  "all15SourceRecordsIdentical": true,
+  "letterMeshesIdentical": true,
+  "floorsIdentical": true,
+  "architectureEqualsTestedOutput": true,
+  "typescript": "passed",
+  "targetedLint": "passed",
+  "productionBuild": "passed"
+}
