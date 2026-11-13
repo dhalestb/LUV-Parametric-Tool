@@ -32,7 +32,7 @@ async function buildSource(r,out){
  if(r.source.length<2)throw Error('Use at least two original letters for cross-letter development.');
  const {nodes,edges,letters}=derive(r),w=await require('manifold-3d/manifold.js').default();w.setup();const M=w.Manifold;
  const {width:W,depth:D,height:H}=r.field,pitch=.5,paths=[],bands=[];
- const vertical=r.envelopeVersion==='inserted-plate'?require('./source-inserted-plate.cjs').insertedPlateEnvelope(w,nodes,edges,letters,r.field):r.envelopeVersion==='void-field'?require('./source-void-field.cjs').voidFieldEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet,r.voidField):r.envelopeVersion==='vertical-walls'?require('./source-vertical-envelope.cjs').verticalEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet):null;
+ const vertical=r.envelopeVersion==='inserted-plate'?require('./source-inserted-plate.cjs').insertedPlateEnvelope(w,nodes,edges,letters,r.field,{...r.insertedPlate,cornerStudy:r.sourceSnapshot?.cornerStudy,inward:r.sourceSnapshot?.orientationVersion===7||(!r.sourceSnapshot&&r.insertedPlate?.version==='edge-connected')}):r.envelopeVersion==='void-field'?require('./source-void-field.cjs').voidFieldEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet,r.voidField):r.envelopeVersion==='vertical-walls'?require('./source-vertical-envelope.cjs').verticalEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet):null;
  if(vertical)bands.push(...vertical.bands);
  for(const e of ['levels','profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion)?[]:edges){
  const dir=e.s.clone().sub(e.q),reach=Math.min(r.preferredFeet*.4,e.d*.4);
