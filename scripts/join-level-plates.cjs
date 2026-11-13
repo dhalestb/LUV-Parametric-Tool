@@ -11,7 +11,10 @@ function joinLevelPlates(w, nodes, parts, floors) {
    const walls=w.Manifold.union(parts.filter(p=>p.id.startsWith('boundary-')).map(p=>p.solid)).slice(mid);
    const landings=[];
    for(const neighbor of neighbors){
-     const target=parts.find(p=>p.id===neighbor.id).solid.slice(mid).subtract(walls);
+     const rawTarget=parts.find(p=>p.id===neighbor.id).solid.slice(mid).subtract(walls);
+     // Remove Boolean-section slivers before offsetting; retain all landing thresholds.
+     const target=rawTarget.simplify(1e-5);
+     if(Math.abs(rawTarget.area()-target.area())>1e-4)throw Error('Plate section simplification changed its area at '+neighbor.source);
      // An inset gives each landing finite area beyond the wall.
      const interior=target.offset(-.75);
      const bounds=interior.bounds();
