@@ -1,3 +1,4 @@
+import {findFacadeJoint} from './voidFieldBoardJoint';
 import * as THREE from 'three';
 import {toCreasedNormals} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type {AmphitheaterResult,ProofMesh} from './amphitheaterInteractiveTypes';
@@ -365,8 +366,84 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     });
   }
 
+  function voidFieldRules(view:'orientation'|'generation',x:number,y:number,width:number){
+    const report=result.voidFieldReport!;
+    const {letters:gold,rules:blue,form:white}=PRESENTATION_COLORS;
+    const source=(id:string)=>result.letters.find(l=>l.id===id);
+    const scene=()=>{const s=new THREE.Scene();lighting(s);return s;};
+    function draw(s:THREE.Scene,left:number,top:number,w:number,h:number,box=new THREE.Box3().setFromObject(s),axis?:THREE.Vector2,plan=false){
+      top*=1.12;h*=1.12;
+      if(box.isEmpty())return;
+      renderer.setSize(Math.round(width*w),Math.round(width*h),false);renderer.setClearColor('#000000',0);
+      const camera=fitCamera(box,w,h,options.iso,axis);
+      if(plan){const center=box.getCenter(new THREE.Vector3()),span=box.getSize(new THREE.Vector3());camera.up.set(0,1,0);camera.position.copy(center).add(new THREE.Vector3(0,0,span.length()*2));camera.lookAt(center);const half=Math.max(span.y,span.x*h/w,1)*.57;camera.top=half;camera.bottom=-half;camera.left=-half*w/h;camera.right=half*w/h;camera.updateProjectionMatrix();}
+      renderer.render(s,camera);ctx!.drawImage(renderer.domElement,x+width*left,y+width*top,w*width,h*width);
+    }
+    const label=(msg:string,left:number,top:number,size=.024,color:string=white)=>text(msg,x+width*left,y+width*top*1.12,width*size*1.1,color);
+    label(view==='orientation'?'ORIENTATION RULES':'GENERATION RULES',0,.045,.036,gold);
+    if(view==='orientation'){
+      const poses=result.request.source.map((p,i)=>({p,l:result.letters[i]}));
+      const outside=poses.filter(({l})=>!report.voids.some(v=>v.source===l.id));
+      const groups=[{name:'EXTERIOR · ALL LEVELS',items:outside}];
+      groups.push({name:'INTERIOR VOID SOURCES',items:poses.filter(({l})=>report.voids.some(v=>v.source===l.id))});
+      const step=.86/groups.length;
+      groups.forEach(({name,items},i)=>{
+        if(!items.length)return;
+        const top=.09+i*step,s=scene();
+        items.forEach(({l})=>addMesh(s,l.mesh,gold));draw(s,0,top,.38,step);
+        label(name,.40,top+.035,.03,blue);
+        const range=(values:number[])=>{const vals=values.map(v=>+v.toFixed(1));const a=Math.min(...vals),b=Math.max(...vals);return a===b?a+'°':a+'° to '+b+'°';};
+        label(i?'Group the inner contours in plan.':'Perimeter faces lie nearly level.',.40,top+.095);
+        label(i?'Together they define the void field.':'Tilt varies across the levels.',.40,top+.14);
+        label('Face tilt: X '+range(items.map(({p})=>p.rx))+'; Y '+range(items.map(({p})=>p.ry)),.40,top+.21);
+        label('Plan rotation: '+[...new Set(items.map(({p})=>+p.rz.toFixed(1)))].sort((a,b)=>a-b).join('° / ')+'°',.40,top+.26);
+      });
+      label('Measured at the saved poses. Z rotation turns the letter in plan.',0,.99,.025);return;
+    }
+    const title=(t:string,y:number)=>label(t,0,y,.032,blue);
+    const stages=(names:string[],top:number)=>names.forEach((n,i)=>label(n,i*.34,top,.024));
+    title('VOID SUBTRACTION',.12);stages(['Source profiles · plan','Letters + extrusions','Void through form'],.17);
+    function stroke(s:THREE.Scene,pts:THREE.Vector3[],radius:number,color:string){
+      for(let i=1;i<pts.length;i++){
+        const d=pts[i].clone().sub(pts[i-1]);if(d.length()<1e-6)continue;
+        const g=new THREE.CylinderGeometry(radius,radius,d.length(),8),m=new THREE.MeshBasicMaterial({color,depthTest:false,depthWrite:false});
+        const tube=new THREE.Mesh(g,m);tube.position.copy(pts[i-1]).lerp(pts[i],.5);tube.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());tube.renderOrder=25;s.add(tube);resources.push(g,m);
+      }
+    }
+    const vs=[scene(),scene(),scene()];addMesh(vs[2],result.architecture,white,.12);
+    for(const v of report.voids){
+      const l=source(v.source);if(l){addMesh(vs[0],l.mesh,gold,.73);addMesh(vs[1],l.mesh,gold);}
+      const pts=v.closedContour.map(p=>new THREE.Vector3().fromArray(p));
+      if(pts.length){pts.push(pts[0]);for(const s of vs.slice(0,2))stroke(s,pts,result.request.preferredFeet*.017,blue);}
+      if(v.cutterMesh?.indices.length){addMesh(vs[1],v.cutterMesh,blue,.29);addMesh(vs[2],v.cutterMesh,blue,.83);}
+    }
+    vs.forEach((s,i)=>draw(s,i*.34,.18,.32,.26,undefined,undefined,i===0));
+    label('Inner contours extrude through the occupied levels.',0,.47);
+    title('WALL EXTRUSION',.56);stages(['Original sources','Sweep from source face','Wall joint detail'],.61);
+    const joint=findFacadeJoint(report.walls??[]);
+    if(!joint){label('No intersecting pair verified in the saved wall meshes.',0,.78);return;}
+    const detail=new THREE.Scene();
+    detail.add(new THREE.AmbientLight(0xffffff,1.2));
+    const key=new THREE.DirectionalLight(0xffffff,2.1);
+    key.position.copy(joint.normal).multiplyScalar(3);key.position.z+=1;detail.add(key);
+    const ws=[scene(),scene(),detail];
+
+    joint.walls.forEach((w,i)=>{
+      const l=source(w.source);if(l){addMesh(ws[0],l.mesh,gold);addMesh(ws[1],l.mesh,gold);}
+      addMesh(ws[1],w.mesh,i?white:'#C2BBB0',.94);
+      addMesh(detail,w.finalMesh!,white);
+    });
+    {
+      const [p,q]=joint.edge;
+      stroke(detail,[p.clone().lerp(q,.08),p.clone().lerp(q,.92)],result.request.preferredFeet*.015,blue);
+    }
+    ws.forEach((s,i)=>draw(s,i*.34,.63,.32,.27,undefined,i===2?joint.axis:undefined));
+    label(report.facadeMode==='face-normal'?'Each wall sweeps perpendicular to its source face.':'Each exterior edge sweeps vertically to its support.',0,.94);
+    label('Blue line: seam between the two finished wall segments.',0,.985);
+  }
   async function panel(view:PlateView,x:number,y:number,width:number){
     await new Promise(resolve=>setTimeout(resolve,0));
+    if((view==='orientation'||view==='generation')&&result.voidFieldReport){voidFieldRules(view,x,y,width);return;}
     if((view==='orientation'||view==='generation')&&result.plateReport?.version==='edge-connected'){plateRulesPanel(view,x,y,width);return;}
     if(view==='generation'&&result.plateReport){await insertedPlateDetail(x,y,width);return;}
     if((view==='orientation'||view==='generation')&&result.request.envelopeVersion==='vertical-walls'&&steppedRules(view,x,y,width))return;
@@ -432,7 +509,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     }
     if(view==='form'){
       const form=addMesh(scene,result.architecture,PRESENTATION_COLORS.form);
-      if(room || result.plateReport || result.request.envelopeVersion==='vertical-walls'){
+      if(room || result.voidFieldReport || result.plateReport || result.request.envelopeVersion==='vertical-walls'){
         const center=bounds.getCenter(new THREE.Vector3());
         const radius=bounds.getSize(new THREE.Vector3()).length()/2;
         const east=direction?.x??(options.iso.includes('E')?1:-1);
@@ -526,7 +603,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
       const contentTop=canvas.width*.12,contentBottom=canvas.height-margin*1.4;
       const rowHeight=(contentBottom-contentTop)/2;
       for(const [i,view] of views.entries()){
-        const y=contentTop+Math.floor(i/2)*rowHeight+(rowHeight-width)/2;
+        const y=contentTop+Math.floor(i/2)*rowHeight+(result.voidFieldReport?0:(rowHeight-width)/2);
         await panel(view,margin+(i%2)*(width+gap),y,width);
       }
       text(result.request.field.width+' × '+result.request.field.depth+' × '+result.request.field.height+' ft · '+result.request.preferredFeet+' ft preferred letters',

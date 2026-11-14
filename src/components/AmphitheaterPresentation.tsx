@@ -67,7 +67,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
       </select></label>
       <label><input type="checkbox" checked={transparent} disabled={blocked} onChange={e=>setTransparent(e.target.checked)}/> Transparent PNG background</label>
     </div>
-    {(view==='orientation'||view==='generation'||view==='board')&&sources.length>0&&<label>Rule source<select aria-label="Rule source" value={activeSource} disabled={blocked} onChange={e=>setRuleSource(e.target.value)}>
+    {(view==='orientation'||view==='generation'||view==='board')&&!result.voidFieldReport&&sources.length>0&&<label>Rule source<select aria-label="Rule source" value={activeSource} disabled={blocked} onChange={e=>setRuleSource(e.target.value)}>
       <option value="">All source operations</option>{sources.map(source=><option key={source.id} value={source.id}>{source.id}</option>)}
     </select></label>}
     <details><summary>{result.plateReport?'Orientation and generation rules':result.roomReport?'Exterior wall and interior room rules':'Measured orientation and terracing rules'}</summary>
