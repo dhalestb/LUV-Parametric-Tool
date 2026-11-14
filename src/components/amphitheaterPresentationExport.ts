@@ -64,6 +64,10 @@ export async function pngWithDpi(blob:Blob,dpi=300){
 }
 
 export function presentationRules(result:AmphitheaterResult){
+  if(result.roomReport)return {
+    orientation:['Letters are drawn at their saved positions and rotations.'],
+    terraces:['The form view shows the full architectural mesh. The generation view overlays the source letters on the room cutaway when available.']
+  };
   const describe=(lift:'lower'|'middle'|'top')=>{
     const sources=result.request.source.filter(p=>p.lift===lift&&(lift!=='middle'||p.architecturalRole==='interior'));
     if(!sources.length)return '';

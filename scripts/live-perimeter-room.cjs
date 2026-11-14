@@ -17,13 +17,19 @@ module.exports=function liveRoom(w,nodes,field,options){
  const outline=C.hull(ring.flatMap(n=>n.line.map(q=>[q.x,q.y])));
  const base=outline.offset(.15).extrude(.35);
  // Each vertical letter face supplies one side of the inner enclosure.
+ let plan,inside,roof,enclosure,suspended;
+ if(options?.suspendedLLV){
+ suspended=require("./suspended-polygon-room.cjs")(w,inner,walls,outline,field,options.edgePlatforms ? nodes.filter(n=>n.p.architecturalRole==="perimeter" && n.p.levelIndex===1 && ["L","U"].includes(n.p.letter)) : [],panels);
+ ({plan,inside,roof}=suspended); enclosure=add("suspended-room-and-landing",suspended.enclosure,inner.map(n=>n.id));
+ }else{
  const planes=inner.map(n=>{const t=n.p.rz*Math.PI/180,nx=Math.sin(t),ny=-Math.cos(t);return {nx,ny,d:n.p.x*nx+n.p.y*ny};});
  const corners=planes.map((p,i)=>{const q=planes[(i+1)%3],det=p.nx*q.ny-p.ny*q.nx;if(Math.abs(det)<.05)throw Error('Interior letter faces do not enclose a room.');return [(p.d*q.ny-p.ny*q.d)/det,(p.nx*q.d-p.d*q.nx)/det];});
- const plan=new C([corners],'EvenOdd'),inside=plan.offset(-.35);
- const roof=Math.min(...inner.map(n=>Math.max(...n.line.map(q=>q.z))));
+ plan=new C([corners],'EvenOdd');inside=plan.offset(-.35);
+ roof=Math.min(...inner.map(n=>Math.max(...n.line.map(q=>q.z))));
  if(inside.area()<35||roof<8||plan.offset(1).subtract(outline).area()>.001)throw Error('The inner letter faces leave insufficient room or surrounding space.');
  const door=inner[0].p,portal=M.cube([3,2,7.1],true).rotate([0,0,door.rz]).translate([door.x,door.y,3.9]);
- const enclosure=add('inner-room',plan.extrude(roof).subtract(inside.extrude(roof-.35)).subtract(portal),inner.map(n=>n.id));
+ enclosure=add('inner-room',plan.extrude(roof).subtract(inside.extrude(roof-.35)).subtract(portal),inner.map(n=>n.id));
+ }
  const u=lower.find(n=>n.p.letter==='U');if(!u)throw Error('A lower U is required for the alcove.');
  const shape=getLetterShape('U'),center=new T.Box2().setFromPoints(shape.getPoints(16)).getCenter(new T.Vector2()),matrix=new T.Matrix4().fromArray(u.matrix);
  const pt=(x,y)=>{const v=new T.Vector3(x-center.x,y-center.y,0).applyMatrix4(matrix);return [v.x,v.y];};
@@ -41,6 +47,6 @@ module.exports=function liveRoom(w,nodes,field,options){
  const solid=new M(union.getMesh()).asOriginal().simplify(.001);
  const upper=nodes.length-lower.length-inner.length;
  const ids=inner.map(n=>n.id);
- const boundaryReport={typology:'Room Within Volume',strategy:'perimeter',roomSources:ids,floorZ:.35,headroom:roof-.70,roomRoofZ:roof,outerRoofZ:solid.boundingBox().max[2],clearRoomArea:inside.area(),interstitialArea:outline.area()-plan.area(),door:{width:3,height:7.1},access:{clearWidth:3,clearHeight:7.1},windows:[],limitations:[],perimeter:{...metrics,lower:lower.length,upper,interior:inner.length}};
+ const boundaryReport={typology:'Room Within Volume',strategy:'perimeter',roomSources:ids,floorZ:suspended?.floorZ??.35,headroom:suspended?.headroom??roof-.70,roomRoofZ:roof,outerRoofZ:solid.boundingBox().max[2],clearRoomArea:inside.area(),interstitialArea:outline.area()-plan.area(),door:{width:3,height:7.1,...(suspended?{jamb:suspended.jamb,landingLength:suspended.landingLength}:{})},access:{clearWidth:3,clearHeight:7.1},windows:[],limitations:[],platforms:suspended?.platforms,perimeter:{...metrics,lower:lower.length,upper,interior:inner.length}};
  return {solid,primary:solid,cutaway:solid.trimByPlane([0,1,0],0),bands,contributionBands:nodes.map(n=>({owner:n.id,id:'contour-'+n.id,sources:[n.id],solid:n.p.architecturalRole==='interior'?enclosure:M.union(panels.filter(p=>p.sources.includes(n.id)).map(p=>p.solid))})),tools:[],projections:[],boundaryReport};
 };

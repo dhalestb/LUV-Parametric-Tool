@@ -66,7 +66,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
     </select></label>}
     <details><summary>Measured orientation and terracing rules</summary>
       <div className="space-y-2 py-2">{[...rules.orientation,...rules.terraces].map(rule=><p key={rule}>{rule}</p>)}
-      {result.request.envelopeVersion!=='void-field'&&<p>Current middle-interior generation uses X tilt 90°. The proposed 75° and 105° X tilts require further generator support.</p>}</div>
+      {!result.roomReport&&result.request.envelopeVersion!=='void-field'&&<p>Current middle-interior generation uses X tilt 90°. The proposed 75° and 105° X tilts require further generator support.</p>}</div>
     </details>
     <div style={{background:'#000',border:'1px solid #34404a',maxWidth:900}}>
       {previewing&&<p role="status" className="p-4">Preparing presentation preview…</p>}

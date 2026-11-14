@@ -227,7 +227,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     await new Promise(resolve=>setTimeout(resolve,0));
     if(view==='generation'&&result.plateReport){await insertedPlateDetail(x,y,width);return;}
     if(view==='generation'&&result.voidFieldReport){await voidFieldGenerationDetail(x,y,width);return;}
-    if(view==='generation'){await generationDetail(x,y,width);return;}
+    if(view==='generation'&&!result.roomReport){await generationDetail(x,y,width);return;}
     const scene=new THREE.Scene();
     const details=view==='orientation';
     const drawingWidth=Math.round(width*(details?.72:1)),drawingHeight=Math.round(width*(details?.64:.76));
@@ -238,6 +238,10 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     key.position.set(40,-60,90);scene.add(ambient,key);
     const fill=new THREE.DirectionalLight(0xffffff,.5);fill.position.set(-30,25,30);scene.add(fill);
     const camera=fitCamera(bounds,drawingWidth,drawingHeight,options.iso);
+    if(view==='generation'&&result.roomReport){
+      addMesh(scene,result.roomCutaway??result.architecture,PRESENTATION_COLORS.form,.55);
+      result.letters.forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters));
+    }
     if(view==='form')addMesh(scene,result.architecture,PRESENTATION_COLORS.form);
     if(view==='letters'||view==='orientation'){
       result.letters.forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,1));
@@ -289,7 +293,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
       orientation:result.request.envelopeVersion==='inserted-plate'?['Horizontal L/U sources · upright V boundary sources','Blue arcs show actual saved source rotations']:result.request.envelopeVersion==='void-field'?['Horizontal interior letters · global Z plan rotation','Blue contours define vertical source-derived voids']:result.request.source.some(p=>p.lift)?['Lower / top terraces · middle interior uprights',
         'Blue arcs show actual X tilt and Z rotation']:
         ['Blue arcs show actual X tilt and Z rotation'],
-      generation:result.request.envelopeVersion==='inserted-plate'?['L-derived plates intersect U edges and upright V boundaries','Plate elevations and connecting strips follow source relationships']:selectedVoids.some(v=>v.cutterMesh?.indices.length)?
+      generation:result.roomReport?['Source letters overlaid on the saved room geometry',result.roomCutaway?'Cutaway exposes the room within the perimeter walls':'Full enclosure']:result.request.envelopeVersion==='inserted-plate'?['L-derived plates intersect U edges and upright V boundaries','Plate elevations and connecting strips follow source relationships']:selectedVoids.some(v=>v.cutterMesh?.indices.length)?
         ['Gold letter contours guide terrace setbacks and vertical exterior walls',
           'Blue inner contours sweep horizontally to carve architectural openings']:
         ['This saved study has no recorded cutter meshes.','Regenerate architecture to create source correspondence data.']
