@@ -4,8 +4,8 @@ import type {AmphitheaterResult,ProofMesh} from './amphitheaterInteractiveTypes'
 import {meshGeometry,PLATE_LABELS,PRESENTATION_COLORS,pngWithDpi,presentationRules,type PlateView,type ExportView} from './amphitheaterPresentationExport';
 
 export type PresentationOptions={view:ExportView;size:number;transparent:boolean;iso:'SE'|'SW'|'NE'|'NW';ruleSource:string};
-type VoidRecord={source:string;axis:number[];sourceContour?:number[][];closedContour?:number[][];closure?:{addedEdges:number[][]};cutterMesh?:ProofMesh;removedVolume?:number;alcove?:boolean};
-type PresentationResult=AmphitheaterResult&{boundaryReport?:{voids:VoidRecord[]}};
+type VoidRecord={source:string;axis:number[];sourceContour?:number[][];closedContour?:number[][];closure?:{addedEdges:number[][]};cutterMesh?:ProofMesh;removedVolume?:number;removedMesh?:ProofMesh;alcove?:boolean};
+type PresentationResult=AmphitheaterResult&{boundaryReport?:{voids:VoidRecord[];walls?:NonNullable<AmphitheaterResult['voidFieldReport']>['walls']}};
 const views:PlateView[]=['letters','form','orientation','generation'];
 
 function fitCamera(box:THREE.Box3,width:number,height:number,iso:PresentationOptions['iso']){
@@ -71,9 +71,59 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     scene.add(new THREE.AmbientLight(0xffffff,.85));
     const light=new THREE.DirectionalLight(0xffffff,1.65);light.position.set(40,-60,90);scene.add(light);
   }
-  async function voidFieldGenerationDetail(x:number,y:number,width:number){
+  function steppedRules(view:'orientation'|'generation',x:number,y:number,width:number){
+    const report=info.boundaryReport;
+    if(!report?.walls?.length)return false;
+    const walls=report.walls.filter(w=>w.mesh?.indices.length);
+    const wall=walls.find(w=>w.source===options.ruleSource)??walls[0];
+    if(!wall?.mesh)return false;
+    const voids=report.voids??[];
+    const cut=voids.find(v=>v.source===options.ruleSource)??voids.find(v=>v.alcove)??voids[0];
+    const source=(id:string)=>result.letters.find(l=>l.id===id);
+    const wallLetter=source(wall.source);
+    const cutLetter=cut&&source(cut.source);
+    const terraceId=result.request.source.findIndex(p=>p.architecturalRole==='terrace'&&p.lift!=='lower');
+    const preferredBand=options.ruleSource||result.letters[terraceId]?.id;
+    const band=result.components.find(c=>c.id==='contour-'+preferredBand&&preferredBand!==cut?.source)
+      ??result.components.find(c=>c.id==='contour-'+wall.source);
+    type Layer={mesh?:ProofMesh;color:string;opacity?:number};
+    function row(top:number,height:number,title:string,layers:Layer[],lines:string[]){
+      const scene=new THREE.Scene();lighting(scene);
+      const box=new THREE.Box3();
+      for(const layer of layers){
+        if(!layer.mesh?.indices.length)continue;
+        const object=addMesh(scene,layer.mesh,layer.color,layer.opacity);
+        box.expandByObject(object);
+      }
+      const w=width*.36,h=width*height;
+      if(!box.isEmpty()){
+        renderer.setSize(Math.round(w),Math.round(h),false);renderer.setClearColor('#000000',0);
+        renderer.render(scene,fitCamera(box,w,h,options.iso));ctx!.drawImage(renderer.domElement,x,y+width*top,w,h);
+      }
+      const left=x+width*.38,base=y+width*(top+.045);
+      text(title,left,base,width*.03,PRESENTATION_COLORS.rules);
+      lines.forEach((value,i)=>text(value,left,base+width*(.052+i*.044),width*.026));
+    }
+    const {letters:gold,rules:blue,form:white}=PRESENTATION_COLORS;
+    text(view==='orientation'?'ORIENTATION RULES':'GENERATION RULES',x,y+width*.045,width*.036,gold);
+    if(view==='orientation'){
+      row(.10,.36,'EXTERIOR LETTERS',[{mesh:wallLetter?.mesh,color:gold}],
+        ['Perimeter faces start horizontal.', 'New letters may slope up or down', 'by up to 12 degrees. The slope', 'sets the upper edge of the wall.']);
+      row(.54,.36,'INTERIOR LETTERS',[{mesh:cutLetter?.mesh,color:gold}],
+        cut?['The inner edge defines the void.', 'Turning the letter in plan aims', 'its extrusion into the form.']:['No interior void in this study.']);
+    }else{
+      row(.08,.27,'WALL EXTRUSION',[{mesh:wall.mesh,color:white},{mesh:wallLetter?.mesh,color:gold}],
+        ['The outer edge extrudes down', 'to form a vertical wall. Its top', 'follows the letter; the platform', 'uses its outline and stays level.']);
+      row(.38,.26,'VOIDS AND RECESSES',[{mesh:cut?.cutterMesh,color:blue,opacity:.7},{mesh:cutLetter?.mesh,color:gold}],
+        cut?['Extrude the inner contour into', 'the form for a recessed alcove.', 'Extend it through the far side', 'for a through-opening.']:['No subtraction in this study.']);
+      row(.68,.28,'TERRACING',[{mesh:band?.mesh,color:white}],
+        ['Level platforms follow the outline.', 'Successive offsets form wider', 'steps beneath the platform.']);
+    }
+    return true;
+  }
+  async function wallAndVoidGenerationDetail(x:number,y:number,width:number){
     text('GENERATION RULES',x,y+width*.045,width*.036,PRESENTATION_COLORS.letters);
-    const allWalls=result.voidFieldReport?.walls??[];
+    const allWalls=result.voidFieldReport?.walls??info.boundaryReport?.walls??[];
     const walls=allWalls.filter(wall=>!options.ruleSource||wall.source===options.ruleSource);
     const wall=[...walls].sort((a,b)=>(b.maximumPlanShift??0)-(a.maximumPlanShift??0))[0];
     const record=selectedVoids[0];
@@ -95,7 +145,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
         await new Promise(resolve=>setTimeout(resolve,0));
         const scene=new THREE.Scene();lighting(scene);
         const px=x+stage*width*.345;
-        const label=stage===0?'Original source':kind==='wall'?(stage===1?'Sweep from source face':'Trimmed exterior façade'):(stage===1?'Inner contour + cutter':'Void through actual form');
+        const label=stage===0?'Original source':kind==='wall'?(stage===1?(result.voidFieldReport?'Sweep from source face':'Sweep exterior edge down'):'Trimmed exterior façade'):(stage===1?'Inner contour + cutter':'Void through actual form');
         text(label,px,rowY+width*.04,width*.022);
         addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,stage===0?1:.75);
         if(stage>0&&operation){
@@ -118,7 +168,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
       }
     }
     const faceNormal=wall?.mode==='face-normal';
-    text(wall?(faceNormal?'Façade sweeps perpendicular to its saved source face.':'Façade uses global Z (vertical comparison).'):'Void follows the actual source concavity; subtract through levels.',x,y+width*.86,width*.025);
+    text(wall?(faceNormal?'Façade sweeps perpendicular to its saved source face.':'Exterior edge sweeps vertically down to its support.'):'Void follows the actual source concavity; subtract through levels.',x,y+width*.86,width*.025);
     if(wall){
       const n=wall.normal;
       text(faceNormal&&n?'Face normal n = ('+n.map(v=>v.toFixed(3)).join(', ')+'); sweep direction = −n.':'Source upper geometry caps the vertical sweep.',x,y+width*.90,width*.024);
@@ -226,7 +276,8 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
   async function panel(view:PlateView,x:number,y:number,width:number){
     await new Promise(resolve=>setTimeout(resolve,0));
     if(view==='generation'&&result.plateReport){await insertedPlateDetail(x,y,width);return;}
-    if(view==='generation'&&result.voidFieldReport){await voidFieldGenerationDetail(x,y,width);return;}
+    if((view==='orientation'||view==='generation')&&result.request.envelopeVersion==='vertical-walls'&&steppedRules(view,x,y,width))return;
+    if(view==='generation'&&(result.voidFieldReport||(result.request.envelopeVersion==='vertical-walls'&&info.boundaryReport?.walls?.length))){await wallAndVoidGenerationDetail(x,y,width);return;}
     if(view==='generation'&&!result.roomReport){await generationDetail(x,y,width);return;}
     const scene=new THREE.Scene();
     const room=result.roomReport&&result.components.find(c=>c.id==='suspended-room-and-landing');
@@ -280,7 +331,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     }
     if(view==='form'){
       const form=addMesh(scene,result.architecture,PRESENTATION_COLORS.form);
-      if(room){
+      if(room || result.request.envelopeVersion==='vertical-walls'){
         const center=bounds.getCenter(new THREE.Vector3());
         const radius=bounds.getSize(new THREE.Vector3()).length()/2;
         const east=options.iso.includes('E')?1:-1;

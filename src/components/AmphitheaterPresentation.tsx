@@ -18,7 +18,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
   const [exporting,setExporting]=useState(false);
   const [previewing,setPreviewing]=useState(false);
   const rules=presentationRules(result);
-  const sources=result.letters.filter((letter,i)=>result.request.source[i]?.architecturalRole==='interior'||result.voidFieldReport?.walls?.some(wall=>wall.source===letter.id));
+  const sources=result.letters.filter((letter,i)=>result.request.source[i]?.architecturalRole==='interior'||(result.request.envelopeVersion==='vertical-walls'&&result.request.source[i]?.architecturalRole==='perimeter')||result.voidFieldReport?.walls?.some(wall=>wall.source===letter.id));
   const activeSource=sources.some(source=>source.id===ruleSource)?ruleSource:'';
   useEffect(()=>{
     let active=true,url='';

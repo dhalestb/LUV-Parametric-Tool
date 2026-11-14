@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {populateThreeLifts} from './threeLiftPopulation';
+import {populateThreeLifts,type LiftLayout} from './threeLiftPopulation';
 import {getLetterShape,getLetterVolumeGeometry} from './letterGeometry3d';
 import type {AmphitheaterRequest, AmphitheaterSource} from './amphitheaterInteractiveTypes';
 type Field=AmphitheaterRequest['field'];
@@ -10,11 +10,11 @@ export function suggestedCount(field:Field,size:number){
 function rotation(p:AmphitheaterSource){
   return new THREE.Euler(...[p.rx,p.ry,p.rz].map(THREE.MathUtils.degToRad) as [number,number,number],p.rotationOrder??'XYZ');
 }
-export function populate(existing:AmphitheaterSource[],count:number,field:Field,size:number,seed:number,options:{transitions?:boolean;legacyOrientations?:boolean;envelopeRoles?:boolean;threeLifts?:boolean}={}){
+export function populate(existing:AmphitheaterSource[],count:number,field:Field,size:number,seed:number,options:{transitions?:boolean;legacyOrientations?:boolean;envelopeRoles?:boolean;threeLifts?:boolean;spread?:boolean;liftLayout?:LiftLayout}={}){
   if(!Number.isSafeInteger(count)||count<1||!(size>0))throw Error('Enter a positive whole population and a positive letter size.');
   if(options.threeLifts){
     if(count<existing.length)throw Error('Remove individual letters or choose New Design to reduce the quantity.');
-    return populateThreeLifts(existing,count,field,size,seed);
+    return populateThreeLifts(existing,count,field,size,seed,options.liftLayout,options.spread);
   }
   let state=seed>>>0;
   const random=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};

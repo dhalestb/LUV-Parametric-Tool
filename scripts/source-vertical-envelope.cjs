@@ -54,7 +54,8 @@ function verticalEnvelope(w,nodes,edges,letters,field,preferred){
   const footprint=CS.union(triangles.map(t=>new CS([t.map(p=>p.slice(0,2))],'NonZero')));
   const low=Math.min(...letters[index].mesh.positions.filter((_,i)=>i%3===2));
   if(support>=low-.1)throw Error(node.id+': supporting elevation must be below the source underside.');
-  const plateBottom=Math.max(support,low-.75),plate=footprint.offset(.8,'Round',2,32).extrude(.75).translate([0,0,plateBottom]);
+  const crown=node.p.lift==='top' && role!=='interior';
+  const plateBottom=Math.max(support,low-.75-(crown?.125:0)),plate=(crown?footprint:footprint.offset(.8,'Round',2,32)).extrude(.75).translate([0,0,plateBottom]);
   const parts=[plate];
   // A pair of source-shaped setbacks connects a perimeter terrace to the lower bank.
   // Retain the original thin plate for studies saved before opening roles were introduced.
@@ -62,8 +63,9 @@ function verticalEnvelope(w,nodes,edges,letters,field,preferred){
    const rise=Math.min(preferred*.12,(plateBottom-support)/3);
    for(let tier=1;tier<=2 && rise>.05;tier++){
     const top=plateBottom-(tier-1)*rise+.04;
+    if(crown)continue; // The upper platform ends at the source outline, without projecting bands.
     const base=footprint.offset(.8+tier*preferred*.075,'Round',2,32);
-    const baseZ=node.p.lift&&node.p.lift!=='lower'?Math.max(support,top-preferred*.45):support;
+    const baseZ=0; // Carry the side setback to field ground before subtracting openings.
     parts.push(base.extrude(top-baseZ).translate([0,0,baseZ]));
    }
   }
