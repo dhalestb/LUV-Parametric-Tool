@@ -30,18 +30,22 @@ module.exports=function liveRoom(w,nodes,field,options){
  const door=inner[0].p,portal=M.cube([3,2,7.1],true).rotate([0,0,door.rz]).translate([door.x,door.y,3.9]);
  enclosure=add('inner-room',plan.extrude(roof).subtract(inside.extrude(roof-.35)).subtract(portal),inner.map(n=>n.id));
  }
- const u=lower.find(n=>n.p.letter==='U');if(!u)throw Error('A lower U is required for the alcove.');
- const shape=getLetterShape('U'),center=new T.Box2().setFromPoints(shape.getPoints(16)).getCenter(new T.Vector2()),matrix=new T.Matrix4().fromArray(u.matrix);
- const pt=(x,y)=>{const v=new T.Vector3(x-center.x,y-center.y,0).applyMatrix4(matrix);return [v.x,v.y];};
- const pocket=new C([shape.curves.slice(5,9).flatMap(c=>c.getPoints(18).map(q=>pt(q.x,q.y)))],'EvenOdd');
- const mask=new C([[pt(-1,-1),pt(1,-1),pt(1,.449),pt(-1,.449)]],'EvenOdd');
- const z=u.p.z+field.height/2;
- const recess=pocket.offset(.32,'Round').subtract(pocket).intersect(mask).extrude(z);
- const bay=new C([[pt(-1,-1),pt(.04,-1),pt(.04,1),pt(-1,1)]],'EvenOdd');
- const terrace=pocket.offset(.40).intersect(bay).extrude(.4).translate([0,0,z-.4]);
- if(terrace.intersect(recess).volume()<=0)throw Error('Terrace misses alcove.');
- add('perimeter-terrace-and-floor',M.union([base,walls,recess,terrace]),Array.from(new Set(panels.flatMap(p=>p.sources))));
- const aboveFloor=M.union([enclosure,walls,recess,terrace]).trimByPlane([0,0,1],.20);
+ const perimeterSolids=[walls];
+ if(!suspended){
+  const u=lower.find(n=>n.p.letter==='U');if(!u)throw Error('A lower U is required for the alcove.');
+  const shape=getLetterShape('U'),center=new T.Box2().setFromPoints(shape.getPoints(16)).getCenter(new T.Vector2()),matrix=new T.Matrix4().fromArray(u.matrix);
+  const pt=(x,y)=>{const v=new T.Vector3(x-center.x,y-center.y,0).applyMatrix4(matrix);return [v.x,v.y];};
+  const pocket=new C([shape.curves.slice(5,9).flatMap(c=>c.getPoints(18).map(q=>pt(q.x,q.y)))],'EvenOdd');
+  const mask=new C([[pt(-1,-1),pt(1,-1),pt(1,.449),pt(-1,.449)]],'EvenOdd');
+  const z=u.p.z+field.height/2;
+  const recess=pocket.offset(.32,'Round').subtract(pocket).intersect(mask).extrude(z);
+  const bay=new C([[pt(-1,-1),pt(.04,-1),pt(.04,1),pt(-1,1)]],'EvenOdd');
+  const terrace=pocket.offset(.40).intersect(bay).extrude(.4).translate([0,0,z-.4]);
+  if(terrace.intersect(recess).volume()<=0)throw Error('Terrace misses alcove.');
+  perimeterSolids.push(recess,terrace);
+ }
+ add(suspended?'perimeter-and-floor':'perimeter-terrace-and-floor',M.union([base,...perimeterSolids]),Array.from(new Set(panels.flatMap(p=>p.sources))));
+ const aboveFloor=M.union([enclosure,...perimeterSolids]).trimByPlane([0,0,1],.20);
  const union=M.union([base,aboveFloor]).setTolerance(.001).simplify(.001);
  // Round-trip through the same float precision used by the viewer and OBJ checks.
  const solid=new M(union.getMesh()).asOriginal().simplify(.001);

@@ -231,30 +231,78 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     const scene=new THREE.Scene();
     const room=result.roomReport&&result.components.find(c=>c.id==='suspended-room-and-landing');
     const details=view==='orientation'&&!room;
-    const drawingWidth=Math.round(width*(details?.72:1)),drawingHeight=Math.round(width*(details?.64:.76));
+    const drawingWidth=Math.round(width*(details?.72:1)),drawingHeight=Math.round(width*(room&&view==='orientation'?.51:details?.64:.76));
     const limit=renderer.getContext().getParameter(renderer.getContext().MAX_RENDERBUFFER_SIZE) as number;
     if(Math.max(drawingWidth,drawingHeight)>limit)throw Error('This GPU cannot render this resolution. Choose 2048 pixels.');
     renderer.setSize(drawingWidth,drawingHeight,false);renderer.setClearColor('#000000',0);
     const ambient=new THREE.AmbientLight(0xffffff,.85),key=new THREE.DirectionalLight(0xffffff,1.65);
     key.position.set(40,-60,90);scene.add(ambient,key);
     const fill=new THREE.DirectionalLight(0xffffff,.5);fill.position.set(-30,25,30);scene.add(fill);
-    const roomDetail=room&&view==='generation';
-    const viewBounds=roomDetail?new THREE.Box3().setFromBufferAttribute(new THREE.Float32BufferAttribute(room.mesh.positions,3)):bounds;
-    const camera=fitCamera(viewBounds,drawingWidth,drawingHeight,options.iso);
+    if(room && view==='generation' && result.roomReport){
+      const report=result.roomReport;
+      const panels=report.perimeter?.fullProfiles?.panels??[];
+      const loft=panels.find(p=>p.kind==='loft' && p.lowerSource.startsWith('U'))??panels.find(p=>p.kind==='loft');
+      const drawDetail=(column:number,items:THREE.Scene,label:string)=>{
+        const w=Math.round(width*.48),h=Math.round(width*.42);
+        const box=new THREE.Box3().setFromObject(items);
+        lighting(items);
+        renderer.setSize(w,h,false);
+        renderer.render(items,fitCamera(box,w,h,options.iso));
+        const left=x+column*width*.51;
+        ctx!.drawImage(renderer.domElement,left,y+width*.13,w,h);
+        text(label,left,y+width*.105,width*.029,PRESENTATION_COLORS.rules);
+      };
+      const exterior=new THREE.Scene();
+      if(loft){
+        addMesh(exterior,loft.mesh,PRESENTATION_COLORS.form,.75);
+        for(const profile of [loft.lowerProfile,loft.upperProfile]){
+          line(exterior,profile.map(([x,y,z])=>new THREE.Vector3(x,y,z)));
+        }
+        result.letters.filter(l=>l.id===loft.lowerSource||l.id===loft.upperSource).forEach(l=>addMesh(exterior,l.mesh,PRESENTATION_COLORS.letters));
+      }else{
+        addMesh(exterior,result.architecture,PRESENTATION_COLORS.form,.35);
+        result.letters.filter(l=>!report.roomSources.includes(l.id)).forEach(l=>addMesh(exterior,l.mesh,PRESENTATION_COLORS.letters));
+      }
+      drawDetail(0,exterior,loft?'Wall · '+loft.lowerSource+' to '+loft.upperSource:'Exterior walls');
+      const interior=new THREE.Scene();
+      addMesh(interior,room.mesh,PRESENTATION_COLORS.form,.55);
+      const sources=new Set([...report.roomSources,...(report.platforms??[]).map(p=>p.source)]);
+      result.letters.filter(l=>sources.has(l.id)).forEach(l=>addMesh(interior,l.mesh,PRESENTATION_COLORS.letters));
+      drawDetail(1,interior,'Room and platforms');
+      text('GENERATION RULES',x,y+width*.045,width*.036,PRESENTATION_COLORS.letters);
+      rules.terraces.forEach((caption,i)=>text(caption,x,y+width*(.59+i*.055),width*.033));
+      return;
+    }
+    const camera=fitCamera(bounds,drawingWidth,drawingHeight,options.iso);
     if(view==='generation'&&result.roomReport){
-      if(room){
-        addMesh(scene,room.mesh,PRESENTATION_COLORS.form);
-      }else addMesh(scene,result.roomCutaway??result.architecture,PRESENTATION_COLORS.form,.55);
-      result.letters.filter(letter=>!room||result.roomReport?.roomSources.includes(letter.id)).forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters));
+      addMesh(scene,result.roomCutaway??result.architecture,PRESENTATION_COLORS.form,.55);
+      result.letters.forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters));
     }
     if(view==='form'){
-      if(room&&result.roomCutaway){
-        addMesh(scene,result.roomCutaway,PRESENTATION_COLORS.form,.28);
-        addMesh(scene,room.mesh,PRESENTATION_COLORS.form);
-      }else addMesh(scene,result.architecture,PRESENTATION_COLORS.form);
+      const form=addMesh(scene,result.architecture,PRESENTATION_COLORS.form);
+      if(room){
+        const center=bounds.getCenter(new THREE.Vector3());
+        const radius=bounds.getSize(new THREE.Vector3()).length()/2;
+        const east=options.iso.includes('E')?1:-1;
+        const north=options.iso.includes('N')?1:-1;
+        ambient.intensity=.52;
+        fill.intensity=.22;
+        key.intensity=2.3;
+        key.position.copy(center).addScaledVector(new THREE.Vector3(east*.35,north,1.2).normalize(),radius*3);
+        key.target.position.copy(center);
+        scene.add(key.target);
+        const shadowCamera=key.shadow.camera;
+        Object.assign(shadowCamera,{left:-radius,right:radius,top:radius,bottom:-radius,near:radius,far:radius*5});
+        shadowCamera.updateProjectionMatrix();
+        key.shadow.mapSize.set(2048,2048);
+        key.shadow.normalBias=radius*.0006;
+        key.shadow.bias=-.00015;
+        renderer.shadowMap.enabled=true;
+        key.castShadow=form.castShadow=form.receiveShadow=true;
+      }
     }
     if(view==='letters'||view==='orientation'){
-      result.letters.filter(letter=>!room||view!=='orientation'||!result.roomReport?.roomSources.includes(letter.id)).forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,1));
+      result.letters.forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,1));
     }
     const annotationSources=details?(result.plateReport?result.letters.slice(0,3).map(l=>l.id):selectedVoids.length?selectedVoids.map(v=>v.source):
       result.letters.filter((_,i)=>result.request.source[i]?.architecturalRole==='interior').map(v=>v.id)):[];
@@ -274,6 +322,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
       }
     }
     renderer.render(scene,camera);
+    if(key.castShadow){renderer.shadowMap.enabled=false;key.shadow.dispose();}
     text(PLATE_LABELS[view].toUpperCase(),x,y+width*.045,width*.036,PRESENTATION_COLORS.letters);
     ctx!.drawImage(renderer.domElement,x,y+width*.08,drawingWidth,drawingHeight);
     if(details){
@@ -308,10 +357,8 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
           'Blue inner contours sweep horizontally to carve architectural openings']:
         ['This saved study has no recorded cutter meshes.','Regenerate architecture to create source correspondence data.']
     };
-    if(room&&view==='generation'){
-      rules.terraces.slice(1).forEach((caption,i)=>text(caption,x,y+width*(.9+i*.043),width*.03));
-    }else if(room&&view==='form'){
-      text('Sectional isometric · suspended room and landing',x,y+width*.91,width*.032);
+    if(room&&view==='orientation'){
+      rules.orientation.forEach((caption,i)=>text(caption,x,y+width*(.62+i*.061),width*.033));
     }else if(view==='orientation'){
       rules.orientation.forEach((caption,i)=>text(caption,x,y+width*(.825+i*.043),room?width*.032:width*.024));
     }else captions[view].forEach((caption,i)=>text(caption,x,y+width*(.905+i*.032),width*.026));
