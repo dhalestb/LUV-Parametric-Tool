@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import type {AmphitheaterResult} from './amphitheaterInteractiveTypes';
-import {createAmphitheaterPlate,type PresentationOptions} from './amphitheaterPresentationRender';
+import {BOARD_WIDTH,BOARD_HEIGHT,createAmphitheaterPlate,type PresentationOptions} from './amphitheaterPresentationRender';
 import {PLATE_LABELS,presentationRules,downloadStudyBlob,studyOBJ,type ExportView} from './amphitheaterPresentationExport';
 
 export default function AmphitheaterPresentation({result,disabled=false}:{result:AmphitheaterResult;disabled?:boolean}){
@@ -9,7 +9,8 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
   const [resolution,setResolution]=useState(4096);
   const [transparent,setTransparent]=useState(false);
   const [cameraChoice,setCameraChoice]=useState<{studyId:string;direction:PresentationOptions['iso']}|null>(null);
-  const defaultDirection=result.roomReport?'SW':'SE';
+  const hasPier=!!result.plateReport&&result.components.some(c=>c.id.startsWith('corner-pier-'));
+  const defaultDirection=hasPier?'Pier':result.roomReport?'SW':'SE';
   const iso=cameraChoice?.studyId===result.id?cameraChoice.direction:defaultDirection;
   const [ruleSource,setRuleSource]=useState('');
   const [preview,setPreview]=useState('');
@@ -23,7 +24,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
   useEffect(()=>{
     let active=true,url='';
     setPreviewing(true);setPreview('');setError('');
-    createAmphitheaterPlate(result,{view,size:900,transparent,iso,ruleSource:activeSource})
+    createAmphitheaterPlate(result,{view,size:view==='board'?BOARD_WIDTH:900,transparent,iso,ruleSource:activeSource})
       .then(blob=>{
         if(!active)return;
         url=URL.createObjectURL(blob);setPreview(url);
@@ -34,9 +35,11 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
   async function exportPNG(){
     setExporting(true);setError('');setMessage('Rendering the high-resolution PNG…');
     try{
-      const blob=await createAmphitheaterPlate(result,{view,size:resolution,transparent,iso,ruleSource:activeSource});
-      downloadStudyBlob(blob,'amphitheater-'+result.id+'-'+view+'-'+resolution+'px.png');
-      setMessage('PNG exported at '+resolution+' × '+(view==='board'?Math.round(resolution*1.125):resolution)+' pixels with 300 ppi metadata.');
+      const board=view==='board';
+      const width=board?BOARD_WIDTH:resolution,height=board?BOARD_HEIGHT:resolution;
+      const blob=board?await (await fetch(preview)).blob():await createAmphitheaterPlate(result,{view,size:resolution,transparent,iso,ruleSource:activeSource});
+      downloadStudyBlob(blob,'amphitheater-'+result.id+'-'+view+'-'+width+'px.png');
+      setMessage('PNG exported at '+width+' × '+height+' pixels with 300 ppi metadata.');
     }catch(e){setError(e instanceof Error?e.message:String(e));setMessage('');}
     finally{setExporting(false);}
   }
@@ -55,10 +58,11 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
       <label>Presentation view<select aria-label="Presentation view" value={view} disabled={blocked} onChange={e=>setView(e.target.value as ExportView)}>
         {(Object.keys(PLATE_LABELS) as ExportView[]).map(key=><option key={key} value={key}>{PLATE_LABELS[key]}</option>)}
       </select></label>
-      <label>PNG resolution<select aria-label="PNG resolution" value={resolution} disabled={blocked} onChange={e=>setResolution(+e.target.value)}>
+      {view==='board'?<span>{BOARD_WIDTH} {'\u00d7'} {BOARD_HEIGHT} px · 300 ppi</span>:<label>PNG resolution<select aria-label="PNG resolution" value={resolution} disabled={blocked} onChange={e=>setResolution(+e.target.value)}>
         <option value={2048}>2048 px</option><option value={4096}>4096 px</option>
-      </select></label>
+      </select></label>}
       <label>Isometric direction<select aria-label="Presentation isometric direction" value={iso} disabled={blocked} onChange={e=>setCameraChoice({studyId:result.id,direction:e.target.value as PresentationOptions['iso']})}>
+        {hasPier&&<option value="Pier">Column at rear right</option>}
         {(['SE','SW','NE','NW'] as const).map(direction=><option key={direction}>{direction}</option>)}
       </select></label>
       <label><input type="checkbox" checked={transparent} disabled={blocked} onChange={e=>setTransparent(e.target.checked)}/> Transparent PNG background</label>
@@ -66,9 +70,9 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
     {(view==='orientation'||view==='generation'||view==='board')&&sources.length>0&&<label>Rule source<select aria-label="Rule source" value={activeSource} disabled={blocked} onChange={e=>setRuleSource(e.target.value)}>
       <option value="">All source operations</option>{sources.map(source=><option key={source.id} value={source.id}>{source.id}</option>)}
     </select></label>}
-    <details><summary>{result.roomReport?'Exterior wall and interior room rules':'Measured orientation and terracing rules'}</summary>
+    <details><summary>{result.plateReport?'Orientation and generation rules':result.roomReport?'Exterior wall and interior room rules':'Measured orientation and terracing rules'}</summary>
       <div className="space-y-2 py-2">{[...rules.orientation,...rules.terraces].map(rule=><p key={rule}>{rule}</p>)}
-      {!result.roomReport&&result.request.envelopeVersion!=='void-field'&&<p>Current middle-interior generation uses X tilt 90°. The proposed 75° and 105° X tilts require further generator support.</p>}</div>
+      {!result.plateReport&&!result.roomReport&&result.request.envelopeVersion!=='void-field'&&<p>Current middle-interior generation uses X tilt 90°. The proposed 75° and 105° X tilts require further generator support.</p>}</div>
     </details>
     <div style={{background:'#000',border:'1px solid #34404a',maxWidth:900}}>
       {previewing&&<p role="status" className="p-4">Preparing presentation preview…</p>}

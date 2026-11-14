@@ -86,6 +86,12 @@ export function presentationRules(result:AmphitheaterResult){
     orientation:['Letters are drawn at their saved positions and rotations.'],
     terraces:['The form view shows the full architectural mesh. The generation view overlays the source letters on the room cutaway when available.']
   };
+  if(result.plateReport?.version==='edge-connected')return {
+    orientation:['Perimeter L and V letters stand upright; U letters turn onto their sides. Plan rotation follows the perimeter.',
+      ...(result.components.some(c=>c.id.startsWith('corner-pier-'))?['The corner L lies horizontal at the head of its column.']:[])],
+    terraces:['Exterior edges sweep perpendicular to the letter faces and meet adjacent walls.',
+      'Level plates follow inner L and U edges and finish at the receiving walls.',
+      ...(result.components.some(c=>c.id.startsWith('corner-pier-'))?['The full horizontal L footprint extends vertically to the base.']:[])]};
   const describe=(lift:'lower'|'middle'|'top')=>{
     const sources=result.request.source.filter(p=>p.lift===lift&&(lift!=='middle'||p.architecturalRole==='interior'));
     if(!sources.length)return '';

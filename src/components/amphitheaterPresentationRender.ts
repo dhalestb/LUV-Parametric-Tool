@@ -3,16 +3,19 @@ import {toCreasedNormals} from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import type {AmphitheaterResult,ProofMesh} from './amphitheaterInteractiveTypes';
 import {meshGeometry,PLATE_LABELS,PRESENTATION_COLORS,pngWithDpi,presentationRules,type PlateView,type ExportView} from './amphitheaterPresentationExport';
 
-export type PresentationOptions={view:ExportView;size:number;transparent:boolean;iso:'SE'|'SW'|'NE'|'NW';ruleSource:string};
+export const BOARD_WIDTH=4096;
+export const BOARD_HEIGHT=5156;
+
+export type PresentationOptions={view:ExportView;size:number;transparent:boolean;iso:'SE'|'SW'|'NE'|'NW'|'Pier';ruleSource:string};
 type VoidRecord={source:string;axis:number[];sourceContour?:number[][];closedContour?:number[][];closure?:{addedEdges:number[][]};cutterMesh?:ProofMesh;removedVolume?:number;removedMesh?:ProofMesh;alcove?:boolean};
 type PresentationResult=AmphitheaterResult&{boundaryReport?:{voids:VoidRecord[];walls?:NonNullable<AmphitheaterResult['voidFieldReport']>['walls']}};
 const views:PlateView[]=['letters','form','orientation','generation'];
 
-function fitCamera(box:THREE.Box3,width:number,height:number,iso:PresentationOptions['iso']){
+function fitCamera(box:THREE.Box3,width:number,height:number,iso:PresentationOptions['iso'],azimuth?:THREE.Vector2){
   const center=box.getCenter(new THREE.Vector3()),span=Math.max(1,box.getSize(new THREE.Vector3()).length());
   const camera=new THREE.OrthographicCamera(-1,1,1,-1,.01,span*12);
   camera.up.set(0,0,1);
-  camera.position.copy(center).add(new THREE.Vector3(iso.includes('E')?span:-span,iso.includes('N')?span:-span,span*.85));
+  camera.position.copy(center).add(new THREE.Vector3(azimuth?azimuth.x*span:(iso==='Pier'||iso.includes('E')?span:-span),azimuth?azimuth.y*span:(iso.includes('N')?span:-span),span*.85));
   camera.lookAt(center);camera.updateMatrixWorld();
   const projected=new THREE.Box3();
   for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){
@@ -31,7 +34,8 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
   renderer.setPixelRatio(1);renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.NoToneMapping;renderer.localClippingEnabled=true;
   const canvas=document.createElement('canvas');
-  canvas.width=options.size;canvas.height=options.view==='board'?Math.round(options.size*1.125):options.size;
+  canvas.width=options.view==='board'?BOARD_WIDTH:options.size;
+  canvas.height=options.view==='board'?BOARD_HEIGHT:options.size;
   const ctx=canvas.getContext('2d');
   if(!ctx){renderer.dispose();throw Error('PNG creation is unavailable in this browser.');}
   if(!options.transparent){ctx.fillStyle='#000000';ctx.fillRect(0,0,canvas.width,canvas.height);}
@@ -255,6 +259,45 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     text('Open to sky; daylight performance and guarding are not verified.',x,y+width*.95,width*.023);
   }
 
+  function plateRulesPanel(view:'orientation'|'generation',x:number,y:number,width:number){
+    const wall=result.components.find(c=>c.id.startsWith('boundary-U-'))??result.components.find(c=>c.id.startsWith('boundary-'));
+    const pier=result.components.find(c=>c.id.startsWith('corner-pier-'));
+    const floor=result.plateReport!.floors.find(f=>result.components.some(c=>c.id===f.id));
+    const source=(id?:string)=>result.letters.find(l=>l.id===id);
+    const wallLetter=source(wall?.id.slice('boundary-'.length)),cap=source(pier?.id.slice('corner-pier-'.length));
+    const slab=result.components.find(c=>c.id===floor?.id);
+    const {letters:gold,rules:blue}=PRESENTATION_COLORS;
+    text(view==='orientation'?'ORIENTATION RULES':'GENERATION RULES',x,y+width*.045,width*.036,gold);
+    function row(top:number,h:number,title:string,caption:string[],letter?:ProofMesh,part?:ProofMesh){
+      const scene=new THREE.Scene(),box=new THREE.Box3();
+      if(letter)box.expandByObject(addMesh(scene,letter,gold));
+      if(part){
+        const local=box.clone().expandByScalar(result.request.preferredFeet*.42);
+        const planes=local.isEmpty()?[]:([0,1,2] as const).flatMap(i=>[1,-1].map(sign=>
+          new THREE.Plane(new THREE.Vector3().setComponent(i,sign),-sign*(sign===1?local.min:local.max).getComponent(i))));
+        const object=addMesh(scene,part,blue,.8,planes);
+        const visible=new THREE.Box3().setFromObject(object);
+        box.union(local.isEmpty()?visible:visible.intersect(local));
+      }
+      if(!box.isEmpty()){
+        const w=width*.39,hh=width*h;lighting(scene);
+        renderer.setSize(Math.round(w),Math.round(hh),false);renderer.setClearColor('#000000',0);
+        renderer.render(scene,fitCamera(box,w,hh,options.iso));ctx!.drawImage(renderer.domElement,x,y+top*width,w,hh);
+      }
+      const left=x+width*.405;
+      text(title,left,y+width*(top+.05),width*.031,blue);
+      caption.forEach((v,i)=>text(v,left,y+width*(top+.112+i*.044),width*.026));
+    }
+    if(view==='orientation'){
+      row(.12,.34,'EXTERIOR LETTERS',['L and V stand upright; U turns','onto its side. The faces may lean','slightly. Plan rotation aims each','outer edge along the perimeter.'],wallLetter?.mesh);
+      row(.55,.34,'HORIZONTAL CORNER L',cap?['The L lies flat at the top of the','corner pier. Its two arms set the','column footprint.']:['No corner-column source is','present in this study.'],cap?.mesh);
+    }else{
+      row(.09,.27,'WALL EXTRUSION',['Sweep the exterior edge normal','to the letter face. Trim at the','adjacent perimeter wall.'],wallLetter?.mesh,wall?.mesh);
+      row(.39,.27,'HORIZONTAL PLATE',['Inner L and U edges guide one','level plank. Extend or trim its','ends to the inside wall faces.'],source(floor?.source)?.mesh,slab?.mesh);
+      row(.69,.27,'COLUMN EXTRUSION',cap?['Extrude the full corner L footprint','vertically down to the base. The','perimeter walls join the shaft.']:['No column was generated.'],cap?.mesh,pier?.mesh);
+    }
+  }
+
   async function insertedPlateDetail(x:number,y:number,width:number){
     const report=result.plateReport!;
     const cell=Math.round(width*.31),height=Math.round(width*.62);
@@ -266,15 +309,65 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
       renderer.render(scene,fitCamera(bounds,cell,height,options.iso));ctx!.drawImage(renderer.domElement,x+stage*width*.34,y+width*.12,cell,height);scene.clear();
       text(['Original sources','Horizontal plates','Edges + boundaries'][stage],x+stage*width*.34,y+width*.10,width*.022);
     }
-    text('INSERTED PLATE — ACTUAL COMPONENTS',x,y+width*.045,width*.035,PRESENTATION_COLORS.letters);
+    text('GENERATION RULES',x,y+width*.045,width*.035,PRESENTATION_COLORS.letters);
     text('L outlines → planar plates → connections to U/V boundaries',x,y+width*.80,width*.026);
     text('U inside contours retain open recesses above the plates.',x,y+width*.85,width*.026);
     text('V source caps define vertical walls to the previous plate support.',x,y+width*.90,width*.024);
     text('Plate links are geometric; circulation and structural support are not certified.',x,y+width*.95,width*.021);
   }
 
+  function platePlans(x:number,y:number,width:number){
+    const floors=result.plateReport!.floors;
+    const elevations=[...new Set(floors.map(f=>f.topZ))].sort((a,b)=>a-b);
+    const cols=elevations.length===1?1:2,rows=Math.ceil(elevations.length/cols);
+    const cellW=width*.54/cols,cellH=width*.70/rows;
+    const extent=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
+    const scale=Math.min(cellW*.91/extent.x,(cellH-width*.052)*.91/extent.y);
+    const walls=result.components.filter(c=>c.id.startsWith('boundary-')||c.id.startsWith('corner-pier-'));
+    elevations.forEach((top,i)=>{
+      const left=x+width*.46+i%cols*cellW,rowY=y+width*.12+Math.floor(i/cols)*cellH;
+      const levelFloors=floors.filter(f=>f.topZ===top);
+      const cut=(top+levelFloors[0].bottomZ)/2;
+      text('Level '+(i+1),left,rowY,width*.028);
+      const originX=left+cellW/2,originY=rowY+cellH/2;
+      const px=(v:number)=>originX+(v-center.x)*scale;
+      const py=(v:number)=>originY-(v-center.y)*scale;
+      const ink=ctx!;
+      // Project the horizontal top triangles so trimmed ends and holes survive.
+      ink.beginPath();
+      for(const floor of levelFloors){
+        const mesh=result.components.find(c=>c.id===floor.id)?.mesh;
+        if(!mesh)continue;
+        const {indices,positions:p}=mesh;
+        for(let k=0;k<indices.length;k+=3){
+          const a=3*indices[k],b=3*indices[k+1],c=3*indices[k+2];
+          if([a,b,c].some(v=>Math.abs(p[v+2]-top)>.015))continue;
+          ink.moveTo(px(p[a]),py(p[a+1]));ink.lineTo(px(p[b]),py(p[b+1]));
+          ink.lineTo(px(p[c]),py(p[c+1]));ink.closePath();
+        }
+      }
+      ink.fillStyle=PRESENTATION_COLORS.form;ink.fill();
+      // Slice each wall at mid-slab so upper stories cannot obscure the joint.
+      ink.beginPath();
+      for(const {mesh:{indices,positions:p}} of walls){
+        for(let k=0;k<indices.length;k+=3){
+          let hits=0;
+          for(let edge=0;edge<3;edge++){
+            const a=3*indices[k+edge],b=3*indices[k+(edge+1)%3];
+            if((p[a+2]>cut)===(p[b+2]>cut))continue;
+            const t=(cut-p[a+2])/(p[b+2]-p[a+2]);
+            const xx=px(p[a]+t*(p[b]-p[a])),yy=py(p[a+1]+t*(p[b+1]-p[a+1]));
+            if(hits++===0)ink.moveTo(xx,yy);else ink.lineTo(xx,yy);
+          }
+        }
+      }
+      ink.lineWidth=width*.0025;ink.strokeStyle=PRESENTATION_COLORS.rules;ink.stroke();
+    });
+  }
+
   async function panel(view:PlateView,x:number,y:number,width:number){
     await new Promise(resolve=>setTimeout(resolve,0));
+    if((view==='orientation'||view==='generation')&&result.plateReport?.version==='edge-connected'){plateRulesPanel(view,x,y,width);return;}
     if(view==='generation'&&result.plateReport){await insertedPlateDetail(x,y,width);return;}
     if((view==='orientation'||view==='generation')&&result.request.envelopeVersion==='vertical-walls'&&steppedRules(view,x,y,width))return;
     if(view==='generation'&&(result.voidFieldReport||(result.request.envelopeVersion==='vertical-walls'&&info.boundaryReport?.walls?.length))){await wallAndVoidGenerationDetail(x,y,width);return;}
@@ -282,7 +375,8 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     const scene=new THREE.Scene();
     const room=result.roomReport&&result.components.find(c=>c.id==='suspended-room-and-landing');
     const details=view==='orientation'&&!room;
-    const drawingWidth=Math.round(width*(details?.72:1)),drawingHeight=Math.round(width*(room&&view==='orientation'?.51:details?.64:.76));
+    const showPlans=view==='form'&&result.plateReport?.version==='edge-connected'&&!!result.plateReport.floors.length;
+    const drawingWidth=Math.round(width*(showPlans?.45:details?.72:1)),drawingHeight=Math.round(width*(room&&view==='orientation'?.51:details?.64:.76));
     const limit=renderer.getContext().getParameter(renderer.getContext().MAX_RENDERBUFFER_SIZE) as number;
     if(Math.max(drawingWidth,drawingHeight)>limit)throw Error('This GPU cannot render this resolution. Choose 2048 pixels.');
     renderer.setSize(drawingWidth,drawingHeight,false);renderer.setClearColor('#000000',0);
@@ -324,18 +418,25 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
       rules.terraces.forEach((caption,i)=>text(caption,x,y+width*(.59+i*.055),width*.033));
       return;
     }
-    const camera=fitCamera(bounds,drawingWidth,drawingHeight,options.iso);
+    const pier=options.iso==='Pier'&&result.components.find(c=>c.id.startsWith('corner-pier-'));
+    let direction:THREE.Vector2|undefined;
+    if(pier){
+      const p=new THREE.Box3().setFromBufferAttribute(new THREE.Float32BufferAttribute(pier.mesh.positions,3)).getCenter(new THREE.Vector3());
+      p.sub(bounds.getCenter(new THREE.Vector3()));
+      direction=new THREE.Vector2(p.x,p.y).rotateAround(new THREE.Vector2(),-Math.PI*2/3).normalize().multiplyScalar(Math.SQRT2);
+    }
+    const camera=fitCamera(bounds,drawingWidth,drawingHeight,options.iso,direction);
     if(view==='generation'&&result.roomReport){
       addMesh(scene,result.roomCutaway??result.architecture,PRESENTATION_COLORS.form,.55);
       result.letters.forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters));
     }
     if(view==='form'){
       const form=addMesh(scene,result.architecture,PRESENTATION_COLORS.form);
-      if(room || result.request.envelopeVersion==='vertical-walls'){
+      if(room || result.plateReport || result.request.envelopeVersion==='vertical-walls'){
         const center=bounds.getCenter(new THREE.Vector3());
         const radius=bounds.getSize(new THREE.Vector3()).length()/2;
-        const east=options.iso.includes('E')?1:-1;
-        const north=options.iso.includes('N')?1:-1;
+        const east=direction?.x??(options.iso.includes('E')?1:-1);
+        const north=direction?.y??(options.iso.includes('N')?1:-1);
         ambient.intensity=.52;
         fill.intensity=.22;
         key.intensity=2.3;
@@ -376,6 +477,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     if(key.castShadow){renderer.shadowMap.enabled=false;key.shadow.dispose();}
     text(PLATE_LABELS[view].toUpperCase(),x,y+width*.045,width*.036,PRESENTATION_COLORS.letters);
     ctx!.drawImage(renderer.domElement,x,y+width*.08,drawingWidth,drawingHeight);
+    if(showPlans)platePlans(x,y,width);
     if(details){
       const rail=x+width*.745;
       annotationSources.slice(0,8).forEach((id,i)=>{
@@ -399,7 +501,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     }
     const captions:Record<PlateView,string[]> = {
       letters:['Original source identities and transformations'],
-      form:['Validated architectural mesh · '+result.sourceCount+' source letters'],
+      form:showPlans?['White: horizontal plates     Blue: wall and pier outlines']:['Validated architectural mesh · '+result.sourceCount+' source letters'],
       orientation:result.request.envelopeVersion==='inserted-plate'?['Horizontal L/U sources · upright V boundary sources','Blue arcs show actual saved source rotations']:result.request.envelopeVersion==='void-field'?['Horizontal interior letters · global Z plan rotation','Blue contours define vertical source-derived voids']:result.request.source.some(p=>p.lift)?['Lower / top terraces · middle interior uprights',
         'Blue arcs show actual X tilt and Z rotation']:
         ['Blue arcs show actual X tilt and Z rotation'],
@@ -421,7 +523,12 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
       text((result.request.typologyName??'Stepped Amphitheater').toUpperCase(),margin,canvas.width*.075,canvas.width*.045,PRESENTATION_COLORS.form);
       ctx.strokeStyle=PRESENTATION_COLORS.form;ctx.lineWidth=canvas.width*.0007;
       ctx.beginPath();ctx.moveTo(margin,canvas.width*.105);ctx.lineTo(canvas.width-margin,canvas.width*.105);ctx.stroke();
-      for(const [i,view] of views.entries())await panel(view,margin+(i%2)*(width+gap),canvas.width*.135+Math.floor(i/2)*(width+gap),width);
+      const contentTop=canvas.width*.12,contentBottom=canvas.height-margin*1.4;
+      const rowHeight=(contentBottom-contentTop)/2;
+      for(const [i,view] of views.entries()){
+        const y=contentTop+Math.floor(i/2)*rowHeight+(rowHeight-width)/2;
+        await panel(view,margin+(i%2)*(width+gap),y,width);
+      }
       text(result.request.field.width+' × '+result.request.field.depth+' × '+result.request.field.height+' ft · '+result.request.preferredFeet+' ft preferred letters',
         margin,canvas.height-margin*.5,canvas.width*.018);
     }else {
