@@ -8,7 +8,9 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
   const [view,setView]=useState<ExportView>('board');
   const [resolution,setResolution]=useState(4096);
   const [transparent,setTransparent]=useState(false);
-  const [iso,setIso]=useState<PresentationOptions['iso']>(result.roomReport?'SW':'SE');
+  const [cameraChoice,setCameraChoice]=useState<{studyId:string;direction:PresentationOptions['iso']}|null>(null);
+  const defaultDirection=result.roomReport?'SW':'SE';
+  const iso=cameraChoice?.studyId===result.id?cameraChoice.direction:defaultDirection;
   const [ruleSource,setRuleSource]=useState('');
   const [preview,setPreview]=useState('');
   const [error,setError]=useState('');
@@ -56,7 +58,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
       <label>PNG resolution<select aria-label="PNG resolution" value={resolution} disabled={blocked} onChange={e=>setResolution(+e.target.value)}>
         <option value={2048}>2048 px</option><option value={4096}>4096 px</option>
       </select></label>
-      <label>Isometric direction<select aria-label="Presentation isometric direction" value={iso} disabled={blocked} onChange={e=>setIso(e.target.value as PresentationOptions['iso'])}>
+      <label>Isometric direction<select aria-label="Presentation isometric direction" value={iso} disabled={blocked} onChange={e=>setCameraChoice({studyId:result.id,direction:e.target.value as PresentationOptions['iso']})}>
         {(['SE','SW','NE','NW'] as const).map(direction=><option key={direction}>{direction}</option>)}
       </select></label>
       <label><input type="checkbox" checked={transparent} disabled={blocked} onChange={e=>setTransparent(e.target.checked)}/> Transparent PNG background</label>
