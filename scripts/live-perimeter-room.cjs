@@ -1,0 +1,46 @@
+const T=require('three');
+const {getLetterShape}=require('../src/components/letterGeometry3d.ts');
+const buildWalls=require('./perimeter-letter-panels.cjs');
+module.exports=function liveRoom(w,nodes,field,options){
+ const C=w.CrossSection,M=w.Manifold;
+ const lower=nodes.filter(n=>n.p.architecturalRole==='perimeter'&&n.p.levelIndex===0);
+ const inner=nodes.filter(n=>n.p.architecturalRole==='interior');
+ if(lower.length<4||inner.length!==3)throw Error('This room requires a perimeter composition. Use Generate Design.');
+ const bands=[];
+ const add=(id,solid,sources)=>{bands.push({id,solid,sources});return solid;};
+ const metrics={};
+ const panels=[];
+ const makeWalls=options?.fullProfiles?require('./full-perimeter-lofts.cjs'):buildWalls;
+ const walls=makeWalls(w,nodes,metrics,(id,solid,sources)=>panels.push({id,solid,sources}));
+ if(metrics.baseCoverage<.70||metrics.maxGapFeet>lower[0].p.scale*.75)throw Error('Lower perimeter has a gap of '+metrics.maxGapFeet.toFixed(1)+' ft. Add perimeter letters or adjust their positions.');
+ const ring=lower.slice().sort((a,b)=>Math.atan2(a.p.y,a.p.x)-Math.atan2(b.p.y,b.p.x));
+ const outline=C.hull(ring.flatMap(n=>n.line.map(q=>[q.x,q.y])));
+ const base=outline.offset(.15).extrude(.35);
+ // Each vertical letter face supplies one side of the inner enclosure.
+ const planes=inner.map(n=>{const t=n.p.rz*Math.PI/180,nx=Math.sin(t),ny=-Math.cos(t);return {nx,ny,d:n.p.x*nx+n.p.y*ny};});
+ const corners=planes.map((p,i)=>{const q=planes[(i+1)%3],det=p.nx*q.ny-p.ny*q.nx;if(Math.abs(det)<.05)throw Error('Interior letter faces do not enclose a room.');return [(p.d*q.ny-p.ny*q.d)/det,(p.nx*q.d-p.d*q.nx)/det];});
+ const plan=new C([corners],'EvenOdd'),inside=plan.offset(-.35);
+ const roof=Math.min(...inner.map(n=>Math.max(...n.line.map(q=>q.z))));
+ if(inside.area()<35||roof<8||plan.offset(1).subtract(outline).area()>.001)throw Error('The inner letter faces leave insufficient room or surrounding space.');
+ const door=inner[0].p,portal=M.cube([3,2,7.1],true).rotate([0,0,door.rz]).translate([door.x,door.y,3.9]);
+ const enclosure=add('inner-room',plan.extrude(roof).subtract(inside.extrude(roof-.35)).subtract(portal),inner.map(n=>n.id));
+ const u=lower.find(n=>n.p.letter==='U');if(!u)throw Error('A lower U is required for the alcove.');
+ const shape=getLetterShape('U'),center=new T.Box2().setFromPoints(shape.getPoints(16)).getCenter(new T.Vector2()),matrix=new T.Matrix4().fromArray(u.matrix);
+ const pt=(x,y)=>{const v=new T.Vector3(x-center.x,y-center.y,0).applyMatrix4(matrix);return [v.x,v.y];};
+ const pocket=new C([shape.curves.slice(5,9).flatMap(c=>c.getPoints(18).map(q=>pt(q.x,q.y)))],'EvenOdd');
+ const mask=new C([[pt(-1,-1),pt(1,-1),pt(1,.449),pt(-1,.449)]],'EvenOdd');
+ const z=u.p.z+field.height/2;
+ const recess=pocket.offset(.32,'Round').subtract(pocket).intersect(mask).extrude(z);
+ const bay=new C([[pt(-1,-1),pt(.04,-1),pt(.04,1),pt(-1,1)]],'EvenOdd');
+ const terrace=pocket.offset(.40).intersect(bay).extrude(.4).translate([0,0,z-.4]);
+ if(terrace.intersect(recess).volume()<=0)throw Error('Terrace misses alcove.');
+ add('perimeter-terrace-and-floor',M.union([base,walls,recess,terrace]),Array.from(new Set(panels.flatMap(p=>p.sources))));
+ const aboveFloor=M.union([enclosure,walls,recess,terrace]).trimByPlane([0,0,1],.20);
+ const union=M.union([base,aboveFloor]).setTolerance(.001).simplify(.001);
+ // Round-trip through the same float precision used by the viewer and OBJ checks.
+ const solid=new M(union.getMesh()).asOriginal().simplify(.001);
+ const upper=nodes.length-lower.length-inner.length;
+ const ids=inner.map(n=>n.id);
+ const boundaryReport={typology:'Room Within Volume',strategy:'perimeter',roomSources:ids,floorZ:.35,headroom:roof-.70,roomRoofZ:roof,outerRoofZ:solid.boundingBox().max[2],clearRoomArea:inside.area(),interstitialArea:outline.area()-plan.area(),door:{width:3,height:7.1},access:{clearWidth:3,clearHeight:7.1},windows:[],limitations:[],perimeter:{...metrics,lower:lower.length,upper,interior:inner.length}};
+ return {solid,primary:solid,cutaway:solid.trimByPlane([0,1,0],0),bands,contributionBands:nodes.map(n=>({owner:n.id,id:'contour-'+n.id,sources:[n.id],solid:n.p.architecturalRole==='interior'?enclosure:M.union(panels.filter(p=>p.sources.includes(n.id)).map(p=>p.solid))})),tools:[],projections:[],boundaryReport};
+};

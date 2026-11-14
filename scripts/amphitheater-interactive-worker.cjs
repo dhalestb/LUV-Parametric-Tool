@@ -24,7 +24,7 @@ function sourceObjects(file){
  const check=spawnSync(process.execPath,[path.join(__dirname,'../proof/rule-validation.cjs'),out],{encoding:'utf8'});
  if(check.status!==0)throw Error('Exported geometry rejected: '+check.stderr);
  const v=JSON.parse(fs.readFileSync(path.join(out,'validation.json')));
- fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({...data,id:path.basename(out),created:new Date().toISOString(),request,generator:request.generator,validation:{passed:true,selfIntersectionPairs:v.selfIntersectionPairs,nonAdjacentTriangleChecks:v.nonAdjacentTriangleChecks,legacyFlags:v.broadPhaseFlags},warnings:[request.envelopeVersion==='inserted-plate'?'Inserted Horizontal Plate. Plate links are geometric connections; circulation, structure and occupancy are not certified.':request.envelopeVersion==='void-field'?'Void Field supports 9–15 source letters. Source plan concavities generate vertical canyons. Circulation, access and occupancy require architectural review.':'Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.']}));
+ fs.writeFileSync(path.join(out,'result.json'),JSON.stringify({...data,id:path.basename(out),created:new Date().toISOString(),request,generator:request.generator,validation:{passed:true,selfIntersectionPairs:v.selfIntersectionPairs,nonAdjacentTriangleChecks:v.nonAdjacentTriangleChecks,legacyFlags:v.broadPhaseFlags},warnings:[request.envelopeVersion==='room-within-volume'?'Independent Enclosed Room pilot. Source transformations preserved. Access is checked geometrically, not certified for occupancy, accessibility or structure.':request.envelopeVersion==='inserted-plate'?'Inserted Horizontal Plate. Plate links are geometric connections; circulation, structure and occupancy are not certified.':request.envelopeVersion==='void-field'?'Void Field supports 9–15 source letters. Source plan concavities generate vertical canyons. Circulation, access and occupancy require architectural review.':'Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.']}));
  return;
  }
  if(request.generator!=='typology-baseline')throw Error('Source-preserving generation is not implemented. No automatic fallback is permitted.');
@@ -51,6 +51,3 @@ function sourceObjects(file){
  ]};
  fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(result));
 })().catch(e=>{fs.writeFileSync(path.join(out,'error.txt'),e.stack||String(e));console.error(e);process.exitCode=1});
-
-
-
