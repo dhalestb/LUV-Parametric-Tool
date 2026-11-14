@@ -8,7 +8,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
   const [view,setView]=useState<ExportView>('board');
   const [resolution,setResolution]=useState(4096);
   const [transparent,setTransparent]=useState(false);
-  const [iso,setIso]=useState<PresentationOptions['iso']>('SE');
+  const [iso,setIso]=useState<PresentationOptions['iso']>(result.roomReport?'SW':'SE');
   const [ruleSource,setRuleSource]=useState('');
   const [preview,setPreview]=useState('');
   const [error,setError]=useState('');
@@ -64,7 +64,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
     {(view==='orientation'||view==='generation'||view==='board')&&sources.length>0&&<label>Rule source<select aria-label="Rule source" value={activeSource} disabled={blocked} onChange={e=>setRuleSource(e.target.value)}>
       <option value="">All source operations</option>{sources.map(source=><option key={source.id} value={source.id}>{source.id}</option>)}
     </select></label>}
-    <details><summary>Measured orientation and terracing rules</summary>
+    <details><summary>{result.roomReport?'Exterior wall and interior room rules':'Measured orientation and terracing rules'}</summary>
       <div className="space-y-2 py-2">{[...rules.orientation,...rules.terraces].map(rule=><p key={rule}>{rule}</p>)}
       {!result.roomReport&&result.request.envelopeVersion!=='void-field'&&<p>Current middle-interior generation uses X tilt 90°. The proposed 75° and 105° X tilts require further generator support.</p>}</div>
     </details>

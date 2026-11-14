@@ -229,7 +229,8 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     if(view==='generation'&&result.voidFieldReport){await voidFieldGenerationDetail(x,y,width);return;}
     if(view==='generation'&&!result.roomReport){await generationDetail(x,y,width);return;}
     const scene=new THREE.Scene();
-    const details=view==='orientation';
+    const room=result.roomReport&&result.components.find(c=>c.id==='suspended-room-and-landing');
+    const details=view==='orientation'&&!room;
     const drawingWidth=Math.round(width*(details?.72:1)),drawingHeight=Math.round(width*(details?.64:.76));
     const limit=renderer.getContext().getParameter(renderer.getContext().MAX_RENDERBUFFER_SIZE) as number;
     if(Math.max(drawingWidth,drawingHeight)>limit)throw Error('This GPU cannot render this resolution. Choose 2048 pixels.');
@@ -237,14 +238,23 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     const ambient=new THREE.AmbientLight(0xffffff,.85),key=new THREE.DirectionalLight(0xffffff,1.65);
     key.position.set(40,-60,90);scene.add(ambient,key);
     const fill=new THREE.DirectionalLight(0xffffff,.5);fill.position.set(-30,25,30);scene.add(fill);
-    const camera=fitCamera(bounds,drawingWidth,drawingHeight,options.iso);
+    const roomDetail=room&&view==='generation';
+    const viewBounds=roomDetail?new THREE.Box3().setFromBufferAttribute(new THREE.Float32BufferAttribute(room.mesh.positions,3)):bounds;
+    const camera=fitCamera(viewBounds,drawingWidth,drawingHeight,options.iso);
     if(view==='generation'&&result.roomReport){
-      addMesh(scene,result.roomCutaway??result.architecture,PRESENTATION_COLORS.form,.55);
-      result.letters.forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters));
+      if(room){
+        addMesh(scene,room.mesh,PRESENTATION_COLORS.form);
+      }else addMesh(scene,result.roomCutaway??result.architecture,PRESENTATION_COLORS.form,.55);
+      result.letters.filter(letter=>!room||result.roomReport?.roomSources.includes(letter.id)).forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters));
     }
-    if(view==='form')addMesh(scene,result.architecture,PRESENTATION_COLORS.form);
+    if(view==='form'){
+      if(room&&result.roomCutaway){
+        addMesh(scene,result.roomCutaway,PRESENTATION_COLORS.form,.28);
+        addMesh(scene,room.mesh,PRESENTATION_COLORS.form);
+      }else addMesh(scene,result.architecture,PRESENTATION_COLORS.form);
+    }
     if(view==='letters'||view==='orientation'){
-      result.letters.forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,1));
+      result.letters.filter(letter=>!room||view!=='orientation'||!result.roomReport?.roomSources.includes(letter.id)).forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,1));
     }
     const annotationSources=details?(result.plateReport?result.letters.slice(0,3).map(l=>l.id):selectedVoids.length?selectedVoids.map(v=>v.source):
       result.letters.filter((_,i)=>result.request.source[i]?.architecturalRole==='interior').map(v=>v.id)):[];
@@ -298,8 +308,12 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
           'Blue inner contours sweep horizontally to carve architectural openings']:
         ['This saved study has no recorded cutter meshes.','Regenerate architecture to create source correspondence data.']
     };
-    if(view==='orientation'){
-      rules.orientation.forEach((caption,i)=>text(caption,x,y+width*(.825+i*.04),width*.024));
+    if(room&&view==='generation'){
+      rules.terraces.slice(1).forEach((caption,i)=>text(caption,x,y+width*(.9+i*.043),width*.03));
+    }else if(room&&view==='form'){
+      text('Sectional isometric · suspended room and landing',x,y+width*.91,width*.032);
+    }else if(view==='orientation'){
+      rules.orientation.forEach((caption,i)=>text(caption,x,y+width*(.825+i*.043),room?width*.032:width*.024));
     }else captions[view].forEach((caption,i)=>text(caption,x,y+width*(.905+i*.032),width*.026));
     scene.clear();
   }

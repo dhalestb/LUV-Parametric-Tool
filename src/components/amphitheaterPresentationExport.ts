@@ -64,6 +64,20 @@ export async function pngWithDpi(blob:Blob,dpi=300){
 }
 
 export function presentationRules(result:AmphitheaterResult){
+  if(result.roomReport && result.components.some(c=>c.id==='suspended-room-and-landing')){
+    const perimeter=result.request.source.filter(p=>p.architecturalRole==='perimeter');
+    const levels=[...new Set(perimeter.map(p=>p.levelIndex??0))].sort((a,b)=>a-b);
+    const schedule=levels.map(level=>{
+      const tier=perimeter.filter(p=>(p.levelIndex??0)===level);
+      const sizes=[...new Set(tier.map(p=>+(p.scale*.92).toFixed(1)))];
+      return tier.length+' × '+sizes.join('/')+' ft';
+    });
+    const tilt=Math.max(0,...perimeter.map(p=>Math.acos(Math.max(-1,Math.min(1,Math.cos(p.rx*Math.PI/180)*Math.cos(p.ry*Math.PI/180))))*180/Math.PI));
+    return {
+      orientation:['Exterior · perimeter letters',schedule.slice(0,2).join('  →  '),schedule.slice(2).join('  →  '),'Faces tilt up to '+tilt.toFixed(1)+'° from horizontal.'].filter(Boolean),
+      terraces:['Exterior · Loft between successive perimeter profiles.','Interior · '+result.roomReport.roomSources.join(', ')+' define the polygonal room.','Room floor at '+result.roomReport.floorZ.toFixed(1)+' ft above the base.']
+    };
+  }
   if(result.roomReport)return {
     orientation:['Letters are drawn at their saved positions and rotations.'],
     terraces:['The form view shows the full architectural mesh. The generation view overlays the source letters on the room cutaway when available.']
