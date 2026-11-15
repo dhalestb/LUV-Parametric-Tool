@@ -69,7 +69,15 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     const materials=[helper.line.material,helper.cone.material].flat();
     resources.push(...materials);
   }
+  let boardPanel:{x:number;y:number;width:number}|undefined;
+  const typologyTitle=result.request.envelopeVersion==='void-field'?'Void-Field':result.request.typologyName??'Stepped Amphitheater';
   function text(value:string,x:number,y:number,size:number,color:string=PRESENTATION_COLORS.form){
+    if(options.view==='board'&&boardPanel){
+      const w=boardPanel.width;
+      if(['ORIGINAL LETTERS','ARCHITECTURAL FORM','ORIENTATION RULES','GENERATION RULES'].includes(value)){
+        size=w*.036;y=boardPanel.y+w*.045;
+      }
+    }
     ctx!.fillStyle=color;ctx!.font=size+'px Arial, sans-serif';ctx!.fillText(value,x,y);
   }
   function lighting(scene:THREE.Scene){
@@ -321,12 +329,12 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     const floors=result.plateReport!.floors;
     const elevations=[...new Set(floors.map(f=>f.topZ))].sort((a,b)=>a-b);
     const cols=elevations.length===1?1:2,rows=Math.ceil(elevations.length/cols);
-    const cellW=width*.54/cols,cellH=width*.70/rows;
+    const cellW=width*.43/cols,cellH=width*.70/rows;
     const extent=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3());
     const scale=Math.min(cellW*.91/extent.x,(cellH-width*.052)*.91/extent.y);
     const walls=result.components.filter(c=>c.id.startsWith('boundary-')||c.id.startsWith('corner-pier-'));
     elevations.forEach((top,i)=>{
-      const left=x+width*.46+i%cols*cellW,rowY=y+width*.12+Math.floor(i/cols)*cellH;
+      const left=x+width*.57+i%cols*cellW,rowY=y+width*.12+Math.floor(i/cols)*cellH;
       const levelFloors=floors.filter(f=>f.topZ===top);
       const cut=(top+levelFloors[0].bottomZ)/2;
       text('Level '+(i+1),left,rowY,width*.028);
@@ -372,14 +380,14 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     const source=(id:string)=>result.letters.find(l=>l.id===id);
     const scene=()=>{const s=new THREE.Scene();lighting(s);return s;};
     function draw(s:THREE.Scene,left:number,top:number,w:number,h:number,box=new THREE.Box3().setFromObject(s),axis?:THREE.Vector2,plan=false){
-      top*=1.12;h*=1.12;
+      top*=1.32;h*=1.32;
       if(box.isEmpty())return;
       renderer.setSize(Math.round(width*w),Math.round(width*h),false);renderer.setClearColor('#000000',0);
       const camera=fitCamera(box,w,h,options.iso,axis);
       if(plan){const center=box.getCenter(new THREE.Vector3()),span=box.getSize(new THREE.Vector3());camera.up.set(0,1,0);camera.position.copy(center).add(new THREE.Vector3(0,0,span.length()*2));camera.lookAt(center);const half=Math.max(span.y,span.x*h/w,1)*.57;camera.top=half;camera.bottom=-half;camera.left=-half*w/h;camera.right=half*w/h;camera.updateProjectionMatrix();}
       renderer.render(s,camera);ctx!.drawImage(renderer.domElement,x+width*left,y+width*top,w*width,h*width);
     }
-    const label=(msg:string,left:number,top:number,size=.024,color:string=white)=>text(msg,x+width*left,y+width*top*1.12,width*size*1.1,color);
+    const label=(msg:string,left:number,top:number,size=.024,color:string=white)=>text(msg,x+width*left,y+width*top*1.32,width*(color===blue?.031:size*1.25),color);
     label(view==='orientation'?'ORIENTATION RULES':'GENERATION RULES',0,.045,.036,gold);
     if(view==='orientation'){
       const poses=result.request.source.map((p,i)=>({p,l:result.letters[i]}));
@@ -398,7 +406,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
         label('Face tilt: X '+range(items.map(({p})=>p.rx))+'; Y '+range(items.map(({p})=>p.ry)),.40,top+.21);
         label('Plan rotation: '+[...new Set(items.map(({p})=>+p.rz.toFixed(1)))].sort((a,b)=>a-b).join('° / ')+'°',.40,top+.26);
       });
-      label('Measured at the saved poses. Z rotation turns the letter in plan.',0,.99,.025);return;
+      return;
     }
     const title=(t:string,y:number)=>label(t,0,y,.032,blue);
     const stages=(names:string[],top:number)=>names.forEach((n,i)=>label(n,i*.34,top,.024));
@@ -442,6 +450,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     label('Blue line: seam between the two finished wall segments.',0,.985);
   }
   async function panel(view:PlateView,x:number,y:number,width:number){
+    boardPanel={x,y,width};
     await new Promise(resolve=>setTimeout(resolve,0));
     if((view==='orientation'||view==='generation')&&result.voidFieldReport){voidFieldRules(view,x,y,width);return;}
     if((view==='orientation'||view==='generation')&&result.plateReport?.version==='edge-connected'){plateRulesPanel(view,x,y,width);return;}
@@ -453,7 +462,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     const room=result.roomReport&&result.components.find(c=>c.id==='suspended-room-and-landing');
     const details=view==='orientation'&&!room;
     const showPlans=view==='form'&&result.plateReport?.version==='edge-connected'&&!!result.plateReport.floors.length;
-    const drawingWidth=Math.round(width*(showPlans?.45:details?.72:1)),drawingHeight=Math.round(width*(room&&view==='orientation'?.51:details?.64:.76));
+    const drawingWidth=Math.round(width*(showPlans?.56:details?.72:1)),drawingHeight=Math.round(width*(room&&view==='orientation'?.51:details?.64:options.view==='board'?.98:.76));
     const limit=renderer.getContext().getParameter(renderer.getContext().MAX_RENDERBUFFER_SIZE) as number;
     if(Math.max(drawingWidth,drawingHeight)>limit)throw Error('This GPU cannot render this resolution. Choose 2048 pixels.');
     renderer.setSize(drawingWidth,drawingHeight,false);renderer.setClearColor('#000000',0);
@@ -591,23 +600,21 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
       rules.orientation.forEach((caption,i)=>text(caption,x,y+width*(.62+i*.061),width*.033));
     }else if(view==='orientation'){
       rules.orientation.forEach((caption,i)=>text(caption,x,y+width*(.825+i*.043),room?width*.032:width*.024));
-    }else captions[view].forEach((caption,i)=>text(caption,x,y+width*(.905+i*.032),width*.026));
+    }else if(options.view!=='board'||(view!=='letters'&&view!=='form'))captions[view].forEach((caption,i)=>text(caption,x,y+width*((result.voidFieldReport?.98:.905)+i*.032),width*.026));
     scene.clear();
   }
   try{
     if(options.view==='board'){
       const margin=canvas.width*.04,gap=canvas.width*.03,width=(canvas.width-2*margin-gap)/2;
-      text((result.request.typologyName??'Stepped Amphitheater').toUpperCase(),margin,canvas.width*.075,canvas.width*.045,PRESENTATION_COLORS.form);
+      text(typologyTitle.toUpperCase(),margin,canvas.width*.075,canvas.width*.045,PRESENTATION_COLORS.form);
       ctx.strokeStyle=PRESENTATION_COLORS.form;ctx.lineWidth=canvas.width*.0007;
       ctx.beginPath();ctx.moveTo(margin,canvas.width*.105);ctx.lineTo(canvas.width-margin,canvas.width*.105);ctx.stroke();
-      const contentTop=canvas.width*.12,contentBottom=canvas.height-margin*1.4;
-      const rowHeight=(contentBottom-contentTop)/2;
+      const contentTop=canvas.width*.12;
       for(const [i,view] of views.entries()){
-        const y=contentTop+Math.floor(i/2)*rowHeight+(result.voidFieldReport?0:(rowHeight-width)/2);
+        const y=contentTop+Math.floor(i/2)*width*1.05;
         await panel(view,margin+(i%2)*(width+gap),y,width);
       }
-      text(result.request.field.width+' × '+result.request.field.depth+' × '+result.request.field.height+' ft · '+result.request.preferredFeet+' ft preferred letters',
-        margin,canvas.height-margin*.5,canvas.width*.018);
+
     }else {
       text((result.request.typologyName??'Stepped Amphitheater').toUpperCase(),canvas.width*.04,canvas.width*.06,canvas.width*.035,PRESENTATION_COLORS.form);
       if(options.view==='visibility')await visibilityPanel(canvas.width*.04,canvas.width*.09,canvas.width*.89);else await panel(options.view,canvas.width*.04,canvas.width*.09,canvas.width*.89);
