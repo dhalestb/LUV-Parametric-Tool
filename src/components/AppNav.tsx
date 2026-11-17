@@ -10,6 +10,8 @@ const LINKS = [
   { href: "/shapes", label: "Shapes" },
   { href: "/voids", label: "Voids" },
   { href: "/composition", label: "Composition" },
+  { href: "/architectural-forms", label: "Architectural Forms" },
+  { href: "/amphitheater", label: "Proto-Form Generation" },
   { href: "/composition-presentation", label: "Presentation" },
   { href: "/evaluations", label: "Evaluations" },
   { href: "/lattice", label: "Lattice" },

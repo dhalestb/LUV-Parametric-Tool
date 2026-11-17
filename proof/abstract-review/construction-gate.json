@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "priorCheckpoint": "7e167b1",
+  "sourceCount": 12,
+  "priorVolume": 5368.625198632873,
+  "newVolume": 1433.654073113481,
+  "construction": "cross-letter L-direction/U-curvature/V-fold trajectories",
+  "copiedCompleteProfiles": false,
+  "intersectionPairs": 0
+}

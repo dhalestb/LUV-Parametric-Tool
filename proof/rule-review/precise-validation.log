@@ -1,0 +1,333 @@
+(node:55688) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{
+  passed: true,
+  broadPhaseFlags: 73,
+  preciseMethod: 'all nonadjacent BVH pairs tested with independent segment/triangle crossings and coplanar polygon clipping; original preflight retained separately',
+  exports: [
+    {
+      file: 'combined-envelope.obj',
+      status: 'NoError',
+      volume: 5238.17668936441,
+      vertices: 7479,
+      triangles: 14970
+    },
+    {
+      file: 'terrace-0.obj',
+      status: 'NoError',
+      volume: 63.37762294799603,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-1.obj',
+      status: 'NoError',
+      volume: 63.37757181718896,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'riser-1.obj',
+      status: 'NoError',
+      volume: 29.9901215553315,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-2.obj',
+      status: 'NoError',
+      volume: 63.19964278626653,
+      vertices: 114,
+      triangles: 224
+    },
+    {
+      file: 'riser-2.obj',
+      status: 'NoError',
+      volume: 29.864798800842237,
+      vertices: 118,
+      triangles: 232
+    },
+    {
+      file: 'terrace-3.obj',
+      status: 'NoError',
+      volume: 63.377544647292964,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'riser-3.obj',
+      status: 'NoError',
+      volume: 29.990630350317392,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-4.obj',
+      status: 'NoError',
+      volume: 63.377672134862856,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'riser-4.obj',
+      status: 'NoError',
+      volume: 29.942568328340982,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-5.obj',
+      status: 'NoError',
+      volume: 63.37757042038427,
+      vertices: 108,
+      triangles: 212
+    },
+    {
+      file: 'riser-5.obj',
+      status: 'NoError',
+      volume: 29.94256581087788,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-6.obj',
+      status: 'NoError',
+      volume: 63.37753556059639,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'riser-6.obj',
+      status: 'NoError',
+      volume: 29.953693412328978,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-7.obj',
+      status: 'NoError',
+      volume: 63.377577317010434,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'riser-7.obj',
+      status: 'NoError',
+      volume: 30.015479824004807,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-8.obj',
+      status: 'NoError',
+      volume: 63.377524927486704,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'riser-8.obj',
+      status: 'NoError',
+      volume: 30.01554313889764,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-9.obj',
+      status: 'NoError',
+      volume: 63.37667618733462,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'riser-9.obj',
+      status: 'NoError',
+      volume: 29.992608803535276,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-10.obj',
+      status: 'NoError',
+      volume: 63.377640422609424,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'riser-10.obj',
+      status: 'NoError',
+      volume: 29.822959238219358,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'terrace-11.obj',
+      status: 'NoError',
+      volume: 63.377651379410906,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'riser-11.obj',
+      status: 'NoError',
+      volume: 29.823153268982566,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'enclosure-left-U-0.obj',
+      status: 'NoError',
+      volume: 270.7940759695785,
+      vertices: 373,
+      triangles: 738
+    },
+    {
+      file: 'enclosure-left-U-1.obj',
+      status: 'NoError',
+      volume: 252.5407484817053,
+      vertices: 258,
+      triangles: 508
+    },
+    {
+      file: 'enclosure-left-U-2.obj',
+      status: 'NoError',
+      volume: 475.489080935307,
+      vertices: 389,
+      triangles: 774
+    },
+    {
+      file: 'enclosure-left-U-3.obj',
+      status: 'NoError',
+      volume: 426.3669482767489,
+      vertices: 369,
+      triangles: 734
+    },
+    {
+      file: 'enclosure-right-U-0.obj',
+      status: 'NoError',
+      volume: 300.69789509909003,
+      vertices: 385,
+      triangles: 762
+    },
+    {
+      file: 'enclosure-right-U-1.obj',
+      status: 'NoError',
+      volume: 265.424248094791,
+      vertices: 325,
+      triangles: 646
+    },
+    {
+      file: 'enclosure-right-U-2.obj',
+      status: 'NoError',
+      volume: 415.60254775178765,
+      vertices: 374,
+      triangles: 744
+    },
+    {
+      file: 'enclosure-right-U-3.obj',
+      status: 'NoError',
+      volume: 481.73151393513456,
+      vertices: 411,
+      triangles: 822
+    },
+    {
+      file: 'rear-enclosure.obj',
+      status: 'NoError',
+      volume: 1797.2871352039822,
+      vertices: 275,
+      triangles: 546
+    },
+    {
+      file: 'presentation-focus-surface.obj',
+      status: 'NoError',
+      volume: 110.66553093189724,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'focus-terrace-threshold.obj',
+      status: 'NoError',
+      volume: 4.28701492612626,
+      vertices: 94,
+      triangles: 184
+    },
+    {
+      file: 'primary-gathering-void.obj',
+      status: 'NoError',
+      volume: 18976.13213311812,
+      vertices: 100,
+      triangles: 196
+    },
+    {
+      file: 'recess-enclosure-left-U-0.obj',
+      status: 'NoError',
+      volume: 18.50009503134843,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'recess-enclosure-left-U-1.obj',
+      status: 'NoError',
+      volume: 27.182079438221486,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'recess-enclosure-left-U-2.obj',
+      status: 'NoError',
+      volume: 28.371395860502588,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'recess-enclosure-left-U-3.obj',
+      status: 'NoError',
+      volume: 25.85138481465226,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'recess-enclosure-right-U-0.obj',
+      status: 'NoError',
+      volume: 18.500100879065414,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'recess-enclosure-right-U-1.obj',
+      status: 'NoError',
+      volume: 27.182069208778223,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'recess-enclosure-right-U-2.obj',
+      status: 'NoError',
+      volume: 28.371416454747525,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'recess-enclosure-right-U-3.obj',
+      status: 'NoError',
+      volume: 25.85137586315264,
+      vertices: 8,
+      triangles: 12
+    },
+    {
+      file: 'recess-rear-enclosure.obj',
+      status: 'NoError',
+      volume: 17.470334366179603,
+      vertices: 8,
+      triangles: 12
+    }
+  ],
+  coplanarAreas: [],
+  nonAdjacentTriangleChecks: 824563,
+  selfIntersectionPairs: 0,
+  coplanar: 0,
+  nonCoplanar: 0,
+  examples: [],
+  shellVolumes: [ 5238.17668936441 ],
+  sourceFocusOverlap: 31.96568724658529
+}

@@ -16,6 +16,8 @@ export type IntersectionPlacement = {
   scaleX: number;
   scaleY: number;
   scaleZ: number;
+  /** Open Hall L-guide role when letters drive generation. */
+  openHallRole?: "column" | "floor" | "mezzanine" | "wall" | "roof";
 };
 
 export type ArchitecturalSpaceMode = "letters" | "voids" | "combined";
