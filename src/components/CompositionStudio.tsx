@@ -9,14 +9,15 @@ import { BoardCanvas as Canvas } from "@/components/BoardCanvas";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import AppNav from "./AppNav";
-import { DEFAULT_DESCRIPTORS, DESCRIPTORS, type CompositionPlacement, type DescriptorId, type DescriptorSettings } from "./compositionEngine";
+import { DEFAULT_DESCRIPTORS, DESCRIPTORS, type CompositionPlacement, type DescriptorSettings } from "./compositionEngine";
 import { gridDimensions } from "./constraintValidation";
 import { evaluateSpatialDesign } from "./descriptorEvaluation";
 import { getLetterVolumeGeometry } from "./letterGeometry3d";
 import DashedOctetBoxes from "./DashedOctetBoxes";
-import { attractorBlend, dashedGroupMeasure, diagonalAttractorScale, diagonalCenterGap, DIAGONAL_GAP_MAXIMUM, DIAGONAL_GAP_MINIMUM, letterDepthSpan, octetBoxes, pullToOctet, scaleTowardOctet, UNIT_LETTER_SPAN, Z_GAP_MINIMUM } from "./letterVolumeLayout";
+import { attractorBlend, dashedGroupMeasure, diagonalAttractorScale, diagonalCenterGap, DIAGONAL_GAP_MAXIMUM, DIAGONAL_GAP_MINIMUM, letterDepthSpan, octetBoxes, pullToOctet, scaleTowardOctet, separatedPitch, UNIT_LETTER_SPAN, XY_GAP_MINIMUM, Z_GAP_MINIMUM } from "./letterVolumeLayout";
 import { useGridStore } from "./GridStore";
 import {
+  DEFAULT_GRID,
   DEFAULT_OPTIMIZER_CONTROLS,
   DEFAULT_RULES,
   DEFAULT_SELECTION,
@@ -33,46 +34,9 @@ import PrototypeDemonstration from "./UnifiedPrototype";
 import { DEFAULT_TYPOLOGY_BY_CATEGORY, type PrototypeCategory, type PrototypeGeometryMode, type PrototypeTypologyId } from "./amphitheaterPrototype";
 import { OPTIMIZER_SESSION_KEY, readJson, writeJson } from "./browserSession";
 import type { Letter } from "./letterTypes";
-import {
-  applyDashedGroupSelection,
-  capacityShortfallMessages,
-  clearHeightRouting,
-  heightRoutedSelectionVolume,
-  isHeightRoutingActive,
-  isSelectionHeightFeet,
-  normalizeStoredSelection,
-  planSourceFieldCapacity,
-  projectSelectionOntoField,
-  selectionHeightPresets,
-  typologyHeightAssignment,
-  type SelectionHeightFeet,
-} from "./selectionHeightRouting";
-import { intersectingSelectionPlacements, localizeIntersectingPlacements } from "./selectionFieldGeometry";
-import {
-  ARCHITECTURAL_GRID_LIMITS,
-  createArchitecturalGrid,
-  normalizeArchitecturalGrid,
-  setGridCellCount,
-  setGridCellPitch,
-  setGridOverall,
-  validateArchitecturalGrid,
-  type GridAxis,
-} from "./architecturalGrid";
-import {
-  applyLetterSizeControlsToRules,
-  controlsFromPreset,
-  DEFAULT_LETTER_SIZE_CONTROLS,
-  letterFootprintFeet,
-  letterSizeControlsFromRules,
-  letterSpansMultipleCells,
-  validateLetterSizeControls,
-  type LetterSizeControls,
-} from "./architecturalLetterSizing";
-import { evaluateLetterLegibility, summarizeLegibility } from "./letterLegibility";
 
 type OverlayState = { circulation: boolean; volume: boolean; sightlines: boolean; hierarchy: boolean; vertical: boolean };
 type DisplayMode = "letters" | "void" | "both";
-type Preset = { id: string; name: string; settings: DescriptorSettings; prototypeCategory?: PrototypeCategory; prototypeTypology?: PrototypeTypologyId; prototypeSource?: PrototypeGeometryMode };
 type SavedDesign = {
   id: string;
   name: string;
@@ -92,6 +56,7 @@ type SavedDesign = {
 };
 type RunHistory = {
   id: string;
+  name?: string;
   seed: number;
   focus: OptimizationFocus;
   fit: number | null;
@@ -142,20 +107,35 @@ function letterInventory(alternative: SpatialAlternative) {
   return comparisonLetters.map((letter) => `${letter} ${alternative.placements.filter((placement) => placement.cell.letter === letter).length}`).join(" · ");
 }
 
-/**
- * Legacy Slide→grid mapping kept for documentation / optional import.
- * Composition Fixed 3D Grid pitches are authored locally and are NOT derived from letter size.
- */
-function gridCountsFromSlide(settings: { cols: number; rows: number; zLayers: number }): Pick<OrthogonalGrid, "xCells" | "yCells" | "zCells"> {
+function gridFromSlide(settings: { cols: number; rows: number; zLayers: number; spacing: number; zSpacing: number; fontSize: number; letterThickness: number }): OrthogonalGrid {
+  const letterSize = Math.max(0.1, settings.fontSize / 50);
+  const planSpan = letterSize * UNIT_LETTER_SPAN;
+  const depthSpan = letterDepthSpan(letterSize, settings.letterThickness, false);
+  const cell = separatedPitch(settings.spacing, planSpan);
   return {
+    ...DEFAULT_GRID,
     xCells: settings.cols,
     yCells: settings.rows,
-    zCells: Math.max(1, settings.zLayers),
+    zCells: settings.zLayers,
+    cellX: cell,
+    cellY: cell,
+    cellZ: separatedPitch(settings.zSpacing, depthSpan),
   };
 }
 
-function rulesSharedFromSlide(settings: { letterThickness: number; yRotationEnabled: boolean; yRotationRange: number; spacing: number; zSpacing: number; attractorGap?: number | null }): Pick<GenerationRules, "letterThicknessPercent" | "allowRotationY" | "maximumRotationY" | "xyGap" | "zGap" | "attractorGap"> {
+const GAP_SLIDER_MAX = 120;
+
+/** Map a composition cell pitch back onto the shared gap slider. */
+function gapFromPitch(pitch: number, minimum: number) {
+  return Math.min(GAP_SLIDER_MAX, Math.max(minimum, Math.round(pitch * 50)));
+}
+
+function rulesFromSlide(settings: { fontSize: number; letterThickness: number; yRotationEnabled: boolean; yRotationRange: number; spacing: number; zSpacing: number; attractorGap?: number | null }): GenerationRules {
+  const slideLetterSize = Math.max(0.1, settings.fontSize / 50);
   return {
+    ...DEFAULT_RULES,
+    minimumLetterSize: Math.min(DEFAULT_RULES.minimumLetterSize, slideLetterSize),
+    maximumLetterSize: Math.max(DEFAULT_RULES.minimumLetterSize, slideLetterSize),
     letterThicknessPercent: settings.letterThickness,
     allowRotationY: settings.yRotationEnabled,
     maximumRotationY: settings.yRotationRange,
@@ -228,19 +208,11 @@ function resultsCsv(alternative: SpatialAlternative) {
   return `${rows.join("\n")}\n`;
 }
 
-/**
- * Letters extracted for the prototype source.
- * Height-routed fields use solid AABB intersection (original TRS preserved).
- * Legacy free-form selection keeps the center-in-window crop used by the optimizer UI.
- */
-function cropRegionPlacements(alternative: SpatialAlternative, thicknessPercent = 12): CompositionPlacement[] {
+/** Letters whose centers sit inside the alternative's crop. The full grid is not sent to the generator. */
+function cropRegionPlacements(alternative: SpatialAlternative): CompositionPlacement[] {
   const window = alternative.selection;
   const field = alternative.fullPlacements;
   if (window && field?.length) {
-    if (isSelectionHeightFeet(window.heightRouting)) {
-      const localized = localizeIntersectingPlacements(field, window, thicknessPercent);
-      if (localized.length) return localized;
-    }
     const contained = field.filter((placement) => placementCenterInSelection(placement, window));
     if (contained.length) return contained.map((placement) => ({ ...placement, x: placement.x - window.centerX, y: placement.y - window.centerY, z: placement.z - window.centerZ }));
   }
@@ -273,13 +245,7 @@ function OptimizationScene({ alternative, grid, thickness, overlays, displayMode
       halfZ: letterDepthSpan(depth, thickness, false) / 2,
     };
   }), { cols: grid.xCells, rows: grid.yCells, layers: grid.zCells }), [renderPlacements, grid.xCells, grid.yCells, grid.zCells, thickness]);
-  const insideSelection = (placement: CompositionPlacement) => {
-    if (!alternative.selection) return true;
-    if (isSelectionHeightFeet(alternative.selection.heightRouting)) {
-      return intersectingSelectionPlacements([placement], alternative.selection, thickness).length > 0;
-    }
-    return placementCenterInSelection(placement, alternative.selection);
-  };
+  const insideSelection = (placement: CompositionPlacement) => !alternative.selection || placementCenterInSelection(placement, alternative.selection);
   return <Canvas dpr={[1, 1.5]} gl={{ antialias: true }}>
     <color attach="background" args={["#05080b"]} />
     <ambientLight intensity={0.65} />
@@ -383,7 +349,25 @@ function NumberInput({ label, value, min, max, step = 1, disabled = false, onCha
 }
 
 function clampSelectionToGrid(selection: SelectionVolume, dimensions: ReturnType<typeof gridDimensions>): SelectionVolume {
-  return projectSelectionOntoField(selection, dimensions);
+  const clampSize = (value: number, maximum: number) => {
+    const safeMaximum = Math.max(0.01, maximum);
+    const minimum = Math.min(0.5, safeMaximum);
+    return Math.max(minimum, Math.min(Number.isFinite(value) ? value : minimum, safeMaximum));
+  };
+  const clampStep = (value: number, maximum: number) => {
+    const safeMaximum = Math.max(0.01, maximum);
+    const minimum = Math.min(0.1, safeMaximum);
+    return Math.max(minimum, Math.min(Number.isFinite(value) ? value : minimum, safeMaximum));
+  };
+  return {
+    ...selection,
+    width: clampSize(selection.width, dimensions.width),
+    height: clampSize(selection.height, dimensions.height),
+    depth: clampSize(selection.depth, dimensions.depth),
+    stepX: clampStep(selection.stepX, dimensions.width),
+    stepY: clampStep(selection.stepY, dimensions.height),
+    stepZ: clampStep(selection.stepZ, dimensions.depth),
+  };
 }
 
 function Check({ label, checked, onChange, disabled = false }: { label: string; checked: boolean; onChange: (checked: boolean) => void; disabled?: boolean }) {
@@ -393,33 +377,12 @@ function Check({ label, checked, onChange, disabled = false }: { label: string; 
   </label>;
 }
 
-function SelectionEnvelopePreview({selection,grid}:{selection:SelectionVolume;grid:OrthogonalGrid}) {
-  const field=gridDimensions(grid),span=Math.max(field.width,field.height,field.depth,selection.depth,20);
-  return <div className="mt-2 h-56" role="img" aria-label={`Selection envelope 20 by 20 by ${selection.depth} feet in the fixed grid`}>
-    <Canvas dpr={[1,1.5]}><color attach="background" args={["#05080b"]}/>
-      <OrthographicCamera makeDefault position={[span,-span,span*Math.SQRT2]} up={[0,0,1]} zoom={140/span} near={.01} far={span*10}/>
-      <lineSegments><edgesGeometry args={[new THREE.BoxGeometry(field.width,field.height,field.depth)]}/><lineBasicMaterial color="#3dd6db" transparent opacity={.5}/></lineSegments>
-      {Array.from({length:grid.zCells+1},(_,i)=><lineSegments key={i} position={[0,0,-field.depth/2+i*grid.cellZ]}><edgesGeometry args={[new THREE.PlaneGeometry(field.width,field.height)]}/><lineBasicMaterial color="#3dd6db" transparent opacity={.25}/></lineSegments>)}
-      <lineSegments><edgesGeometry args={[new THREE.BoxGeometry(selection.width,selection.height,selection.depth)]}/><lineBasicMaterial color="#ffbd4a" depthTest={false}/></lineSegments>
-      <TrackballControls makeDefault target={[0,0,0]} rotateSpeed={5}/><AxisIndicator scale={2/3} cornerInset={25}/>
-    </Canvas>
-  </div>;
-}
-
 export default function CompositionStudio() {
-  const [capacityNotice, setCapacityNotice] = useState<string>("");
   const store = useGridStore();
   const { setAppliedComposition, setLayerMode } = store;
   const [descriptors, setDescriptors] = useState<DescriptorSettings>(() => structuredClone(DEFAULT_DESCRIPTORS));
-  const [grid, setGrid] = useState<OrthogonalGrid>(() => createArchitecturalGrid());
-  const [rules, setRules] = useState<GenerationRules>(() => ({
-    ...DEFAULT_RULES,
-    ...rulesSharedFromSlide(store),
-  }));
-  const [letterSizes, setLetterSizes] = useState<LetterSizeControls>(() => letterSizeControlsFromRules({
-    ...DEFAULT_RULES,
-    ...rulesSharedFromSlide(store),
-  }));
+  const [grid, setGrid] = useState<OrthogonalGrid>(() => gridFromSlide(store));
+  const [rules, setRules] = useState<GenerationRules>(() => rulesFromSlide(store));
   const [controls, setControls] = useState<OptimizerControls>(() => ({ ...DEFAULT_OPTIMIZER_CONTROLS }));
   const [selection, setSelection] = useState<SelectionVolume>(() => ({ ...DEFAULT_SELECTION }));
   const [focus, setFocus] = useState<OptimizationFocus>("combined");
@@ -434,24 +397,15 @@ export default function CompositionStudio() {
   const [displayMode, setDisplayMode] = useState<DisplayMode>("letters");
   const [prototypeCategory, setPrototypeCategory] = useState<PrototypeCategory>("gathering");
   const [prototypeTypology, setPrototypeTypology] = useState<PrototypeTypologyId>("stepped-amphitheater");
-  const [presets, setPresets] = useState<Preset[]>([]);
-  const [presetName, setPresetName] = useState("My preset");
-  const [selectedPresetId, setSelectedPresetId] = useState("");
   const [storageMessage, setStorageMessage] = useState("");
   const [savedDesigns, setSavedDesigns] = useState<SavedDesign[]>([]);
   const [history, setHistory] = useState<RunHistory[]>([]);
+  const [renamingRun, setRenamingRun] = useState<{ id: string; name: string } | null>(null);
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
   const [storageReady, setStorageReady] = useState(false);
   const [keptNotice, setKeptNotice] = useState("Working session is kept in this browser.");
-  const [gridNotice, setGridNotice] = useState("");
-  /** Once true, Slide gap/font sync must not overwrite Composition pitches or letter-size feet controls. */
-  const [compositionGridOwned, setCompositionGridOwned] = useState(true);
-  const slideSourceSignature = `${store.cols}:${store.rows}:${store.layerMode}:${store.zLayers}:${store.letterThickness}:${store.yRotationEnabled}:${store.yRotationRange}:${store.spacing}:${store.zSpacing}:${store.attractorGap ?? "auto"}`;
+  const slideSourceSignature = `${store.cols}:${store.rows}:${store.layerMode}:${store.zLayers}:${store.spacing}:${store.zSpacing}:${store.attractorGap ?? "auto"}:${store.fontSize}:${store.letterThickness}:${store.yRotationEnabled}:${store.yRotationRange}`;
   const lastSlideSourceSignature = useRef<string | null>(null);
-  const heightRoutingActive = isHeightRoutingActive(selection);
-  const typologyHeight = typologyHeightAssignment(prototypeTypology);
-  const gridValidation = useMemo(() => validateArchitecturalGrid(grid), [grid]);
-  const letterValidation = useMemo(() => validateLetterSizeControls(letterSizes), [letterSizes]);
   const sourceCells = useMemo(() => [store.cells, ...store.layerCells.slice(0, Math.max(0, store.zLayers - 1))].flat(), [store.cells, store.layerCells, store.zLayers]);
   const selectedSourceCells = useMemo(() => sourceCells.filter((cell) => selectedLetters.includes(cell.letter)), [sourceCells, selectedLetters]);
   const evaluationFocus = focus === "auto" ? "combined" : focus;
@@ -477,7 +431,7 @@ export default function CompositionStudio() {
     const offsetY = (grid.yCells - 1) * grid.cellY / 2;
     const offsetZ = (grid.zCells - 1) * grid.cellZ / 2;
     const capacity = grid.xCells * grid.yCells * grid.zCells;
-    const scale = rules.preferredLetterSize ?? Math.max(rules.minimumLetterSize, rules.maximumLetterSize);
+    const scale = Math.max(rules.minimumLetterSize, rules.maximumLetterSize);
     const xyBlend = attractorBlend(rules.xyGap ?? 56);
     const zBlend = attractorBlend(rules.zGap ?? 56);
     const diagonalScale = rules.attractorGap == null
@@ -513,20 +467,17 @@ export default function CompositionStudio() {
         scale,
       };
     });
-  }, [selected, sourceCells, grid, rules.minimumLetterSize, rules.preferredLetterSize, rules.maximumLetterSize, rules.xyGap, rules.zGap, rules.attractorGap]);
-  const prototypeSourcePlacements = useMemo<CompositionPlacement[]>(
-    () => selected ? cropRegionPlacements(selected, rules.letterThicknessPercent) : completePrototypePlacements,
-    [selected, completePrototypePlacements, rules.letterThicknessPercent],
-  );
+  }, [selected, sourceCells, grid, rules.minimumLetterSize, rules.maximumLetterSize, rules.xyGap, rules.zGap, rules.attractorGap]);
+  const prototypeSourcePlacements = useMemo<CompositionPlacement[]>(() => selected ? cropRegionPlacements(selected) : completePrototypePlacements, [selected, completePrototypePlacements]);
   const prototypeSourceOptions = useMemo(() => evaluatedAlternatives.map((alternative, index) => {
-    const crop = cropRegionPlacements(alternative, rules.letterThicknessPercent);
+    const crop = cropRegionPlacements(alternative);
     return {
       index,
       label: `Alternative ${index + 1} · seed ${alternative.seed} · ${crop.length} crop letters${alternative.selection ? ` · center ${alternative.selection.centerX.toFixed(1)}, ${alternative.selection.centerY.toFixed(1)}, ${alternative.selection.centerZ.toFixed(1)}` : ""}`,
     };
-  }), [evaluatedAlternatives, rules.letterThicknessPercent]);
+  }), [evaluatedAlternatives]);
   const prototypeSourceLabel = selected
-    ? `Alternative ${selectedIndex + 1} · seed ${selected.seed} · ${prototypeSourcePlacements.length} crop letters${selected.selection ? ` · selected ${selected.selection.width.toFixed(1)} × ${selected.selection.height.toFixed(1)} × ${selected.selection.depth.toFixed(1)}${isSelectionHeightFeet(selected.selection.heightRouting) ? ` · height route ${selected.selection.heightRouting} ft` : ""} at center (${selected.selection.centerX.toFixed(1)}, ${selected.selection.centerY.toFixed(1)}, ${selected.selection.centerZ.toFixed(1)})` : ""}`
+    ? `Alternative ${selectedIndex + 1} · seed ${selected.seed} · ${prototypeSourcePlacements.length} crop letters${selected.selection ? ` · selected ${selected.selection.width.toFixed(1)} × ${selected.selection.height.toFixed(1)} × ${selected.selection.depth.toFixed(1)} at center (${selected.selection.centerX.toFixed(1)}, ${selected.selection.centerY.toFixed(1)}, ${selected.selection.centerZ.toFixed(1)})` : ""}`
     : `Original synchronized grid · ${prototypeSourcePlacements.length} objects`;
   const selectedIsApplied = Boolean(selected
     && store.appliedComposition?.seed === selected.seed
@@ -546,10 +497,6 @@ export default function CompositionStudio() {
       : diagonalAttractorScale(rules.attractorGap, rules.xyGap ?? 56, Math.max(rules.minimumLetterSize, rules.maximumLetterSize) * UNIT_LETTER_SPAN),
   }), [grid, rules.minimumLetterSize, rules.maximumLetterSize, rules.letterThicknessPercent, rules.attractorGap, rules.xyGap]);
   const selectionValid = !selection.enabled || (selection.width <= dimensions.width && selection.height <= dimensions.height && selection.depth <= dimensions.depth);
-  const capacityPlan = heightRoutingActive && isSelectionHeightFeet(selection.heightRouting)
-    ? planSourceFieldCapacity(grid, selection.heightRouting)
-    : null;
-  const capacityShortfall = capacityPlan ? capacityShortfallMessages(capacityPlan) : [];
 
   useEffect(() => {
     setSelection((current) => {
@@ -562,7 +509,15 @@ export default function CompositionStudio() {
   useEffect(() => {
     if (!storageReady || !dashedSelection) return;
     setSelection((current) => {
-      const next = clampSelectionToGrid(applyDashedGroupSelection(current, dashedSelection), dimensions);
+      const next = clampSelectionToGrid({
+        ...current,
+        width: dashedSelection.width,
+        height: dashedSelection.height,
+        depth: dashedSelection.depth,
+        stepX: dashedSelection.stepX,
+        stepY: dashedSelection.stepY,
+        stepZ: dashedSelection.stepZ,
+      }, dimensions);
       const unchanged = (Object.keys(next) as Array<keyof SelectionVolume>)
         .every((key) => next[key] === current[key]);
       return unchanged ? current : next;
@@ -571,21 +526,16 @@ export default function CompositionStudio() {
 
   useEffect(() => {
     try {
-      const presetData = localStorage.getItem("vul-optimizer-presets");
       const designData = localStorage.getItem("vul-optimizer-designs");
-      if (presetData) setPresets(JSON.parse(presetData));
       if (designData) setSavedDesigns(JSON.parse(designData));
     } catch { /* Ignore unavailable or corrupted storage. */ }
     const session = readJson<OptimizerSession>(OPTIMIZER_SESSION_KEY);
     if (session?.descriptors && session.grid && session.rules && session.controls && session.selection && session.focus) {
       setDescriptors(session.descriptors);
-      const restoredGrid = normalizeArchitecturalGrid(session.grid);
-      setGrid(restoredGrid);
-      setCompositionGridOwned(true);
+      setGrid(session.grid);
       setRules(session.rules);
-      setLetterSizes(letterSizeControlsFromRules(session.rules));
       setControls({ ...session.controls, alternatives: Math.min(4, session.controls.alternatives) });
-      setSelection(normalizeStoredSelection(session.selection));
+      setSelection(session.selection);
       setFocus(session.focus);
       if (Array.isArray(session.selectedLetters) && session.selectedLetters.length) setSelectedLetters(session.selectedLetters.filter((letter): letter is Letter => comparisonLetters.includes(letter)));
       setAlternatives(Array.isArray(session.alternatives) ? session.alternatives : []);
@@ -673,30 +623,24 @@ export default function CompositionStudio() {
     const firstSync = lastSlideSourceSignature.current === null;
     if (!firstSync && lastSlideSourceSignature.current === slideSourceSignature) return;
     lastSlideSourceSignature.current = slideSourceSignature;
-    const shared = rulesSharedFromSlide(store);
-    // Shared Slide settings: thickness, rotation, attractor gaps. Letter feet sizes stay on Composition.
+    const synchronizedGrid = gridFromSlide(store);
+    const synchronizedRules = rulesFromSlide(store);
+    setGrid((current) => ({ ...synchronizedGrid, locked: current.locked }));
     setRules((current) => ({
       ...current,
-      letterThicknessPercent: shared.letterThicknessPercent,
-      allowRotationY: shared.allowRotationY,
-      maximumRotationY: shared.maximumRotationY,
-      xyGap: shared.xyGap,
-      zGap: shared.zGap,
-      attractorGap: shared.attractorGap,
+      maximumLetterSize: Math.max(current.minimumLetterSize, synchronizedRules.maximumLetterSize),
+      letterThicknessPercent: synchronizedRules.letterThicknessPercent,
+      allowRotationY: synchronizedRules.allowRotationY,
+      maximumRotationY: synchronizedRules.maximumRotationY,
+      xyGap: synchronizedRules.xyGap,
+      zGap: synchronizedRules.zGap,
+      attractorGap: synchronizedRules.attractorGap,
     }));
-    // Composition owns pitches/overall. Optionally absorb Slide cell counts only before local authorship.
-    if (!compositionGridOwned) {
-      const counts = gridCountsFromSlide(store);
-      setGrid((current) => {
-        const next = { ...current, ...counts, locked: current.locked };
-        return next;
-      });
-    }
     if (firstSync) return;
     setAlternatives([]);
     setSelectedIndex(0);
     setLockedParent(null);
-  }, [slideSourceSignature, store, selection.heightRouting, compositionGridOwned]);
+  }, [slideSourceSignature, store]);
 
   const applySelectedToSlide = () => {
     if (!selected) return;
@@ -704,7 +648,7 @@ export default function CompositionStudio() {
     setAppliedComposition({
       seed: selected.seed,
       alternativeIndex: selectedIndex,
-      placements: cropRegionPlacements(selected, rules.letterThicknessPercent),
+      placements: cropRegionPlacements(selected),
       width: activeBounds.width,
       height: activeBounds.height,
       depth: activeBounds.depth,
@@ -713,110 +657,39 @@ export default function CompositionStudio() {
     setLayerMode(true);
   };
 
-  const syncSlideCellCounts = (next: OrthogonalGrid) => {
-    // Keep Slide source capacity aligned with Composition cell counts without rewriting pitches.
-    if (next.xCells !== store.cols || next.yCells !== store.rows) store.resizeGrid(next.xCells, next.yCells);
-    if (next.zCells !== store.zLayers) {
-      store.setLayerMode(true);
-      store.setZLayers(next.zCells);
-    }
-  };
-
-  const commitGrid = (next: OrthogonalGrid, notice?: string) => {
-    const validation = validateArchitecturalGrid(next);
-    if (!validation.valid) {
-      setGridNotice(validation.errors.join(" "));
-      return;
-    }
-    setCapacityNotice("");
-    setCompositionGridOwned(true);
-    setGrid(next);
-    syncSlideCellCounts(next);
-    setGridNotice([...(validation.warnings), notice].filter(Boolean).join(" "));
-    // Preserve selection size/height when overall grows; clamp only if it no longer fits.
-    setSelection((current) => clampSelectionToGrid(current, gridDimensions(next)));
-  };
-
-  const applyHeightPreset = (height: SelectionHeightFeet) => {
-    const plan = planSourceFieldCapacity(grid, height);
-    const nextGrid = grid;
-    setCompositionGridOwned(true);
-    setGrid(nextGrid);
-    syncSlideCellCounts(nextGrid);
-    setLayerMode(true);
-    setSelection(clampSelectionToGrid(heightRoutedSelectionVolume(height, selection), gridDimensions(nextGrid)));
-    setCapacityNotice(capacityShortfallMessages(plan).join(" "));
-    setGridNotice(validateArchitecturalGrid(nextGrid).warnings.join(" "));
-    setAlternatives([]);
-    setSelectedIndex(0);
-    setLockedParent(null);
-  };
-
-  const clearHeightPreset = () => {
-    setSelection(clearHeightRouting(selection));
-    setCapacityNotice("");
-  };
-
-  const setLetterSizeValue = (key: keyof LetterSizeControls, value: number | boolean) => {
-    setLetterSizes((current) => {
-      const next = { ...current, [key]: value } as LetterSizeControls;
-      const validation = validateLetterSizeControls(next);
-      if (!validation.valid) {
-        setGridNotice(validation.errors.join(" "));
-        return current;
-      }
-      setRules((rulesCurrent) => applyLetterSizeControlsToRules(rulesCurrent, next));
-      setGridNotice(validation.warnings.join(" "));
-      return next;
-    });
-  };
-
-  const setDescriptor = (id: DescriptorId, key: "intensity" | "importance", value: number) => {
-    setDescriptors((current) => ({ ...current, [id]: { ...current[id], [key]: value } }));
-  };
   const setGridValue = (key: keyof OrthogonalGrid, value: number | boolean) => {
     if (key === "locked") {
       setGrid((current) => ({ ...current, locked: Boolean(value) }));
       return;
     }
-    if (typeof value !== "number" || grid.locked) return;
-    if (key === "xCells") commitGrid(setGridCellCount(grid, "x", value));
-    else if (key === "yCells") commitGrid(setGridCellCount(grid, "y", value));
-    else if (key === "zCells") commitGrid(setGridCellCount(grid, "z", value));
-    else if (key === "cellX") commitGrid(setGridCellPitch(grid, "x", value), "Cell X changed; letter sizes were not modified.");
-    else if (key === "cellY") commitGrid(setGridCellPitch(grid, "y", value), "Cell Y changed; letter sizes were not modified.");
-    else if (key === "cellZ") commitGrid(setGridCellPitch(grid, "z", value), "Cell Z changed; letter sizes were not modified.");
-  };
-  const setOverallValue = (axis: GridAxis, overall: number) => {
-    if (grid.locked) return;
-    commitGrid(setGridOverall(grid, axis, overall), `Overall ${axis.toUpperCase()} updated cell pitch only; cell count and letter sizes unchanged.`);
+    if (typeof value !== "number") return;
+    if (key === "xCells") store.resizeGrid(Math.round(value), store.rows);
+    else if (key === "yCells") store.resizeGrid(store.cols, Math.round(value));
+    else if (key === "zCells") {
+      store.setLayerMode(true);
+      store.setZLayers(Math.round(value));
+    } else if (key === "cellX" || key === "cellY") store.setSpacing(gapFromPitch(value, XY_GAP_MINIMUM));
+    else if (key === "cellZ") store.setZSpacing(gapFromPitch(value, Z_GAP_MINIMUM));
   };
   const setRule = (key: keyof GenerationRules, value: number | boolean) => {
+    if (key === "maximumLetterSize" && typeof value === "number") {
+      store.setFontSize(Math.min(96, Math.max(16, Math.round(value * 50))));
+    }
     if (key === "letterThicknessPercent" && typeof value === "number") store.setLetterThickness(value);
     if (key === "allowRotationY" && typeof value === "boolean") store.setYRotationEnabled(value);
     if (key === "maximumRotationY" && typeof value === "number") store.setYRotationRange(value);
     setRules((current) => ({ ...current, [key]: value }));
   };
   const setControl = (key: keyof OptimizerControls, value: number) => setControls((current) => ({ ...current, [key]: key === "alternatives" ? Math.min(4, value) : value }));
-  const setSelectionValue = (key: keyof SelectionVolume, value: number | boolean) => setSelection((current) => {
-    if (isHeightRoutingActive(current) && (key === "width" || key === "height" || key === "depth" || key === "heightRouting")) {
-      return current;
-    }
-    return clampSelectionToGrid({ ...current, [key]: value }, dimensions);
-  });
+  const setSelectionValue = (key: keyof SelectionVolume, value: number | boolean) => setSelection((current) => (
+    clampSelectionToGrid({ ...current, [key]: value }, dimensions)
+  ));
   const resetAll = () => {
-    const nextGrid = createArchitecturalGrid();
-    const nextSizes = { ...DEFAULT_LETTER_SIZE_CONTROLS };
     setDescriptors(structuredClone(DEFAULT_DESCRIPTORS));
-    setCompositionGridOwned(true);
-    setGrid(nextGrid);
-    syncSlideCellCounts(nextGrid);
-    setLetterSizes(nextSizes);
-    setRules(applyLetterSizeControlsToRules({ ...DEFAULT_RULES, ...rulesSharedFromSlide(store) }, nextSizes));
+    setGrid(gridFromSlide(store));
+    setRules(rulesFromSlide(store));
     setControls({ ...DEFAULT_OPTIMIZER_CONTROLS });
-    setSelection({ ...DEFAULT_SELECTION, heightRouting: null });
-    setCapacityNotice("");
-    setGridNotice("");
+    setSelection({ ...DEFAULT_SELECTION });
     setFocus("combined");
     setSelectedLetters([...comparisonLetters]);
     setDisplayMode("both");
@@ -824,23 +697,23 @@ export default function CompositionStudio() {
     setPrototypeTypology("stepped-amphitheater");
     setLockedParent(null);
   };
-  const savePreset = () => {
-    if (presets.length >= 12) { setStorageMessage("Presets are full (12 presets). Delete a previous preset before saving another."); return; }
-    const next = [{ id: crypto.randomUUID(), name: presetName.trim() || "Preset", settings: structuredClone(descriptors), prototypeCategory, prototypeTypology, prototypeSource: (displayMode === "void" ? "voids" : displayMode === "both" ? "combined" : "letters") as PrototypeGeometryMode }, ...presets];
-    if (writeJson("vul-optimizer-presets", next)) { setPresets(next); setStorageMessage(""); }
-    else setStorageMessage("Preset could not be saved: browser storage is full or unavailable. Delete previous runs or presets and try again.");
-  };
-  const deletePreset = () => {
-    const next = presets.filter(p => p.id !== selectedPresetId);
-    if (writeJson("vul-optimizer-presets", next)) { setPresets(next); setSelectedPresetId(""); setStorageMessage(""); }
-    else setStorageMessage("Could not update presets in browser storage.");
+  const saveHistory = (next: RunHistory[], activeId = activeHistoryId) => {
+    const session = { descriptors, grid, rules, controls, selection, focus, alternatives, selectedIndex, lockedParent, overlays, displayMode, prototypeCategory, prototypeTypology, history: next, activeHistoryId: activeId, rankingEnabled, selectedLetters };
+    if (!writeJson(OPTIMIZER_SESSION_KEY, session)) {
+      setStorageMessage("Could not update history in browser storage.");
+      return false;
+    }
+    setHistory(next);
+    setActiveHistoryId(activeId);
+    setStorageMessage("");
+    return true;
   };
   const deleteHistory = (id: string) => {
-    const next = history.filter(run => run.id !== id);
-    const activeId = activeHistoryId === id ? null : activeHistoryId;
-    const session = { descriptors, grid, rules, controls, selection, focus, alternatives, selectedIndex, lockedParent, overlays, displayMode, prototypeCategory, prototypeTypology, history: next, activeHistoryId: activeId, rankingEnabled, selectedLetters };
-    if (writeJson(OPTIMIZER_SESSION_KEY, session)) { setHistory(next); setActiveHistoryId(activeId); setStorageMessage(""); }
-    else setStorageMessage("Could not update history in browser storage.");
+    saveHistory(history.filter(run => run.id !== id), activeHistoryId === id ? null : activeHistoryId);
+  };
+  const renameHistory = () => {
+    if (!renamingRun || optimizing || !renamingRun.name.trim()) return;
+    if (saveHistory(history.map(run => run.id === renamingRun.id ? { ...run, name: renamingRun.name.trim() } : run))) setRenamingRun(null);
   };
   const saveDesign = () => {
     if (!selected) return;
@@ -864,13 +737,7 @@ export default function CompositionStudio() {
     setSavedDesigns((current) => [design, ...current].slice(0, 8));
   };
   const restoreDesign = (design: SavedDesign) => {
-    setGrid(normalizeArchitecturalGrid(design.grid));
-    setCompositionGridOwned(true);
-    setRules(design.rules);
-    setLetterSizes(letterSizeControlsFromRules(design.rules));
-    setControls({ ...design.controls, alternatives: Math.min(4, design.controls.alternatives) });
-    setSelection(design.selection ?? { ...DEFAULT_SELECTION });
-    setFocus(design.focus);
+    setGrid(design.grid); setRules(design.rules); setControls({ ...design.controls, alternatives: Math.min(4, design.controls.alternatives) }); setSelection(design.selection ?? { ...DEFAULT_SELECTION }); setFocus(design.focus);
     setDescriptors(design.descriptors); setAlternatives(design.alternatives); setSelectedIndex(Math.min(3, design.selectedIndex));
     if (design.selectedLetters?.length) setSelectedLetters(design.selectedLetters);
     if (design.prototypeCategory) setPrototypeCategory(design.prototypeCategory);
@@ -880,10 +747,8 @@ export default function CompositionStudio() {
   const restoreHistoryRun = (index: number) => {
     const previous = history[index];
     if (!previous) return;
-    setGrid(normalizeArchitecturalGrid(previous.grid));
-    setCompositionGridOwned(true);
+    setGrid(previous.grid);
     setRules(previous.rules);
-    setLetterSizes(letterSizeControlsFromRules(previous.rules));
     setControls({ ...previous.controls, alternatives: Math.min(4, previous.controls.alternatives) });
     setSelection(previous.selection ?? { ...DEFAULT_SELECTION });
     setFocus(previous.focus);
@@ -895,18 +760,6 @@ export default function CompositionStudio() {
     setLockedParent(null);
     setActiveHistoryId(previous.id);
   };
-
-  const legibilityReport = useMemo(() => {
-    if (!selected) return null;
-    return evaluateLetterLegibility({
-      placements: cropRegionPlacements(selected, rules.letterThicknessPercent),
-      thicknessPercent: rules.letterThicknessPercent,
-      selection: selected.selection ?? null,
-      preserveProportions: rules.preserveProportions,
-    });
-  }, [selected, rules.letterThicknessPercent, rules.preserveProportions]);
-
-  const preferredSpansCells = letterSpansMultipleCells(letterSizes.preferredFeet, Math.min(grid.cellX, grid.cellY));
   const undo = () => restoreHistoryRun(0);
   const toggleComparisonLetter = (letter: Letter) => {
     const enabled = selectedLetters.includes(letter);
@@ -932,126 +785,61 @@ export default function CompositionStudio() {
         <button type="button" onClick={undo} disabled={!history.length} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Undo run</button>
         <button type="button" onClick={saveDesign} disabled={!selected} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Save configuration</button>
         <button type="button" onClick={resetAll} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Reset</button>
-        <button type="button" onClick={() => void runOptimization()} disabled={!grid.locked || !selectionValid || !gridValidation.valid || !letterValidation.valid || !selectedSourceCells.length || optimizing} className="rounded px-3 py-1 text-[11px] font-semibold text-black disabled:opacity-40" style={{ background: "var(--accent-primary)" }}>{optimizing ? `Optimizing ${progress}%` : "Generate + optimize"}</button>
+        <button type="button" onClick={() => void runOptimization()} disabled={!grid.locked || !selectionValid || !selectedSourceCells.length || optimizing} className="rounded px-3 py-1 text-[11px] font-semibold text-black disabled:opacity-40" style={{ background: "var(--accent-primary)" }}>{optimizing ? `Optimizing ${progress}%` : "Generate + optimize"}</button>
       </div>
     </header><FeetScaleNote/>
 
+    <details className="rounded-xl border p-3" style={panelStyle}>
+      <summary className="cursor-pointer text-sm font-semibold" style={{ color: "var(--accent-gold)" }}>Watch the Vertical Void Lobby walkthrough</summary>
+      <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>A captioned walkthrough using L and U, an alternative, and the Form Editor.</p>
+      <video className="mt-3 w-full max-w-4xl rounded" controls preload="none" playsInline aria-label="Vertical Void Lobby walkthrough">
+        <source src="/tutorials/vertical-void-walkthrough.mp4" type="video/mp4" />
+        Your browser does not support video playback.
+      </video>
+    </details>
+
     {optimizing && <div className="h-1 overflow-hidden rounded bg-[var(--input-background)]"><div className="h-full bg-[var(--accent)] transition-all" style={{ width: `${progress}%` }} /></div>}
-    {!grid.locked && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b7634", color: "#ffd38a", background: "#2b2415" }}>Lock the Fixed 3D Grid before optimization.</p>}
+    {!grid.locked && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b7634", color: "#ffd38a", background: "#2b2415" }}>Lock the orthogonal grid before optimization.</p>}
     {!selectionValid && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>The selection volume must fit completely inside the overall solution volume.</p>}
-    {!gridValidation.valid && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>{gridValidation.errors.join(" ")}</p>}
-    {!letterValidation.valid && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>{letterValidation.errors.join(" ")}</p>}
-    {gridNotice && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b7634", color: "#ffd38a", background: "#2b2415" }}>{gridNotice}</p>}
     {!selectedSourceCells.length && <p className="rounded border px-3 py-2 text-[11px]" style={{ borderColor: "#9b563d", color: "#ffad95", background: "#2b1815" }}>None of the enabled letter types are present in the current composition.</p>}
     <p className="rounded border px-3 py-2 text-[10px]" style={{ borderColor: "var(--accent-secondary)", color: "var(--accent-pale)", background: "var(--panel-background)" }}>
-      Composition Fixed 3D Grid pitches and letter footprints (ft) are independent. Slide still supplies letter identities, thickness, and rotation; cell counts stay aligned for source capacity. Letter size is the unrotated plan footprint = scale × 0.92 ft. Generate creates alternatives; Apply selected to Slide transfers the selected arrangement.</p>
+      Slide and Composition share dimensions in feet. Gap controls specify nominal spacing; attraction can reduce actual separation. Letter size is the unrotated footprint span. The overlap threshold is 0.2 ft. Thickness is a percentage of letter size. Generate creates alternatives; Apply selected to Slide transfers the selected arrangement.</p>
 
     <div className="board-composition-content"><div className="grid gap-3 xl:grid-cols-[360px_minmax(0,1fr)_340px]">
       <aside className="space-y-3">
+        <section className="rounded-xl border p-3" style={panelStyle}>
+          <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Fixed 3D grid</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Shared with Slide. Cell X and Cell Y use the same gap. Lock the dimensions before generation.</p></div><button type="button" onClick={() => setGridValue("locked", !grid.locked)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: grid.locked ? "var(--accent-light)" : "var(--input-background)", color: grid.locked ? "var(--app-background)" : "var(--text-primary)" }}>{grid.locked ? "Locked" : "Unlocked"}</button></div>
+          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+            <NumberInput label="X cells" value={grid.xCells} min={2} max={16} disabled={grid.locked} onChange={(value) => setGridValue("xCells", value)} />
+            <NumberInput label="Cell X" value={grid.cellX} min={0.4} max={8} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellX", value)} />
+            <NumberInput label="Y cells" value={grid.yCells} min={2} max={12} disabled={grid.locked} onChange={(value) => setGridValue("yCells", value)} />
+            <NumberInput label="Cell Y" value={grid.cellY} min={0.4} max={8} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellY", value)} />
+            <NumberInput label="Z cells" value={grid.zCells} min={2} max={8} disabled={grid.locked} onChange={(value) => setGridValue("zCells", value)} />
+            <NumberInput label="Cell Z" value={grid.cellZ} min={0.4} max={8} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellZ", value)} />
+          </div>
+          <div className="mt-2 grid grid-cols-3 gap-1 border-t pt-2" style={{ borderColor: "var(--line)" }}>
+            <NumberInput label="Overall X" value={Number(dimensions.width.toFixed(2))} min={2} max={100} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellX", value / grid.xCells)} />
+            <NumberInput label="Overall Y" value={Number(dimensions.height.toFixed(2))} min={2} max={100} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellY", value / grid.yCells)} />
+            <NumberInput label="Overall Z" value={Number(dimensions.depth.toFixed(2))} min={2} max={100} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellZ", value / grid.zCells)} />
+          </div>
+          <p className="mt-2 rounded bg-[var(--input-background)] px-2 py-1 text-[10px] tabular-nums" style={{ color: "var(--accent-pale)" }}>Overall: {dimensions.width.toFixed(1)} × {dimensions.height.toFixed(1)} × {dimensions.depth.toFixed(1)} ft · {dimensions.volume.toFixed(1)} ft³</p>
+        </section>
+
         <section className="rounded-xl border p-3" style={panelStyle}>
           <div className="flex items-center justify-between gap-2">
             <div><h2 className="text-sm font-semibold">Selection volume</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Search a smaller composition inside the overall solution.</p></div>
             <span className="text-[10px]" style={{ color: "var(--accent-gold)" }}>One box per alternative</span>
           </div>
-          <div className="mt-2">
-            <h3 className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--accent-pale)" }}>Height-specific fields</h3>
-            <p className="mt-1 text-[9px]" style={{ color: "var(--muted)" }}>20 × 20 ft plan × 20 / 40 / 60 ft height (X width, Y depth, Z height). Dashed-group auto-sizing is disabled while a height route is active. Letters are taken by solid intersection, not center-point only.</p>
-            <div className="mt-2 flex flex-wrap gap-1">
-              {selectionHeightPresets().map((preset) => (
-                <button
-                  key={preset.height}
-                  type="button"
-                  aria-pressed={selection.heightRouting === preset.height}
-                  onClick={() => applyHeightPreset(preset.height)}
-                  className="rounded border px-2 py-1 text-[10px] font-semibold"
-                  style={{
-                    borderColor: selection.heightRouting === preset.height ? "var(--accent-gold)" : "var(--line)",
-                    background: selection.heightRouting === preset.height ? "var(--accent-dark)" : "transparent",
-                    color: selection.heightRouting === preset.height ? "var(--accent-pale)" : "var(--muted)",
-                  }}
-                >
-                  {preset.label}
-                </button>
-              ))}
-              <button type="button" onClick={clearHeightPreset} disabled={!heightRoutingActive} className="rounded border px-2 py-1 text-[10px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Clear height route</button>
-            </div>
-            {capacityNotice && <p className="mt-2 text-[9px]" style={{ color: "var(--accent-gold)" }}>{capacityNotice}</p>}
-            <p className="mt-2 text-[9px]" style={{ color: typologyHeight.status === "unresolved" ? "var(--muted)" : "var(--accent-pale)" }}>
-              Typology height for {prototypeTypology}: {typologyHeight.status === "assigned" ? `${typologyHeight.height} ft (${typologyHeight.source})` : `unresolved — ${typologyHeight.reason}`}
-            </p>
-          </div>
           <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
-            <NumberInput label="Selection X" value={selection.width} min={Math.min(0.5, dimensions.width)} max={dimensions.width} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("width", value)} />
-            <NumberInput label="Search step X" value={selection.stepX} min={0.1} max={Math.max(0.1, dimensions.width)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepX", value)} />
-            <NumberInput label="Selection Y" value={selection.height} min={Math.min(0.5, dimensions.height)} max={dimensions.height} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("height", value)} />
-            <NumberInput label="Search step Y" value={selection.stepY} min={0.1} max={Math.max(0.1, dimensions.height)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepY", value)} />
-            <NumberInput label="Selection Z" value={selection.depth} min={Math.min(0.5, dimensions.depth)} max={dimensions.depth} step={0.1} disabled={!selection.enabled || heightRoutingActive || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("depth", value)} />
-            <NumberInput label="Search step Z" value={selection.stepZ} min={0.1} max={Math.max(0.1, dimensions.depth)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection && !heightRoutingActive)} onChange={(value) => setSelectionValue("stepZ", value)} />
+            <NumberInput label="Selection X" value={selection.width} min={Math.min(0.5, dimensions.width)} max={dimensions.width} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("width", value)} />
+            <NumberInput label="Search step X" value={selection.stepX} min={0.1} max={Math.max(0.1, dimensions.width)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("stepX", value)} />
+            <NumberInput label="Selection Y" value={selection.height} min={Math.min(0.5, dimensions.height)} max={dimensions.height} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("height", value)} />
+            <NumberInput label="Search step Y" value={selection.stepY} min={0.1} max={Math.max(0.1, dimensions.height)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("stepY", value)} />
+            <NumberInput label="Selection Z" value={selection.depth} min={Math.min(0.5, dimensions.depth)} max={dimensions.depth} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("depth", value)} />
+            <NumberInput label="Search step Z" value={selection.stepZ} min={0.1} max={Math.max(0.1, dimensions.depth)} step={0.1} disabled={!selection.enabled || Boolean(dashedSelection)} onChange={(value) => setSelectionValue("stepZ", value)} />
           </div>
-          <p className="mt-2 text-[9px]" style={{ color: selection.enabled ? "var(--accent-gold)" : "var(--muted)" }}>{heightRoutingActive ? `Height route ${selection.heightRouting} ft: fixed 20 × 20 × ${selection.depth.toFixed(0)} ft field. Search steps ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} reposition the window inside the source field. Letters whose solids intersect the box are kept with original transforms. The architectural generator uses this height and physically trims boundary crossings.` : dashedSelection ? `The selection box matches each dashed group: ${selection.width.toFixed(2)} × ${selection.height.toFixed(2)} × ${selection.depth.toFixed(2)}, centered on that group. Search steps of ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} move from one dashed box to the next.` : selection.enabled ? `The optimizer searches ${selection.width.toFixed(1)} × ${selection.height.toFixed(1)} × ${selection.depth.toFixed(1)} windows. Every letter whose center is inside the gold box is evaluated, including letters that cross the crop. Selection dimensions automatically reduce when the overall solution becomes smaller.` : "The entire overall grid is evaluated and exported."}</p>
-          {heightRoutingActive && <SelectionEnvelopePreview selection={selection} grid={grid}/>}
-          {capacityShortfall.length > 0 && <p role="alert" className="mt-2 text-[9px]" style={{color:"#ffad95"}}>{capacityShortfall.join(" ")}</p>}
-          {!selectionValid && heightRoutingActive && <p className="mt-2 text-[9px]" style={{ color: "#ffad95" }}>The height-routed selection does not fit inside the current source field. Expand overall X/Y/Z or choose a shorter height.</p>}
+          <p className="mt-2 text-[9px]" style={{ color: selection.enabled ? "var(--accent-gold)" : "var(--muted)" }}>{dashedSelection ? `The selection box matches each dashed group: ${selection.width.toFixed(2)} × ${selection.height.toFixed(2)} × ${selection.depth.toFixed(2)}, centered on that group. Search steps of ${selection.stepX.toFixed(2)} × ${selection.stepY.toFixed(2)} × ${selection.stepZ.toFixed(2)} move from one dashed box to the next.` : selection.enabled ? `The optimizer searches ${selection.width.toFixed(1)} × ${selection.height.toFixed(1)} × ${selection.depth.toFixed(1)} windows. Every letter whose center is inside the gold box is evaluated, including letters that cross the crop. Selection dimensions automatically reduce when the overall solution becomes smaller.` : "The entire overall grid is evaluated and exported."}</p>
         </section>
-
-        <section className="rounded-xl border p-3" style={panelStyle}>
-          <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Fixed 3D grid</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Independent cell counts and pitches (ft). Example field 60×60×80 ft. Lock before generation.</p></div><button type="button" onClick={() => setGridValue("locked", !grid.locked)} className="rounded px-2 py-1 text-[10px] font-medium" style={{ background: grid.locked ? "var(--accent-light)" : "var(--input-background)", color: grid.locked ? "var(--app-background)" : "var(--text-primary)" }}>{grid.locked ? "Locked" : "Unlocked"}</button></div>
-          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
-            <NumberInput label="X cells" value={grid.xCells} min={ARCHITECTURAL_GRID_LIMITS.cellsMin} max={ARCHITECTURAL_GRID_LIMITS.cellsMax} disabled={grid.locked} onChange={(value) => setGridValue("xCells", value)} />
-            <NumberInput label="Cell X" value={Number(grid.cellX.toFixed(3))} min={ARCHITECTURAL_GRID_LIMITS.cellPitchMin} max={ARCHITECTURAL_GRID_LIMITS.cellPitchMax} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellX", value)} />
-            <NumberInput label="Y cells" value={grid.yCells} min={ARCHITECTURAL_GRID_LIMITS.cellsMin} max={ARCHITECTURAL_GRID_LIMITS.cellsMax} disabled={grid.locked} onChange={(value) => setGridValue("yCells", value)} />
-            <NumberInput label="Cell Y" value={Number(grid.cellY.toFixed(3))} min={ARCHITECTURAL_GRID_LIMITS.cellPitchMin} max={ARCHITECTURAL_GRID_LIMITS.cellPitchMax} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellY", value)} />
-            <NumberInput label="Z cells" value={grid.zCells} min={ARCHITECTURAL_GRID_LIMITS.cellsMin} max={ARCHITECTURAL_GRID_LIMITS.cellsMax} disabled={grid.locked} onChange={(value) => setGridValue("zCells", value)} />
-            <NumberInput label="Cell Z" value={Number(grid.cellZ.toFixed(3))} min={ARCHITECTURAL_GRID_LIMITS.cellPitchMin} max={ARCHITECTURAL_GRID_LIMITS.cellPitchMax} step={0.1} disabled={grid.locked} onChange={(value) => setGridValue("cellZ", value)} />
-          </div>
-          <div className="mt-2 grid grid-cols-3 gap-1 border-t pt-2" style={{ borderColor: "var(--line)" }}>
-            <NumberInput label="Overall X" value={Number(dimensions.width.toFixed(2))} min={ARCHITECTURAL_GRID_LIMITS.overallMin} max={ARCHITECTURAL_GRID_LIMITS.overallMax} step={0.1} disabled={grid.locked} onChange={(value) => setOverallValue("x", value)} />
-            <NumberInput label="Overall Y" value={Number(dimensions.height.toFixed(2))} min={ARCHITECTURAL_GRID_LIMITS.overallMin} max={ARCHITECTURAL_GRID_LIMITS.overallMax} step={0.1} disabled={grid.locked} onChange={(value) => setOverallValue("y", value)} />
-            <NumberInput label="Overall Z" value={Number(dimensions.depth.toFixed(2))} min={ARCHITECTURAL_GRID_LIMITS.overallMin} max={ARCHITECTURAL_GRID_LIMITS.overallMax} step={0.1} disabled={grid.locked} onChange={(value) => setOverallValue("z", value)} />
-          </div>
-          <p className="mt-2 rounded bg-[var(--input-background)] px-2 py-1 text-[10px] tabular-nums" style={{ color: "var(--accent-pale)" }}>Overall: {dimensions.width.toFixed(1)} × {dimensions.height.toFixed(1)} × {dimensions.depth.toFixed(1)} ft · {dimensions.volume.toFixed(1)} ft³ · {grid.xCells * grid.yCells * grid.zCells} cells</p>
-          <p className="mt-1 text-[9px]" style={{ color: "var(--muted)" }}>Changing cell pitch updates overall on that axis only. Changing overall updates pitch and keeps cell count. Letter sizes are not coupled to pitch.</p>
-          {preferredSpansCells && <p className="mt-1 text-[9px]" style={{ color: "var(--accent-gold)" }}>Preferred letter footprint ({letterSizes.preferredFeet.toFixed(1)} ft) can span multiple cells (min pitch {Math.min(grid.cellX, grid.cellY).toFixed(2)} ft).</p>}
-        </section>
-
-        <section className="rounded-xl border p-3" style={panelStyle}>
-          <h2 className="text-sm font-semibold">Architectural letter size</h2>
-          <p className="text-[9px]" style={{ color: "var(--muted)" }}>Unrotated plan footprint in feet (scale × 0.92). Presets follow selection height guidelines and remain editable. Different letters may vary within min–max.</p>
-          <div className="mt-2 flex flex-wrap gap-1">
-            {([20, 40, 60] as const).map((height) => (
-              <button
-                key={height}
-                type="button"
-                onClick={() => {
-                  const sizes = controlsFromPreset(height, letterSizes);
-                  setLetterSizes(sizes);
-                  setRules((current) => applyLetterSizeControlsToRules(current, sizes));
-                }}
-                className="rounded border px-2 py-1 text-[10px]"
-                style={{ borderColor: "var(--line)" }}
-              >
-                {height}&apos; letters
-              </button>
-            ))}
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
-            <NumberInput label="Min size ft" value={letterSizes.minimumFeet} min={1} max={40} step={0.5} onChange={(value) => setLetterSizeValue("minimumFeet", value)} />
-            <NumberInput label="Preferred ft" value={letterSizes.preferredFeet} min={1} max={40} step={0.5} onChange={(value) => setLetterSizeValue("preferredFeet", value)} />
-            <NumberInput label="Max size ft" value={letterSizes.maximumFeet} min={1} max={40} step={0.5} onChange={(value) => setLetterSizeValue("maximumFeet", value)} />
-            <NumberInput label="Variation %" value={letterSizes.variationPercent} min={0} max={100} step={5} onChange={(value) => setLetterSizeValue("variationPercent", value)} />
-          </div>
-          <div className="mt-2">
-            <Check label="Preserve letter proportions" checked={letterSizes.preserveProportions} onChange={(checked) => setLetterSizeValue("preserveProportions", checked)} />
-          </div>
-          <p className="mt-2 text-[9px]" style={{ color: "var(--muted)" }}>Optimizer scale range {rules.minimumLetterSize.toFixed(2)}–{rules.maximumLetterSize.toFixed(2)} (preferred { (rules.preferredLetterSize ?? rules.maximumLetterSize).toFixed(2) }). Footprints {letterFootprintFeet(rules.minimumLetterSize).toFixed(1)}–{letterFootprintFeet(rules.maximumLetterSize).toFixed(1)} ft.</p>
-          {legibilityReport && (
-            <p className="mt-2 text-[9px]" style={{ color: legibilityReport.compromisedCount ? "#ffad95" : "var(--accent-pale)" }}>
-              Legibility: score {(legibilityReport.recognizabilityProxy * 100).toFixed(0)}% · {legibilityReport.compromisedCount} compromised · {legibilityReport.watchCount} watch — {summarizeLegibility(legibilityReport)}
-            </p>
-          )}
-        </section>
-
-
 
         <section className="rounded-xl border p-3" style={panelStyle}>
           <h2 className="text-sm font-semibold">Hard constraints</h2>
@@ -1073,10 +861,11 @@ export default function CompositionStudio() {
             <Check label="Y rotation" checked={store.yRotationEnabled} onChange={store.setYRotationEnabled} />
           </div>
           <h3 className="mt-3 border-t pt-2 text-[10px] font-semibold uppercase tracking-wide" style={{ borderColor: "var(--line)", color: "var(--accent-pale)" }}>Optimizer feasibility</h3>
-          <p className="mt-1 text-[9px]" style={{ color: "var(--muted)" }}>Letter footprint min/preferred/max are set in Architectural letter size (feet). Clearance remains in feet.</p>
           <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
             <NumberInput label="Clearance" value={rules.minimumClearance} min={0} max={4} step={0.1} onChange={(value) => setRule("minimumClearance", value)} />
             <NumberInput label="Max intersections" value={rules.maximumIntersections} min={0} max={500} onChange={(value) => setRule("maximumIntersections", value)} />
+            <NumberInput label="Min letter size" value={rules.minimumLetterSize} min={0.1} max={4} step={0.05} onChange={(value) => setRule("minimumLetterSize", value)} />
+            <NumberInput label="Max letter size" value={rules.maximumLetterSize} min={0.2} max={8} step={0.05} onChange={(value) => setRule("maximumLetterSize", value)} />
             <NumberInput label="Rotation step" value={rules.rotationStep} min={1} max={90} onChange={(value) => setRule("rotationStep", value)} />
           </div>
           <div className="mt-2 grid grid-cols-2 gap-1">
@@ -1091,19 +880,6 @@ export default function CompositionStudio() {
           </div>
         </section>
 
-        <section className="rounded-xl border p-3" style={panelStyle}>
-          <div className="flex items-center justify-between"><div><h2 className="text-sm font-semibold">Descriptor targets</h2><p className="text-[9px]" style={{ color: "var(--muted)" }}>Zero importance excludes ranking, not measurement.</p></div></div>
-          <div className="mt-2 max-h-[620px] space-y-1.5 overflow-auto pr-1">
-            {DESCRIPTORS.map((descriptor) => <div key={descriptor.id} className="rounded-lg border p-2" style={{ borderColor: "var(--line)", background: "var(--input-background)" }}>
-              <div className="mb-1 flex justify-between"><strong className="text-[10px]">{descriptor.name}</strong><span className="text-[8px] uppercase" style={{ color: descriptor.kind === "objective" ? "var(--accent-light)" : "var(--accent-gold)" }}>{descriptor.kind}</span></div>
-              <Slider label="Target" value={descriptors[descriptor.id].intensity} onChange={(value) => setDescriptor(descriptor.id, "intensity", value)} />
-              <Slider label="Importance" value={descriptors[descriptor.id].importance} color="var(--accent-gold)" onChange={(value) => setDescriptor(descriptor.id, "importance", value)} />
-            </div>)}
-          </div>
-          <div className="mt-2 flex gap-1"><input value={presetName} onChange={(event) => setPresetName(event.target.value)} className="min-w-0 flex-1 rounded border px-2 py-1 text-[10px]" style={inputStyle} /><button type="button" onClick={savePreset} className="rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Save preset</button></div>
-          {presets.length > 0 && <select aria-label="Load descriptor preset" value={selectedPresetId} onChange={(event) => { setSelectedPresetId(event.target.value); const preset = presets.find((item) => item.id === event.target.value); if (preset) { setDescriptors(structuredClone(preset.settings)); if (preset.prototypeCategory) setPrototypeCategory(preset.prototypeCategory); if (preset.prototypeTypology) setPrototypeTypology(preset.prototypeTypology); if (preset.prototypeSource) setDisplayMode(preset.prototypeSource === "voids" ? "void" : preset.prototypeSource === "combined" ? "both" : "letters"); } }} className="mt-1 w-full rounded border px-2 py-1 text-[10px]" style={inputStyle}><option value="" disabled>Load descriptor preset…</option>{presets.map((preset) => <option key={preset.id} value={preset.id}>{preset.name}</option>)}</select>}
-          {selectedPresetId && <button type="button" onClick={deletePreset} className="mt-1 rounded border px-2 py-1 text-[10px]" style={{ borderColor: "var(--line)" }}>Delete selected preset</button>}
-        </section>
       </aside>
 
       <section className="min-w-0 space-y-3">
@@ -1176,6 +952,8 @@ export default function CompositionStudio() {
             </table>
           </div>
         </section>}
+
+
       </section>
 
       <aside className="space-y-3">
@@ -1198,18 +976,30 @@ export default function CompositionStudio() {
           {savedDesigns.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Save a complete grid, objective, geometry, and analysis state.</p> : <div className="mt-2 max-h-64 space-y-1 overflow-auto">{savedDesigns.map((design) => <button key={design.id} type="button" onClick={() => restoreDesign(design)} className="w-full rounded border p-2 text-left" style={{ borderColor: "var(--line)", background: "var(--input-background)" }}><div className="text-[10px] font-medium">{design.name}</div><div className="text-[8px]" style={{ color: "var(--muted)" }}>{design.created} · {design.alternatives.length} alternatives</div></button>)}</div>}
         </section>
 
-        <section className="rounded-xl border p-3" style={panelStyle}>
-          <h2 className="text-sm font-semibold">Configuration history</h2>
-          {history.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Optimization runs are kept here. Select any run to restore it; newer runs stay available.</p> : <div className="mt-2 max-h-48 space-y-1 overflow-auto">{history.map((run, index) => {
-            const isActive = run.id === activeHistoryId;
-            return <div key={run.id} className="flex gap-1"><button type="button" onClick={() => restoreHistoryRun(index)} className="w-full rounded border p-2 text-left text-[9px] transition-colors hover:bg-[var(--panel-background)]" style={{ borderColor: isActive ? "var(--accent-secondary)" : "var(--line)", background: isActive ? "var(--panel-background)" : "var(--input-background)", color: isActive ? "var(--accent-light)" : undefined }}><strong>Run {history.length - index}</strong> · seed {run.seed} · {focusLabels[run.focus]} · {run.fit?.toFixed(1) ?? "unranked"}{isActive ? " · active" : ""}<div className="mt-0.5 text-[8px]" style={{ color: "var(--muted)" }}>{run.alternatives.length} alternatives · click to restore</div></button><button type="button" aria-label={`Delete run ${history.length - index}`} onClick={() => deleteHistory(run.id)} className="rounded border px-2 text-[9px]" style={{borderColor:"var(--line)"}}>Delete</button></div>;
-          })}</div>}
-        </section>
-
         <section className="rounded-xl border p-3 text-[9px]" style={panelStyle}>
           <h2 className="text-sm font-semibold">Evaluation basis</h2>
           <p className="mt-2" style={{ color: "var(--muted)" }}>Enabled-letter count determines comparison order. Descriptor fit resolves ties between alternatives with the same selected-letter count.</p>
           <p className="mt-2" style={{ color: "var(--muted)" }}>Circulation clearance is excluded from comparison ranking and does not produce an invalid warning in this panel.</p>
+        </section>
+        <section className="rounded-xl border p-3" style={panelStyle}>
+          <h2 className="text-sm font-semibold">Configuration history</h2>
+          {history.length === 0 ? <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Optimization runs are kept here. Select any run to restore it; newer runs stay available.</p> : <div className="mt-2 max-h-48 space-y-1 overflow-auto">{history.map((run, index) => {
+            const isActive = run.id === activeHistoryId;
+            const name = run.name || ("Run " + (history.length - index));
+            const editing = renamingRun?.id === run.id;
+            return <div key={run.id} className="space-y-1">
+              <div className="flex gap-1">
+                <button type="button" onClick={() => restoreHistoryRun(index)} className="min-w-0 flex-1 rounded border p-2 text-left text-[9px] transition-colors hover:bg-[var(--panel-background)]" style={{ borderColor: isActive ? "var(--accent-secondary)" : "var(--line)", background: isActive ? "var(--panel-background)" : "var(--input-background)", color: isActive ? "var(--accent-light)" : undefined }}><strong className="break-words">{name}</strong> · seed {run.seed} · {focusLabels[run.focus]} · {run.fit?.toFixed(1) ?? "unranked"}{isActive ? " · active" : ""}<div className="mt-0.5 text-[8px]" style={{ color: "var(--muted)" }}>{run.alternatives.length} alternatives · click to restore</div></button>
+                <button type="button" aria-label={"Rename " + name} disabled={optimizing || editing} onClick={() => setRenamingRun({ id: run.id, name })} className="rounded border px-2 text-[9px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Rename</button>
+                <button type="button" aria-label={"Delete " + name} disabled={optimizing} onClick={() => deleteHistory(run.id)} className="rounded border px-2 text-[9px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Delete</button>
+              </div>
+              {editing && <form className="flex flex-wrap items-center gap-1" onSubmit={event => { event.preventDefault(); renameHistory(); }}>
+                <input aria-label="Run name" autoFocus maxLength={80} value={renamingRun.name} onChange={event => setRenamingRun({ id: run.id, name: event.target.value })} className="min-w-0 flex-1 rounded border px-2 py-1 text-[10px]" style={inputStyle} />
+                <button type="submit" disabled={optimizing || !renamingRun.name.trim()} className="rounded border px-2 py-1 text-[9px] disabled:opacity-40" style={{ borderColor: "var(--line)" }}>Save name</button>
+                <button type="button" onClick={() => setRenamingRun(null)} className="rounded border px-2 py-1 text-[9px]" style={{ borderColor: "var(--line)" }}>Cancel</button>
+              </form>}
+            </div>;
+          })}</div>}
         </section>
       </aside>
     </div>
@@ -1219,7 +1009,6 @@ export default function CompositionStudio() {
       sourcePlacements={prototypeSourcePlacements}
       completeSourcePlacements={completePrototypePlacements}
       sourceLabel={prototypeSourceLabel}
-      envelopeHeight={isSelectionHeightFeet(selection.heightRouting) ? selection.heightRouting : 20}
       sourceBounds={selected?.selection ?? dimensions}
       sourceThickness={rules.letterThicknessPercent}
       sourceOptions={prototypeSourceOptions}

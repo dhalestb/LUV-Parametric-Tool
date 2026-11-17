@@ -5,12 +5,14 @@ import { usePathname } from "next/navigation";
 import { useGlobalBoardMode } from "./BoardMode";
 
 const LINKS = [
+  { href: "/intro", label: "Intro" },
   { href: "/", label: "Slide" },
   { href: "/crops", label: "Crops" },
   { href: "/shapes", label: "Shapes" },
   { href: "/voids", label: "Voids" },
   { href: "/composition", label: "Composition" },
   { href: "/amphitheater", label: "Amphitheater proof" },
+  { href: "/lobby", label: "Lobby proof" },
   { href: "/composition-presentation", label: "Presentation" },
   { href: "/evaluations", label: "Evaluations" },
   { href: "/lattice", label: "Lattice" },

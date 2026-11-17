@@ -3,6 +3,8 @@ import {useEffect,useState} from 'react';
 import type {AmphitheaterResult} from './amphitheaterInteractiveTypes';
 import {createAmphitheaterPlate,type PresentationOptions} from './amphitheaterPresentationRender';
 import {PLATE_LABELS,presentationRules,downloadStudyBlob,studyOBJ,type ExportView} from './amphitheaterPresentationExport';
+import {LOBBY_TYPOLOGIES} from './lobbyProof';
+import {savePresentationGraphic} from './presentationGraphics';
 
 export default function AmphitheaterPresentation({result,disabled=false}:{result:AmphitheaterResult;disabled?:boolean}){
   const [view,setView]=useState<ExportView>('board');
@@ -15,6 +17,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
   const [message,setMessage]=useState('');
   const [exporting,setExporting]=useState(false);
   const [previewing,setPreviewing]=useState(false);
+  const lobbyTypology=LOBBY_TYPOLOGIES.find(item=>item.name===result.request.typologyName);
   const rules=presentationRules(result);
   const sources=result.letters.filter((letter,i)=>result.request.source[i]?.architecturalRole==='interior'||result.voidFieldReport?.walls?.some(wall=>wall.source===letter.id));
   const activeSource=sources.some(source=>source.id===ruleSource)?ruleSource:'';
@@ -35,6 +38,16 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
       const blob=await createAmphitheaterPlate(result,{view,size:resolution,transparent,iso,ruleSource:activeSource});
       downloadStudyBlob(blob,'amphitheater-'+result.id+'-'+view+'-'+resolution+'px.png');
       setMessage('PNG exported at '+resolution+' × '+(view==='board'?Math.round(resolution*1.125):resolution)+' pixels with 300 ppi metadata.');
+    }catch(e){setError(e instanceof Error?e.message:String(e));setMessage('');}
+    finally{setExporting(false);}
+  }
+  async function exportPngToBoard(){
+    if(!lobbyTypology)return;
+    setExporting(true);setError('');setMessage('Rendering the PNG for Lobby Proofs…');
+    try{
+      const blob=await createAmphitheaterPlate(result,{view,size:resolution,transparent,iso,ruleSource:activeSource});
+      await savePresentationGraphic(lobbyTypology.id,lobbyTypology.name,blob,'lobby-proofs');
+      setMessage(lobbyTypology.name+' PNG sent to Lobby Proofs. Sending another PNG for this typology replaces it.');
     }catch(e){setError(e instanceof Error?e.message:String(e));setMessage('');}
     finally{setExporting(false);}
   }
@@ -78,6 +91,9 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
       <button className="border rounded p-2" disabled={blocked||previewing||!preview} onClick={()=>void exportPNG()}>{exporting?'Exporting PNG…':'Export high-resolution PNG'}</button>
       <button className="border rounded p-2" disabled={blocked} onClick={()=>exportOBJ('letters')}>Export Letters OBJ</button>
       <button className="border rounded p-2" disabled={blocked} onClick={()=>exportOBJ('form')}>Export Form OBJ</button>
+    </div>
+    <div className="flex flex-wrap gap-3">
+      <button className="border rounded p-2" disabled={blocked||previewing||!preview||!lobbyTypology} onClick={()=>void exportPngToBoard()}>{exporting?'Exporting PNG…':'Export PNG to Board'}</button>
     </div>
     <p role="status">{message}</p>
     {error&&<p role="alert" style={{color:'#ed8989'}}>{error}</p>}

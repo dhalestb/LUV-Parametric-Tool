@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {OBJExporter} from 'three/examples/jsm/exporters/OBJExporter.js';
 import type {AmphitheaterResult,ProofMesh} from './amphitheaterInteractiveTypes';
+import { lobbyExplanation } from './lobbyExplanation';
 
 export const PRESENTATION_COLORS={letters:'#D6AD4F',form:'#F7F6F5',rules:'#71BEDA'} as const;
 export type PlateView='letters'|'form'|'orientation'|'generation';
@@ -74,8 +75,13 @@ export function presentationRules(result:AmphitheaterResult){
   };
   const orientation=(['lower','middle','top'] as const).map(describe).filter(Boolean);
   if(result.request.envelopeVersion==='inserted-plate')orientation.splice(0,orientation.length,'L plates and U edge sources: horizontal faces; X/Y tilt 0°.', 'V boundaries: upright faces; X tilt 90°. Z rotation follows each saved source.');
-  if(!orientation.length)orientation.push('Source labels show actual saved X tilt and Z plan rotation.');
-  orientation.push('X tilt is measured from horizontal; Z turns the letter in plan.');
+  const lobbyName=result.request.typologyName??'';
+  const lobby=lobbyExplanation(lobbyName);
+  if(lobby)orientation.splice(0,orientation.length,...lobby.lines);
+  else{
+    if(!orientation.length)orientation.push('Source labels show actual saved X tilt and Z plan rotation.');
+    orientation.push('X tilt is measured from horizontal; Z turns the letter in plan.');
+  }
   const size=result.request.preferredFeet;
   const terraces=result.request.envelopeVersion==='inserted-plate'?['L outlines define .75-ft planar plates with .50-ft edge offset.','2.40-ft geometric links connect source boundaries at each plate elevation.','U channels remain open edge recesses; V upper surfaces define vertical boundary caps.']:result.request.envelopeVersion==='void-field'?[
     'Actual source plan concavities form subtractive volumes along global Z.',
@@ -89,5 +95,6 @@ export function presentationRules(result:AmphitheaterResult){
     'Two stepped bands add '+(size*.075).toFixed(3)+' ft of outward offset per band; vertical steps are capped at '+(size*.12).toFixed(2)+' ft.',
     'Upper/middle bases have up to '+(size*.45).toFixed(2)+' ft depth. Exterior walls extend vertically to their configured support.'
   ]:['Terracing follows the saved envelope operation and original source relationships.'];
+  if(lobby)terraces.splice(0,terraces.length);
   return {orientation,terraces};
 }

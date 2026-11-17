@@ -13,6 +13,13 @@ const nextConfig: NextConfig = {
   // A package-lock.json in the user home directory was being treated as the
   // workspace root, so the dev server never emitted the app routes.
   outputFileTracingRoot: path.resolve(process.cwd()),
+  webpack: (config) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/node_modules/**', '**/.git/**', '**/.next/**', '**/.cursor/**'],
+    };
+    return config;
+  },
 };
 
 export default nextConfig;

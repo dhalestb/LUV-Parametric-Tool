@@ -10,6 +10,16 @@ export function orientationFamily(id:string):OrientationFamily {
  return 'continuous';
 }
 export function orientationSteps(family:OrientationFamily){return {xy:family==='rigid'||family==='flat'?90:family==='continuous'?45:15,vertical:family==='flat'?0:family==='rigid'||family==='continuous'?45:15};}
+/** Form Editor rotation increments, in world-axis order. Zero means locked. */
+export function editorRotationSteps(id:string):[number,number,number] {
+ if(id==='linear-gallery-lobby')return [90,90,90];
+ if(id==='open-hall-workspace')return [0,0,90];
+ if(id==='void-field-gathering')return [0,0,15];
+ if(id==='stepped-amphitheater')return [90,0,15];
+ if(id==='flat-deep-plan-plate'||id==='inserted-horizontal-plate')return [90,0,90];
+ const steps=orientationSteps(orientationFamily(id));
+ return [steps.vertical,steps.vertical,steps.xy];
+}
 /** Foundational poses precede profile selection, importance scaling and solid connections.
  * XY rotation is Z yaw; XZ is Y rotation; YZ is X rotation. */
 export function foundationPoses(source:IntersectionPlacement[],sequence:number[],typology:string,spacing:number,heading:number){

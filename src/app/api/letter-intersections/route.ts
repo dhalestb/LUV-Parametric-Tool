@@ -92,7 +92,7 @@ export async function POST(request: Request) {
              if(cancelled||request.signal.aborted)throw new Error("Generation cancelled");
              send({type:"progress",percent:Math.round(percent),label});
              await new Promise(resolve=>setTimeout(resolve,0));
-            },gatheringAngles,gatheringOperations,payload.workspaceEdits,payload.envelopeHeight);
+            },gatheringAngles,gatheringOperations,payload.workspaceEdits);
             send({type:"result",data});
            }catch(error){send({type:"error",message:error instanceof Error?error.message:"Generation failed"});}
            finally{if(!cancelled)controller.close();}
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
         });
         return new Response(stream,{headers:{"Content-Type":"application/x-ndjson","Cache-Control":"no-store","X-Accel-Buffering":"no"}});
        }
-       return NextResponse.json(await buildConnectionWorkflow(placements,thickness,settings,rule.id,undefined,gatheringAngles,gatheringOperations,payload.workspaceEdits,payload.envelopeHeight));
+       return NextResponse.json(await buildConnectionWorkflow(placements,thickness,settings,rule.id,undefined,gatheringAngles,gatheringOperations,payload.workspaceEdits));
       }
       const mesh=await buildBridgeSpaceMesh(payload.placements,payload.thickness as number,mode??"combined",typologyBridgeSettings(base,rule.behaviors));
       return NextResponse.json(mesh);

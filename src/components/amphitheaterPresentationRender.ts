@@ -2,17 +2,19 @@ import * as THREE from 'three';
 import {toCreasedNormals} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type {AmphitheaterResult,ProofMesh} from './amphitheaterInteractiveTypes';
 import {meshGeometry,PLATE_LABELS,PRESENTATION_COLORS,pngWithDpi,presentationRules,type PlateView,type ExportView} from './amphitheaterPresentationExport';
+import { lobbyExplanation } from './lobbyExplanation';
 
 export type PresentationOptions={view:ExportView;size:number;transparent:boolean;iso:'SE'|'SW'|'NE'|'NW';ruleSource:string};
 type VoidRecord={source:string;axis:number[];sourceContour?:number[][];closedContour?:number[][];closure?:{addedEdges:number[][]};cutterMesh?:ProofMesh;removedVolume?:number;alcove?:boolean};
 type PresentationResult=AmphitheaterResult&{boundaryReport?:{voids:VoidRecord[]}};
 const views:PlateView[]=['letters','form','orientation','generation'];
 
-function fitCamera(box:THREE.Box3,width:number,height:number,iso:PresentationOptions['iso']){
+function fitCamera(box:THREE.Box3,width:number,height:number,iso:PresentationOptions['iso'],aim?:THREE.Vector3){
   const center=box.getCenter(new THREE.Vector3()),span=Math.max(1,box.getSize(new THREE.Vector3()).length());
   const camera=new THREE.OrthographicCamera(-1,1,1,-1,.01,span*12);
   camera.up.set(0,0,1);
-  camera.position.copy(center).add(new THREE.Vector3(iso.includes('E')?span:-span,iso.includes('N')?span:-span,span*.85));
+  const place=aim&&aim.lengthSq()>1e-8?aim.clone().normalize().multiplyScalar(span*1.7).add(new THREE.Vector3(span*.28,-span*.28,span*.42)):new THREE.Vector3(iso.includes('E')?span:-span,iso.includes('N')?span:-span,span*.85);
+  camera.position.copy(center).add(place);
   camera.lookAt(center);camera.updateMatrixWorld();
   const projected=new THREE.Box3();
   for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){
@@ -129,52 +131,59 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
 
   async function generationDetail(x:number,y:number,width:number){
     text('GENERATION RULES',x,y+width*.045,width*.036,PRESENTATION_COLORS.letters);
-    const records=selectedVoids.filter(v=>v.sourceContour?.length&&v.cutterMesh?.indices.length).slice(0,2);
-    if(!records.length){
+    const picks=(['L','U','V'] as const).flatMap(name=>{
+      const matches=result.letters.filter((item,index)=>result.request.source[index]?.letter===name);
+      if(!matches.length)return [];
+      const chosen=options.ruleSource?matches.find(item=>item.id===options.ruleSource):matches[0];
+      if(!chosen)return [];
+      const record=selectedVoids.find(item=>item.source===chosen.id);
+      return [{letter:chosen,record}];
+    });
+    if(!picks.length){
       text('Regenerate this study to record source-to-void geometry.',x,y+width*.2,width*.026);
       return;
     }
-    const cellWidth=width*.31,cellHeight=width*(records.length===1?.59:.30);
-    for(const [row,record] of records.entries()){
-      const letter=result.letters.find(item=>item.id===record.source);
-      if(!letter||!record.sourceContour)continue;
+    const cellRatio=picks.length===1?.52:picks.length===2?.28:.18;
+    const cellWidth=width*.78,cellHeight=width*cellRatio;
+    const rowPitch=picks.length===1?.64:picks.length===2?.36:.24;
+    for(const [row,pick] of picks.entries()){
+      const {letter,record}=pick;
       const sourceBox=new THREE.Box3().setFromBufferAttribute(new THREE.Float32BufferAttribute(letter.mesh.positions,3));
-      const center=sourceBox.getCenter(new THREE.Vector3());
-      const localBox=sourceBox.clone().expandByScalar(result.request.preferredFeet*.28);
-      if(result.request.envelopeVersion==='void-field'&&record.cutterMesh){localBox.union(new THREE.Box3().setFromBufferAttribute(new THREE.Float32BufferAttribute(record.cutterMesh.positions,3)));}
+      const crop=sourceBox.clone().expandByScalar(Math.max(result.request.preferredFeet*.55,sourceBox.getSize(new THREE.Vector3()).length()*.35));
       const planes=[
-        new THREE.Plane(new THREE.Vector3(1,0,0),-localBox.min.x),
-        new THREE.Plane(new THREE.Vector3(-1,0,0),localBox.max.x),
-        new THREE.Plane(new THREE.Vector3(0,1,0),-localBox.min.y),
-        new THREE.Plane(new THREE.Vector3(0,-1,0),localBox.max.y),
-        new THREE.Plane(new THREE.Vector3(0,0,1),-localBox.min.z),
-        new THREE.Plane(new THREE.Vector3(0,0,-1),localBox.max.z)
+        new THREE.Plane(new THREE.Vector3(1,0,0),-crop.min.x),
+        new THREE.Plane(new THREE.Vector3(-1,0,0),crop.max.x),
+        new THREE.Plane(new THREE.Vector3(0,1,0),-crop.min.y),
+        new THREE.Plane(new THREE.Vector3(0,-1,0),crop.max.y),
+        new THREE.Plane(new THREE.Vector3(0,0,1),-crop.min.z),
+        new THREE.Plane(new THREE.Vector3(0,0,-1),crop.max.z)
       ];
-      const rowY=y+width*(.11+row*.37);
-      text(record.source,x,rowY,width*.029,PRESENTATION_COLORS.rules);
-      for(let stage=0;stage<3;stage++){
-        await new Promise(resolve=>setTimeout(resolve,0));
-        const scene=new THREE.Scene();lighting(scene);
-        const px=x+stage*width*.345;
-        const labels=['Source letter','Inner contour + cutter','Opening through form'];
-        text(labels[stage],px,rowY+width*.045,width*.024);
-        renderer.setSize(Math.round(cellWidth),Math.round(cellHeight),false);renderer.setClearColor('#000000',0);
-        if(stage<2)addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,stage===0?1:.4);
-        if(stage===2)addMesh(scene,result.architecture,PRESENTATION_COLORS.form,.48,planes);
-        if(stage>0&&record.cutterMesh)addMesh(scene,record.cutterMesh,PRESENTATION_COLORS.rules,.65,planes);
-        const contour=(record.closedContour??record.sourceContour).map(p=>new THREE.Vector3(...p as [number,number,number]));
-        line(scene,[...contour,contour[0]]);
-        if(stage>0)arrow(scene,center,new THREE.Vector3(...record.axis as [number,number,number]),result.request.preferredFeet*.4);
-        renderer.render(scene,fitCamera(localBox,cellWidth,cellHeight,options.iso));
-        ctx!.drawImage(renderer.domElement,px,rowY+width*.065,cellWidth,cellHeight);
+      const axis=record?new THREE.Vector3(...record.axis as [number,number,number]):undefined;
+      const rowY=y+width*(.10+row*rowPitch);
+      text(letter.id,x,rowY+width*.04,width*.024,PRESENTATION_COLORS.rules);
+      text('Where it carves',x,rowY+width*.07,width*.016);
+      await new Promise(resolve=>setTimeout(resolve,0));
+      const scene=new THREE.Scene();lighting(scene);
+      addMesh(scene,result.architecture,PRESENTATION_COLORS.form,1,planes);
+      addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,.95);
+      if(record?.cutterMesh)addMesh(scene,record.cutterMesh,PRESENTATION_COLORS.rules,.42,planes);
+      const contour=record?.closedContour??record?.sourceContour;
+      if(contour?.length)line(scene,[...contour,contour[0]].map(p=>new THREE.Vector3(...p as [number,number,number])));
+      renderer.setSize(Math.round(cellWidth),Math.round(cellHeight),false);renderer.setClearColor('#000000',0);
+      renderer.render(scene,fitCamera(crop,cellWidth,cellHeight,options.iso,axis));
+      ctx!.drawImage(renderer.domElement,x+width*.2,rowY+width*.02,cellWidth,cellHeight);
+      scene.clear();
+    }
+    const lobby=lobbyExplanation(result.request.typologyName??'');
+    const captionY=.10+(picks.length-1)*rowPitch+.02+cellRatio+.03;
+    if(lobby)lobby.lines.forEach((line,index)=>text(line,x,y+width*(captionY+index*.014),width*.013));
+    else{
+      text('Source contour → cutter → opening in clipped form',x,y+width*.89,width*.026);
+      if(result.request.envelopeVersion==='vertical-walls'){
+        text('Platform 0.75 ft · step out '+(result.request.preferredFeet*.075).toFixed(3)+' ft · rise ≤ '+(result.request.preferredFeet*.12).toFixed(2)+' ft',x,y+width*.93,width*.024);
+        text('Horizontal terraces · vertical exterior walls',x,y+width*.97,width*.024);
       }
     }
-    text('Source contour → cutter → opening in clipped form',x,y+width*.89,width*.026);
-    if(result.request.envelopeVersion==='vertical-walls'){
-      text('Platform 0.75 ft · step out '+(result.request.preferredFeet*.075).toFixed(3)+' ft · rise ≤ '+(result.request.preferredFeet*.12).toFixed(2)+' ft',x,y+width*.93,width*.024);
-      text('Horizontal terraces · vertical exterior walls',x,y+width*.97,width*.024);
-    }
-    if(selectedVoids.length>2)text('Showing two sources. Select a Rule source for another detail.',x,y+width*.967,width*.024);
   }
 
   async function visibilityPanel(x:number,y:number,width:number){
@@ -242,7 +251,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     if(view==='letters'||view==='orientation'){
       result.letters.forEach(letter=>addMesh(scene,letter.mesh,PRESENTATION_COLORS.letters,1));
     }
-    const annotationSources=details?(result.plateReport?result.letters.slice(0,3).map(l=>l.id):selectedVoids.length?selectedVoids.map(v=>v.source):
+    const annotationSources=details?(result.plateReport||/lobby/i.test(result.request.typologyName??'')?['L','U','V'].map(letter=>result.letters.find((item,index)=>result.request.source[index]?.letter===letter)?.id).filter((id):id is string=>Boolean(id)):selectedVoids.length?selectedVoids.map(v=>v.source):
       result.letters.filter((_,i)=>result.request.source[i]?.architecturalRole==='interior').map(v=>v.id)):[];
     if(view==='orientation'){
       for(const id of annotationSources){
@@ -295,7 +304,9 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
         ['This saved study has no recorded cutter meshes.','Regenerate architecture to create source correspondence data.']
     };
     if(view==='orientation'){
-      rules.orientation.forEach((caption,i)=>text(caption,x,y+width*(.825+i*.04),width*.024));
+      const step=Math.min(.032, .2/Math.max(1, rules.orientation.length));
+      const start=.78;
+      rules.orientation.forEach((caption,i)=>text(caption,x,y+width*(start+i*step),width*.018));
     }else captions[view].forEach((caption,i)=>text(caption,x,y+width*(.905+i*.032),width*.026));
     scene.clear();
   }

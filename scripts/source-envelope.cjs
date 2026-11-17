@@ -32,9 +32,11 @@ async function buildSource(r,out){
  if(r.source.length<2)throw Error('Use at least two original letters for cross-letter development.');
  const {nodes,edges,letters}=derive(r),w=await require('manifold-3d/manifold.js').default();w.setup();const M=w.Manifold;
  const {width:W,depth:D,height:H}=r.field,pitch=.5,paths=[],bands=[];
- const vertical=r.envelopeVersion==='inserted-plate'?require('./source-inserted-plate.cjs').insertedPlateEnvelope(w,nodes,edges,letters,r.field):r.envelopeVersion==='void-field'?require('./source-void-field.cjs').voidFieldEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet,r.voidField):r.envelopeVersion==='vertical-walls'?require('./source-vertical-envelope.cjs').verticalEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet):null;
+ const lobby=r.proof==='lobby';
+ const vertical=lobby?require('./source-lobby-envelope.cjs').lobbyEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet,r.typologyName):r.envelopeVersion==='inserted-plate'?require('./source-inserted-plate.cjs').insertedPlateEnvelope(w,nodes,edges,letters,r.field):r.envelopeVersion==='void-field'?require('./source-void-field.cjs').voidFieldEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet,r.voidField):r.envelopeVersion==='vertical-walls'?require('./source-vertical-envelope.cjs').verticalEnvelope(w,nodes,edges,letters,r.field,r.preferredFeet):null;
  if(vertical)bands.push(...vertical.bands);
- for(const e of ['levels','profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion)?[]:edges){
+ const developed=lobby||['levels','profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion);
+ for(const e of developed?[]:edges){
  const dir=e.s.clone().sub(e.q),reach=Math.min(r.preferredFeet*.4,e.d*.4);
  const orient=t=>t.clone().multiplyScalar(t.dot(dir)<0?-reach:reach);
  const c=new T.CubicBezierCurve3(e.q,e.q.clone().add(orient(e.u)),e.s.clone().sub(orient(e.v)),e.s);
@@ -56,14 +58,14 @@ async function buildSource(r,out){
  }}
  const solid=M.union(cells);bands.push({solid,id:'bank-'+(bands.length+1),sources:paths.at(-1).sources});
  }
- if(['levels','profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion))for(const e of edges)paths.push({sources:[nodes[e.i].id,nodes[e.j].id],line:[e.q.toArray(),e.s.toArray()]});
+ if(developed)for(const e of edges)paths.push({sources:[nodes[e.i].id,nodes[e.j].id],line:[e.q.toArray(),e.s.toArray()]});
  if(r.envelopeVersion==='levels')bands.push(...require('./source-level-envelope.cjs').levelEnvelope(M,nodes,edges,r.field,r.preferredFeet));
  if(r.envelopeVersion==='profiles')bands.push(...require('./source-profile-envelope.cjs').profileEnvelope(w,nodes,edges,r.field,r.preferredFeet));
  const joined=M.union(bands.map(b=>b.solid));
- const primary=vertical?.primary??(['levels','profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion)?M.compose(joined.decompose().filter(part=>part.volume()>0)):joined);
+ const primary=vertical?.primary??(developed?M.compose(joined.decompose().filter(part=>part.volume()>0)):joined);
  const degree=r.articulation??0;
  if(!Number.isFinite(degree)||degree<0||degree>1)throw Error('Articulation must be between 0 and 1');
- const {solid,tools,projections,report}=vertical??require('./source-articulation.cjs').articulate(M,primary,nodes,edges,degree,r.field,['levels','profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion)?'bounded':r.articulationElevation);
+ const {solid,tools,projections,report}=vertical??require('./source-articulation.cjs').articulate(M,primary,nodes,edges,degree,r.field,developed?'bounded':r.articulationElevation);
  if(!vertical)for(const band of bands)for(const tool of tools)band.solid=band.solid.subtract(tool.solid);
  for(const p of projections)bands.push({id:p.id,sources:p.sources,solid:p.solid.intersect(solid)});
  const bounds=solid.boundingBox(),shellVolumes=solid.decompose().map(s=>s.volume());
@@ -74,12 +76,12 @@ async function buildSource(r,out){
  obj('combined-envelope.obj',architecture);dump('combined-envelope.json',architecture);
  const outside=solid.subtract(M.cube([W,D,H]).translate([-W/2,-D/2,0])).volume();
  dump('manifest.json',{generator:r.generator,validation:{status:solid.status(),outside,sourceOutside:0,shellVolumes},instances:nodes.map(n=>({pose:n.p,matrix:n.matrix})),components:components.map((c,i)=>{const file=c.id+'.obj';obj(file,c.mesh);return {file,sources:c.sources,finalVolume:bands[i].solid.volume()}}),tools:tools.map(t=>{const file=t.id+'.obj';obj(file,mesh(t.solid));return {file,removed:t.removed,finalObstruction:solid.intersect(t.solid).volume()}})});
- let contributions=['levels','profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion)?require('./source-level-envelope.cjs').contributionReport(solid,[...bands,...(vertical?tools.filter(t=>nodes.find(n=>n.id===t.source)?.p.lift).map(t=>({owner:t.source,id:'void-'+t.source,sources:[t.source],solid:t.cuttingSolid})):[])],nodes):undefined;
+ let contributions=!lobby&&['levels','profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion)?require('./source-level-envelope.cjs').contributionReport(solid,[...bands,...(vertical?tools.filter(t=>nodes.find(n=>n.id===t.source)?.p.lift).map(t=>({owner:t.source,id:'void-'+t.source,sources:[t.source],solid:t.cuttingSolid})):[])],nodes):undefined;
  if(r.envelopeVersion==='void-field'){
   const attributed=nodes.map(n=>({id:'source-influence-'+n.id,owner:n.id,sources:[n.id],solid:M.union([...bands.filter(b=>b.owner===n.id).map(b=>b.solid),...tools.filter(t=>t.source===n.id).map(t=>t.cuttingSolid)])}));
   contributions=require('./source-level-envelope.cjs').contributionReport(solid,attributed,nodes).map(c=>({...c,component:bands.find(b=>b.owner===c.letter)?.id??c.component,relationships:[...new Set(bands.filter(b=>b.sources.includes(c.letter)).map(b=>b.id).concat(tools.filter(t=>t.source===c.letter).map(t=>t.id)))]}));
  }
  if(contributions?.some(c=>c.exposedArea<1))throw Error('A source lacks a visible contour surface: '+JSON.stringify(contributions));
- return {plateReport:r.envelopeVersion==='inserted-plate'?vertical.boundaryReport:undefined,voidFieldReport:r.envelopeVersion==='void-field'?vertical.boundaryReport:undefined,boundaryReport:vertical?.boundaryReport,contributions,primary:mesh(primary),articulationReport:report,architecture,letters,components,paths,features:nodes.map(n=>({id:n.id,line:n.line.map(p=>p.toArray())})),bounds,volume:solid.volume(),sourceCount:letters.length};
+ return {plateReport:r.envelopeVersion==='inserted-plate'?vertical.boundaryReport:undefined,voidFieldReport:r.envelopeVersion==='void-field'||vertical?.family==='void'?vertical.boundaryReport:undefined,boundaryReport:vertical?.boundaryReport,contributions,primary:mesh(primary),articulationReport:report,architecture,letters,components,paths,features:nodes.map(n=>({id:n.id,line:n.line.map(p=>p.toArray())})),bounds,volume:solid.volume(),sourceCount:letters.length};
 }
 module.exports={derive,buildSource};

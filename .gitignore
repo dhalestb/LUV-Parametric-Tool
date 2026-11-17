@@ -49,6 +49,7 @@ reports/descriptor-calibration/*.json
 
 # Isolated interactive proof studies
 /.amphitheater-runs/
+/.lobby-runs/
 /proof/interactive-check/
 
 # Machine-local safety-backup location (not a portable study)
