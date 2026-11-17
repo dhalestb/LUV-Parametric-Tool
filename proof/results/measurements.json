@@ -1,0 +1,272 @@
+{
+  "records": [
+    {
+      "sourceIndex": 0,
+      "source": {
+        "letter": "L",
+        "x": -14.673913043478262,
+        "y": -1.9565217391304348,
+        "z": -1.9565217391304348,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 9.782608695652174,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      "role": "terrace boundary",
+      "yaw": 7.594643368591445,
+      "tilt": 0,
+      "origin": [
+        -4.757893923276646,
+        -1.769341802718503,
+        0
+      ],
+      "localBayDepth": 10.13767578,
+      "notchRemoved": 0,
+      "horizontalTopTriangleArea": 17.73195663188426
+    },
+    {
+      "sourceIndex": 1,
+      "source": {
+        "letter": "U",
+        "x": -8.804347826086957,
+        "y": 1.9565217391304348,
+        "z": -1.9565217391304348,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 9.782608695652174,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      "role": "enclosure",
+      "yaw": 22.594643368591445,
+      "tilt": 0,
+      "origin": [
+        -3.09263105012982,
+        0.7226051395976407,
+        2.0700000000000003
+      ],
+      "localBayDepth": 12.217876650000001,
+      "notchRemoved": 7.442904008047904,
+      "horizontalTopTriangleArea": 12.03499660998272,
+      "incomingRamp": {
+        "meanSlope": 0.6275648460904734,
+        "contacts": [
+          0.985276419316585,
+          0.9852762893539513
+        ]
+      }
+    },
+    {
+      "sourceIndex": 2,
+      "source": {
+        "letter": "V",
+        "x": -2.9347826086956528,
+        "y": -1.9565217391304348,
+        "z": 0,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 9.782608695652174,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      "role": "transition",
+      "yaw": 37.59464336859145,
+      "tilt": 90,
+      "origin": [
+        -0.8326314365734131,
+        -1.2459734711580719,
+        4.140000000000001
+      ],
+      "localBayDepth": 7.3844008599999995,
+      "notchRemoved": 0,
+      "horizontalTopTriangleArea": 3.3048845795977826,
+      "incomingRamp": {
+        "meanSlope": 0.3882550075763515,
+        "contacts": [
+          1.4079118479088522,
+          1.2765322513102078
+        ]
+      }
+    },
+    {
+      "sourceIndex": 3,
+      "source": {
+        "letter": "L",
+        "x": 2.9347826086956506,
+        "y": 1.9565217391304348,
+        "z": 0,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 9.782608695652174,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      "role": "terrace boundary",
+      "yaw": 52.59464336859145,
+      "tilt": 0,
+      "origin": [
+        0.8326314365734131,
+        1.2459734711580719,
+        6.210000000000001
+      ],
+      "localBayDepth": 10.012065880000002,
+      "notchRemoved": 5.056197934063654,
+      "horizontalTopTriangleArea": 12.332700900871439,
+      "incomingRamp": {
+        "meanSlope": 0.6554992634807261,
+        "contacts": [
+          0.9559902181863772,
+          0.9559900387455091
+        ]
+      }
+    },
+    {
+      "sourceIndex": 4,
+      "source": {
+        "letter": "U",
+        "x": 8.804347826086955,
+        "y": -1.9565217391304348,
+        "z": 1.9565217391304348,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 9.782608695652174,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      "role": "enclosure",
+      "yaw": 97.59464336859145,
+      "tilt": 0,
+      "origin": [
+        3.09263105012982,
+        -0.7226051395976407,
+        8.280000000000001
+      ],
+      "localBayDepth": 9.895064999999999,
+      "notchRemoved": 0,
+      "horizontalTopTriangleArea": 9.695890273563158,
+      "incomingRamp": {
+        "meanSlope": 0.4477233859075903,
+        "contacts": [
+          1.2607515243241472,
+          1.252822465322321
+        ]
+      }
+    },
+    {
+      "sourceIndex": 5,
+      "source": {
+        "letter": "V",
+        "x": 14.673913043478262,
+        "y": 1.9565217391304348,
+        "z": 1.9565217391304348,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 9.782608695652174,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      "role": "transition",
+      "yaw": 7.594643368591445,
+      "tilt": 90,
+      "origin": [
+        4.757893923276646,
+        1.769341802718503,
+        10.350000000000001
+      ],
+      "localBayDepth": 4.1528139600000005,
+      "notchRemoved": 1.1077739819331214,
+      "horizontalTopTriangleArea": 4.127484926175654,
+      "incomingRamp": {
+        "meanSlope": 0.3012189813805713,
+        "contacts": [
+          1.6056429868882023,
+          1.3823369199834359
+        ]
+      }
+    }
+  ],
+  "results": [
+    {
+      "height": 20,
+      "factor": 0.9930600820406458,
+      "status": "NoError",
+      "components": 1,
+      "bounds": {
+        "min": [
+          -10,
+          -7.231965017726713,
+          -7.730972779219391
+        ],
+        "max": [
+          10,
+          7.231965017726713,
+          3.262202707792916
+        ]
+      },
+      "outside": 0,
+      "openingArchitectureOverlap": -5.204170427930421e-17,
+      "openingLetterOverlap": 0,
+      "architectureOutsideLetters": 101.59166495918647,
+      "sourceCount": 6
+    },
+    {
+      "height": 40,
+      "factor": 0.9930600820406458,
+      "status": "NoError",
+      "components": 1,
+      "bounds": {
+        "min": [
+          -10,
+          -7.231965017726713,
+          -7.730972779219391
+        ],
+        "max": [
+          10,
+          7.231965017726713,
+          3.262202707792916
+        ]
+      },
+      "outside": 0,
+      "openingArchitectureOverlap": -5.204170427930421e-17,
+      "openingLetterOverlap": 0,
+      "architectureOutsideLetters": 101.59166495918647,
+      "sourceCount": 6
+    },
+    {
+      "height": 60,
+      "factor": 0.9930600820406458,
+      "status": "NoError",
+      "components": 1,
+      "bounds": {
+        "min": [
+          -10,
+          -7.231965017726713,
+          -7.730972779219391
+        ],
+        "max": [
+          10,
+          7.231965017726713,
+          3.262202707792916
+        ]
+      },
+      "outside": 0,
+      "openingArchitectureOverlap": -5.204170427930421e-17,
+      "openingLetterOverlap": 0,
+      "architectureOutsideLetters": 101.59166495918647,
+      "sourceCount": 6
+    }
+  ]
+}

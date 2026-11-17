@@ -1,5 +1,5 @@
 import type { CompositionPlacement, DescriptorId, DescriptorSettings } from "./compositionEngine";
-import type { Cell } from "./letterTypes";
+import type { Cell, Letter } from "./letterTypes";
 
 export type OptimizationFocus = "letter" | "void" | "combined" | "auto";
 export type CandidateFocus = Exclude<OptimizationFocus, "auto">;
@@ -31,6 +31,11 @@ export type GenerationRules = {
   allowGeometryModification: boolean;
   maximumIntersections: number;
   letterThicknessPercent: number;
+  /** Shared Slide gap sliders. At 10 and below, octet attractors pull letters into overlap. */
+  xyGap: number;
+  zGap: number;
+  /** Center-to-letter distance along the 45° diagonal. Omit to leave letters on the grid. */
+  attractorGap?: number;
 };
 
 export type OptimizerControls = {
@@ -140,6 +145,7 @@ export type SpatialAlternative = {
 
 export type OptimizationInput = {
   sourceCells: Cell[];
+  selectedLetters: Letter[];
   descriptors: DescriptorSettings;
   grid: OrthogonalGrid;
   rules: GenerationRules;
@@ -176,6 +182,8 @@ export const DEFAULT_RULES: GenerationRules = {
   allowGeometryModification: true,
   maximumIntersections: 24,
   letterThicknessPercent: 12,
+  xyGap: 56,
+  zGap: 56,
 };
 
 export const DEFAULT_OPTIMIZER_CONTROLS: OptimizerControls = {

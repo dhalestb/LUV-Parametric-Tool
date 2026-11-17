@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "selfIntersectionPairs": 0,
+  "nonAdjacentTriangleChecks": 0,
+  "legacyFlags": 0,
+  "method": "manifold-status-and-volume; amphitheater BVH pair scan not applied to workspace dual-ruleset solids"
+}

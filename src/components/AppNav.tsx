@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useBoardMode } from "./BoardMode";
+import { useGlobalBoardMode } from "./BoardMode";
 
 const LINKS = [
   { href: "/", label: "Slide" },
@@ -10,13 +10,17 @@ const LINKS = [
   { href: "/shapes", label: "Shapes" },
   { href: "/voids", label: "Voids" },
   { href: "/composition", label: "Composition" },
+  { href: "/architectural-forms", label: "Architectural Forms" },
+  { href: "/amphitheater", label: "Proto-Form Generation" },
+  { href: "/composition-presentation", label: "Presentation" },
   { href: "/evaluations", label: "Evaluations" },
   { href: "/lattice", label: "Lattice" },
+  { href: "/part3", label: "Part 3" },
 ] as const;
 
 export default function AppNav() {
   const pathname = usePathname();
-  const board = useBoardMode();
+  const board = useGlobalBoardMode();
 
   return (
     <nav aria-label="Application" className="app-nav flex items-center gap-1">
@@ -24,7 +28,7 @@ export default function AppNav() {
         const active =
           link.href === "/"
             ? pathname === "/"
-            : pathname.startsWith(link.href);
+            : (pathname === link.href || pathname.startsWith(`${link.href}/`));
         return (
           <Link
             key={link.href}

@@ -1,0 +1,15 @@
+(node:41872) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+AssertionError [ERR_ASSERTION]: Noncoplanar intersections remain
+
+1 !== 0
+
+    at C:\Users\DHale\Documents\Codex\LUV-Amphitheater-Proof\proof\abstract-validation.cjs:65:9 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 1,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

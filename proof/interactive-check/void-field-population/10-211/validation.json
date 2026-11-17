@@ -1,0 +1,233 @@
+{
+  "passed": true,
+  "broadPhaseFlags": 154,
+  "preciseMethod": "all nonadjacent BVH pairs tested with independent segment/triangle crossings and coplanar polygon clipping; original preflight retained separately",
+  "exports": [
+    {
+      "file": "combined-envelope.obj",
+      "status": "NoError",
+      "volume": 4489.5826891166835,
+      "vertices": 5547,
+      "triangles": 11210
+    },
+    {
+      "file": "occupied-level-1.obj",
+      "status": "NoError",
+      "volume": 528.6608012140077,
+      "vertices": 688,
+      "triangles": 1384
+    },
+    {
+      "file": "occupied-level-2.obj",
+      "status": "NoError",
+      "volume": 528.1555521171919,
+      "vertices": 692,
+      "triangles": 1392
+    },
+    {
+      "file": "occupied-level-3.obj",
+      "status": "NoError",
+      "volume": 527.6128486217277,
+      "vertices": 690,
+      "triangles": 1388
+    },
+    {
+      "file": "source-envelope-L-2.obj",
+      "status": "NoError",
+      "volume": 198.70769407120721,
+      "vertices": 196,
+      "triangles": 388
+    },
+    {
+      "file": "source-envelope-U-3.obj",
+      "status": "NoError",
+      "volume": 197.77887675885435,
+      "vertices": 475,
+      "triangles": 942
+    },
+    {
+      "file": "source-envelope-V-4.obj",
+      "status": "NoError",
+      "volume": 189.66516004872346,
+      "vertices": 266,
+      "triangles": 528
+    },
+    {
+      "file": "source-envelope-L-5.obj",
+      "status": "NoError",
+      "volume": 398.31515929352474,
+      "vertices": 189,
+      "triangles": 366
+    },
+    {
+      "file": "source-envelope-U-7.obj",
+      "status": "NoError",
+      "volume": 473.1987767576516,
+      "vertices": 745,
+      "triangles": 1486
+    },
+    {
+      "file": "source-envelope-V-9.obj",
+      "status": "NoError",
+      "volume": 559.7150058676553,
+      "vertices": 258,
+      "triangles": 512
+    },
+    {
+      "file": "source-envelope-L-10.obj",
+      "status": "NoError",
+      "volume": 304.7275605117217,
+      "vertices": 220,
+      "triangles": 436
+    },
+    {
+      "file": "void-rim-L-8.obj",
+      "status": "NoError",
+      "volume": 385.02618022091326,
+      "vertices": 1188,
+      "triangles": 2388
+    },
+    {
+      "file": "void-rim-U-6.obj",
+      "status": "NoError",
+      "volume": 581.6816481697766,
+      "vertices": 1460,
+      "triangles": 2916
+    },
+    {
+      "file": "void-rim-V-1.obj",
+      "status": "NoError",
+      "volume": 544.5086104844034,
+      "vertices": 950,
+      "triangles": 1896
+    },
+    {
+      "file": "void-L-8.obj",
+      "status": "NoError",
+      "volume": 2114.8678008733696,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "void-U-6.obj",
+      "status": "NoError",
+      "volume": 1200.9455015469412,
+      "vertices": 70,
+      "triangles": 136
+    },
+    {
+      "file": "void-V-1.obj",
+      "status": "NoError",
+      "volume": 564.5994923312085,
+      "vertices": 6,
+      "triangles": 8
+    },
+    {
+      "file": "connection-L-8-V-1-0.obj",
+      "status": "NoError",
+      "volume": 188.82300379309868,
+      "vertices": 100,
+      "triangles": 196
+    },
+    {
+      "file": "connection-L-8-V-1-1.obj",
+      "status": "NoError",
+      "volume": 188.823020313801,
+      "vertices": 100,
+      "triangles": 196
+    },
+    {
+      "file": "atrium-L-8-0-0.obj",
+      "status": "NoError",
+      "volume": 163.92421012100866,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-1-0.obj",
+      "status": "NoError",
+      "volume": 161.230299014551,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-2-0.obj",
+      "status": "NoError",
+      "volume": 57.06787737424824,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-0-1.obj",
+      "status": "NoError",
+      "volume": 201.6190507171801,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-1-1.obj",
+      "status": "NoError",
+      "volume": 198.3056634352693,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-2-1.obj",
+      "status": "NoError",
+      "volume": 70.19079402508505,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-0-2.obj",
+      "status": "NoError",
+      "volume": 163.92421293902228,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-1-2.obj",
+      "status": "NoError",
+      "volume": 161.2302867999401,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-2-2.obj",
+      "status": "NoError",
+      "volume": 57.06787667226903,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-0-3.obj",
+      "status": "NoError",
+      "volume": 201.6190587100349,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-1-3.obj",
+      "status": "NoError",
+      "volume": 198.30565113683357,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "atrium-L-8-2-3.obj",
+      "status": "NoError",
+      "volume": 70.19079291269146,
+      "vertices": 8,
+      "triangles": 12
+    }
+  ],
+  "coplanarAreas": [],
+  "nonAdjacentTriangleChecks": 480293,
+  "selfIntersectionPairs": 0,
+  "coplanar": 0,
+  "nonCoplanar": 0,
+  "examples": [],
+  "shellVolumes": [
+    4489.5826891166835
+  ]
+}

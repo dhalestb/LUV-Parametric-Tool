@@ -1,0 +1,15 @@
+[
+(node:57156) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+  { pair: [ 875, 880 ], hits: [] },
+  { pair: [ 1529, 1532 ], hits: [] },
+  { pair: [ 1617, 1635 ], hits: [] },
+  { pair: [ 2012, 2022 ], hits: [] },
+  { pair: [ 2013, 2022 ], hits: [] },
+  { pair: [ 2987, 3042 ], hits: [] },
+  { pair: [ 3078, 3108 ], hits: [] },
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+  { pair: [ 4385, 4406 ], hits: [] },
+  { pair: [ 4386, 4406 ], hits: [] },
+  { pair: [ 4700, 4773 ], hits: [] }
+]
