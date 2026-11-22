@@ -390,7 +390,7 @@ function styleLayer(layer: EvidenceLayer, options: PresentationOptions = {}): Ev
 
 function presentationOverride(id: string): Partial<Pick<EvidenceLayer, "pointShape" | "pointScale">> & { color?: string } {
   if (id === "ce-approaches") return { color: "#43D9F1" };
-  if (id === "ce-gathering") return { color: "#D6AD4F" };
+  if (id.startsWith("ce-floor-gathering/") || id === "ce-gathering") return { color: "#D6AD4F" };
   if (id === "ce-primary") return { color: "#D6AD4F" };
   if (id === "ce-secondary") return { color: "#9BD5E4" };
   if (id === "ce-regions") return { color: "#71BEDA" };
@@ -428,7 +428,7 @@ function presentationOverride(id: string): Partial<Pick<EvidenceLayer, "pointSha
 
 function keepLayer(layer: EvidenceLayer, descriptorId: string, options: PresentationOptions = {}) {
   if (descriptorId === "circulationActivated" && (layer.id === "ca-network" || layer.id === "ca-disconnected")) return false;
-  if (descriptorId === "verticallyIntegrated" && (layer.id === "vi-void" || layer.id === "vi-sight")) return false;
+  // The default view omits voids and sightlines. Metric focus below can reveal either.
   if (descriptorId === 'visuallyConnected') return PRESENTATION_KEEP.visuallyConnected.includes(layer.id);
   if (layer.id === "lu-blocked" && !options.showBlocked) return false;
   if (options.componentFocus === "Continuous Field") return layer.id === "ov-field";
@@ -436,7 +436,7 @@ function keepLayer(layer: EvidenceLayer, descriptorId: string, options: Presenta
   const keep = PRESENTATION_KEEP[descriptorId];
   if (!keep) return true;
   if (layer.id === "lu-blocked" && options.showBlocked) return true;
-  return keep.includes(layer.id);
+  return keep.includes(layer.id) || (descriptorId === "centralized" && layer.id.startsWith("ce-floor-gathering/"));
 }
 
 function planBoundsOf(layers: EvidenceLayer[]): { minX: number; minY: number; maxX: number; maxY: number } | null {

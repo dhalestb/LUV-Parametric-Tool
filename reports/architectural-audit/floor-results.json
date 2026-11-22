@@ -1,0 +1,191 @@
+[
+  {
+    "filename": "Linear.obj",
+    "method": "centralized-floor-v3.0.0",
+    "comparison": {
+      "openVolume": 24.84152791380999,
+      "visuallyConnected": 32.307601494597215,
+      "circulationActivated": 44.054658100823815,
+      "verticallyIntegrated": 30
+    },
+    "buildingScore": null,
+    "floors": [
+      {
+        "floor": 0.53,
+        "score": null,
+        "candidates": [
+          {
+            "region": 10,
+            "score": null,
+            "measuredGathering": 1,
+            "reasons": [
+              "Confirm gathering use on this floor.",
+              "Confirm occupied-region and connection review coverage.",
+              "Unclassified regions remain.",
+              "No other confirmed occupied origins."
+            ]
+          }
+        ]
+      },
+      {
+        "floor": 10,
+        "score": null,
+        "candidates": [
+          {
+            "region": 3,
+            "score": null,
+            "measuredGathering": 0.9179275577562453,
+            "reasons": [
+              "Confirm gathering use on this floor.",
+              "Confirm occupied-region and connection review coverage.",
+              "Unclassified regions remain.",
+              "An unresolved connection may change convergence or reachability.",
+              "No other confirmed occupied origins."
+            ]
+          },
+          {
+            "region": 16,
+            "score": null,
+            "measuredGathering": null,
+            "reasons": [
+              "Confirm gathering use on this floor.",
+              "Confirm occupied-region and connection review coverage.",
+              "Unclassified regions remain.",
+              "Confirm unobstructed gathering width.",
+              "An unresolved connection may change convergence or reachability."
+            ]
+          }
+        ]
+      },
+      {
+        "floor": 17.53,
+        "score": null,
+        "candidates": [
+          {
+            "region": 4,
+            "score": null,
+            "measuredGathering": null,
+            "reasons": [
+              "Confirm gathering use on this floor.",
+              "Confirm occupied-region and connection review coverage.",
+              "Unclassified regions remain.",
+              "Confirm unobstructed gathering width.",
+              "Confirm clear height or open sky.",
+              "An unresolved connection may change convergence or reachability."
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filename": "Stepped.obj",
+    "method": "centralized-floor-v3.0.0",
+    "comparison": {
+      "openVolume": 1.4823145732389116,
+      "visuallyConnected": 35.982693634570104,
+      "circulationActivated": 44.33368442927763,
+      "verticallyIntegrated": 45.231918238993714
+    },
+    "buildingScore": null,
+    "floors": [
+      {
+        "floor": 0,
+        "score": null,
+        "candidates": []
+      },
+      {
+        "floor": 9.16,
+        "score": null,
+        "candidates": []
+      },
+      {
+        "floor": 24.17,
+        "score": null,
+        "candidates": []
+      },
+      {
+        "floor": 38.46,
+        "score": null,
+        "candidates": []
+      },
+      {
+        "floor": 46.77,
+        "score": null,
+        "candidates": []
+      }
+    ]
+  },
+  {
+    "filename": "Void_Field.obj",
+    "method": "centralized-floor-v3.0.0",
+    "comparison": {
+      "openVolume": 7.87468758678145,
+      "visuallyConnected": 47.48446814988361,
+      "circulationActivated": 16.263736263736263,
+      "verticallyIntegrated": 20.459466263846927
+    },
+    "buildingScore": null,
+    "floors": [
+      {
+        "floor": 2.64,
+        "score": null,
+        "candidates": []
+      },
+      {
+        "floor": 17.64,
+        "score": null,
+        "candidates": [
+          {
+            "region": 33,
+            "score": null,
+            "measuredGathering": null,
+            "reasons": [
+              "Confirm gathering use on this floor.",
+              "Confirm occupied-region and connection review coverage.",
+              "Unclassified regions remain.",
+              "Confirm unobstructed gathering width.",
+              "An unresolved connection may change convergence or reachability."
+            ]
+          }
+        ]
+      },
+      {
+        "floor": 32.64,
+        "score": null,
+        "candidates": [
+          {
+            "region": 34,
+            "score": null,
+            "measuredGathering": 0.9924430361509996,
+            "reasons": [
+              "Confirm gathering use on this floor.",
+              "Confirm occupied-region and connection review coverage.",
+              "Unclassified regions remain.",
+              "An unresolved connection may change convergence or reachability.",
+              "No other confirmed occupied origins."
+            ]
+          }
+        ]
+      },
+      {
+        "floor": 47.64,
+        "score": null,
+        "candidates": [
+          {
+            "region": 3,
+            "score": null,
+            "measuredGathering": null,
+            "reasons": [
+              "Confirm gathering use on this floor.",
+              "Confirm occupied-region and connection review coverage.",
+              "Unclassified regions remain.",
+              "Confirm unobstructed gathering width.",
+              "Confirm clear height or open sky."
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

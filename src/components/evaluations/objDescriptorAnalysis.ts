@@ -56,6 +56,7 @@ export type MetricComponent = {
 };
 
 export type DescriptorResult = {
+  floorResults?: { candidates?: {region:number;area:number;percent:number|null;levelUsableArea:number;patch?:number[]}[]; level: number; score: number | null; primary?: number; secondary: number[]; status: string }[];
   id: ArchDescriptorId;
   name: string;
   /** Rounded absolute geometric score, 0–100. 0 when unavailable; check `available`. */

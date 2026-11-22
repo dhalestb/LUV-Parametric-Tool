@@ -9,7 +9,8 @@
         "clear": 752.2229,
         "width": 20.95,
         "anchor": "Linear-R10",
-        "finding": "Covered lower-floor gathering candidate."
+        "finding": "Covered lower-floor gathering candidate.",
+        "gatheringCandidate": true
       },
       {
         "id": 3,
@@ -18,7 +19,8 @@
         "clear": 405.1358,
         "width": 14.77,
         "anchor": "Linear-R3",
-        "finding": "Covered gallery candidate with localized low headroom."
+        "finding": "The second-floor loft is open to the sky. The R3 outline measures mostly covered gallery floor.",
+        "gatheringCandidate": true
       },
       {
         "id": 4,
@@ -91,7 +93,8 @@
         "clear": 374.7403,
         "width": 11.73,
         "anchor": "Void_Field-R34",
-        "finding": "Provisional gathering-space candidate. Source geometry supports a continuous 372.25 ft² patch with at least seven feet of headroom and an 11.73 ft clear diameter. Access remains unresolved."
+        "finding": "Provisional gathering-space candidate. Source geometry supports a continuous 372.25 ft² patch with at least seven feet of headroom and an 11.73 ft clear diameter. Access remains unresolved.",
+        "gatheringCandidate": true
       }
     ]
   }

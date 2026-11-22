@@ -20,6 +20,8 @@ import {
   type ArchDescriptorId,
   type FormDescriptorEvaluation,
 } from "./objDescriptorAnalysis";
+import { evaluateBatch } from "./evaluationBatch";
+import { gatheringScoreRanks } from "./gatheringComparison";
 import DescriptorComparison from "./DescriptorComparison";
 import { VISIBLE_DESCRIPTOR_IDS, VISIBLE_DESCRIPTORS } from './visibleDescriptors';
 
@@ -132,9 +134,12 @@ export default function ArchitecturalEvaluations() {
     return { slot, mesh, result };
   }), [meshes, assignments, results]);
 
-  const analyzedCount = useMemo(() => rows.filter((row) => row.result?.status === "ready").length, [rows]);
   const selected = rows.find((row) => row.slot.id === selectedSlotId) ?? rows[0];
-  const explain = selected?.result?.descriptors.find((item) => item.id === explainId) ?? selected?.result?.descriptors.find((item) => VISIBLE_DESCRIPTOR_IDS.includes(item.id));
+  const areaRanks = useMemo(() => gatheringScoreRanks(rows.flatMap(row => row.mesh && row.result?.status === "ready"
+    ? [{ id: row.slot.id, result: row.result.descriptors.find(d => d.id === "centralized") }] : [])), [rows]);
+  const selectedArea = areaRanks.get(selectedSlotId);
+  const evaluated = selected?.result?.descriptors.find((item) => item.id === explainId) ?? selected?.result?.descriptors.find((item) => VISIBLE_DESCRIPTOR_IDS.includes(item.id));
+  const explain = evaluated?.id === "centralized" && selectedArea ? { ...evaluated, ...selectedArea } : evaluated;
   const selectedSessionRank = explain?.comparativeRank !== undefined && explain.cohortSize
     ? { rank: explain.comparativeRank, cohortSize: explain.cohortSize }
     : null;
@@ -179,7 +184,7 @@ export default function ArchitecturalEvaluations() {
     try {
       const nextModels: Record<string, TileModel> = {};
       const nextResults: Record<string, FormDescriptorEvaluation> = {};
-      for (const row of targets) {
+      const outcomes = await evaluateBatch(targets, async row => {
         const mesh = row.mesh!;
         const up = resolvedUp(mesh.upAxis, upAxisMode);
         const model = analyzeMesh(mesh, row.slot.id, UNIT_TO_FEET[unit], up);
@@ -190,12 +195,16 @@ export default function ArchitecturalEvaluations() {
           unitScale: UNIT_TO_FEET[unit],
         }, { includeTopDecks, retainedDescriptors: results[mesh.id]?.descriptors });
         const {savedCentralizedResult}=await import('./v4/verifiedCentralizedResult');
+        const previousCentral = results[mesh.id]?.descriptors.find(d=>d.id==='centralized' && d.version==='centralized-verified-v2.0.0');
+        if(previousCentral) {
+          const key='luv-centralized-v2-history:'+mesh.id+':'+up+':'+unit+':'+includeTopDecks+':'+previousCentral.absoluteScore;
+          if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify(previousCentral));
+        }
         const verified=await savedCentralizedResult(mesh,up,unit);
         const legacy=evaluated.descriptors.find(d=>d.id==='centralized');
         const historicalKey='luv-centralized-graph-history:'+mesh.id+':'+legacy?.evidence?.sourceHash+':'+up+':'+unit+':'+includeTopDecks;
         if(legacy&&!localStorage.getItem(historicalKey))localStorage.setItem(historicalKey,JSON.stringify({score:legacy.absoluteScore,version:legacy.version,reason:legacy.unavailableReason}));
-        nextModels[mesh.id] = model;
-        nextResults[mesh.id] = {
+        return { model, result: {
           meshId: mesh.id,
           slotId: row.slot.id,
           filename: mesh.filename,
@@ -206,16 +215,36 @@ export default function ArchitecturalEvaluations() {
           confidence: evaluated.confidence,
           raw: evaluated.raw,
           descriptors: evaluated.descriptors.map(d=>d.id==='centralized'?verified:d),
-        };
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        } satisfies FormDescriptorEvaluation };
+      });
+      for (const outcome of outcomes) {
+        const { mesh, slot } = outcome.source;
+        if (!mesh) continue;
+        if (outcome.ok) {
+          nextModels[mesh.id] = outcome.value.model;
+          nextResults[mesh.id] = outcome.value.result;
+        } else {
+          nextResults[mesh.id] = {
+            meshId: mesh.id, slotId: slot.id, filename: mesh.filename, code: slot.code, category: slot.category,
+            name: slot.name, status: "error", error: outcome.error, confidence: 0, raw: null, descriptors: [],
+          };
+        }
       }
-      const ranked = Object.values(nextResults);
+      const ranked = Object.values(nextResults).filter(result => result.status === "ready");
       assignRelativeRanks(ranked);
-      publishDescriptorRanks(ranked);
+      const snapshot = ranked.map(form => ({ ...form }));
       for (const result of ranked) result.descriptors = result.descriptors.filter(descriptor => VISIBLE_DESCRIPTOR_IDS.includes(descriptor.id));
       setModels(nextModels);
       setResults(nextResults);
-      setStatus(`Analyzed ${targets.length} Lattice source OBJ${targets.length === 1 ? "" : "s"} · 5 descriptors each${includeTopDecks ? " · top decks included" : " · official v4.1 (top decks excluded)"}. Unassigned slots were skipped.`);
+      const failed = Object.values(nextResults).filter(result => result.status === "error");
+      const summary = `Analyzed ${ranked.length} of ${targets.length} forms.`;
+      const failures = failed.map(result => result.filename + " — " + result.error);
+      setStatus([summary, ...failures].join(" "));
+      try {
+        publishDescriptorRanks(snapshot);
+      } catch {
+        setStatus([summary, ...failures, "Session rank storage is unavailable."].join(" "));
+      }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Analysis failed.");
     } finally {
@@ -333,10 +362,11 @@ export default function ArchitecturalEvaluations() {
 
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>{status}</p>
       <CentralizedVerification meshes={meshes} unit={unit} upAxisMode={upAxisMode} onApply={(id,descriptor)=>{
-        if(!results[id])return false;
+        if(results[id]?.status !== "ready")return false;
         const ranked=Object.values(results).map(form=>({...form,descriptors:form.descriptors.map(d=>d.id==='centralized'&&form.meshId===id?{...descriptor}:{...d})}));
-        assignRelativeRanks(ranked);
-        publishDescriptorRanks(ranked);
+        const ready = ranked.filter(form => form.status === "ready");
+        assignRelativeRanks(ready);
+        publishDescriptorRanks(ready);
         setResults(Object.fromEntries(ranked.map(form=>[form.meshId,form])));
         return true;
       }}/>
@@ -374,7 +404,7 @@ export default function ArchitecturalEvaluations() {
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-medium">{row.slot.code} · {row.slot.category}</span>
                       <span style={{ color: "var(--muted)" }}>
-                        {row.result ? row.result.confidence : row.mesh ? "source" : "empty"}
+                        {row.result?.status === "error" ? "Failed" : row.result ? row.result.confidence : row.mesh ? "source" : "empty"}
                       </span>
                     </div>
                     <div className="truncate" data-slot-file={row.slot.id} style={{ color: "var(--muted)" }}>
@@ -435,10 +465,13 @@ export default function ArchitecturalEvaluations() {
           {selected?.result?.status === "ready" && (
             <>
               <p className="text-[11px]" style={{ color: "var(--muted)" }}>
-                Each displayed descriptor is ranked across the {analyzedCount} analyzed form{analyzedCount === 1 ? "" : "s"} in this session. Rank 1 is the weakest result and the highest rank is the strongest. Open Volume calls those ends the least and most open volume. Neither rank is a grade of architectural quality.
+                Each rank counts the forms with a comparable score. Provisional gathering areas and completed Centralized results rank separately. Rank 1 is the weakest result and the highest rank is the strongest. Open Volume calls those ends the least and most open volume. Neither rank is a grade of architectural quality.
               </p>
               <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 xl:grid-cols-4">
-                {VISIBLE_DESCRIPTORS.map(({id}) => selected.result!.descriptors.find(descriptor=>descriptor.id===id)).filter((descriptor): descriptor is NonNullable<typeof descriptor> => Boolean(descriptor)).map((descriptor) => (
+                {VISIBLE_DESCRIPTORS.map(({id}) => selected.result!.descriptors.find(descriptor=>descriptor.id===id)).filter((descriptor): descriptor is NonNullable<typeof descriptor> => Boolean(descriptor)).map((result) => {
+                  const area = result.id === "centralized" && selectedArea;
+                  const descriptor = area ? { ...result, ...area } : result;
+                  return (
                   <button
                     key={descriptor.id}
                     type="button"
@@ -455,13 +488,13 @@ export default function ArchitecturalEvaluations() {
                       {descriptor.comparativeRank !== undefined && descriptor.cohortSize ? <span className="descriptor-rank-of"> / {descriptor.cohortSize}</span> : null}
                     </div>
                     <div className="descriptor-rank-label text-[10px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
-                      Rank (higher is stronger) · score {Number.isFinite(descriptor.absoluteScore) ? descriptor.absoluteScore.toFixed(1) : "n/a"}
+                      {area ? "Provisional gathering area score" : "Rank · score"} {Number.isFinite(descriptor.absoluteScore) ? descriptor.absoluteScore.toFixed(1) : "n/a"}
                     </div>
                   </button>
-                ))}
+                ); })}
               </div>
               <div className="overflow-auto">
-                <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Evaluation matrix · score / 100 and comparative rank (higher is stronger)</div>
+                <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Evaluation matrix · score / 100 and comparative rank</div>
                 <table className="mt-1 w-full text-[10px]">
                   <thead>
                     <tr>
@@ -479,9 +512,11 @@ export default function ArchitecturalEvaluations() {
                           <div>{row.result?.descriptors.find((item) => item.id === "openVolume")?.version ?? ""}</div>
                         </td>
                         {VISIBLE_DESCRIPTORS.map((descriptor) => {
-                          const local = row.result?.descriptors.find((item) => item.id === descriptor.id);
+                          const measured = row.result?.descriptors.find((item) => item.id === descriptor.id);
+                          const area = descriptor.id === "centralized" && areaRanks.get(row.slot.id);
+                          const local = measured && area ? { ...measured, ...area } : measured;
                           const shown = local?.comparativeRank ?? (local && !Number.isFinite(local.absoluteScore) ? "n/a" : "—");
-                          return <td key={descriptor.id} className="px-1 py-1 text-right" title={local?.unavailableReason}><div>{local && Number.isFinite(local.absoluteScore) ? local.absoluteScore.toFixed(1) : 'N/A'}</div><div>Rank {shown}{local?.cohortSize ? ` of ${local.cohortSize}` : ''}</div><div>{local?.version}</div></td>;
+                          return <td key={descriptor.id} className="px-1 py-1 text-right" title={area ? "Gathering area. Overall score pending review." : local?.unavailableReason}><div>{local && Number.isFinite(local.absoluteScore) ? local.absoluteScore.toFixed(1) : 'N/A'}</div><div>Rank {shown}{local?.cohortSize ? ` of ${local.cohortSize}` : ''}</div><div>{area ? "Provisional gathering area" : local?.version}</div></td>;
                         })}
                       </tr>
                     ))}
@@ -498,18 +533,18 @@ export default function ArchitecturalEvaluations() {
           </div>
           {!selected?.result || !explain ? (
             <p className="mt-3 text-[12px]" style={{ color: "var(--muted)" }}>
-              {selected?.mesh ? "Press Analyze All Forms. v4 measures every descriptor on the original surfaces: floor samples, clearances, levels, mesh sightlines, voids, and verified movement routes." : "Assign a source OBJ in Lattice."}
+              {selected?.result?.status === "error" ? selected.result.error : selected?.mesh ? "Press Analyze All Forms. v4 measures every descriptor on the original surfaces: floor samples, clearances, levels, mesh sightlines, voids, and verified movement routes." : "Assign a source OBJ in Lattice."}
             </p>
           ) : (
             <div className="mt-3 space-y-3">
               <div>
                 <div className="text-[13px] font-semibold uppercase tracking-wide">{explain.name}</div>
-                <div className="mt-2 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Session rank</div>
+                <div className="mt-2 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>{explain.id === "centralized" && selectedArea ? "Provisional area rank" : "Session rank"}</div>
                 <div className="descriptor-rank text-3xl font-semibold" style={{ color: "var(--accent)" }}>
                   {selectedSessionRank ? `${selectedSessionRank.rank} / ${selectedSessionRank.cohortSize}` : "—"}
                 </div>
                 <div className="mt-1 text-[12px]">
-                  {!Number.isFinite(explain.absoluteScore)
+                  {explain.id === "centralized" && selectedArea ? "Ranked by gathering area. The overall Centralized score is pending review." : !Number.isFinite(explain.absoluteScore)
                     ? `Not ranked. ${explain.unavailableReason ?? "The geometry offered no evidence for this descriptor."}`
                     : selectedSessionRank
                       ? (explain.id === "openVolume"
@@ -519,7 +554,7 @@ export default function ArchitecturalEvaluations() {
                         : `Rank ${selectedSessionRank.rank} of ${selectedSessionRank.cohortSize} among analyzed forms in this session. 1 is the weakest ${explain.name}. ${selectedSessionRank.cohortSize} is the strongest.`)
                       : "Press Analyze All Forms to rank the loaded session forms."}
                 </div>
-                <div className="mt-3 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }} data-calculation-version={explain.version ?? ""}>{explain.id === "sequential" ? "Verified vertical gain" : "Absolute score"} · {explain.id === "openVolume" ? "calculation version " : ""}{explain.version ?? "v3.5"}</div>
+                <div className="mt-3 text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }} data-calculation-version={explain.version ?? ""}>{explain.id === "sequential" ? "Verified vertical gain" : explain.id === "centralized" && selectedArea ? "Provisional gathering area score" : "Absolute score"} · {explain.id === "openVolume" ? "calculation version " : ""}{explain.version ?? "v3.5"}</div>
                 <div className="text-[18px] font-semibold" data-explain-score={Number.isFinite(explain.absoluteScore) ? explain.absoluteScore.toFixed(2) : "unavailable"}>
                   {Number.isFinite(explain.absoluteScore)
                     ? (explain.id === "sequential" ? `${explain.absoluteScore.toFixed(1)} ft` : explain.absoluteScore.toFixed(1))
@@ -528,7 +563,7 @@ export default function ArchitecturalEvaluations() {
                 <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>
                   {explain.id === "sequential"
                     ? "Verified rise above the main entry, in feet. Rank uses this gain first, then higher levels reached. Ties keep both measurements. A form with no verified upward connection is 0. This is not the previous 0–100 Sequential blend."
-                    : explain.id === "centralized" ? (explain.version === "centralized-verified-v2.0.0" ? "The score combines confirmed gathering suitability (40%), circulation convergence (40%), and reachability (20%)." : "Historical network centralization. Use spatial verification to review gathering regions and circulation for the 40/40/20 method.") : "0–100 from fixed calibration thresholds. The rank is this score's place among the analyzed forms in this session. A genuine zero is ranked. n/a is reserved for a processing failure."}
+                    : explain.id === "centralized" ? (explain.version === "centralized-area-v4.0.0" ? "Gathering area scores 100 × A / (A + 200 ft²), using continuous usable area A. The overall Centralized score weights gathering at 40%, same-floor convergence at 40%, and accessibility at 20%." : explain.version === "centralized-floor-v3.0.0" ? "Each architectural floor is evaluated independently using gathering suitability (40%), convergence (40%) and accessibility (20%). The building score averages the floor primary scores equally." : explain.version === "centralized-verified-v2.0.0" ? "The score combines confirmed gathering suitability (40%), circulation convergence (40%), and reachability (20%)." : "Historical network centralization. Use spatial verification to review gathering regions and circulation for the 40/40/20 method.") : "0–100 from fixed calibration thresholds. The rank is this score's place among the analyzed forms in this session. A genuine zero is ranked. n/a is reserved for a processing failure."}
                 </div>
                 {explain.id === "openVolume" && explain.evidence?.measurements && (
                   <div className="mt-2 text-[11px]" style={{ color: "var(--muted)" }} data-continuous-field>
@@ -537,7 +572,8 @@ export default function ArchitecturalEvaluations() {
                       : "Continuous-field area and volume are not in this cached result."}
                   </div>
                 )}
-                {explain.id === "centralized" && explain.evidence?.measurements && (
+                {explain.floorResults?.map(f=><div key={f.level}>Floor {f.level} ft · {f.score?.toFixed(1) ?? f.status} · Primary {f.primary === undefined ? "—" : "R"+f.primary} · Secondary {f.secondary.map(id=>"R"+id).join(", ")||"—"}</div>)}
+                {explain.id === "centralized" && !explain.floorResults && explain.evidence?.measurements && (
                   <div className="mt-2 space-y-1 text-[11px]" style={{ color: "var(--muted)" }}>
                     <div>Primary region: {explain.evidence.measurements.primaryRegion ?? "unavailable"} · Spatial regions: {explain.evidence.measurements.spatialNodes} · Verified connections: {explain.evidence.measurements.verifiedConnections}</div>
                     <div>Connected components: {explain.evidence.measurements.connectedComponents} · Regions in primary system: {explain.evidence.measurements.regionsInPrimarySystem} · Outside it: {explain.evidence.measurements.disconnectedRegions}</div>
@@ -551,7 +587,7 @@ export default function ArchitecturalEvaluations() {
                   </div>
                 )}
                 <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>
-                  {explain.id === "centralized" ? "Graph evidence confidence: low" : `Confidence ${selected.result.confidence}`}
+                  {explain.floorResults ? "Floor-level architectural review" : explain.id === "centralized" ? "Graph evidence confidence: low" : `Confidence ${selected.result.confidence}`}
                   {explain.relativePercentile !== undefined ? ` · percentile ${explain.relativePercentile}` : ""}
                   {" · "}{selected.slot.code} · {slotById(selected.slot.id)?.category}
                 </div>

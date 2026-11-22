@@ -1,5 +1,7 @@
 "use client";
 
+import { gatheringComparison, gatheringScoreRanks } from "./gatheringComparison";
+import GatheringCandidatePanel from './GatheringCandidatePanel';
 import { useEffect, useMemo, useRef, useState } from "react";
 import AnalysisViewport, { createCameraBus } from "./AnalysisViewport";
 import { ARCH_DESCRIPTORS } from "./objDescriptorAnalysis";
@@ -410,9 +412,24 @@ export default function DescriptorComparison({
   }
 
   const unitScale = UNIT_TO_FEET[unit];
-  const verifiedCentralizedPresent = descriptorId==='centralized' && rows.some(r=>r.result?.descriptors.some(d=>d.id==='centralized'&&d.version==='centralized-verified-v2.0.0'));
+  const method = rows.some(r=>r.result?.descriptors.some(d=>d.version==="centralized-area-v4.0.0")) ? "centralized-area-v4.0.0" : rows.some(r=>r.result?.descriptors.some(d=>d.id==='centralized'&&d.version==='centralized-floor-v3.0.0')) ? 'centralized-floor-v3.0.0' : 'centralized-verified-v2.0.0';
+  const verifiedCentralizedPresent = descriptorId==='centralized' && rows.some(r=>r.result?.descriptors.some(d=>d.id==='centralized'&&d.version===method));
+  const candidateModels = useMemo(() => descriptorId === "centralized" ? rows.flatMap(row => {
+    const result = row.result?.descriptors.find(item => item.id === "centralized");
+    return row.mesh && row.result?.status === "ready" && result?.version === "centralized-area-v4.0.0" && result.floorResults
+      ? [{ id: row.slotId, name: row.mesh.filename, result }] : [];
+  }) : [], [rows, descriptorId]);
+  const areaRanks = useMemo(() => gatheringScoreRanks(candidateModels.length ? rows.flatMap(row =>
+    row.mesh && row.result?.status === "ready" ? [{ id: row.slotId, result: row.result.descriptors.find(d => d.id === "centralized") }] : []) : []),
+    [candidateModels, rows]);
+  const [centralizedBasis, setCentralizedBasis] = useState<"building" | "area">("building");
+  const hasBuildingScore = candidateModels.some(model => Number.isFinite(model.result.absoluteScore));
+  const areaComparison = areaRanks.size > 0 && (!hasBuildingScore || centralizedBasis === "area");
   const prepared = useMemo(() => rows.map((row) => {
     const descriptor = row.result?.descriptors.find((item) => item.id === descriptorId);
+    const floorGathering = gatheringComparison(descriptor, row.slotId);
+    const gathering = areaComparison && areaRanks.has(row.slotId) ? floorGathering : null;
+    const comparisonScore = areaComparison ? gathering?.areaScore : descriptor?.absoluteScore;
     const up = row.mesh ? resolvedUp(row.mesh.upAxis, upAxisMode) : "z";
     const revision = row.mesh ? geometryContentRevision(row.mesh.positions, row.mesh.id) : "";
     const form: ComparedForm = {
@@ -421,24 +438,24 @@ export default function DescriptorComparison({
       meshId: row.mesh?.id ?? "",
       filename: row.mesh?.filename ?? "",
       geometryRevision: revision,
-      absoluteScore: descriptor?.absoluteScore ?? null,
+      absoluteScore: comparisonScore ?? null,
       rankSecondary: descriptorId === "sequential"
         ? (descriptor?.components.find((item) => item.name === "Higher Levels Reached")?.raw ?? 0)
         : null,
       circulationFeasible: null,
-      eligible: Boolean((!verifiedCentralizedPresent||descriptor?.version==='centralized-verified-v2.0.0')&&row.mesh && row.result?.status === "ready" && descriptor && Number.isFinite(descriptor.absoluteScore)),
-      ineligibleReason: verifiedCentralizedPresent&&descriptor?.version!=='centralized-verified-v2.0.0' ? 'Historical Centralized methodology; excluded from the verified 40/40/20 comparison.' : !row.mesh
+      eligible: Boolean((!verifiedCentralizedPresent||descriptor?.version===method)&&row.mesh && row.result?.status === "ready" && descriptor && Number.isFinite(comparisonScore)),
+      ineligibleReason: verifiedCentralizedPresent&&descriptor?.version!==method ? 'Historical Centralized methodology; excluded from the verified 40/40/20 comparison.' : !row.mesh
         ? "No source OBJ."
         : row.result?.status !== "ready"
           ? "Not evaluated."
           : !descriptor
             ? "Missing score."
-            : !Number.isFinite(descriptor.absoluteScore)
+            : !Number.isFinite(comparisonScore)
               ? (descriptor.unavailableReason ?? "Unavailable: the geometry offered no evidence.")
               : undefined,
     };
-    return { row, form, up, revision, descriptor };
-  }), [rows, descriptorId, upAxisMode, verifiedCentralizedPresent]);
+    return { row, form, up, revision, descriptor, gathering, floorGathering };
+  }), [rows, descriptorId, upAxisMode, verifiedCentralizedPresent, method, areaComparison, areaRanks]);
 
   const selection = useMemo(
     () => selectDescriptorExtremes(descriptorId, prepared.map((item) => item.form)),
@@ -457,7 +474,7 @@ export default function DescriptorComparison({
       anchor: Vec3;
     }>();
     for (const item of prepared) {
-      if (!item.row.mesh) continue;
+      if (!item.row.mesh || item.row.result?.status === "error") continue;
       const triangles = specTriangles(item.row.mesh, unitScale, item.up);
       const bounds = meshBounds(triangles);
       const occupied = (item.row.model?.variants[0]?.occupied ?? []).map((packed) => unpackCell(packed));
@@ -475,7 +492,7 @@ export default function DescriptorComparison({
         voidComponents: diagnosis?.voids,
         enclosed: diagnosis?.enclosedCells,
         // v4 results carry their own evidence layers; the v3.5 voxel figure is only built for legacy results.
-        figure: descriptorId === "openVolume" || item.descriptor?.evidence ? undefined : descriptorFigures(descriptorId, {
+        figure: descriptorId === "openVolume" || item.gathering || item.descriptor?.evidence ? undefined : descriptorFigures(descriptorId, {
           cells: occupied,
           cellFeet: item.row.model?.cellFeet ?? 2,
           bboxFeet: item.row.result?.raw ? [item.row.result.raw.bboxX, item.row.result.raw.bboxY, item.row.result.raw.bboxZ] : undefined,
@@ -660,13 +677,17 @@ export default function DescriptorComparison({
 
   /** v4 evidence layers for a form, after component focus and user toggles. */
   function v4Layers(data: NonNullable<typeof least>, applyHidden = true): EvidenceLayer[] {
-    const all = data.item.descriptor?.evidence?.layers ?? [];
+    const recorded = data.item.descriptor?.evidence?.layers ?? [];
+    const floors = data.item.floorGathering;
+    const all = floors && (componentFocus === "Gathering area" || (areaComparison && componentFocus === "all"))
+      ? [...floors.layers, ...recorded.filter(layer => layer.id !== "ce-gathering")]
+      : recorded;
     return presentLayers(all, descriptorId, { componentFocus, seatOnPlate, showBlocked: showBlockedRays, mergeFaces }).filter((layer) => {
       if (applyHidden && hiddenSet.has(layer.id)) return false;
       return layer.total > 0 || (layer.dimensions?.length ?? 0) > 0;
     });
   }
-  const usesV4 = Boolean(least?.item.descriptor?.evidence || most?.item.descriptor?.evidence);
+  const usesV4 = areaComparison || Boolean(least?.item.descriptor?.evidence || most?.item.descriptor?.evidence);
 
   function rayMeetsPlane(a: Vec3, b: Vec3, plane: { origin: Vec3; normal: Vec3 }, band: number) {
     const signed = (point: Vec3) => plane.normal[0] * (point[0] - plane.origin[0]) + plane.normal[1] * (point[1] - plane.origin[1]) + plane.normal[2] * (point[2] - plane.origin[2]);
@@ -728,6 +749,21 @@ export default function DescriptorComparison({
     ? { width: Math.round(customWidth), height: Math.round(customHeight) }
     : BOARD_PRESETS.find((item) => item.id === preset) ?? BOARD_PRESETS[0];
 
+  function comparisonRank(item: (typeof prepared)[number]) {
+    if (item.gathering) {
+      const rank = areaRanks.get(item.form.formId);
+      return rank ? { rank: rank.comparativeRank, cohortSize: rank.cohortSize } : null;
+    }
+    const result = item.descriptor;
+    return result?.comparativeRank !== undefined && result.cohortSize
+      ? { rank: result.comparativeRank, cohortSize: result.cohortSize } : null;
+  }
+
+  function displayScore(item: (typeof prepared)[number]) {
+    const score = item.form.absoluteScore;
+    return score != null && Number.isFinite(score) ? score.toFixed(1) + (descriptorId === "sequential" ? " ft" : "") : "Unavailable";
+  }
+
   function makeBoard(width: number, height: number): BoardModel | null {
     if (!least || !most) return null;
     const leastCut = panelLines("least", least, width * BOARD_LAYOUT.panelWidth, height * BOARD_LAYOUT.panelHeight);
@@ -746,28 +782,22 @@ export default function DescriptorComparison({
         unavailable: component.status === "unavailable",
       })) ?? []
     );
-    const rankText = (descriptor: NonNullable<typeof least>["item"]["descriptor"]) => (
-      descriptor?.comparativeRank !== undefined && descriptor.cohortSize
-        ? `${descriptor.comparativeRank} of ${descriptor.cohortSize}`
-        : null
-    );
-    const scoreText = (descriptor: NonNullable<typeof least>["item"]["descriptor"]) => (
-      descriptor && Number.isFinite(descriptor.absoluteScore)
-        ? (descriptorId === "sequential" ? `${descriptor.absoluteScore.toFixed(1)} ft` : descriptor.absoluteScore.toFixed(1))
-        : "unavailable"
-    );
+    const rankText = (item: (typeof prepared)[number]) => {
+      const rank = comparisonRank(item);
+      return rank ? rank.rank + " of " + rank.cohortSize : null;
+    };
     const higherLevelsText = (descriptor: NonNullable<typeof least>["item"]["descriptor"]) => {
       const raw = descriptor?.components.find((item) => item.name === "Higher Levels Reached")?.raw;
       return Number.isFinite(raw) ? `${raw} higher levels` : null;
     };
     const dy = height * BOARD_LAYOUT.panelTop;
-    const leastRank = rankText(least.item.descriptor);
-    const mostRank = rankText(most.item.descriptor);
-    const compared = `${selection.note} Least is ${least.item.row.mesh?.filename ?? "the lower form"} at ${leastRank ?? scoreText(least.item.descriptor)}. Most is ${most.item.row.mesh?.filename ?? "the higher form"} at ${mostRank ?? scoreText(most.item.descriptor)}.`;
+    const leastRank = rankText(least.item);
+    const mostRank = rankText(most.item);
+    const compared = `${selection.note} Least is ${least.item.row.mesh?.filename ?? "the lower form"} at ${leastRank ?? displayScore(least.item)}. Most is ${most.item.row.mesh?.filename ?? "the higher form"} at ${mostRank ?? displayScore(most.item)}.`;
     const panelWidth = width * BOARD_LAYOUT.panelWidth;
     const panelHeight = height * BOARD_LAYOUT.panelHeight;
     const overlaysFor = (side: Side, data: NonNullable<typeof least>, left: number) => {
-      if (!showAnalysis || !data.item.descriptor?.evidence) return [];
+      if (!showAnalysis || !(data.item.gathering || data.item.descriptor?.evidence)) return [];
       const plane = cutFor(side, data.bounds);
       const fitted = comparisonScale(least.bounds.size, most.bounds.size, scaleMode, { width: panelWidth, height: panelHeight });
       const feet = side === "least" ? fitted.feetPerPixelA : fitted.feetPerPixelB;
@@ -794,26 +824,26 @@ export default function DescriptorComparison({
       width,
       height,
       descriptorName,
-      title: "Lowest and highest scored forms for this descriptor",
+      title: areaComparison ? "Provisional gathering area comparison" : "Lowest and highest scored forms for this descriptor",
       leastLabel: `${least.item.row.code}  ${least.item.row.mesh?.filename ?? ""}`,
       mostLabel: `${most.item.row.code}  ${most.item.row.mesh?.filename ?? ""}`,
-      leastScore: usesV4 ? `${descriptorId === "sequential" ? "Gain" : "Score"} ${scoreText(least.item.descriptor)}` : (leastRank ?? scoreText(least.item.descriptor)),
-      mostScore: usesV4 ? `${descriptorId === "sequential" ? "Gain" : "Score"} ${scoreText(most.item.descriptor)}` : (mostRank ?? scoreText(most.item.descriptor)),
+      leastScore: usesV4 ? `${descriptorId === "sequential" ? "Gain" : "Score"} ${displayScore(least.item)}` : (leastRank ?? displayScore(least.item)),
+      mostScore: usesV4 ? `${descriptorId === "sequential" ? "Gain" : "Score"} ${displayScore(most.item)}` : (mostRank ?? displayScore(most.item)),
       leastScoreDetail: usesV4
         ? (descriptorId === "sequential"
           ? `${higherLevelsText(least.item.descriptor) ?? "0 higher levels"} · rank ${leastRank ?? "pending"}`
-          : `Session rank ${leastRank ?? "pending"}`)
+          : `${areaComparison ? "Provisional area rank" : "Session rank"} ${leastRank ?? "pending"}`)
         : undefined,
       mostScoreDetail: usesV4
         ? (descriptorId === "sequential"
           ? `${higherLevelsText(most.item.descriptor) ?? "0 higher levels"} · rank ${mostRank ?? "pending"}`
-          : `Session rank ${mostRank ?? "pending"}`)
+          : `${areaComparison ? "Provisional area rank" : "Session rank"} ${mostRank ?? "pending"}`)
         : undefined,
-      leastHeading: descriptorId === "openVolume" ? "Lowest Open Volume Score." : descriptorId === "sequential" ? "Least verified ascent." : usesV4 ? `Lowest ${descriptorName} score.` : undefined,
-      mostHeading: descriptorId === "openVolume" ? "Highest Open Volume Score." : descriptorId === "sequential" ? "Most verified ascent." : usesV4 ? `Highest ${descriptorName} score.` : undefined,
+      leastHeading: areaComparison ? "Lowest provisional gathering area score" : descriptorId === "openVolume" ? "Lowest Open Volume Score." : descriptorId === "sequential" ? "Least verified ascent." : usesV4 ? `Lowest ${descriptorName} score.` : undefined,
+      mostHeading: areaComparison ? "Highest provisional gathering area score" : descriptorId === "openVolume" ? "Highest Open Volume Score." : descriptorId === "sequential" ? "Most verified ascent." : usesV4 ? `Highest ${descriptorName} score.` : undefined,
       leastSection: descriptorId === "openVolume" || usesV4 ? sectionCaption(orientation, controlsFor("least").offset) : undefined,
       mostSection: descriptorId === "openVolume" || usesV4 ? sectionCaption(orientation, controlsFor("most").offset) : undefined,
-      notes: usesV4 ? v4Notes : descriptorId === "openVolume" ? [
+      notes: areaComparison ? ["Gold marks the largest measured gathering candidate on each floor. The area rank uses the largest candidate in each model. The gathering-area score is out of 100 and carries 40% of the overall score. Building Centralized scores await review."] : usesV4 ? v4Notes : descriptorId === "openVolume" ? [
         "Gold is the clearance above each upper surface when that clearance is above 5 ft.",
         "Clearance at or below 5 ft adds nothing. Credit rises to fully open at 10 ft. Exterior-open samples count as fully open.",
         "Surface Clearance is the Open Volume rating.",
@@ -826,8 +856,8 @@ export default function DescriptorComparison({
       leastOverlays,
       mostOverlays,
       legendItems,
-      leastMetrics: metrics(least.item.descriptor),
-      mostMetrics: metrics(most.item.descriptor),
+      leastMetrics: areaComparison ? [] : metrics(least.item.descriptor),
+      mostMetrics: areaComparison ? [] : metrics(most.item.descriptor),
       explanation: descriptorId === "openVolume" && !usesV4
         ? `${compared} Gold marks interstitial raster cells on this cut. It is not verified accessible or occupiable space. Open Volume rank is not circulation feasibility.`
         : compared,
@@ -860,7 +890,7 @@ export default function DescriptorComparison({
     setOrientation("section-y");
   }
 
-  const rankingResolved = prepared.some((item) => item.descriptor?.comparativeRank !== undefined);
+  const rankingResolved = areaComparison || prepared.some((item) => item.descriptor?.comparativeRank !== undefined);
   function exportBlocked() {
     if (!rankingResolved) {
       setExportNote("Session ranking is not ready. Press Analyze All Forms, then export.");
@@ -932,18 +962,16 @@ export default function DescriptorComparison({
 
   const panel = (side: Side, data: NonNullable<typeof least> | null, drawing: typeof leastView) => {
     const clip = data ? liveClip(side, data) : null;
-    const v4 = Boolean(data?.item.descriptor?.evidence);
+    const gathering = data?.item.gathering;
+    const v4 = Boolean(gathering || data?.item.descriptor?.evidence);
     const layers = data && showAnalysis && !v4 ? openSpaceLayers(data, side) : null;
     const evidenceLayers = data && showAnalysis && v4 ? v4Layers(data) : [];
     const legendLayers = data && v4 ? v4Layers(data, false) : [];
-    const descriptor = data?.item.descriptor;
-    const sessionRank = descriptor?.comparativeRank !== undefined && descriptor.cohortSize
-      ? { rank: descriptor.comparativeRank, cohortSize: descriptor.cohortSize }
-      : null;
-    const available = descriptor ? Number.isFinite(descriptor.absoluteScore) : false;
+    const sessionRank = data ? comparisonRank(data.item) : null;
+    const available = Number.isFinite(data?.item.form.absoluteScore);
     return (
       <div className="flex min-h-[420px] flex-col gap-2 rounded border p-2" style={{ borderColor: "var(--line)", background: "#000" }} data-analysis-panel={side}>
-        <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{side === "least" ? `Least ${descriptorId === "openVolume" ? "open volume" : descriptorName} on this page` : `Most ${descriptorId === "openVolume" ? "open volume" : descriptorName} on this page`}</div>
+        <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{areaComparison ? (side === "least" ? "Lowest provisional gathering area score" : "Highest provisional gathering area score") : side === "least" ? `Least ${descriptorId === "openVolume" ? "open volume" : descriptorName} on this page` : `Most ${descriptorId === "openVolume" ? "open volume" : descriptorName} on this page`}</div>
         {!data || !data.item.descriptor || !data.item.row.mesh ? (
           <p className="text-[12px]" style={{ color: "var(--muted)" }}>No eligible form for this side.</p>
         ) : (
@@ -953,16 +981,14 @@ export default function DescriptorComparison({
             </div>
             <div className="flex flex-wrap items-end gap-4">
               <div>
-                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{descriptorId === "sequential" ? "Verified vertical gain" : descriptorId === "centralized" ? "Centralized score" : "Absolute score"}</div>
-                <div className="text-[28px] font-semibold leading-none" style={{ color: "#F7F6F5" }} data-absolute-score={available ? data.item.descriptor.absoluteScore.toFixed(2) : "unavailable"}>
-                  {available
-                    ? (descriptorId === "sequential" ? `${data.item.descriptor.absoluteScore.toFixed(1)} ft` : data.item.descriptor.absoluteScore.toFixed(1))
-                    : "Unavailable"}
+                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{descriptorId === "sequential" ? "Verified vertical gain" : areaComparison ? "Provisional gathering area score" : "Absolute score"}</div>
+                <div className="text-[28px] font-semibold leading-none" style={{ color: "#F7F6F5" }} data-score-basis={areaComparison ? "gathering-area" : "descriptor"} data-absolute-score={data.item.form.absoluteScore != null && available ? data.item.form.absoluteScore.toFixed(2) : "unavailable"}>
+                  {displayScore(data.item)}
                 </div>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{descriptorId === "sequential" ? "Higher levels reached" : "Session rank"}</div>
-                <div className="text-[28px] font-semibold leading-none" style={{ color: "#F7F6F5" }} data-registry-rank={sessionRank ? `${sessionRank.rank}/${sessionRank.cohortSize}` : available ? "pending" : "unavailable"}>
+                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{descriptorId === "sequential" ? "Higher levels reached" : areaComparison ? "Provisional area rank" : "Session rank"}</div>
+                <div className="text-[28px] font-semibold leading-none" style={{ color: "#F7F6F5" }} data-registry-rank={areaComparison ? "unavailable" : sessionRank ? `${sessionRank.rank}/${sessionRank.cohortSize}` : available ? "pending" : "unavailable"}>
                   {descriptorId === "sequential"
                     ? `${data.item.descriptor.components.find((item) => item.name === "Higher Levels Reached")?.raw ?? 0}`
                     : sessionRank ? `${sessionRank.rank} of ${sessionRank.cohortSize}` : available ? "Ranking…" : "Not ranked"}
@@ -977,7 +1003,13 @@ export default function DescriptorComparison({
                 </div>
               )}
             </div>
-            {!available ? (
+            {gathering ? (
+              <ul className="list-disc space-y-1 pl-4 text-[11px]" style={{ color: "#F7F6F5" }}>
+                <li><strong>Usable floor:</strong> Gathering area on a 0–100 scale. R{gathering.candidate.region} · Floor {gathering.level} ft · {gathering.candidate.area.toFixed(2)} ft² usable area{gathering.candidate.percent != null && " · " + gathering.candidate.percent.toFixed(1) + "% of this floor (provisional)"}</li>
+                <li><strong>Area rank:</strong> Based on the largest measured gathering candidate in each form. Overall Centralized score pending review.</li>
+                {!gathering.candidate.patch?.length && <li>Footprint unavailable for this candidate.</li>}
+              </ul>
+            ) : !available ? (
               <p className="text-[11px]" style={{ color: "#F7F6F5" }}>{data.item.descriptor.unavailableReason ?? "The geometry offered no evidence for this descriptor."}</p>
             ) : (
               <ul className="list-disc space-y-1 pl-4 text-[11px]" style={{ color: "#F7F6F5" }}>
@@ -989,10 +1021,10 @@ export default function DescriptorComparison({
                   : "This form’s position among the analyzed forms in this session; ranking is pending."}</li>
               </ul>
             )}
-            {descriptorId === "centralized" && v4 && (
+            {descriptorId === "centralized" && !areaComparison && v4 && (
               <div className="text-[11px]" style={{ color: GOLD }}>
                 <div>{data.item.descriptor.evidence?.measurements.gatheringStatus ?? "Gathering Space Not Reliably Identified"}</div>
-                <div>Region {data.item.descriptor.evidence?.measurements.gatheringRegion ?? "—"} · {data.item.descriptor.evidence?.measurements.gatheringAreaFt2 ?? "—"} ft² continuous floor · Clear height {typeof data.item.descriptor.evidence?.measurements.gatheringClearHeightFt === "number" ? Number(data.item.descriptor.evidence.measurements.gatheringClearHeightFt).toFixed(1) : "—"} ft</div>
+                {data.item.descriptor.floorResults ? <><p>Building score · equal mean of floor primary scores</p>{data.item.descriptor.floorResults.map(f=><div key={f.level}>Floor {f.level} ft · {f.score?.toFixed(1) ?? f.status} · Primary {f.primary === undefined ? "—" : "R"+f.primary} · Secondary {f.secondary.map(id=>"R"+id).join(", ")||"—"}</div>)}</> : <div>Region {data.item.descriptor.evidence?.measurements.gatheringRegion ?? "—"} · {data.item.descriptor.evidence?.measurements.gatheringAreaFt2 ?? "—"} ft² continuous floor · Clear height {typeof data.item.descriptor.evidence?.measurements.gatheringClearHeightFt === "number" ? Number(data.item.descriptor.evidence.measurements.gatheringClearHeightFt).toFixed(1) : "—"} ft</div>}
               </div>
             )}
             {descriptorId === "openVolume" && v4 && (
@@ -1146,16 +1178,15 @@ export default function DescriptorComparison({
     ctx.fillText(`${descriptorName} · ${view}`, margin, Math.round(height * 0.05));
     for (const [data, x] of sides) {
       if (!data) continue;
-      const rank = data.item.descriptor?.comparativeRank !== undefined && data.item.descriptor.cohortSize
-        ? `${data.item.descriptor.comparativeRank} of ${data.item.descriptor.cohortSize}`
-        : null;
-      const score = data.item.descriptor && Number.isFinite(data.item.descriptor.absoluteScore) ? data.item.descriptor.absoluteScore.toFixed(1) : "unavailable";
+      const position = comparisonRank(data.item);
+      const rank = position ? position.rank + " of " + position.cohortSize : "pending";
+      const score = displayScore(data.item);
       ctx.fillStyle = GOLD;
       ctx.font = `${sizes.heading}px Arial, Helvetica, sans-serif`;
       ctx.fillText(data.item.row.mesh?.filename ?? "", x, Math.round(height * 0.11));
       ctx.fillStyle = "#F7F6F5";
       ctx.font = `${sizes.value}px Arial, Helvetica, sans-serif`;
-      ctx.fillText(`Absolute score ${score} · Session rank ${rank ?? "pending"}`, x, Math.round(height * 0.16));
+      ctx.fillText(areaComparison ? `Provisional gathering area ${score} · Area rank ${rank}` : `Absolute score ${score} · Session rank ${rank}`, x, Math.round(height * 0.16));
     }
     const legendLayers = [...(least ? v4Layers(least) : []), ...(most ? v4Layers(most) : [])];
     const legendItems = legendFromLayers(legendLayers);
@@ -1215,7 +1246,8 @@ export default function DescriptorComparison({
   const openFocus = descriptorId === "openVolume" && !usesV4;
   const focusedMetric = focusId();
   const componentNames = [...new Set([
-    ...[...(least?.item.descriptor?.components ?? []), ...(most?.item.descriptor?.components ?? [])].filter((component) => component.weight > 0 && !(descriptorId === "verticallyIntegrated" && ["Vertical Void Continuity", "Vertical Visual Connectivity"].includes(component.name))).map((component) => component.name),
+    ...(least?.item.floorGathering || most?.item.floorGathering ? ["Gathering area"] : []),
+    ...[...(least?.item.descriptor?.components ?? []), ...(most?.item.descriptor?.components ?? [])].filter((component) => component.weight > 0).map((component) => component.name),
     ...(descriptorId === "openVolume" ? ["Continuous Field"] : []),
     ...(descriptorId === "verticallyIntegrated" ? ["Double-height areas"] : []),
   ])];
@@ -1243,13 +1275,24 @@ export default function DescriptorComparison({
           </select>
         </label>
       </div>
+
       <p className="mt-2 text-[11px]" style={{ color: "#71BEDA" }}>
         Descriptor scores do not by themselves establish circulation feasibility or architectural quality.
       </p>
       {descriptorId === 'visuallyConnected' && <p className="mt-2 text-[11px]">Cyan marks the floor region on each level with the most sampled viewing positions that have a clear sightline. The gold dot marks the most connected sampled viewing position. Up to two gold arrows lead from it toward same-level gathering candidates, chosen by nearby clearance-weighted floor area and shown only when the eye-height sightline is clear. No arrow appears when a visible candidate is unavailable. This is visual evidence, not a verified walking route, and does not change the score.</p>}
       {descriptorId === "circulationActivated" && <p className="mt-2 text-[11px]">The diagram shows one verified movement path in the largest connected region of each supported floor. Up to three blue 4-foot patches per floor mark candidates with at least 100 sq ft of sampled floor in the same region within 8 ft. Samples and obstacle checks do not establish actual use or accessibility. The full movement network remains in the score.</p>}
       {descriptorId === "verticallyIntegrated" && <p className="mt-2 text-[11px]">Cyan fill shows sampled interior space with at least 16 ft of overhead clearance. Patch corners and paths are smoothed for display and may not follow the exact measured geometry. Open-to-sky areas are excluded. These visual changes do not change the score.</p>}
-      {usesV4 && (
+      {candidateModels.length > 0 && hasBuildingScore && areaRanks.size > 0 && (
+        <label className="mt-2 block text-[12px]">Compare Centralized results
+          <select className="ml-2" value={centralizedBasis} onChange={event => { setComponentFocus("all"); setCentralizedBasis(event.target.value === "area" ? "area" : "building"); }}>
+            <option value="building">Completed building scores</option>
+            <option value="area">Provisional gathering area scores</option>
+          </select>
+        </label>
+      )}
+      {descriptorId === "verticallyIntegrated" && <p className="mt-2 text-[11px]">Cyan double-height areas show clearance of at least 16 ft. They add no points directly. Use Metric to inspect vertical void continuity (30%), cross-level visibility (25%), vertical circulation (30%), and integrated-level distribution (15%).</p>}
+      {areaComparison && <p className="mt-2 text-[11px]">For buildings awaiting review, the cards compare the largest continuous gathering candidate in each model. The gathering-area score is out of 100, with 50 points at 200 ft². Equal areas share a rank.</p>}
+      {usesV4 && descriptorId !== "centralized" && (
         <p className="mt-2 text-[11px]" style={{ color: "#B9BEC6" }}>
           Grey is the original massing. Cyan is measured surfaces, volumes, and positions. Yellow is verified routes, sightlines, and measurement directions. {descriptorId === "convergent" ? "Connected entries are light-blue dots. The destination is a larger cyan dot." : "Squares mark entries, circles mark samples, diamonds mark destinations."} Scores and ranks are unchanged.
         </p>
@@ -1407,13 +1450,13 @@ export default function DescriptorComparison({
         </label>
       )}
       <p className="mt-2 text-[11px]" style={{ color: "var(--muted)" }}>
-        {usesV4
+        {(least?.item.floorGathering || most?.item.floorGathering) && (areaComparison || componentFocus === "Gathering area") ? "Gold marks the largest measured gathering candidate on each floor with a recorded footprint." : descriptorId === "centralized" && hasBuildingScore ? "Gold marks the confirmed primary gathering destinations. Cyan traces their verified approaches." : usesV4
           ? "Presentation layers restyle the evaluator's recorded measurements. Grey is the massing, cyan is measured space, yellow is verified connection. Toggle a layer or focus one component; the score does not change."
           : openFocus && categoryId === "overall" ? `Overall comparison. Focused evidence: ${focusedMetric === "permeability" ? "Permeability" : focusedMetric === "architectural-open" ? "Surface clearance" : focusedMetric === "interstitial" ? "Interstitial Space" : "Low Mass"}.` : descriptorId === "openVolume" ? "One measurement is drawn." : "Gold and cyan mark the measurements that place this rank."} The mesh stays the reference. Moving a cut or hiding a layer does not recalculate the score.
       </p>
       <details className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>
         <summary>Measurement notes</summary>
-        {usesV4 ? (
+        {areaComparison ? <p>Area score = 100 × usable ft² / (usable ft² + 200). Gathering carries 40% of the overall Centralized score. Each model contributes one candidate.</p> : usesV4 ? (
           <ul className="mt-1 space-y-1">
             {(least?.item.descriptor?.components ?? most?.item.descriptor?.components ?? []).filter((component) => component.weight > 0).map((component) => (
               <li key={component.name}>
@@ -1449,6 +1492,10 @@ export default function DescriptorComparison({
         {panel("least", least, leastView)}
         {panel("most", most, mostView)}
       </div>
+      {candidateModels.length > 0 && <details className="mt-3 text-xs">
+        <summary className="cursor-pointer">Explore gathering candidates by floor</summary>
+        <GatheringCandidatePanel models={candidateModels} />
+      </details>}
       <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
         <button type="button" className="rounded border px-2 py-1" style={{ borderColor: "var(--line)" }} onClick={() => setPreview((value) => !value)}>{preview ? "Hide board preview" : "Board preview"}</button>
         <button type="button" className="rounded px-2 py-1 text-black" style={{ background: "#1293C2" }} onClick={() => void exportPng()}>Export PNG</button>

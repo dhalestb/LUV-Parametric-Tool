@@ -7,7 +7,7 @@ const previous = require('../spatial-review/comparison-matrix.json');
 const decisions = {
  'Linear.obj': {
    10: ['Covered lower-floor gathering candidate.', 'Is the blue footprint the occupied lower hall? Mark the stair entrance if this model is meant to include one.'],
-   3: ['Covered gallery candidate with localized low headroom.', 'Does the blue area include a covered exterior loft? Identify its boundary and the stair landing inside or outside the outline.'],
+   3: ['The second-floor loft is open to the sky. The R3 outline measures mostly covered gallery floor.', 'Where does the stair from R10 land on this level, if it appears in the OBJ?'],
    4: ['Predominantly open-to-sky upper surface. Occupancy is unknown.', 'Is this accessible occupied space or a roof? Indicate the access point if occupied.']},
  'Stepped.obj': {
    70: ['Connected floor with localized obstructions. Its seven-foot-clear footprint is too narrow for a ten-foot gathering patch.', 'Is the gathering floor intended to continue past the blue outline across one of the three labeled steps? Identify that boundary and the intended approaches.'],
@@ -19,12 +19,12 @@ const decisions = {
    34: ['Provisional gathering-space candidate. Source geometry supports a continuous 372.25 ft² patch with at least seven feet of headroom and an 11.73 ft clear diameter. Access remains unresolved.', 'Review decision: retain R56 and R95 as potential connections. Neither is an approved entrance. Both are excluded from convergence and accessibility until a continuous approach is confirmed.']}
 };
 const reasons={
- 'Linear.obj':'Both covered footprints pass the area and width checks. Their interior/gallery boundary and a traversable route between levels are unverified.',
+ 'Linear.obj':'The designer confirmed the second-floor loft is uncovered. The R3 mask measures predominantly covered floor. The stair landing and a traversable R10–R3 route remain unverified.',
  'Stepped.obj':'R70 has three local step crossings. None of the three selected clear footprints contains a ten-foot gathering circle. A larger continuous destination or an alternate boundary requires evidence.',
  'Void_Field.obj':'R34 passes the geometric area and width checks. Neither proposed approach has continuous support across the full tested strip. Occupied origins and access remain unresolved.'
 };
 const names={openVolume:'Open Volume',visuallyConnected:'Visually Connected',circulationActivated:'Circulation Activated',verticallyIntegrated:'Vertically Integrated',centralized:'Centralized'};
-const byModel=models.map(m=>({geometryHash:m.geometryHash,regions:m.reviews.map(r=>({id:r.region,z:r.z,support:r.supportArea,clear:r.clear7Area,width:r.maxClearDiskDiameterFt,anchor:m.filename.split('.')[0]+'-R'+r.region,finding:decisions[m.filename][r.region][0]}))}));
+const byModel=models.map(m=>({geometryHash:m.geometryHash,regions:m.reviews.map(r=>({id:r.region,z:r.z,support:r.supportArea,clear:r.clear7Area,width:r.maxClearDiskDiameterFt,anchor:m.filename.split('.')[0]+'-R'+r.region,finding:decisions[m.filename][r.region][0],...((m.filename==='Linear.obj'&&[10,3].includes(r.region)||m.filename==='Void_Field.obj'&&r.region===34)?{gatheringCandidate:true}:{})}))}));
 fs.writeFileSync(path.join(root,'src/components/evaluations/v4/sourceReviewIndex.json'),JSON.stringify(byModel,null,2)+'\n');
 const matrix=previous.map(m=>({filename:m.filename,sourceSha256:m.sourceSha256,geometryHash:m.geometryHash,unit:m.unit,up:m.up,includeTopDecks:m.topDecks,scores:Object.fromEntries(Object.entries(m.descriptors).map(([id,d])=>[id,id==='centralized'?{score:null,rank:null,version:d.version,reason:reasons[m.filename]}:d])),historicalGraphCentralized:m.descriptors.centralized.historicalScore}));
 fs.writeFileSync(path.join(out,'comparison-matrix.json'),JSON.stringify(matrix,null,2)+'\n');
@@ -41,7 +41,14 @@ const reviewDecision={
      testedSegments:crossing.tested,passingLocalStrips:crossing.passing};
  }),destinationApproved:false,score:null
 };
-fs.writeFileSync(path.join(out,'architectural-decisions.json'),JSON.stringify([reviewDecision],null,2)+'\n');
+const linear=models.find(m=>m.filename==='Linear.obj');
+const loftDecision={
+ filename:linear.filename,geometryHash:linear.geometryHash,sourceSha256:linear.sourceSha256,
+ subject:'second-floor loft',cover:'open to sky',evidence:'designer confirmation',
+ relatedReviewRegion:3,loftBoundaryConfirmed:false,
+ connectionFromR10:'unresolved',destinationApproved:false,score:null
+};
+fs.writeFileSync(path.join(out,'architectural-decisions.json'),JSON.stringify([reviewDecision,loftDecision],null,2)+'\n');
 const f=(n,d=1)=>n==null?'—':n.toFixed(d);
 const img=(file,alt)=>'<a href="'+file+'"><img src="'+file+'" alt="'+alt+'"></a>';
 function card(m,r){
@@ -58,7 +65,7 @@ function card(m,r){
  '<p class="decision"><b>Decision on this view</b> · '+decisions[m.filename][r.region][1]+'</p></article>';
 }
 const descriptions={
- 'Linear.obj':'The 1,192 ft² count is the area of the original sample cells. Clipping their two masks to the actual floor faces gives 1,164.78 ft², of which 1,157.36 ft² has seven feet of headroom. Only 0.59 ft² has no modeled cover. Covered exterior lofts cannot be separated from interior floor by headroom alone. The entire coplanar component at R3 spans 855.86 ft², extending beyond the selected footprint. No sloping walkable face bridges the floors. Under the 0.8 ft maximum step rise, even the combined walkable elevations across the whole building have gaps: '+models[0].verticalGaps.map(a=>a.map(v=>f(v,2)).join('–')).join(', ')+' ft. An R10–R3 stair or ramp cannot be verified.',
+ 'Linear.obj':'The 1,192 ft² count is the area of the original sample cells. Clipping their two masks to the actual floor faces gives 1,164.78 ft², of which 1,157.36 ft² has seven feet of headroom. Only 0.59 ft² has no modeled cover. The designer confirmed the second-floor loft is open to the sky. Within the selected R3 outline, 411.97 of 412.56 ft² has geometry overhead. This outline therefore captures mostly covered floor. The open loft boundary and its full area have yet to be measured. The entire coplanar component at R3 spans 855.86 ft², extending beyond the selected footprint. No sloping walkable face bridges the floors. Under the 0.8 ft maximum step rise, even the combined walkable elevations across the whole building have gaps: '+models[0].verticalGaps.map(a=>a.map(v=>f(v,2)).join('–')).join(', ')+' ft. An R10–R3 stair or ramp cannot be verified.',
  'Stepped.obj':'R70 has 10.51 ft² below 5.86 ft of headroom and 17.04 ft² below 7 ft. The 5.85 ft sampled minimum is localized. The source supports three short steps into neighboring regions. Their endpoint height changes are roughly 0.26, 0.18 and 0.77 ft. The tests establish local transitions. Independent approaches from occupied origins still need tracing.',
  'Void_Field.obj':'The earlier 387 ft² for R34 counted grid cells. Their intersection with the source floor is 375.17 ft². The largest continuous seven-foot-clear patch is 372.25 ft². Its 11.73 ft clear diameter makes R34 a geometric gathering candidate. Sub-cell floor gaps at the proposed approaches prevent confirming a continuous two-foot strip. Their small size warrants checking the intended joints.'};
 const nav=models.map(m=>'<p>'+m.filename+' '+m.reviews.map(r=>'<a href="#'+m.filename.split('.')[0]+'-R'+r.region+'">R'+r.region+'</a>').join(' · ')+'</p>').join('');

@@ -28,7 +28,7 @@ describe("presentLayers", () => {
     assert.ok((result[1].polylines?.[0].length ?? 0) > 3);
     assert.deepEqual(result[1].polylines?.[0].at(-1), [2, 2, 2]);
   });
-  it("hides vertical voids and cross-level sightlines in all and focused views", () => {
+  it("keeps voids and sightlines off by default and exposes each in its own metric view", () => {
     const layers = [
       layer({ id: "vi-void", kind: "volume", components: ["Vertical Void Continuity"] }),
       layer({ id: "vi-sight", kind: "segment", components: ["Vertical Visual Connectivity"] }),
@@ -36,7 +36,8 @@ describe("presentLayers", () => {
       layer({ id: "vi-chain", kind: "polyline", components: ["Vertical Circulation"] }),
     ];
     assert.deepEqual(presentLayers(layers, "verticallyIntegrated").map((item) => item.id), ["vi-double-height", "vi-chain"]);
-    assert.deepEqual(presentLayers(layers, "verticallyIntegrated", { componentFocus: "Vertical Void Continuity" }), []);
+    assert.deepEqual(presentLayers(layers, "verticallyIntegrated", { componentFocus: "Vertical Void Continuity" }).map(item => item.id), ["vi-void"]);
+    assert.deepEqual(presentLayers(layers, "verticallyIntegrated", { componentFocus: "Vertical Visual Connectivity" }).map(item => item.id), ["vi-sight"]);
   });
   it("does not mutate source layers and restyles from the shared graphic roles", () => {
     const source = layer({

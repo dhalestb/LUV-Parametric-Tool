@@ -31,5 +31,18 @@
     ],
     "destinationApproved": false,
     "score": null
+  },
+  {
+    "filename": "Linear.obj",
+    "geometryHash": "a1bd4c04a308353748ec239b7aaaa24b767d8e8e0e1172e3934337f27e891af9",
+    "sourceSha256": "17c938d3b4e09893f652412d7b9d966562e60a14ddf013aef0cf3c7682bff258",
+    "subject": "second-floor loft",
+    "cover": "open to sky",
+    "evidence": "designer confirmation",
+    "relatedReviewRegion": 3,
+    "loftBoundaryConfirmed": false,
+    "connectionFromR10": "unresolved",
+    "destinationApproved": false,
+    "score": null
   }
 ]

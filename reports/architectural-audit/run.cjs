@@ -4,7 +4,8 @@ const {parseObj}=require('../../src/components/lattice/parseObj.ts');
 const {buildV4Context}=require('../../src/components/evaluations/v4/evaluateV4.ts');
 const {centralizedContext}=require('../../src/components/evaluations/v4/centralizedContext.ts');
 const {reconstructArchitecturalRegions}=require('../../src/components/evaluations/v4/architecturalRegions.ts');
-const {validateVerification}=require('../../src/components/evaluations/v4/spatialVerification.ts');
+const {restoreReview}=require('../../src/components/evaluations/v4/spatialVerification.ts');
+const {createSpatialReview}=require('../../src/components/evaluations/v4/spatialReviewFactory.ts');
 const {geometryHash,verifiedResult}=require('../../src/components/evaluations/v4/verifiedCentralizedResult.ts');
 const {round,measure,verifyStrip,elevationGaps}=require('./geometry.cjs');
 const {regionDiagnosticSvg}=require('../../src/components/evaluations/v4/architecturalRegionDiagnostics.ts');
@@ -68,7 +69,7 @@ function auditRoutes(C,ctx,recon,id){
    const meta=require('../spatial-review/'+ref.filename+'.spatial-review.json');
    const ctx=centralizedContext(buildV4Context({...m,unitScale:1,up:'z'},meta.sourceId));
    const recon=reconstructArchitecturalRegions(ctx,{enabled:true});
-   validateVerification(meta,ref.geometryHash);
+   const floorReview=restoreReview(meta,await createSpatialReview(ctx,recon,{id:meta.sourceId,hash:ref.geometryHash,filename:ref.filename,unit:'feet',up:'z'},C));
    const model={filename:ref.filename,geometryHash:ref.geometryHash,sourceSha256:original.sourceSha256,sourceHeader:raw.toString('utf8').split(/\r?\n/).slice(0,2),groups:m.groups.map(g=>g.name),reviews:[]};
    if(ref.filename==='Linear.obj')model.verticalGaps=elevationGaps(ctx.mesh.triangles,recon.regions[10].centroid[2],recon.regions[3].centroid[2]);
    for(const location of ref.locations){
@@ -83,7 +84,7 @@ function auditRoutes(C,ctx,recon,id){
      for(const iso of [false,true])fs.writeFileSync(path.join(out,ref.filename+'-R'+r.id+(iso?'-3D':'-plan')+'.svg'),draw(ctx,recon,row,iso));
      console.log(ref.filename,'R'+r.id,'support',row.supportArea,'clear',row.clear7Area,'covered',row.coveredArea,'diameter',row.maxClearDiskDiameterFt,'min',row.minClear,'median',row.medianBoundedClear,'routes',row.routes.map(s=>[s.other,s.passing,s.tested]));
    }
-   const result=verifiedResult(meta,ctx);assert.equal(result.available,false);
+   const result=verifiedResult(floorReview,ctx);assert.equal(result.available,false);
    all.push(model);
  }
  fs.writeFileSync(path.join(out,'source-evidence.json'),JSON.stringify(all,null,2));

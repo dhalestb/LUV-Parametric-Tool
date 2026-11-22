@@ -19,5 +19,7 @@ export type DescriptorAlgorithmVersion =
   | typeof DESCRIPTOR_ALGORITHM_VERSION
   | typeof OPEN_VOLUME_ALGORITHM_VERSION
   | "centralized-verified-v2.0.0"
+  | "centralized-floor-v3.0.0"
+  | "centralized-area-v4.0.0"
   | typeof CENTRALIZED_ALGORITHM_VERSION
   | typeof LEGACY_DESCRIPTOR_ALGORITHM_VERSION;
