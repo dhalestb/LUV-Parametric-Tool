@@ -1,0 +1,216 @@
+▶ evaluation edge visibility
+  ✔ keeps arrow shafts and heads while hiding segment and polyline edges (3.5297ms)
+✔ evaluation edge visibility (5.4281ms)
+(node:68332) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+▶ comparison camera fit
+  ✔ keeps all corners of the largest shared bounds inside wide, square and narrow panels (6.3089ms)
+✔ comparison camera fit (8.1738ms)
+▶ descriptor geometry cache
+  ✔ moves other ranks when one form is replaced without recomputing them (115.7938ms)
+✔ descriptor geometry cache (119.2519ms)
+▶ descriptor figures
+  ✔ draws convergent from the measured cells (6.6865ms)
+  ✔ draws centralized from the measured cells (3.4642ms)
+  ✖ draws verticallyIntegrated from the measured cells (2.0877ms)
+  ✔ draws sculptural from the measured cells (1.8589ms)
+  ✔ draws visuallyConnected from the measured cells (2.1693ms)
+  ✔ draws surreal from the measured cells (1.4661ms)
+  ✔ draws hierarchical from the measured cells (2.0075ms)
+  ✔ draws sequential from the measured cells (35.748ms)
+  ✔ draws circulationActivated from the measured cells (11.776ms)
+  ✔ draws monumental from the measured cells (5.2925ms)
+  ✔ draws luminous from the measured cells (1.1745ms)
+✖ descriptor figures (108.508ms)
+▶ comparative ranks
+  ✔ assigns 1 through 15 once, with 15 as the strongest (4.1649ms)
+  ✔ ranks full-precision scores above their rounded twins (0.4964ms)
+  ✔ breaks exact ties with raw components, then form id (0.7279ms)
+  ✔ re-ranks a replaced form from cached absolute scores (0.9688ms)
+  ✔ ranks Sequential by verified gain, then higher levels, and reports ties (0.6102ms)
+  ✔ drops Open Volume ranks unless the stored version matches the current Open Volume version (0.4739ms)
+  ✔ is deterministic (18.0201ms)
+✔ comparative ranks (28.2613ms)
+▶ descriptor calibration V2
+  ✔ scores connected levels above disconnected slabs (66.2929ms)
+  ✔ lets an atrium score without a stair and keeps a dense object visually closed (64.0319ms)
+  ✔ scores a multi-approach destination above a compact box (11.5557ms)
+  ✔ scores a dominant hierarchy above equal modules (26.0202ms)
+  ✔ scores a folded form above an orthogonal cube (9.5546ms)
+  ✔ keeps a radial mass more centralized than a hollow ring (23.3276ms)
+  ✔ gives a linear run more sequence depth than a single room (8.6223ms)
+  ✔ finds more intersections in a branched network than in a line (5.2009ms)
+  ✔ reads a cantilever as more surreal than a supported cube (21.4527ms)
+  ✔ lets daylight reach an open floor more than a roofed floor (37.0563ms)
+  ✔ is deterministic (6.9686ms)
+  ✔ uses a fixed monumental scale (7.0392ms)
+✔ descriptor calibration V2 (293.464ms)
+▶ formIdentity
+  ✔ treats word-order variants as the same form (2.4206ms)
+  ✔ ignores slot prefixes, punctuation, and extension case (0.4442ms)
+  ✔ treats Cont Hall as Continuous Hall (0.3075ms)
+  ✔ does not collapse distinct forms that share one token (0.2987ms)
+  ✔ does not collapse a different geometry version onto the official file (0.5333ms)
+  ✔ refuses an ambiguous token match when two registry files share an identity (0.2927ms)
+  ✔ finds the registry row for a reordered session filename (0.2846ms)
+✔ formIdentity (7.0139ms)
+▶ Open Volume
+  ✔ scores a solid cube very low (15.5245ms)
+  ✔ scores a closed hollow box above a solid, with low permeability and real enclosed void (11.3692ms)
+  ✔ scores an open frame very high (37.276ms)
+  ✔ scores wall-less stacked slabs high, with horizontal permeability and little enclosed void (13.762ms)
+  ✔ gives a single thin plate high mass-reduction and permeability, but less openness than stacked plates (38.3009ms)
+  ✔ scores a dense multi-wall field below an open frame and below stacked slabs (45.847ms)
+✔ Open Volume (165.0331ms)
+▶ Open Volume cache version
+  ✔ rejects a stored Open Volume result unless its version matches the current Open Volume version and keeps the other descriptors (258.3797ms)
+✔ Open Volume cache version (260.7453ms)
+▶ surface-anchored clearance
+  ✔ starts on the upper face and stops at the next surface (7.2967ms)
+  ✔ keeps a column when the shrink-wrap does not contain it (1.2473ms)
+  ✔ gives no credit and no gold when the gap is 5 ft or less (13.9542ms)
+  ✔ counts exterior-open as fully open and scales bounded clearance from 5 ft to 10 ft (4.1493ms)
+✔ surface-anchored clearance (31.6722ms)
+▶ presentLayers
+  ✔ rounds vertical integration samples and smooths paths without changing source evidence (6.147ms)
+  ✔ hides vertical voids and cross-level sightlines in all and focused views (0.7392ms)
+  ✔ does not mutate source layers and restyles from the shared graphic roles (1.0024ms)
+  ✔ hides Open Volume diagnostics and keeps only sheltered clearance (0.5782ms)
+  ✔ highlights the recorded continuous field and hides other Open Volume overlays (0.6607ms)
+  ✔ shows Convergent routes in yellow and entries/destination as dots (1.2424ms)
+  ✔ keeps a focused component even when it is hidden in the default pair drawing (0.7387ms)
+  ✔ shows only the continuous field when that layer is selected (0.4686ms)
+  ✔ returns a short empty-state note when nothing qualifies (0.4737ms)
+  ✔ shows Sculptural folds, orientation surfaces, and sectional bars (1.0546ms)
+  ✔ keeps every analysis face until merge is requested (0.3745ms)
+  ✔ merges adjacent faces into cluster outlines on any descriptor when asked (0.9559ms)
+  ✔ draws luminous laterals from the floor edge at probe height by default (1.3746ms)
+  ✔ seats lateral and overhead arrows on each local plate when asked (1.0329ms)
+  ✔ seats lower-level luminous arrows on their own plate, not only the top (0.7083ms)
+  ✔ drops luminous arrows by the probe offset even without a recorded plate (0.5618ms)
+  ✔ shows blocked light rays for the two light components when asked (0.6575ms)
+  ✔ shows only the cyan floor area and gold best point for Visually Connected (0.9849ms)
+  ✔ draws Centralized clear volume as #71BEDA (0.3875ms)
+  ✔ clips Monumental clear volume columns to the massing height (0.7483ms)
+  ✔ draws Monumental floor plane in light blue and clear volume in cyan (0.3881ms)
+  ✔ shows Sequential ascent as one verified route with numbered stages (0.5107ms)
+✔ presentLayers (26.3242ms)
+▶ experimental architectural segmentation
+  ✔ is disabled unless explicitly enabled (98.2294ms)
+  ✔ leaves an unpartitioned open room intact (42.0168ms)
+  ✔ preserves two rooms and one verified doorway (36.9488ms)
+  ✔ keeps a sealed partition closed (24.5476ms)
+  ✔ preserves multiple doorways independently (32.5904ms)
+  ✔ identifies a linear sequence without merging its rooms (34.3221ms)
+  ✔ does not invent a closure for an unsupported partial partition (32.6958ms)
+  ✔ preserves a narrow supported passage (19.5164ms)
+  ✔ retains sub-16 sq ft transition regions and their connections (2.3389ms)
+  ✔ does not use a low physical partition as a verified doorway (27.0272ms)
+  ✔ is deterministic and preserves the source buffers (42.4737ms)
+  ✔ preserves verified sampled stair chains between levels (28.3387ms)
+  ✔ does not create vertical access from overlapping plates (29.2881ms)
+  ✔ does not invent an organizational center or arbitrary subdivisions around an atrium (22.3479ms)
+  ✔ preserves separate wings without inventing proximity connections (13.0239ms)
+  ✔ uses shared wall evidence without equating it to circulation (30.4905ms)
+  ✔ retains three separate rooms opening onto a common corridor (50.5825ms)
+  ✔ classifies a low-headroom gap as unknown rather than verified walking (25.3882ms)
+  ✔ detects a rotated planar partition without typology or axis-specific rules (45.2777ms)
+  ✔ retains every original movement node exactly once without changing its graph (39.1245ms)
+✔ experimental architectural segmentation (680.3914ms)
+▶ unweighted centrality graph
+  ✔ star agrees with the independent reference (2.8821ms)
+  ✔ chain agrees with the independent reference (0.5989ms)
+  ✔ cycle agrees with the independent reference (0.4131ms)
+  ✔ complete agrees with the independent reference (0.3012ms)
+  ✔ counts unreachable nodes as zero and normalizes duplicate edges (0.5829ms)
+  ✔ reports insufficient evidence for fewer than three nodes or no edges (0.4794ms)
+  ✔ sets hierarchy to zero for equally central hubs (0.4148ms)
+  ✔ is invariant to node ordering, deduplication, and reversing edges (0.4118ms)
+  ✔ accepts explicit normalized weights and rejects invalid configurations (0.8081ms)
+✔ unweighted centrality graph (9.5396ms)
+▶ continuous field
+  ✔ keeps one run of edge-adjacent qualifying floor (2.6518ms)
+  ✔ does not join pockets that only share an elevation (0.6938ms)
+  ✔ does not stack nearby levels into one field (0.6731ms)
+✔ continuous field (6.5109ms)
+▶ v4 version constants
+  ✔ publishes v4.3.0, Open Volume v4.4.0, and keeps v3.5 as the legacy constant (2.2164ms)
+✔ v4 version constants (5.5425ms)
+▶ v4 shared geometry
+  ✔ does not modify the source arrays (901.9533ms)
+  ✔ finds one level on an open slab and two in the atrium (184.9729ms)
+  ✔ keeps a closed hall as one level: the roof cap is not a storey (49.8023ms)
+  ✔ counts an uncovered projecting terrace as a second level even without a stair (93.5571ms)
+  ✔ keeps a sub-16 ft² projecting ledge as a connection interface and not a floor (52.9418ms)
+  ✔ recognizes three interior levels when an upper deck exists without an internal stair (152.0383ms)
+  ✔ classifies a closed hall floor as sheltered with the roof clearance (140.9458ms)
+  ✔ classifies the atrium hole as open void and the open slab as exposed (178.5986ms)
+  ✔ finds doorway entries only where the wall is open (149.1361ms)
+✔ v4 shared geometry (1906.1613ms)
+▶ v4 descriptor behaviour on fixtures
+  ✔ reports twelve descriptors with the v4 version and a source hash (2.6909ms)
+  ✔ scores qualifying halls equally above 7.5 ft and excludes a bare slab (0.797ms)
+  ✔ enforces the 7.5 ft height and sampled 10 ft horizontal clearance gates (1349.8061ms)
+  ✔ reports a continuous field from qualifying floor without changing the Open Volume score (701.4256ms)
+  ✔ credits a counted top deck when includeTopDecks is on (595.2214ms)
+  ✔ scores a missing characteristic as 0 and still ranks the form (0.6977ms)
+  ✔ scores Convergent and Sequential once a doorway exists (2.4618ms)
+  ✔ scores Sequential as verified ascent, not stacked plates or a 0–100 blend (695.2974ms)
+  ✔ gives a closed box measured-zero light, not unavailable (0.4351ms)
+  ✔ gives the roofless slab measured-zero interior light rather than inflating overhead exposure (0.4669ms)
+  ✔ ranks Monumental by height: tall hall above low hall (0.3802ms)
+  ✔ measures two levels in the atrium and makes Hierarchical available (1.4491ms)
+  ✔ does not substitute a network center for an unsupported gathering destination (2195.4654ms)
+  ✔ fills sheltered space when measured clearance is at least 16 feet (2072.0178ms)
+  ✔ credits the atrium void in Vertically Integrated and not the solid stack (0.3367ms)
+  ✔ is deterministic and reconstructs every published score from its components (897.6525ms)
+  ✔ documents every component and keeps unavailable terms out of the score (5.1375ms)
+  ✔ draws only palette colours and gives every measured component a drawn layer (3.3063ms)
+  ✔ blocks same-level sightlines through a closed partition (424.9658ms)
+  ✔ draws at most two visible same-floor gathering arrows from each gold point (533.3778ms)
+  ✔ does not invent circulation between disconnected plates (34.9712ms)
+  ✔ draws one same-floor spine and gathering candidate per supported level (1329.2268ms)
+  ✔ credits lateral openings and not a sealed box (1066.7502ms)
+  ✔ uses the configured eye height for sightlines (559.6951ms)
+  ✔ reports a geometry-processing failure, not a measured zero, for an empty mesh (19.8796ms)
+✔ v4 descriptor behaviour on fixtures (12498.169ms)
+▶ trianglePatchBoundary
+  ✔ drops the shared edge of a two-triangle cluster (2.0425ms)
+  ✔ keeps a gap between separate clusters (0.3976ms)
+✔ trianglePatchBoundary (4.4857ms)
+▶ massing layers
+  ✔ reads three aligned equal plates as a regular stacked sequence (10.315ms)
+  ✔ penalizes fragmented, offset plates at uneven heights (3.702ms)
+✔ massing layers (16.1126ms)
+▶ visual hotspots
+  ✔ selects one largest visually connected region on each floor and its strongest sampled position (17.7059ms)
+✔ visual hotspots (20.6149ms)
+ℹ tests 145
+ℹ suites 20
+ℹ pass 144
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20645.9504
+
+✖ failing tests:
+
+test at src\components\evaluations\descriptorFigures.test.ts:32:28
+✖ draws verticallyIntegrated from the measured cells (2.0877ms)
+  AssertionError [ERR_ASSERTION]: verticallyIntegrated drew nothing
+      at TestContext.<anonymous> (C:\Users\ryanh\Documents\Codex\2026-11-10\github-plugin-github-openai-curated-remote-2\outputs\handoff-review\src\components\evaluations\descriptorFigures.test.ts:35:30)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Suite.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Suite.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

@@ -1,0 +1,43 @@
+[
+  {
+    "fixture": "open",
+    "originalRegions": 1,
+    "originalRegionEdges": 0,
+    "newRegions": 1,
+    "movementConnections": 0,
+    "organizationalRelationships": []
+  },
+  {
+    "fixture": "doorway",
+    "originalRegions": 1,
+    "originalRegionEdges": 0,
+    "newRegions": 2,
+    "movementConnections": 1,
+    "organizationalRelationships": [
+      {
+        "type": "opening",
+        "status": "verified",
+        "navigable": true
+      },
+      {
+        "type": "shared-wall",
+        "status": "verified",
+        "navigable": false
+      }
+    ]
+  },
+  {
+    "fixture": "sealed",
+    "originalRegions": 2,
+    "originalRegionEdges": 0,
+    "newRegions": 2,
+    "movementConnections": 0,
+    "organizationalRelationships": [
+      {
+        "type": "shared-wall",
+        "status": "verified",
+        "navigable": false
+      }
+    ]
+  }
+]

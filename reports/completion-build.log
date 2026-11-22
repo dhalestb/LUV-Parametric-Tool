@@ -1,0 +1,21 @@
+
+> d7-letter-grid@0.1.0 build
+> node scripts/patch-next-eisdir.js && next build
+
+[patch-next-eisdir] next-trace-entrypoints-plugin.js already patched
+[patch-next-eisdir] collect-build-traces.js already patched
+[patch-next-eisdir] no changes needed
+   ▲ Next.js 15.5.27
+
+   Creating an optimized production build ...
+Failed to compile.
+
+Error: EPERM: operation not permitted, mkdir 'C:\Users\ryanh\Documents\Codex\luv-evaluations-completion\.next\server\app\evaluations'
+
+
+> Build failed because of webpack errors
+npm notice
+npm notice New major version of npm available! 11.17.0 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

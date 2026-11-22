@@ -1,0 +1,38 @@
+[
+  {
+    "fixture": "open room",
+    "floorSamples": 1800,
+    "regions": 1,
+    "sampleEdges": 3422,
+    "regionEdges": 0,
+    "walkEdgesAcrossRegions": 0,
+    "stepEdgesAcrossRegions": 0,
+    "edgesTouchingDiscardedRegions": 0,
+    "score": null,
+    "reason": "Insufficient evidence: Fewer than three spatial regions were identified."
+  },
+  {
+    "fixture": "doorway partition",
+    "floorSamples": 1800,
+    "regions": 1,
+    "sampleEdges": 3344,
+    "regionEdges": 0,
+    "walkEdgesAcrossRegions": 0,
+    "stepEdgesAcrossRegions": 0,
+    "edgesTouchingDiscardedRegions": 0,
+    "score": null,
+    "reason": "Insufficient evidence: Fewer than three spatial regions were identified."
+  },
+  {
+    "fixture": "sealed partition",
+    "floorSamples": 1800,
+    "regions": 2,
+    "sampleEdges": 3334,
+    "regionEdges": 0,
+    "walkEdgesAcrossRegions": 0,
+    "stepEdgesAcrossRegions": 0,
+    "edgesTouchingDiscardedRegions": 0,
+    "score": null,
+    "reason": "Insufficient evidence: Fewer than three spatial regions were identified."
+  }
+]

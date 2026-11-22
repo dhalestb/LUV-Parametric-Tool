@@ -441,13 +441,13 @@ export default function ArchitecturalEvaluations() {
                       {descriptor.comparativeRank !== undefined && descriptor.cohortSize ? <span className="descriptor-rank-of"> / {descriptor.cohortSize}</span> : null}
                     </div>
                     <div className="descriptor-rank-label text-[10px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>
-                      Rank · score {Number.isFinite(descriptor.absoluteScore) ? descriptor.absoluteScore.toFixed(1) : "n/a"}
+                      Rank (higher is stronger) · score {Number.isFinite(descriptor.absoluteScore) ? descriptor.absoluteScore.toFixed(1) : "n/a"}
                     </div>
                   </button>
                 ))}
               </div>
               <div className="overflow-auto">
-                <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Comparative rank matrix</div>
+                <div className="text-[11px] uppercase tracking-wide" style={{ color: "var(--muted)" }}>Evaluation matrix · score / 100 and comparative rank (higher is stronger)</div>
                 <table className="mt-1 w-full text-[10px]">
                   <thead>
                     <tr>
@@ -467,7 +467,7 @@ export default function ArchitecturalEvaluations() {
                         {VISIBLE_DESCRIPTORS.map((descriptor) => {
                           const local = row.result?.descriptors.find((item) => item.id === descriptor.id);
                           const shown = local?.comparativeRank ?? (local && !Number.isFinite(local.absoluteScore) ? "n/a" : "—");
-                          return <td key={descriptor.id} className="px-1 py-1 text-right">{shown}</td>;
+                          return <td key={descriptor.id} className="px-1 py-1 text-right" title={local?.unavailableReason}><div>{local && Number.isFinite(local.absoluteScore) ? local.absoluteScore.toFixed(1) : 'N/A'}</div><div>Rank {shown}{local?.cohortSize ? ` of ${local.cohortSize}` : ''}</div><div>{local?.version}</div></td>;
                         })}
                       </tr>
                     ))}

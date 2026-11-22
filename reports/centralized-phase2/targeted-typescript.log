@@ -1,0 +1,10 @@
+[96msrc/components/evaluations/openVolumeClearance.ts[0m:[93m155[0m:[93m46[0m - [91merror[0m[90m TS2345: [0mArgument of type 'Pick<ObjFace, "vertices">' is not assignable to parameter of type 'ObjFace'.
+  Property 'normals' is missing in type 'Pick<ObjFace, "vertices">' but required in type 'ObjFace'.
+
+[7m155[0m     for (const [ia, ib, ic] of faceTriangles(face)) {
+[7m   [0m [91m                                             ~~~~[0m
+
+  [96msrc/components/lattice/types.ts[0m:[93m107[0m:[93m45[0m
+    [7m107[0m export type ObjFace = { vertices: number[]; normals: number[] | null };
+    [7m   [0m [96m                                            ~~~~~~~[0m
+    'normals' is declared here.

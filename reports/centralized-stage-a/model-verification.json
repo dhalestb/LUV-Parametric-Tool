@@ -1,0 +1,176 @@
+[
+  {
+    "filename": "Linear.obj",
+    "sha256": "17c938d3b4e09893f652412d7b9d966562e60a14ddf013aef0cf3c7682bff258",
+    "sourceHash": "5f11ef0a",
+    "originalRegions": 4,
+    "experimentalRegions": 79,
+    "smallFragments": 73,
+    "verifiedMovementRecords": 7,
+    "verifiedMovementPairs": 7,
+    "verifiedMovementComponents": 73,
+    "isolatedRegions": 71,
+    "movementRecords": {
+      "step:verified": 2,
+      "opening:verified": 5
+    },
+    "productionCentralized": null,
+    "detectedLevels": [
+      {
+        "id": 0,
+        "minZ": -4.440892098500626e-16,
+        "maxZ": 0.5312500000000004,
+        "elevation": 0.4957903519417476
+      },
+      {
+        "id": 1,
+        "minZ": 8.359375,
+        "maxZ": 10.000000000000002,
+        "elevation": 9.938841276477145
+      },
+      {
+        "id": 2,
+        "minZ": 13.328125,
+        "maxZ": 19.914062500000004,
+        "elevation": 17.954892791970803
+      }
+    ],
+    "sourceAndProductionResultsUnchanged": true
+  },
+  {
+    "filename": "Stepped.obj",
+    "sha256": "761b7eead53d8e3e6cd7f39fa0744f9f1ee299ddbab7bdbcfd2273a15f761a2c",
+    "sourceHash": "10b2c3d1",
+    "originalRegions": 64,
+    "experimentalRegions": 256,
+    "smallFragments": 191,
+    "verifiedMovementRecords": 131,
+    "verifiedMovementPairs": 129,
+    "verifiedMovementComponents": 142,
+    "isolatedRegions": 118,
+    "movementRecords": {
+      "step:verified": 104,
+      "opening:verified": 27
+    },
+    "productionCentralized": 6.13389656938044,
+    "detectedLevels": [
+      {
+        "id": 0,
+        "minZ": -4.440892098500626e-16,
+        "maxZ": 5.832412705011285,
+        "elevation": 1.1067892766180225
+      },
+      {
+        "id": 1,
+        "minZ": 8.761779785156245,
+        "maxZ": 9.268736839294439,
+        "elevation": 9.068934391663138
+      },
+      {
+        "id": 2,
+        "minZ": 12.140000343322752,
+        "maxZ": 12.140000343322756,
+        "elevation": 12.140000343322754
+      },
+      {
+        "id": 3,
+        "minZ": 14.611779212951653,
+        "maxZ": 19.99600829124821,
+        "elevation": 16.619159744737058
+      },
+      {
+        "id": 4,
+        "minZ": 23.655921936035142,
+        "maxZ": 24.99871635437012,
+        "elevation": 24.453946646118165
+      },
+      {
+        "id": 5,
+        "minZ": 26.928012847900387,
+        "maxZ": 27.798740386962894,
+        "elevation": 27.286547716926126
+      },
+      {
+        "id": 6,
+        "minZ": 29.505922317504876,
+        "maxZ": 35.46039127412041,
+        "elevation": 31.431362392795457
+      },
+      {
+        "id": 7,
+        "minZ": 38.20729064941404,
+        "maxZ": 40.210670471191406,
+        "elevation": 39.021257633116186
+      },
+      {
+        "id": 8,
+        "minZ": 44.05728912353515,
+        "maxZ": 50.85733843316974,
+        "elevation": 46.74669888112226
+      }
+    ],
+    "sourceAndProductionResultsUnchanged": true
+  },
+  {
+    "filename": "Void_Field.obj",
+    "sha256": "129f4ec8d491855ce0fd2f8acda3502620d6694ff5fc1be836561b46f6cc8030",
+    "sourceHash": "444f9645",
+    "originalRegions": 13,
+    "experimentalRegions": 83,
+    "smallFragments": 67,
+    "verifiedMovementRecords": 15,
+    "verifiedMovementPairs": 15,
+    "verifiedMovementComponents": 68,
+    "isolatedRegions": 58,
+    "movementRecords": {
+      "step:verified": 1,
+      "opening:verified": 14
+    },
+    "productionCentralized": null,
+    "detectedLevels": [
+      {
+        "id": 0,
+        "minZ": 0,
+        "maxZ": 4.440892098500626e-16,
+        "elevation": 4.1503664471968466e-18
+      },
+      {
+        "id": 1,
+        "minZ": 1.6780153512954712,
+        "maxZ": 2.8889999389648455,
+        "elevation": 2.6392155682168355
+      },
+      {
+        "id": 2,
+        "minZ": 4.540583011620764,
+        "maxZ": 4.7176479366129955,
+        "elevation": 4.639547379260562
+      },
+      {
+        "id": 3,
+        "minZ": 16.889999389648438,
+        "maxZ": 20.42468931679541,
+        "elevation": 17.746308526360917
+      },
+      {
+        "id": 4,
+        "minZ": 31.562030792236328,
+        "maxZ": 35.403214456445156,
+        "elevation": 32.699896718059335
+      },
+      {
+        "id": 5,
+        "minZ": 47.639999389647855,
+        "maxZ": 50.609486271351415,
+        "elevation": 47.8103101808567
+      },
+      {
+        "id": 6,
+        "minZ": 52.692714691161925,
+        "maxZ": 52.69271469116248,
+        "elevation": 52.692714691162124
+      }
+    ],
+    "sourceAndProductionResultsUnchanged": true
+  }
+]

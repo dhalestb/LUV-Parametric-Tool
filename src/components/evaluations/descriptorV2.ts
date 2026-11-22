@@ -1356,22 +1356,23 @@ export function descriptorFigures(descriptorId: string, input: SpatialInput): De
   if (descriptorId === "verticallyIntegrated") {
     const rays: DescriptorFigure["rays"] = [];
     const swatches: DescriptorFigure["swatches"] = [];
-    for (const cell of takeEven(walk.list, 40)) {
-      const above = walk.set.has(keyOf(cell.x, cell.y, cell.z + 1));
-      const below = walk.set.has(keyOf(cell.x, cell.y, cell.z - 1));
+    for (const cell of walk.list) {
+      const vertical = (links.get(keyOf(cell.x,cell.y,cell.z)) ?? []).map(id => id.split(',').map(Number) as Voxel).filter(next=>next[2]!==cell.z);
+      const above = vertical.some(next=>next[2]>cell.z);
+      const below = vertical.some(next=>next[2]<cell.z);
       if (!above && !below) continue;
       swatches.push({ cell: asVoxel(cell), color: above && below ? FIGURE_GOLD : FIGURE_CYAN });
-      if (above) rays.push(figureRay(asVoxel(cell), [cell.x, cell.y, cell.z + 1], true, FIGURE_CYAN));
+      for(const next of vertical.filter(next=>next[2]>cell.z)) rays.push(figureRay(asVoxel(cell), next, true, FIGURE_CYAN));
     }
     if (!swatches.length) {
       return {
-        legend: "No walkable cell sits directly above or below another, so Vertically Integrated has no vertical link to draw. The cream form is the mass that was tested.",
+        legend: "No measured legacy walk-network connection spans different elevations, so there is no vertical link to draw. The cream form is the mass that was tested.",
         swatches: [],
         rays: [],
       };
     }
     return {
-      legend: "Cyan links are walkable cells stacked on the next level. Gold marks a cell with walkable space both above and below. This is the vertical connection Vertically Integrated scores.",
+      legend: "Cyan links show elevation-changing connections in the measured legacy walk network. Gold marks a cell connected both above and below. These voxel connections are diagnostic, not certified stairs.",
       swatches: takeEven(swatches, 50),
       rays: takeEven(rays, 30),
     };

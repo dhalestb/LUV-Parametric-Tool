@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {it} from 'node:test';
+import {gatheringMetrics, type GatheringMeasurements} from './gatheringMetrics';
+const hall:GatheringMeasurements={area:200,width:12,clearHeight:7,openSky:false,independentApproaches:4,originsReachableArea:100,originsDisconnectedArea:0,originsUnknownArea:0};
+it('independent reference hall is 40+40+20',()=>assert.equal(gatheringMetrics(hall).scoreLower,100));
+it('one approach contributes 10 points rather than 40',()=>assert.equal(gatheringMetrics({...hall,independentApproaches:1}).scoreLower,70));
+it('unknown origins produce bounds rather than fabricated disconnections',()=>{const r=gatheringMetrics({...hall,originsUnknownArea:100});assert.equal(r.scoreLower,90);assert.equal(r.scoreUpper,100);assert.equal(r.definitive,false);});
+it('demonstrably disconnected origins lower both bounds',()=>{const r=gatheringMetrics({...hall,originsDisconnectedArea:100});assert.equal(r.scoreLower,90);assert.equal(r.scoreUpper,90);});
+it('a destination is not its own accessibility origin',()=>assert.equal(gatheringMetrics({...hall,originsReachableArea:0}).scoreLower,null));
+it('size beyond calibration saturation cannot reward larger buildings',()=>assert.equal(gatheringMetrics({...hall,area:20000,width:120,clearHeight:70}).scoreLower,100));
+it('does not silently treat missing clear height as open sky',()=>assert.throws(()=>gatheringMetrics({...hall,clearHeight:null})));

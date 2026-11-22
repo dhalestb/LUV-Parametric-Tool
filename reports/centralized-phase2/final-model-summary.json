@@ -1,0 +1,159 @@
+[
+  {
+    "filename": "Linear.obj",
+    "sourceFileSha256": "17c938d3b4e09893f652412d7b9d966562e60a14ddf013aef0cf3c7682bff258",
+    "sourceId": "mesh-1-1uo0nc",
+    "sourceHash": "5f11ef0a",
+    "originalRegions": 4,
+    "spaces": 6,
+    "transitions": 73,
+    "allRegions": 79,
+    "originalRegionEdges": 0,
+    "movementRecords": {
+      "step:verified": 2,
+      "opening:verified": 5
+    },
+    "organizationalRecords": {
+      "opening:verified": 5,
+      "shared-wall:inferred": 2,
+      "shared-wall:verified": 102
+    },
+    "distinctMovementPairs": 7,
+    "distinctOrganizationalPairs": 104,
+    "unchangedProductionCentralizedScore": null,
+    "levels": [
+      {
+        "id": 0,
+        "elevation": 0.4957903519417476
+      },
+      {
+        "id": 1,
+        "elevation": 9.938841276477145
+      },
+      {
+        "id": 2,
+        "elevation": 17.954892791970803
+      }
+    ],
+    "rawNodes": 2269,
+    "rawEdges": 7484
+  },
+  {
+    "filename": "Stepped.obj",
+    "sourceFileSha256": "761b7eead53d8e3e6cd7f39fa0744f9f1ee299ddbab7bdbcfd2273a15f761a2c",
+    "sourceId": "mesh-2-jfzxvj",
+    "sourceHash": "10b2c3d1",
+    "originalRegions": 64,
+    "spaces": 65,
+    "transitions": 191,
+    "allRegions": 256,
+    "originalRegionEdges": 25,
+    "movementRecords": {
+      "step:verified": 104,
+      "opening:verified": 27
+    },
+    "organizationalRecords": {
+      "shared-wall:inferred": 35,
+      "opening:verified": 27,
+      "shared-wall:verified": 312
+    },
+    "distinctMovementPairs": 129,
+    "distinctOrganizationalPairs": 335,
+    "unchangedProductionCentralizedScore": 6.13389656938044,
+    "levels": [
+      {
+        "id": 0,
+        "elevation": 1.1067892766180225
+      },
+      {
+        "id": 1,
+        "elevation": 9.068934391663138
+      },
+      {
+        "id": 2,
+        "elevation": 12.140000343322754
+      },
+      {
+        "id": 3,
+        "elevation": 16.619159744737058
+      },
+      {
+        "id": 4,
+        "elevation": 24.453946646118165
+      },
+      {
+        "id": 5,
+        "elevation": 27.286547716926126
+      },
+      {
+        "id": 6,
+        "elevation": 31.431362392795457
+      },
+      {
+        "id": 7,
+        "elevation": 39.021257633116186
+      },
+      {
+        "id": 8,
+        "elevation": 46.74669888112226
+      }
+    ],
+    "rawNodes": 5756,
+    "rawEdges": 16216
+  },
+  {
+    "filename": "Void_Field.obj",
+    "sourceFileSha256": "129f4ec8d491855ce0fd2f8acda3502620d6694ff5fc1be836561b46f6cc8030",
+    "sourceId": "mesh-3-i9ehh4",
+    "sourceHash": "444f9645",
+    "originalRegions": 13,
+    "spaces": 16,
+    "transitions": 67,
+    "allRegions": 83,
+    "originalRegionEdges": 0,
+    "movementRecords": {
+      "step:verified": 1,
+      "opening:verified": 14
+    },
+    "organizationalRecords": {
+      "opening:verified": 14,
+      "shared-wall:inferred": 14,
+      "shared-wall:verified": 52
+    },
+    "distinctMovementPairs": 15,
+    "distinctOrganizationalPairs": 64,
+    "unchangedProductionCentralizedScore": null,
+    "levels": [
+      {
+        "id": 0,
+        "elevation": 4.1503664471968466e-18
+      },
+      {
+        "id": 1,
+        "elevation": 2.6392155682168355
+      },
+      {
+        "id": 2,
+        "elevation": 4.639547379260562
+      },
+      {
+        "id": 3,
+        "elevation": 17.746308526360917
+      },
+      {
+        "id": 4,
+        "elevation": 32.699896718059335
+      },
+      {
+        "id": 5,
+        "elevation": 47.8103101808567
+      },
+      {
+        "id": 6,
+        "elevation": 52.692714691162124
+      }
+    ],
+    "rawNodes": 3315,
+    "rawEdges": 9883
+  }
+]

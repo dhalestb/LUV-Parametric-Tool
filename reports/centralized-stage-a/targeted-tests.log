@@ -1,0 +1,41 @@
+▶ experimental architectural segmentation
+  ✔ is disabled unless explicitly enabled (76.4241ms)
+  ✔ leaves an unpartitioned open room intact (60.0634ms)
+  ✔ preserves two rooms and one verified doorway (44.5972ms)
+  ✔ keeps a sealed partition closed (25.7145ms)
+  ✔ preserves multiple doorways independently (25.6976ms)
+  ✔ identifies a linear sequence without merging its rooms (33.489ms)
+  ✔ does not invent a closure for an unsupported partial partition (35.3421ms)
+  ✔ preserves a narrow supported passage (21.5514ms)
+  ✔ retains sub-16 sq ft transition regions and their connections (1.9706ms)
+  ✔ does not use a low physical partition as a verified doorway (18.5654ms)
+  ✔ is deterministic and preserves the source buffers (42.2978ms)
+  ✔ preserves verified sampled stair chains between levels (29.8281ms)
+  ✔ does not create vertical access from overlapping plates (29.8227ms)
+  ✔ does not invent an organizational center or arbitrary subdivisions around an atrium (18.4512ms)
+  ✔ preserves separate wings without inventing proximity connections (14.989ms)
+  ✔ uses shared wall evidence without equating it to circulation (30.9994ms)
+  ✔ retains three separate rooms opening onto a common corridor (43.9801ms)
+  ✔ classifies a low-headroom gap as unknown rather than verified walking (26.2939ms)
+  ✔ detects a rotated planar partition without typology or axis-specific rules (42.2805ms)
+  ✔ retains every original movement node exactly once without changing its graph (33.6602ms)
+✔ experimental architectural segmentation (659.1346ms)
+▶ unweighted centrality graph
+  ✔ star agrees with the independent reference (2.7005ms)
+  ✔ chain agrees with the independent reference (0.3577ms)
+  ✔ cycle agrees with the independent reference (0.2034ms)
+  ✔ complete agrees with the independent reference (0.507ms)
+  ✔ counts unreachable nodes as zero and normalizes duplicate edges (0.365ms)
+  ✔ reports insufficient evidence for fewer than three nodes or no edges (0.2826ms)
+  ✔ sets hierarchy to zero for equally central hubs (0.458ms)
+  ✔ is invariant to node ordering, deduplication, and reversing edges (0.5616ms)
+  ✔ accepts explicit normalized weights and rejects invalid configurations (0.7054ms)
+✔ unweighted centrality graph (8.1564ms)
+ℹ tests 29
+ℹ suites 2
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1778.181

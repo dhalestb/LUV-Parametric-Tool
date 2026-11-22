@@ -5,7 +5,7 @@ import {PALETTE,type EvidenceLayer} from './v4/evidence';
 
 describe('evaluation edge visibility',()=>{
  it('keeps arrow shafts and heads while hiding segment and polyline edges',()=>{
-  const base={color:PALETTE.gold,status:'measured',components:[],lineStyle:'solid',shown:1,total:1} as const;
+  const base={color:PALETTE.gold,status:'measured',components:[] as string[],lineStyle:'solid',shown:1,total:1} as const;
   const layers:EvidenceLayer[]=[
    {...base,id:'arrow',label:'Arrow',kind:'arrow',arrows:[{a:[0,0,0],b:[10,0,0]}]},
    {...base,id:'edge',label:'Edge',kind:'segment',segments:[{a:[0,1,0],b:[10,1,0]}]},
