@@ -8,6 +8,8 @@ The three verified-method scores remain pending. No source file or previously sa
 
 ## Reproduction
 
+The Void_Field review retains R34 as a provisional gathering candidate. R56 and R95 remain potential connections with unresolved access. Neither contributes to convergence or accessibility. The [decision record](../../public/centralized-source-review/architectural-decisions.json) ties this instruction to the source hash and lists the measured area, width and route trial counts.
+
 From the worktree, using its locked dependencies, run the following with the directory containing the three original models:
 
 ```powershell

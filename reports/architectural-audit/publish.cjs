@@ -16,7 +16,7 @@ const decisions = {
  'Void_Field.obj': {
    3: ['Predominantly open-to-sky top surface with multiple clear pieces.', 'Is this an accessible occupied deck? Identify its access point if so.'],
    0: ['Covered lower-level floor. Its seven-foot-clear footprint does not fit a ten-foot circle.', 'Is the curved surface a passage or part of an occupied gathering room beyond the outline?'],
-   34: ['Covered floor with a sufficiently wide, continuous gathering patch. Access and intended use remain unconfirmed.', 'Is this occupied floor, and are the small support gaps toward R56 or R95 intentional joints in a walkable surface? Mark the actual entrance if it is elsewhere.']}
+   34: ['Provisional gathering-space candidate. Source geometry supports a continuous 372.25 ft² patch with at least seven feet of headroom and an 11.73 ft clear diameter. Access remains unresolved.', 'Review decision: retain R56 and R95 as potential connections. Neither is an approved entrance. Both are excluded from convergence and accessibility until a continuous approach is confirmed.']}
 };
 const reasons={
  'Linear.obj':'Both covered footprints pass the area and width checks. Their interior/gallery boundary and a traversable route between levels are unverified.',
@@ -28,6 +28,20 @@ const byModel=models.map(m=>({geometryHash:m.geometryHash,regions:m.reviews.map(
 fs.writeFileSync(path.join(root,'src/components/evaluations/v4/sourceReviewIndex.json'),JSON.stringify(byModel,null,2)+'\n');
 const matrix=previous.map(m=>({filename:m.filename,sourceSha256:m.sourceSha256,geometryHash:m.geometryHash,unit:m.unit,up:m.up,includeTopDecks:m.topDecks,scores:Object.fromEntries(Object.entries(m.descriptors).map(([id,d])=>[id,id==='centralized'?{score:null,rank:null,version:d.version,reason:reasons[m.filename]}:d])),historicalGraphCentralized:m.descriptors.centralized.historicalScore}));
 fs.writeFileSync(path.join(out,'comparison-matrix.json'),JSON.stringify(matrix,null,2)+'\n');
+const voidField=models.find(m=>m.filename==='Void_Field.obj');
+const r34=voidField.reviews.find(r=>r.region===34);
+const reviewDecision={
+ filename:voidField.filename,geometryHash:voidField.geometryHash,sourceSha256:voidField.sourceSha256,
+ region:r34.region,classification:'provisional gathering-space candidate',access:'unresolved',
+ continuousClearAreaFt2:r34.largestClear7Piece,minimumHeadroomForThisAreaFt:7,
+ clearPatchDiameterFt:r34.maxClearDiskDiameterFt,
+ crossings:[56,95].map(id=>{
+   const crossing=r34.routes.find(c=>c.other===id);
+   return {to:id,state:'potential',verifiedApproach:false,countsForConvergence:false,countsForAccessibility:false,
+     testedSegments:crossing.tested,passingLocalStrips:crossing.passing};
+ }),destinationApproved:false,score:null
+};
+fs.writeFileSync(path.join(out,'architectural-decisions.json'),JSON.stringify([reviewDecision],null,2)+'\n');
 const f=(n,d=1)=>n==null?'—':n.toFixed(d);
 const img=(file,alt)=>'<a href="'+file+'"><img src="'+file+'" alt="'+alt+'"></a>';
 function card(m,r){

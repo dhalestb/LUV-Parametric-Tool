@@ -11,6 +11,9 @@ const models=require(path.join(dir,'source-evidence.json'));
     for(const r of m.reviews){
       for(const [j,view] of ['plan','3D'].entries()){
         const svg=path.join(dir,m.filename+'-R'+r.region+'-'+view+'.svg');
+        if(view==='plan'&&(r.region===3||m.filename==='Stepped.obj'&&r.region===70)){
+          await sharp(svg,{density:140}).png().toFile(svg.replace(/\.svg$/,'.png'));
+        }
         const buf=await sharp(svg).resize(tileWidth,tileHeight,{fit:'contain',background:'#101820'}).png().toBuffer();
         if(r.region===primary)layers.push({input:buf,left:j*tileWidth,top:i*rowHeight+42});
       }
