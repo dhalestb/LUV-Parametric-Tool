@@ -1,0 +1,96 @@
+
+> d7-letter-grid@0.1.0 build
+> node scripts/patch-next-eisdir.js && next build
+
+[patch-next-eisdir] next-trace-entrypoints-plugin.js already patched
+[patch-next-eisdir] collect-build-traces.js already patched
+[patch-next-eisdir] no changes needed
+   ▲ Next.js 15.5.27
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 71s
+   Linting and checking validity of types ...
+
+./src/components/amphitheaterPrototype.ts
+540:48  Warning: 'itemIndex' is defined but never used.  @typescript-eslint/no-unused-vars
+571:29  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+580:27  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+1044:11  Warning: 'nearestPair' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/evaluations/ArchitecturalRegionExperiment.tsx
+25:766  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/evaluations/CentralizedVerification.tsx
+114:75  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/evaluations/descriptorEvidence.ts
+207:7  Warning: 'EMPTY_MARKS' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/evaluations/v4/ascent.ts
+105:5  Warning: 'travelled' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/evaluations/v4/circulation.ts
+96:44  Warning: '_lowestLevelId' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/evaluations/v4/destinationRoutes.ts
+1:14  Warning: 'RegionConnection' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/evaluations/v4/evaluateV4.test.ts
+552:11  Warning: 'open' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/evaluations/v4/evaluateV4.ts
+823:9  Warning: 'total' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/evaluations/v4/massingLayers.ts
+126:52  Warning: '_gap' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/evaluations/v4/surfaces.ts
+296:53  Warning: 'byCell' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+296:101  Warning: 'topZ' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/lattice/distribution.ts
+297:5  Warning: 'neighborCount' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/lattice/LatticeViewport.tsx
+188:9  Warning: The 'visibleMeshes' conditional could make the dependencies of useMemo Hook (at line 200) change on every render. To fix this, wrap the initialization of 'visibleMeshes' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+246:6  Warning: React Hook useMemo has a missing dependency: 'field'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+484:104  Warning: React Hook useImperativeHandle has an unnecessary dependency: 'canvasKey'. Either exclude it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/lattice/search.ts
+444:16  Warning: 'rankAttachments' is defined but never used.  @typescript-eslint/no-unused-vars
+573:16  Warning: 'beamSearch' is defined but never used.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/11) ...
+   Generating static pages (2/11)
+   Generating static pages (5/11)
+   Generating static pages (8/11)
+ ✓ Generating static pages (11/11)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    6.09 kB         117 kB
+├ ○ /_not-found                            996 B         104 kB
+├ ƒ /api/export-volume                     123 B         103 kB
+├ ○ /composition                           66 kB         423 kB
+├ ○ /crops                               3.22 kB         114 kB
+├ ○ /evaluations                          108 kB         472 kB
+├ ○ /lattice                             39.1 kB         258 kB
+├ ○ /shapes                              2.25 kB         218 kB
+└ ○ /voids                               2.89 kB         218 kB
++ First Load JS shared by all             103 kB
+  ├ chunks/255-ce8c7c75002f810b.js       46.5 kB
+  ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+  └ other shared chunks (total)          2.32 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+npm notice
+npm notice New major version of npm available! 11.17.0 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice

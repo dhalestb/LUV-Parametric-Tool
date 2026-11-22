@@ -1,0 +1,12 @@
+✔ a localized low beam changes only its projected area, even with duplicated floor faces (93.7948ms)
+✔ a sub-sample slit interrupts a crossing that looks supported at all sample centers (6.4578ms)
+✔ clearance prism catches a thin blocking wall between sampled rays (7.2847ms)
+✔ overlapping floors have no inferred vertical route; a continuous sloped face spans the gap (3.452ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 488.3232

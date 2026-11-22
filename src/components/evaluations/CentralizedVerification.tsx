@@ -7,6 +7,7 @@ import type { RegionReconstruction } from './v4/architecturalRegions';
 import { regionDiagnosticSvg } from './v4/architecturalRegionDiagnostics';
 import { validateVerification, scoreVerifiedDestinations, type SpatialVerification, type RegionReview } from './v4/spatialVerification';
 import { createSpatialReview } from './v4/spatialReviewFactory';
+import sourceReview from './v4/sourceReviewIndex.json';
 import type { DescriptorResult } from './objDescriptorAnalysis';
 import { geometryHash, verifiedResult, reviewKey, pendingCentralized } from './v4/verifiedCentralizedResult';
 type Item = {
@@ -25,6 +26,8 @@ export default function CentralizedVerification({ meshes, unit, upAxisMode, onAp
     useEffect(() => { setItems([]); }, [meshes, unit, upAxisMode]);
     const item = items[active], review = item?.review, region = review?.regions.find(r => r.id === regionId), scores = review ? scoreVerifiedDestinations(review) : [], selected = scores.find(s => s.region.id === regionId);
     const storage = (r: SpatialVerification) => reviewKey(r.filename, r.geometryHash);
+    const sourceModel = sourceReview.find(model => model.geometryHash === review?.geometryHash);
+    const evidence = sourceModel?.regions.find(r => r.id === regionId);
     function edit(update: (r: SpatialVerification) => SpatialVerification) { if (!item)
         return; try {
         const next = update(structuredClone(item.review));
@@ -91,6 +94,7 @@ export default function CentralizedVerification({ meshes, unit, upAxisMode, onAp
     const changeRegion = (field: keyof RegionReview, value: unknown) => edit(r => ({ ...r, coverageConfirmed: false, regions: r.regions.map(x => x.id === regionId ? { ...x, [field]: value } : x) }));
     return <details className="rounded border p-3 text-sm">
     <summary>Centralized · verify regions and circulation</summary>
+    <p><a className="underline" href="/centralized-source-review/index.html" target="_blank" rel="noreferrer">Open the nine annotated source reviews and comparison matrix</a></p>
     <p>Review at least 100 ft² of continuous floor and 10 ft of clear width. Enter measured headroom or confirm open sky. A usable 7 ft gallery can qualify.</p>
     <p>Select measured regions in the plan and 3D views, classify their use, then review each connection. Gold indicates the selected region, not yet a verified gathering destination.</p>
     <button disabled={busy || !meshes.length} onClick={() => void load()}>{busy ? 'Reading model geometry…' : 'Load spatial review'}</button>
@@ -99,6 +103,12 @@ export default function CentralizedVerification({ meshes, unit, upAxisMode, onAp
         </label>
   <label>Region <select value={regionId} onChange={e => setRegionId(Number(e.target.value))}>{review.regions.map(r => <option key={r.id} value={r.id}>R{r.id} · z {r.levelFeet.toFixed(2)}′ · {r.area.toFixed(1)} ft² · {r.role}</option>)}</select>
         </label>
+  {sourceModel && <section className="grid gap-2 rounded border p-3">
+    <p>Measured locations in this source geometry</p>
+    <div className="flex flex-wrap gap-2">{sourceModel.regions.map(r => <button type="button" key={r.id} onClick={() => setRegionId(r.id)}>R{r.id} · {r.z.toFixed(2)} ft</button>)}</div>
+    {evidence && <><p>{evidence.finding}</p><p>{evidence.support.toFixed(1)} ft² of source floor · {evidence.clear.toFixed(1)} ft² with 7 ft of headroom · {evidence.width.toFixed(2)} ft clear patch diameter</p>
+    <a className="underline" href={'/centralized-source-review/index.html#'+evidence.anchor} target="_blank" rel="noreferrer">Inspect this footprint, obstructions and tested crossings</a></>}
+  </section>}
   <label>
         <input type="checkbox" checked={diagnostics} onChange={e => setDiagnostics(e.target.checked)}/> All spatial diagnostics</label>
   <div className="grid grid-cols-2 gap-2">{[false, true].map(isometric => <img key={String(isometric)} alt={`${review.filename} ${isometric ? '3D' : 'plan'} selected region R${regionId}`} src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(regionDiagnosticSvg(item.ctx, item.reconstruction, { isometric, levelId: isometric ? undefined : item.reconstruction.regions.find(r => r.id === regionId)?.levelId, selectedRegion: diagnostics ? undefined : regionId, reviewRoutes: review.connections.filter(c => c.state === 'connected' && (c.from === regionId || c.to === regionId)).map(c => c.path) }))}`}/>)}</div>

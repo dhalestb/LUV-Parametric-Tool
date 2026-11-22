@@ -1,0 +1,98 @@
+[
+  {
+    "geometryHash": "a1bd4c04a308353748ec239b7aaaa24b767d8e8e0e1172e3934337f27e891af9",
+    "regions": [
+      {
+        "id": 10,
+        "z": 0.5313,
+        "support": 752.2229,
+        "clear": 752.2229,
+        "width": 20.95,
+        "anchor": "Linear-R10",
+        "finding": "Covered lower-floor gathering candidate."
+      },
+      {
+        "id": 3,
+        "z": 10,
+        "support": 412.5565,
+        "clear": 405.1358,
+        "width": 14.77,
+        "anchor": "Linear-R3",
+        "finding": "Covered gallery candidate with localized low headroom."
+      },
+      {
+        "id": 4,
+        "z": 17.5313,
+        "support": 327.6622,
+        "clear": 326.9586,
+        "width": 12.91,
+        "anchor": "Linear-R4",
+        "finding": "Predominantly open-to-sky upper surface. Occupancy is unknown."
+      }
+    ]
+  },
+  {
+    "geometryHash": "e04c33109f5a0f58f33b0b1d471fa6c30032bc63ff800525d2b50e8012a9b6dd",
+    "regions": [
+      {
+        "id": 70,
+        "z": 38.4647,
+        "support": 215.5128,
+        "clear": 198.4747,
+        "width": 7.3,
+        "anchor": "Stepped-R70",
+        "finding": "Connected floor with localized obstructions. Its seven-foot-clear footprint is too narrow for a ten-foot gathering patch."
+      },
+      {
+        "id": 215,
+        "z": 9.1582,
+        "support": 191.9987,
+        "clear": 145.1504,
+        "width": 5.56,
+        "anchor": "Stepped-R215",
+        "finding": "Narrow stepped-floor candidate with overhead obstructions."
+      },
+      {
+        "id": 2,
+        "z": 9.2687,
+        "support": 164.7623,
+        "clear": 134.4773,
+        "width": 5.39,
+        "anchor": "Stepped-R2",
+        "finding": "Narrow lower-level floor with separated clear patches."
+      }
+    ]
+  },
+  {
+    "geometryHash": "1587dc0976dd73792a368aa1bf94a4a490b91d1f221ac7ca015daa2a4fea819b",
+    "regions": [
+      {
+        "id": 3,
+        "z": 47.64,
+        "support": 733.6562,
+        "clear": 731.3673,
+        "width": 11.73,
+        "anchor": "Void_Field-R3",
+        "finding": "Predominantly open-to-sky top surface with multiple clear pieces."
+      },
+      {
+        "id": 0,
+        "z": 2.64,
+        "support": 480.1428,
+        "clear": 469.4594,
+        "width": 7.41,
+        "anchor": "Void_Field-R0",
+        "finding": "Covered lower-level floor. Its seven-foot-clear footprint does not fit a ten-foot circle."
+      },
+      {
+        "id": 34,
+        "z": 32.64,
+        "support": 375.1744,
+        "clear": 374.7403,
+        "width": 11.73,
+        "anchor": "Void_Field-R34",
+        "finding": "Covered floor with a sufficiently wide, continuous gathering patch. Access and intended use remain unconfirmed."
+      }
+    ]
+  }
+]
