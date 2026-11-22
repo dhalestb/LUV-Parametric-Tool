@@ -1,0 +1,7 @@
+require('../scripts/ts-test-register.cjs');
+const fs=require('node:fs'),path=require('node:path');const {parseObj}=require('../src/components/lattice/parseObj.ts');
+const {buildV4Context}=require('../src/components/evaluations/v4/evaluateV4.ts');const {centralizedContext}=require('../src/components/evaluations/v4/centralizedContext.ts');
+const {reconstructArchitecturalRegions}=require('../src/components/evaluations/v4/architecturalRegions.ts');const {destinationRoutes}=require('../src/components/evaluations/v4/destinationRoutes.ts');
+const refs=require('./centralized-phase2/model-evidence.json');if(!process.argv[2])throw new Error('Provide original OBJ directory.');
+const rows=[];for(const ref of refs){const raw=fs.readFileSync(path.join(process.argv[2],ref.filename),'utf8'),m=parseObj(raw,ref.filename),ctx=centralizedContext(buildV4Context({positions:m.positions,faces:m.faces,up:'z',unitScale:1},ref.result.sourceId));if(ctx.mesh.sourceHash!==ref.result.sourceHash)throw new Error('Source identity changed');const reconstructed=reconstructArchitecturalRegions(ctx,{enabled:true});const large=reconstructed.regions.slice().sort((a,b)=>b.area-a.area).slice(0,5);rows.push({filename:ref.filename,regions:reconstructed.regions.length,large:large.map(r=>({id:r.id,area:r.area,levelId:r.levelId,route:destinationRoutes(reconstructed,r.id)}))});}
+fs.writeFileSync('reports/destination-evidence.json',JSON.stringify(rows,null,2));console.log(JSON.stringify(rows.map(r=>({filename:r.filename,regions:r.regions,largest:r.large[0]})),null,2));

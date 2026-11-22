@@ -1,0 +1,172 @@
+[
+  {
+    "id": "openVolume",
+    "name": "Open Volume",
+    "cohort": 3,
+    "rows": [
+      {
+        "model": "Linear.obj",
+        "sourceHash": "5f11ef0a",
+        "score": 24.84152791380999,
+        "available": true,
+        "reason": null,
+        "rank": 3,
+        "cohort": 3
+      },
+      {
+        "model": "Stepped.obj",
+        "sourceHash": "10b2c3d1",
+        "score": 1.4823145732389116,
+        "available": true,
+        "reason": null,
+        "rank": 1,
+        "cohort": 3
+      },
+      {
+        "model": "Void_Field.obj",
+        "sourceHash": "444f9645",
+        "score": 7.87468758678145,
+        "available": true,
+        "reason": null,
+        "rank": 2,
+        "cohort": 3
+      }
+    ]
+  },
+  {
+    "id": "visuallyConnected",
+    "name": "Visually Connected",
+    "cohort": 3,
+    "rows": [
+      {
+        "model": "Linear.obj",
+        "sourceHash": "5f11ef0a",
+        "score": 32.307601494597215,
+        "available": true,
+        "reason": null,
+        "rank": 1,
+        "cohort": 3
+      },
+      {
+        "model": "Stepped.obj",
+        "sourceHash": "10b2c3d1",
+        "score": 35.982693634570104,
+        "available": true,
+        "reason": null,
+        "rank": 2,
+        "cohort": 3
+      },
+      {
+        "model": "Void_Field.obj",
+        "sourceHash": "444f9645",
+        "score": 47.48446814988361,
+        "available": true,
+        "reason": null,
+        "rank": 3,
+        "cohort": 3
+      }
+    ]
+  },
+  {
+    "id": "circulationActivated",
+    "name": "Circulation Activated",
+    "cohort": 3,
+    "rows": [
+      {
+        "model": "Linear.obj",
+        "sourceHash": "5f11ef0a",
+        "score": 44.054658100823815,
+        "available": true,
+        "reason": null,
+        "rank": 2,
+        "cohort": 3
+      },
+      {
+        "model": "Stepped.obj",
+        "sourceHash": "10b2c3d1",
+        "score": 44.33368442927763,
+        "available": true,
+        "reason": null,
+        "rank": 3,
+        "cohort": 3
+      },
+      {
+        "model": "Void_Field.obj",
+        "sourceHash": "444f9645",
+        "score": 16.263736263736263,
+        "available": true,
+        "reason": null,
+        "rank": 1,
+        "cohort": 3
+      }
+    ]
+  },
+  {
+    "id": "verticallyIntegrated",
+    "name": "Vertically Integrated",
+    "cohort": 3,
+    "rows": [
+      {
+        "model": "Linear.obj",
+        "sourceHash": "5f11ef0a",
+        "score": 30,
+        "available": true,
+        "reason": null,
+        "rank": 2,
+        "cohort": 3
+      },
+      {
+        "model": "Stepped.obj",
+        "sourceHash": "10b2c3d1",
+        "score": 45.231918238993714,
+        "available": true,
+        "reason": null,
+        "rank": 3,
+        "cohort": 3
+      },
+      {
+        "model": "Void_Field.obj",
+        "sourceHash": "444f9645",
+        "score": 20.459466263846927,
+        "available": true,
+        "reason": null,
+        "rank": 1,
+        "cohort": 3
+      }
+    ]
+  },
+  {
+    "id": "centralized",
+    "name": "Centralized",
+    "cohort": 1,
+    "rows": [
+      {
+        "model": "Linear.obj",
+        "sourceHash": "5f11ef0a",
+        "score": null,
+        "available": false,
+        "reason": "Insufficient evidence: No verified relationships between spatial regions were found.",
+        "rank": null,
+        "cohort": null
+      },
+      {
+        "model": "Stepped.obj",
+        "sourceHash": "10b2c3d1",
+        "score": 6.13389656938044,
+        "available": true,
+        "reason": null,
+        "rank": 1,
+        "cohort": 1
+      },
+      {
+        "model": "Void_Field.obj",
+        "sourceHash": "444f9645",
+        "score": null,
+        "available": false,
+        "reason": "Insufficient evidence: No verified relationships between spatial regions were found.",
+        "rank": null,
+        "cohort": null
+      }
+    ]
+  }
+]

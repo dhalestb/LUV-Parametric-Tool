@@ -1,0 +1,338 @@
+[
+  {
+    "filename": "Linear.obj",
+    "regions": 86,
+    "large": [
+      {
+        "id": 10,
+        "area": 769,
+        "levelId": 1,
+        "route": {
+          "approachRegions": [],
+          "approachCount": 0,
+          "reachedRegionIds": [
+            10
+          ],
+          "connectedArea": 0,
+          "unknownArea": 1505,
+          "unknownBoundaryRecords": 2,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 3,
+        "area": 423,
+        "levelId": 10,
+        "route": {
+          "approachRegions": [
+            9,
+            16,
+            54
+          ],
+          "approachCount": 1,
+          "reachedRegionIds": [
+            3,
+            9,
+            13,
+            15,
+            16,
+            53,
+            54
+          ],
+          "connectedArea": 418,
+          "unknownArea": 1433,
+          "unknownBoundaryRecords": 2,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 4,
+        "area": 337,
+        "levelId": 17,
+        "route": {
+          "approachRegions": [
+            72
+          ],
+          "approachCount": 1,
+          "reachedRegionIds": [
+            4,
+            72
+          ],
+          "connectedArea": 6,
+          "unknownArea": 1931,
+          "unknownBoundaryRecords": 2,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 16,
+        "area": 219,
+        "levelId": 10,
+        "route": {
+          "approachRegions": [
+            3,
+            15,
+            53
+          ],
+          "approachCount": 2,
+          "reachedRegionIds": [
+            3,
+            9,
+            13,
+            15,
+            16,
+            53,
+            54
+          ],
+          "connectedArea": 622,
+          "unknownArea": 1433,
+          "unknownBoundaryRecords": 2,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 9,
+        "area": 185,
+        "levelId": 10,
+        "route": {
+          "approachRegions": [
+            3,
+            13,
+            54
+          ],
+          "approachCount": 1,
+          "reachedRegionIds": [
+            3,
+            9,
+            13,
+            15,
+            16,
+            53,
+            54
+          ],
+          "connectedArea": 656,
+          "unknownArea": 1433,
+          "unknownBoundaryRecords": 2,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      }
+    ]
+  },
+  {
+    "filename": "Stepped.obj",
+    "regions": 341,
+    "large": [
+      {
+        "id": 70,
+        "area": 229,
+        "levelId": 62,
+        "route": {
+          "approachRegions": [
+            9,
+            203,
+            212
+          ],
+          "approachCount": 2,
+          "reachedRegionIds": [
+            9,
+            70,
+            89,
+            203,
+            212,
+            293,
+            340
+          ],
+          "connectedArea": 553,
+          "unknownArea": 4974,
+          "unknownBoundaryRecords": 88,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 215,
+        "area": 205,
+        "levelId": 21,
+        "route": {
+          "approachRegions": [],
+          "approachCount": 0,
+          "reachedRegionIds": [
+            215
+          ],
+          "connectedArea": 0,
+          "unknownArea": 5551,
+          "unknownBoundaryRecords": 88,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 2,
+        "area": 182,
+        "levelId": 21,
+        "route": {
+          "approachRegions": [],
+          "approachCount": 0,
+          "reachedRegionIds": [
+            2
+          ],
+          "connectedArea": 0,
+          "unknownArea": 5574,
+          "unknownBoundaryRecords": 88,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 139,
+        "area": 178,
+        "levelId": 20,
+        "route": {
+          "approachRegions": [],
+          "approachCount": 0,
+          "reachedRegionIds": [
+            139
+          ],
+          "connectedArea": 0,
+          "unknownArea": 5578,
+          "unknownBoundaryRecords": 88,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 152,
+        "area": 164,
+        "levelId": 38,
+        "route": {
+          "approachRegions": [],
+          "approachCount": 0,
+          "reachedRegionIds": [
+            152
+          ],
+          "connectedArea": 0,
+          "unknownArea": 5592,
+          "unknownBoundaryRecords": 88,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      }
+    ]
+  },
+  {
+    "filename": "Void_Field.obj",
+    "regions": 149,
+    "large": [
+      {
+        "id": 3,
+        "area": 765,
+        "levelId": 37,
+        "route": {
+          "approachRegions": [],
+          "approachCount": 0,
+          "reachedRegionIds": [
+            3
+          ],
+          "connectedArea": 0,
+          "unknownArea": 2550,
+          "unknownBoundaryRecords": 70,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 0,
+        "area": 503,
+        "levelId": 3,
+        "route": {
+          "approachRegions": [
+            49,
+            73
+          ],
+          "approachCount": 2,
+          "reachedRegionIds": [
+            0,
+            49,
+            73
+          ],
+          "connectedArea": 8,
+          "unknownArea": 2804,
+          "unknownBoundaryRecords": 70,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 34,
+        "area": 387,
+        "levelId": 25,
+        "route": {
+          "approachRegions": [
+            56
+          ],
+          "approachCount": 1,
+          "reachedRegionIds": [
+            34,
+            56
+          ],
+          "connectedArea": 5,
+          "unknownArea": 2923,
+          "unknownBoundaryRecords": 70,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 33,
+        "area": 376,
+        "levelId": 8,
+        "route": {
+          "approachRegions": [
+            55,
+            72
+          ],
+          "approachCount": 2,
+          "reachedRegionIds": [
+            33,
+            55,
+            72
+          ],
+          "connectedArea": 4,
+          "unknownArea": 2935,
+          "unknownBoundaryRecords": 70,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      },
+      {
+        "id": 2,
+        "area": 331,
+        "levelId": 25,
+        "route": {
+          "approachRegions": [
+            51,
+            75,
+            83
+          ],
+          "approachCount": 3,
+          "reachedRegionIds": [
+            2,
+            51,
+            75,
+            83
+          ],
+          "connectedArea": 6,
+          "unknownArea": 2978,
+          "unknownBoundaryRecords": 70,
+          "disconnectedArea": 0,
+          "reachabilityStatus": "bounded"
+        }
+      }
+    ]
+  }
+]

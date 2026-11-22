@@ -1,0 +1,75 @@
+[
+  {
+    "filename": "Linear.obj",
+    "regions": 86,
+    "largest": {
+      "id": 10,
+      "area": 769,
+      "levelId": 1,
+      "route": {
+        "approachRegions": [],
+        "approachCount": 0,
+        "reachedRegionIds": [
+          10
+        ],
+        "connectedArea": 0,
+        "unknownArea": 1505,
+        "unknownBoundaryRecords": 2,
+        "disconnectedArea": 0,
+        "reachabilityStatus": "bounded"
+      }
+    }
+  },
+  {
+    "filename": "Stepped.obj",
+    "regions": 341,
+    "largest": {
+      "id": 70,
+      "area": 229,
+      "levelId": 62,
+      "route": {
+        "approachRegions": [
+          9,
+          203,
+          212
+        ],
+        "approachCount": 2,
+        "reachedRegionIds": [
+          9,
+          70,
+          89,
+          203,
+          212,
+          293,
+          340
+        ],
+        "connectedArea": 553,
+        "unknownArea": 4974,
+        "unknownBoundaryRecords": 88,
+        "disconnectedArea": 0,
+        "reachabilityStatus": "bounded"
+      }
+    }
+  },
+  {
+    "filename": "Void_Field.obj",
+    "regions": 149,
+    "largest": {
+      "id": 3,
+      "area": 765,
+      "levelId": 37,
+      "route": {
+        "approachRegions": [],
+        "approachCount": 0,
+        "reachedRegionIds": [
+          3
+        ],
+        "connectedArea": 0,
+        "unknownArea": 2550,
+        "unknownBoundaryRecords": 70,
+        "disconnectedArea": 0,
+        "reachabilityStatus": "bounded"
+      }
+    }
+  }
+]
