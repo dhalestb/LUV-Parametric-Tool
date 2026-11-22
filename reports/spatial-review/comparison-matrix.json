@@ -1,0 +1,119 @@
+[
+  {
+    "filename": "Linear.obj",
+    "sourceSha256": "17c938d3b4e09893f652412d7b9d966562e60a14ddf013aef0cf3c7682bff258",
+    "geometryHash": "a1bd4c04a308353748ec239b7aaaa24b767d8e8e0e1172e3934337f27e891af9",
+    "topDecks": false,
+    "unit": "feet",
+    "up": "z",
+    "regions": 86,
+    "proposedConnections": 12,
+    "descriptors": {
+      "openVolume": {
+        "score": 24.84152791380999,
+        "rank": 3,
+        "cohort": 3
+      },
+      "visuallyConnected": {
+        "score": 32.307601494597215,
+        "rank": 1,
+        "cohort": 3
+      },
+      "circulationActivated": {
+        "score": 44.054658100823815,
+        "rank": 2,
+        "cohort": 3
+      },
+      "centralized": {
+        "score": null,
+        "rank": null,
+        "version": "centralized-verified-v2.0.0",
+        "reason": "Review gathering use, clear width and circulation in Centralized spatial verification.",
+        "historicalScore": null
+      },
+      "verticallyIntegrated": {
+        "score": 30,
+        "rank": 2,
+        "cohort": 3
+      }
+    }
+  },
+  {
+    "filename": "Stepped.obj",
+    "sourceSha256": "761b7eead53d8e3e6cd7f39fa0744f9f1ee299ddbab7bdbcfd2273a15f761a2c",
+    "geometryHash": "e04c33109f5a0f58f33b0b1d471fa6c30032bc63ff800525d2b50e8012a9b6dd",
+    "topDecks": false,
+    "unit": "feet",
+    "up": "z",
+    "regions": 341,
+    "proposedConnections": 305,
+    "descriptors": {
+      "openVolume": {
+        "score": 1.4823145732389116,
+        "rank": 1,
+        "cohort": 3
+      },
+      "visuallyConnected": {
+        "score": 35.982693634570104,
+        "rank": 2,
+        "cohort": 3
+      },
+      "circulationActivated": {
+        "score": 44.33368442927763,
+        "rank": 3,
+        "cohort": 3
+      },
+      "centralized": {
+        "score": null,
+        "rank": null,
+        "version": "centralized-verified-v2.0.0",
+        "reason": "Review gathering use, clear width and circulation in Centralized spatial verification.",
+        "historicalScore": 6.13389656938044
+      },
+      "verticallyIntegrated": {
+        "score": 45.231918238993714,
+        "rank": 3,
+        "cohort": 3
+      }
+    }
+  },
+  {
+    "filename": "Void_Field.obj",
+    "sourceSha256": "129f4ec8d491855ce0fd2f8acda3502620d6694ff5fc1be836561b46f6cc8030",
+    "geometryHash": "1587dc0976dd73792a368aa1bf94a4a490b91d1f221ac7ca015daa2a4fea819b",
+    "topDecks": false,
+    "unit": "feet",
+    "up": "z",
+    "regions": 149,
+    "proposedConnections": 128,
+    "descriptors": {
+      "openVolume": {
+        "score": 7.87468758678145,
+        "rank": 2,
+        "cohort": 3
+      },
+      "visuallyConnected": {
+        "score": 47.48446814988361,
+        "rank": 3,
+        "cohort": 3
+      },
+      "circulationActivated": {
+        "score": 16.263736263736263,
+        "rank": 1,
+        "cohort": 3
+      },
+      "centralized": {
+        "score": null,
+        "rank": null,
+        "version": "centralized-verified-v2.0.0",
+        "reason": "Review gathering use, clear width and circulation in Centralized spatial verification.",
+        "historicalScore": null
+      },
+      "verticallyIntegrated": {
+        "score": 20.459466263846927,
+        "rank": 1,
+        "cohort": 3
+      }
+    }
+  }
+]

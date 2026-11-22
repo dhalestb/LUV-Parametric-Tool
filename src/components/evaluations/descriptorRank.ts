@@ -24,6 +24,7 @@ export type RankComponent = {
 
 export type RankDescriptor = {
   id: string;
+  version?: string;
   absoluteScore: number;
   components: RankComponent[];
   comparativeRank?: number;
@@ -42,7 +43,14 @@ export type RankDescriptor = {
  */
 export function assignComparativeRanks<T extends { formId: string; descriptors: RankDescriptor[] }>(forms: T[]) {
   if (!forms.length) return forms;
-  const ids = forms[0].descriptors.map((descriptor) => descriptor.id);
+  const centralVersions = new Set(forms.flatMap(f=>f.descriptors.filter(d=>d.id==='centralized').map(d=>d.version??'legacy')));
+  if(centralVersions.size>1)for(const version of centralVersions){
+    assignComparativeRanks(forms.flatMap(f=>{
+      const descriptors=f.descriptors.filter(d=>d.id==='centralized'&&(d.version??'legacy')===version);
+      return descriptors.length?[{formId:f.formId,descriptors}]:[];
+    }));
+  }
+  const ids = forms[0].descriptors.map((descriptor) => descriptor.id).filter(id=>id!=='centralized'||centralVersions.size<=1);
   for (const id of ids) {
     const rows = forms.flatMap((form, index) => {
       const descriptor = form.descriptors.find((item) => item.id === id);

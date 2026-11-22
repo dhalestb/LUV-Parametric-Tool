@@ -108,7 +108,7 @@ const PRESENTATION_KEEP: Record<string, readonly string[]> = {
   hierarchical: ["hi-primary", "hi-secondary", "hi-tertiary"],
   sequential: ["sq-path", "sq-arrows", "sq-stages", "sq-descent", "sq-metrics"],
   circulationActivated: ["ca-spine", "ca-gathering"],
-  centralized: ["ce-gathering", "ce-primary", "ce-secondary", "ce-regions", "ce-relationships", "ce-centroids", "ce-inner", "ce-inner-clear", "ce-center", "ce-guides"],
+  centralized: ["ce-gathering", "ce-approaches", "ce-primary", "ce-secondary", "ce-regions", "ce-relationships", "ce-centroids", "ce-inner", "ce-inner-clear", "ce-center", "ce-guides"],
   verticallyIntegrated: ["vi-levels", "vi-chain", "vi-double-height", "vi-double-volume"],
   luminous: ["lu-lit", "lu-overhead", "lu-lateral"],
 };
@@ -389,6 +389,7 @@ function styleLayer(layer: EvidenceLayer, options: PresentationOptions = {}): Ev
 }
 
 function presentationOverride(id: string): Partial<Pick<EvidenceLayer, "pointShape" | "pointScale">> & { color?: string } {
+  if (id === "ce-approaches") return { color: "#43D9F1" };
   if (id === "ce-gathering") return { color: "#D6AD4F" };
   if (id === "ce-primary") return { color: "#D6AD4F" };
   if (id === "ce-secondary") return { color: "#9BD5E4" };

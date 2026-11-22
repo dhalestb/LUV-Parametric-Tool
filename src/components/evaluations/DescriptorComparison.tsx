@@ -410,6 +410,7 @@ export default function DescriptorComparison({
   }
 
   const unitScale = UNIT_TO_FEET[unit];
+  const verifiedCentralizedPresent = descriptorId==='centralized' && rows.some(r=>r.result?.descriptors.some(d=>d.id==='centralized'&&d.version==='centralized-verified-v2.0.0'));
   const prepared = useMemo(() => rows.map((row) => {
     const descriptor = row.result?.descriptors.find((item) => item.id === descriptorId);
     const up = row.mesh ? resolvedUp(row.mesh.upAxis, upAxisMode) : "z";
@@ -425,8 +426,8 @@ export default function DescriptorComparison({
         ? (descriptor?.components.find((item) => item.name === "Higher Levels Reached")?.raw ?? 0)
         : null,
       circulationFeasible: null,
-      eligible: Boolean(row.mesh && row.result?.status === "ready" && descriptor && Number.isFinite(descriptor.absoluteScore)),
-      ineligibleReason: !row.mesh
+      eligible: Boolean((!verifiedCentralizedPresent||descriptor?.version==='centralized-verified-v2.0.0')&&row.mesh && row.result?.status === "ready" && descriptor && Number.isFinite(descriptor.absoluteScore)),
+      ineligibleReason: verifiedCentralizedPresent&&descriptor?.version!=='centralized-verified-v2.0.0' ? 'Historical Centralized methodology; excluded from the verified 40/40/20 comparison.' : !row.mesh
         ? "No source OBJ."
         : row.result?.status !== "ready"
           ? "Not evaluated."
@@ -437,7 +438,7 @@ export default function DescriptorComparison({
               : undefined,
     };
     return { row, form, up, revision, descriptor };
-  }), [rows, descriptorId, upAxisMode]);
+  }), [rows, descriptorId, upAxisMode, verifiedCentralizedPresent]);
 
   const selection = useMemo(
     () => selectDescriptorExtremes(descriptorId, prepared.map((item) => item.form)),
@@ -952,7 +953,7 @@ export default function DescriptorComparison({
             </div>
             <div className="flex flex-wrap items-end gap-4">
               <div>
-                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{descriptorId === "sequential" ? "Verified vertical gain" : descriptorId === "centralized" ? "Network Centralization Score" : "Absolute score"}</div>
+                <div className="text-[11px] uppercase tracking-wide" style={{ color: GOLD }}>{descriptorId === "sequential" ? "Verified vertical gain" : descriptorId === "centralized" ? "Centralized score" : "Absolute score"}</div>
                 <div className="text-[28px] font-semibold leading-none" style={{ color: "#F7F6F5" }} data-absolute-score={available ? data.item.descriptor.absoluteScore.toFixed(2) : "unavailable"}>
                   {available
                     ? (descriptorId === "sequential" ? `${data.item.descriptor.absoluteScore.toFixed(1)} ft` : data.item.descriptor.absoluteScore.toFixed(1))
@@ -991,7 +992,7 @@ export default function DescriptorComparison({
             {descriptorId === "centralized" && v4 && (
               <div className="text-[11px]" style={{ color: GOLD }}>
                 <div>{data.item.descriptor.evidence?.measurements.gatheringStatus ?? "Gathering Space Not Reliably Identified"}</div>
-                <div>Region {data.item.descriptor.evidence?.measurements.gatheringRegion ?? "—"} · {data.item.descriptor.evidence?.measurements.gatheringAreaFt2 ?? "—"} ft² continuous floor · Mean clear height {typeof data.item.descriptor.evidence?.measurements.gatheringClearHeightFt === "number" ? Number(data.item.descriptor.evidence.measurements.gatheringClearHeightFt).toFixed(1) : "—"} ft</div>
+                <div>Region {data.item.descriptor.evidence?.measurements.gatheringRegion ?? "—"} · {data.item.descriptor.evidence?.measurements.gatheringAreaFt2 ?? "—"} ft² continuous floor · Clear height {typeof data.item.descriptor.evidence?.measurements.gatheringClearHeightFt === "number" ? Number(data.item.descriptor.evidence.measurements.gatheringClearHeightFt).toFixed(1) : "—"} ft</div>
               </div>
             )}
             {descriptorId === "openVolume" && v4 && (

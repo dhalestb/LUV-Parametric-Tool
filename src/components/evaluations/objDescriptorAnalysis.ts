@@ -689,7 +689,7 @@ export function publishDescriptorRanks(forms: Array<Pick<FormDescriptorEvaluatio
   const payload: DescriptorRankSnapshot = {
     version: DESCRIPTOR_ALGORITHM_VERSION,
     openVolumeVersion: OPEN_VOLUME_ALGORITHM_VERSION,
-    centralizedVersion: CENTRALIZED_ALGORITHM_VERSION,
+    centralizedVersion: forms.find(f=>f.descriptors.some(d=>d.id==='centralized'))?.descriptors.find(d=>d.id==='centralized')?.version??CENTRALIZED_ALGORITHM_VERSION,
     forms: forms.map((form) => ({
       slotId: form.slotId,
       meshId: form.meshId,

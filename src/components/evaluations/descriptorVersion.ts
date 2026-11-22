@@ -18,5 +18,6 @@ export const LEGACY_DESCRIPTOR_ALGORITHM_VERSION = "v3.5";
 export type DescriptorAlgorithmVersion =
   | typeof DESCRIPTOR_ALGORITHM_VERSION
   | typeof OPEN_VOLUME_ALGORITHM_VERSION
+  | "centralized-verified-v2.0.0"
   | typeof CENTRALIZED_ALGORITHM_VERSION
   | typeof LEGACY_DESCRIPTOR_ALGORITHM_VERSION;

@@ -139,3 +139,10 @@ describe("comparative ranks", () => {
     assert.deepEqual(read(once), read(twice));
   });
 });
+
+ it('never ranks historical and reviewed Centralized methods in one cohort',()=>{
+ const forms=[{formId:'old',descriptors:[{id:'centralized',version:'graph-v1',absoluteScore:6.1,components:[]}]},{formId:'new',descriptors:[{id:'centralized',version:'verified-v2',absoluteScore:70,components:[]}]}];
+ assignComparativeRanks(forms);
+ assert.equal((forms[0].descriptors[0] as typeof forms[0]['descriptors'][0] & {cohortSize?:number}).cohortSize,1);
+ assert.equal((forms[1].descriptors[0] as RankDescriptor).cohortSize,1);
+ });

@@ -1,4 +1,5 @@
 "use client";
+import CentralizedVerification from './CentralizedVerification';
 import ArchitecturalRegionExperiment from './ArchitecturalRegionExperiment';
 
 import { OrbitControls } from "@react-three/drei";
@@ -188,6 +189,11 @@ export default function ArchitecturalEvaluations() {
           up,
           unitScale: UNIT_TO_FEET[unit],
         }, { includeTopDecks, retainedDescriptors: results[mesh.id]?.descriptors });
+        const {savedCentralizedResult}=await import('./v4/verifiedCentralizedResult');
+        const verified=await savedCentralizedResult(mesh,up,unit);
+        const legacy=evaluated.descriptors.find(d=>d.id==='centralized');
+        const historicalKey='luv-centralized-graph-history:'+mesh.id+':'+legacy?.evidence?.sourceHash+':'+up+':'+unit+':'+includeTopDecks;
+        if(legacy&&!localStorage.getItem(historicalKey))localStorage.setItem(historicalKey,JSON.stringify({score:legacy.absoluteScore,version:legacy.version,reason:legacy.unavailableReason}));
         nextModels[mesh.id] = model;
         nextResults[mesh.id] = {
           meshId: mesh.id,
@@ -199,7 +205,7 @@ export default function ArchitecturalEvaluations() {
           status: "ready",
           confidence: evaluated.confidence,
           raw: evaluated.raw,
-          descriptors: evaluated.descriptors,
+          descriptors: evaluated.descriptors.map(d=>d.id==='centralized'?verified:d),
         };
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
@@ -326,6 +332,14 @@ export default function ArchitecturalEvaluations() {
       </header>
 
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>{status}</p>
+      <CentralizedVerification meshes={meshes} unit={unit} upAxisMode={upAxisMode} onApply={(id,descriptor)=>{
+        if(!results[id])return false;
+        const ranked=Object.values(results).map(form=>({...form,descriptors:form.descriptors.map(d=>d.id==='centralized'&&form.meshId===id?{...descriptor}:{...d})}));
+        assignRelativeRanks(ranked);
+        publishDescriptorRanks(ranked);
+        setResults(Object.fromEntries(ranked.map(form=>[form.meshId,form])));
+        return true;
+      }}/>
       <ArchitecturalRegionExperiment meshes={meshes} unit={unit} upAxisMode={upAxisMode}/>
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>
         Unit {unit}. Up axis {upAxisMode}. {includeTopDecks ? "Uncovered top decks on a counted level are scored as open-to-sky floor. Roof lids stay excluded. Press Analyze All Forms after changing this." : "Official v4.1: uncovered top decks are excluded from interior Open Volume, visibility, and light. Press Analyze All Forms after changing this."}
@@ -514,7 +528,7 @@ export default function ArchitecturalEvaluations() {
                 <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>
                   {explain.id === "sequential"
                     ? "Verified rise above the main entry, in feet. Rank uses this gain first, then higher levels reached. Ties keep both measurements. A form with no verified upward connection is 0. This is not the previous 0–100 Sequential blend."
-                    : explain.id === "centralized" ? "The score measures network centralization; n/a means the sampled region graph has insufficient evidence. It is not a judgment of architectural quality." : "0–100 from fixed calibration thresholds. The rank is this score's place among the analyzed forms in this session. A genuine zero is ranked. n/a is reserved for a processing failure."}
+                    : explain.id === "centralized" ? (explain.version === "centralized-verified-v2.0.0" ? "The score combines confirmed gathering suitability (40%), circulation convergence (40%), and reachability (20%)." : "Historical network centralization. Use spatial verification to review gathering regions and circulation for the 40/40/20 method.") : "0–100 from fixed calibration thresholds. The rank is this score's place among the analyzed forms in this session. A genuine zero is ranked. n/a is reserved for a processing failure."}
                 </div>
                 {explain.id === "openVolume" && explain.evidence?.measurements && (
                   <div className="mt-2 text-[11px]" style={{ color: "var(--muted)" }} data-continuous-field>

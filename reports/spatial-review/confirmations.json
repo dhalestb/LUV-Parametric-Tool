@@ -1,0 +1,447 @@
+[
+  {
+    "filename": "Linear.obj",
+    "geometryHash": "a1bd4c04a308353748ec239b7aaaa24b767d8e8e0e1172e3934337f27e891af9",
+    "locations": [
+      {
+        "id": 10,
+        "centroid": [
+          -0.2125192029578478,
+          0.4793867847854356,
+          0.53125
+        ],
+        "area": 769,
+        "clearHeight": 7.296875,
+        "proposedConnections": []
+      },
+      {
+        "id": 3,
+        "centroid": [
+          0.5941653556012093,
+          -0.3775672281323877,
+          10
+        ],
+        "area": 423,
+        "clearHeight": 5.4140625,
+        "proposedConnections": [
+          {
+            "from": 3,
+            "to": 9,
+            "state": "unknown",
+            "type": "doorway",
+            "path": [
+              [
+                -1.661153793334961,
+                -11.3515625,
+                10
+              ],
+              [
+                -0.6611537933349609,
+                -10.3515625,
+                10
+              ]
+            ],
+            "note": "Proposal: opening; geometric confidence verified. Source triangles 1959, 1957, 500, 501, 623. Two collinear source wall fragments bound this gap; an original unobstructed movement edge crosses it. Width is measured along the source wall line; accessibility and door semantics are unverified. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 3,
+            "to": 54,
+            "state": "unknown",
+            "type": "doorway",
+            "path": [
+              [
+                0.33884620666503906,
+                -11.3515625,
+                10
+              ],
+              [
+                1.338846206665039,
+                -12.3515625,
+                10
+              ]
+            ],
+            "note": "Proposal: opening; geometric confidence verified. Source triangles 1959, 1957, 500, 501, 623. Two collinear source wall fragments bound this gap; an original unobstructed movement edge crosses it. Width is measured along the source wall line; accessibility and door semantics are unverified. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 3,
+            "to": 16,
+            "state": "unknown",
+            "type": "doorway",
+            "path": [
+              [
+                1.338846206665039,
+                6.6484375,
+                10
+              ],
+              [
+                2.338846206665039,
+                7.6484375,
+                10.000000000000002
+              ]
+            ],
+            "note": "Proposal: opening; geometric confidence verified. Source triangles 2703, 2694, 2700, 2715, 2724, 2714, 2655, 2646, 2649. Two collinear source wall fragments bound this gap; an original unobstructed movement edge crosses it. Width is measured along the source wall line; accessibility and door semantics are unverified. Architectural connection requires user confirmation."
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "centroid": [
+          -0.4712428141064743,
+          0.32499536350148367,
+          17.53125
+        ],
+        "area": 337,
+        "clearHeight": null,
+        "proposedConnections": [
+          {
+            "from": 4,
+            "to": 72,
+            "state": "unknown",
+            "type": "doorway",
+            "path": [
+              [
+                12.338846206665039,
+                1.6484375,
+                17.53125
+              ],
+              [
+                13.338846206665039,
+                0.6484375,
+                17.53125
+              ]
+            ],
+            "note": "Proposal: opening; geometric confidence verified. Source triangles 2246, 2248, 3070, 3067. Two collinear source wall fragments bound this gap; an original unobstructed movement edge crosses it. Width is measured along the source wall line; accessibility and door semantics are unverified. Architectural connection requires user confirmation."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "filename": "Stepped.obj",
+    "geometryHash": "e04c33109f5a0f58f33b0b1d471fa6c30032bc63ff800525d2b50e8012a9b6dd",
+    "locations": [
+      {
+        "id": 70,
+        "centroid": [
+          -5.932314410480349,
+          3.006550218340611,
+          38.464717864990234
+        ],
+        "area": 229,
+        "clearHeight": 5.849998474121087,
+        "proposedConnections": [
+          {
+            "from": 9,
+            "to": 70,
+            "state": "unknown",
+            "type": "stair",
+            "path": [
+              [
+                -14.5,
+                -2.5,
+                38.20729064941406
+              ],
+              [
+                -14.5,
+                -1.5,
+                38.46471786499024
+              ]
+            ],
+            "note": "Proposal: step; geometric confidence unknown. Source triangles not established. Original rise-limited, unobstructed step edge crosses region boundaries. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 70,
+            "to": 203,
+            "state": "unknown",
+            "type": "stair",
+            "path": [
+              [
+                -2.5,
+                -6.5,
+                38.46471786499024
+              ],
+              [
+                -1.5,
+                -7.5,
+                38.64923095703126
+              ]
+            ],
+            "note": "Proposal: step; geometric confidence unknown. Source triangles not established. Original rise-limited, unobstructed step edge crosses region boundaries. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 70,
+            "to": 212,
+            "state": "unknown",
+            "type": "stair",
+            "path": [
+              [
+                -1.5,
+                10.5,
+                38.464717864990234
+              ],
+              [
+                -0.5,
+                11.5,
+                39.2329330444336
+              ]
+            ],
+            "note": "Proposal: step; geometric confidence verified. Source triangles 7370, 12177, 7371, 12179, 12165, 11660, 12180, 11645, 11666, 11664, 11662, 12182. Original rise-limited, unobstructed step edge crosses region boundaries. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 9,
+            "to": 70,
+            "state": "unknown",
+            "type": "stair",
+            "path": [
+              [
+                -14.5,
+                -2.5,
+                38.20729064941406
+              ],
+              [
+                -14.5,
+                -1.5,
+                38.46471786499024
+              ]
+            ],
+            "note": "Proposal: vertical-chain; geometric confidence verified. Source triangles 3061, 6448. Existing verified sample chain spans distinct levels. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 70,
+            "to": 203,
+            "state": "unknown",
+            "type": "stair",
+            "path": [
+              [
+                -2.5,
+                -6.5,
+                38.46471786499024
+              ],
+              [
+                -1.5,
+                -7.5,
+                38.64923095703126
+              ]
+            ],
+            "note": "Proposal: vertical-chain; geometric confidence verified. Source triangles 4760, 4650. Existing verified sample chain spans distinct levels. Architectural connection requires user confirmation."
+          }
+        ]
+      },
+      {
+        "id": 215,
+        "centroid": [
+          9.085365853658537,
+          -10.05609756097561,
+          9.158248901367188
+        ],
+        "area": 205,
+        "clearHeight": 5.850000381469709,
+        "proposedConnections": []
+      },
+      {
+        "id": 2,
+        "centroid": [
+          -13.302197802197803,
+          -8.565934065934066,
+          9.268736839294434
+        ],
+        "area": 182,
+        "clearHeight": 5.849999427795391,
+        "proposedConnections": []
+      }
+    ]
+  },
+  {
+    "filename": "Void_Field.obj",
+    "geometryHash": "1587dc0976dd73792a368aa1bf94a4a490b91d1f221ac7ca015daa2a4fea819b",
+    "locations": [
+      {
+        "id": 3,
+        "centroid": [
+          -0.37543319253360524,
+          0.4201953015296288,
+          47.63999938964844
+        ],
+        "area": 765,
+        "clearHeight": null,
+        "proposedConnections": []
+      },
+      {
+        "id": 0,
+        "centroid": [
+          -0.5828943081925925,
+          4.5693370523320045,
+          2.640000104904175
+        ],
+        "area": 503,
+        "clearHeight": 5.126197990963477,
+        "proposedConnections": [
+          {
+            "from": 0,
+            "to": 49,
+            "state": "unknown",
+            "type": "stair",
+            "path": [
+              [
+                -6.610727310180664,
+                7.084247589111328,
+                2.640000104904174
+              ],
+              [
+                -5.610727310180664,
+                7.084247589111328,
+                2.8889999389648438
+              ]
+            ],
+            "note": "Proposal: step; geometric confidence unknown. Source triangles not established. Original rise-limited, unobstructed step edge crosses region boundaries. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 0,
+            "to": 73,
+            "state": "unknown",
+            "type": "doorway",
+            "path": [
+              [
+                -2.610727310180664,
+                8.084247589111328,
+                2.888999938964843
+              ],
+              [
+                -2.610727310180664,
+                9.084247589111328,
+                2.640000104904174
+              ]
+            ],
+            "note": "Proposal: opening; geometric confidence verified. Source triangles 13700, 13683, 8020, 8000, 8023. Two collinear source wall fragments bound this gap; an original unobstructed movement edge crosses it. Width is measured along the source wall line; accessibility and door semantics are unverified. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 0,
+            "to": 73,
+            "state": "unknown",
+            "type": "doorway",
+            "path": [
+              [
+                -2.610727310180664,
+                9.084247589111328,
+                2.640000104904174
+              ],
+              [
+                -1.610727310180664,
+                8.084247589111328,
+                2.888999938964843
+              ]
+            ],
+            "note": "Proposal: opening; geometric confidence verified. Source triangles 13700, 13683, 8020, 8000, 8023. Two collinear source wall fragments bound this gap; an original unobstructed movement edge crosses it. Width is measured along the source wall line; accessibility and door semantics are unverified. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 0,
+            "to": 93,
+            "state": "unknown",
+            "type": "stair",
+            "path": [
+              [
+                3.389272689819336,
+                0.08424758911132812,
+                2.8889999389648446
+              ],
+              [
+                4.389272689819336,
+                0.08424758911132812,
+                2.640000104904175
+              ]
+            ],
+            "note": "Proposal: step; geometric confidence unknown. Source triangles not established. Original rise-limited, unobstructed step edge crosses region boundaries. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 0,
+            "to": 49,
+            "state": "unknown",
+            "type": "stair",
+            "path": [
+              [
+                -6.610727310180664,
+                7.084247589111328,
+                2.640000104904174
+              ],
+              [
+                -5.610727310180664,
+                7.084247589111328,
+                2.8889999389648438
+              ]
+            ],
+            "note": "Proposal: vertical-chain; geometric confidence verified. Source triangles 7889, 7918. Existing verified sample chain spans distinct levels. Architectural connection requires user confirmation."
+          }
+        ]
+      },
+      {
+        "id": 34,
+        "centroid": [
+          2.5649832841345814,
+          -5.362780834661281,
+          32.63999938964844
+        ],
+        "area": 387,
+        "clearHeight": 13.197296142578104,
+        "proposedConnections": [
+          {
+            "from": 34,
+            "to": 56,
+            "state": "unknown",
+            "type": "doorway",
+            "path": [
+              [
+                -5.610727310180664,
+                -0.9157524108886719,
+                32.63999938964844
+              ],
+              [
+                -4.610727310180664,
+                0.08424758911132812,
+                32.888999938964844
+              ]
+            ],
+            "note": "Proposal: opening; geometric confidence verified. Source triangles 13123, 6729, 6341, 6497. Two collinear source wall fragments bound this gap; an original unobstructed movement edge crosses it. Width is measured along the source wall line; accessibility and door semantics are unverified. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 34,
+            "to": 56,
+            "state": "unknown",
+            "type": "doorway",
+            "path": [
+              [
+                -4.610727310180664,
+                0.08424758911132812,
+                32.888999938964844
+              ],
+              [
+                -3.610727310180664,
+                -0.9157524108886719,
+                32.63999938964843
+              ]
+            ],
+            "note": "Proposal: opening; geometric confidence verified. Source triangles 13123, 6729, 6341, 6497. Two collinear source wall fragments bound this gap; an original unobstructed movement edge crosses it. Width is measured along the source wall line; accessibility and door semantics are unverified. Architectural connection requires user confirmation."
+          },
+          {
+            "from": 34,
+            "to": 95,
+            "state": "unknown",
+            "type": "stair",
+            "path": [
+              [
+                3.389272689819336,
+                -0.9157524108886719,
+                32.63999938964844
+              ],
+              [
+                3.389272689819336,
+                0.08424758911132812,
+                32.88899993896484
+              ]
+            ],
+            "note": "Proposal: step; geometric confidence unknown. Source triangles not established. Original rise-limited, unobstructed step edge crosses region boundaries. Architectural connection requires user confirmation."
+          }
+        ]
+      }
+    ]
+  }
+]
