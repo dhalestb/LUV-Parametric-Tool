@@ -4,7 +4,7 @@ import type {AmphitheaterResult} from './amphitheaterInteractiveTypes';
 import {BOARD_WIDTH,BOARD_HEIGHT,createAmphitheaterPlate,type PresentationOptions} from './amphitheaterPresentationRender';
 import {PLATE_LABELS,presentationRules,downloadStudyBlob,studyOBJ,type ExportView} from './amphitheaterPresentationExport';
 
-export default function AmphitheaterPresentation({result,disabled=false}:{result:AmphitheaterResult;disabled?:boolean}){
+export default function AmphitheaterPresentation({result,disabled=false,joinWalls=false,onJoinWalls}:{result:AmphitheaterResult;disabled?:boolean;joinWalls?:boolean;onJoinWalls?:(value:boolean)=>void}){
   const [view,setView]=useState<ExportView>('board');
   const [resolution,setResolution]=useState(4096);
   const [transparent,setTransparent]=useState(false);
@@ -46,6 +46,10 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
   function exportOBJ(kind:'letters'|'form'){
     setError('');
     try{
+      if(kind==='form'&&result.request.workspaceTypology==='open-hall-workspace'&&joinWalls&&!result.request.openHall?.joinWalls){
+        setMessage('Generate the Open Hall study after enabling joined walls, then export the form OBJ.');
+        return;
+      }
       downloadStudyBlob(new Blob([studyOBJ(result,kind)],{type:'text/plain'}),'amphitheater-'+result.id+'-'+kind+'.obj');
       setMessage((kind==='letters'?'Source letter instances':'Architectural form')+' exported in feet with Z up.');
     }catch(e){setError(e instanceof Error?e.message:String(e));}
@@ -85,6 +89,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
       <button className="border rounded p-2" disabled={blocked} onClick={()=>exportOBJ('letters')}>Export Letters OBJ</button>
       <button className="border rounded p-2" disabled={blocked} onClick={()=>exportOBJ('form')}>Export Form OBJ</button>
     </div>
+    {result.request.workspaceTypology==='open-hall-workspace'&&<label className="block"><input type="checkbox" checked={joinWalls} disabled={blocked} onChange={e=>onJoinWalls?.(e.target.checked)}/> Join walls into Form OBJ <span className="text-xs">· generate the study after changing this setting</span></label>}
     <p role="status">{message}</p>
     {error&&<p role="alert" style={{color:'#ed8989'}}>{error}</p>}
   </section>;

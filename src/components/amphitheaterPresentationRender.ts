@@ -2,7 +2,7 @@ import {findFacadeJoint} from './voidFieldBoardJoint';
 import * as THREE from 'three';
 import {toCreasedNormals} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type {AmphitheaterResult,ProofMesh} from './amphitheaterInteractiveTypes';
-import {meshGeometry,PLATE_LABELS,PRESENTATION_COLORS,pngWithDpi,presentationRules,workspacePresentationLessons,type PlateView,type ExportView} from './amphitheaterPresentationExport';
+import {meshGeometry,PLATE_LABELS,PRESENTATION_COLORS,pngWithDpi,presentationRules,workspacePresentationLessons,workspaceRuleStageTitle,type PlateView,type ExportView} from './amphitheaterPresentationExport';
 
 export const BOARD_WIDTH=4096;
 export const BOARD_HEIGHT=5156;
@@ -461,7 +461,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     const rows=view==='orientation'?lessons.orientation:lessons.generation;
     const plan=result.request.workspacePlan;
     const zLift=result.request.field.height/2;
-    text(view==='orientation'?'ORIENTATION RULES':'GENERATION RULES',x,y+width*.045,width*.036,gold);
+    text(workspaceRuleStageTitle(result,view),x,y+width*.045,width*.036,gold);
 
     const letterMeshes=(prefer:'L'|'V'|'any')=>{
       const picks=result.letters.filter((_,i)=>{
@@ -470,6 +470,19 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
         return ch===prefer;
       });
       return (picks.length?picks:result.letters).map(letter=>letter.mesh);
+    };
+    const typology=result.request.workspaceTypology;
+    const detailedRules=typology==='open-hall-workspace'||typology==='flat-deep-plan-plate';
+    const guideMeshes=(role:'floor'|'mezzanine')=>{
+      if(typology==='open-hall-workspace'){
+        const matches=result.letters.filter((_,i)=>result.request.source[i]?.openHallRole===role);
+        if(matches.length)return matches.map(letter=>letter.mesh);
+      }
+      if(typology==='flat-deep-plan-plate'){
+        const start=role==='floor'?0:4;
+        return result.letters.slice(start,start+4).map(letter=>letter.mesh);
+      }
+      return letterMeshes(role==='floor'?'L':'V');
     };
     const addPlate=(scene:THREE.Scene,role:string|string[],color:string,opacity=1)=>{
       if(!plan)return;
@@ -515,10 +528,10 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
 
     if(view==='orientation'){
       // Stepped Amphitheater shows one letter large per row — not the whole plan scatter.
-      const ground=letterMeshes('L')[0];
-      const mezz=letterMeshes('V')[0]??letterMeshes('any').find(mesh=>mesh!==ground)??letterMeshes('any')[0];
-      row(.10,.36,'GROUND LETTERS',ground?[{mesh:ground,color:gold}]:[],rows[0]?.lines??[]);
-      row(.54,.36,'MEZZANINE LETTERS',mezz?[
+      const ground=guideMeshes('floor')[0];
+      const mezz=guideMeshes('mezzanine')[0]??letterMeshes('any').find(mesh=>mesh!==ground)??letterMeshes('any')[0];
+      row(.10,.36,(detailedRules?rows[0]?.title:undefined)??'GROUND LETTERS',ground?[{mesh:ground,color:gold}]:[],rows[0]?.lines??[]);
+      row(.54,.36,(detailedRules?rows[1]?.title:undefined)??'MEZZANINE LETTERS',mezz?[
         {mesh:mezz,color:gold},
         {mesh:result.architecture,color:white,opacity:.12},
       ]:[],rows[1]?.lines??[]);
@@ -526,18 +539,20 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
     }
 
     // Generation: same 3-row operation layout as Stepped Amphitheater wall / void / terrace.
+    const groundGuides=guideMeshes('floor').slice(0,2).map(mesh=>({mesh,color:gold}));
+    const mezzGuides=guideMeshes('mezzanine').slice(0,2).map(mesh=>({mesh,color:gold}));
     const groundLayers:Layer[]=plan
-      ?[{planRoles:['ground','working'],color:white},...letterMeshes('L').slice(0,2).map(mesh=>({mesh,color:gold}))]
-      :[{mesh:result.architecture,color:white,opacity:.55},...letterMeshes('L').slice(0,2).map(mesh=>({mesh,color:gold}))];
+      ?[{planRoles:['ground','working'],color:white},...groundGuides]
+      :[{mesh:result.architecture,color:white,opacity:.55},...groundGuides];
     const mezzLayers:Layer[]=plan
-      ?[{planRoles:['mezzanine','terrace'],color:blue,opacity:.9},...letterMeshes('V').slice(0,2).map(mesh=>({mesh,color:gold}))]
-      :[{mesh:result.architecture,color:blue,opacity:.45},...letterMeshes('V').slice(0,2).map(mesh=>({mesh,color:gold}))];
+      ?[{planRoles:['mezzanine','terrace'],color:blue,opacity:.9},...mezzGuides]
+      :[{mesh:result.architecture,color:blue,opacity:.45},...mezzGuides];
     const supportLayers:Layer[]=plan
       ?[{planRoles:['support','roof'],color:white},{mesh:result.architecture,color:white,opacity:.2}]
       :[{mesh:result.architecture,color:white,opacity:.85}];
-    row(.08,.27,'GROUND PLATE',groundLayers,rows[0]?.lines??[]);
-    row(.38,.26,'MEZZANINE WRAP',mezzLayers,rows[1]?.lines??[]);
-    row(.68,.28,'SUPPORTS AND ROOF',supportLayers,rows[2]?.lines??[]);
+    row(.08,.27,(detailedRules?rows[0]?.title:undefined)??'GROUND PLATE',groundLayers,rows[0]?.lines??[]);
+    row(.38,.26,(detailedRules?rows[1]?.title:undefined)??'MEZZANINE WRAP',mezzLayers,rows[1]?.lines??[]);
+    row(.68,.28,(detailedRules?rows[2]?.title:undefined)??'SUPPORTS AND ROOF',supportLayers,rows[2]?.lines??[]);
   }
   async function panel(view:PlateView,x:number,y:number,width:number){
     await new Promise(resolve=>setTimeout(resolve,0));

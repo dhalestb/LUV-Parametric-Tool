@@ -5,7 +5,7 @@ import {
   buildOpenHallGuideLetters,
   officePlanReady,
   planOfficeWorkspace,
-} from "./officeWorkspaceRules";
+} from "./protoWorkspaceRules";
 import {
   ARCHITECTURAL_GENERATION_RULESET_ID,
   ARCHITECTURAL_GENERATION_RULESET_VERSION,
@@ -15,9 +15,11 @@ import {
   WORKSPACE_TYPOLOGIES,
   buildArchitecturalGenerationReport,
   buildLetterArrangementReport,
+  requirementsForWorkspaceRule,
   workspaceDualReports,
 } from "./workspaceDualRulesets";
 import type { IntersectionPlacement } from "./architecturalConnections";
+import { sectionsForTypology } from "./workspaceRulesetCatalog";
 
 function letter(letter: "L" | "U" | "V", x = 0, y = 0, z = 0): IntersectionPlacement {
   return {
@@ -34,12 +36,24 @@ describe("workspace dual rulesets", () => {
     assert.equal(ARCHITECTURAL_GENERATION_RULESET_VERSION, "1.2.0");
   });
 
-  it("Open Hall dual bindings are exactly ten per stage", () => {
-    const plan = planOfficeWorkspace("open-hall-workspace", 0, [0, 0, 0], WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"]);
-    const dual = workspaceDualReports(plan);
-    assert.equal(dual.letterArrangement.rules.length, 10);
-    assert.equal(dual.architecturalGeneration.rules.length, 10);
-  });
+  for (const typology of ["open-hall-workspace", "flat-deep-plan-plate"] as const) {
+    it(`${typology} exposes the requirements for all ten rules per stage`, () => {
+      const plan = planOfficeWorkspace(typology, 0, [0, 0, 0], WORKSPACE_DEFAULT_FIELDS[typology]);
+      const dual = workspaceDualReports(plan);
+      for (const report of [dual.letterArrangement, dual.architecturalGeneration]) {
+        const catalog = sectionsForTypology(typology).find((section) => section.stage === report.stage);
+        assert.equal(report.rules.length, 10);
+        assert.equal(catalog?.requirements.length, 10);
+        report.rules.forEach(({ requirements, ...rule }, index) => {
+          assert.ok(requirements?.length, `${report.stage} ${rule.id} has no requirements`);
+          assert.equal(catalog.requirements[index], [`${rule.title}.`, ...requirements].join(" "));
+          assert.deepEqual(requirementsForWorkspaceRule(report, rule), requirements);
+          assert.deepEqual(requirementsForWorkspaceRule({ ...report, rulesetVersion: "0.0.0" }, rule), []);
+          assert.deepEqual(requirementsForWorkspaceRule(report, { ...rule, requirements }), requirements);
+        });
+      }
+    });
+  }
 
   for (const [typology] of WORKSPACE_TYPOLOGIES) {
     it(`builds dual reports for ${typology} inside its default field`, () => {
@@ -51,8 +65,9 @@ describe("workspace dual rulesets", () => {
       assert.equal(dual.architecturalGeneration.stage, "architectural-generation");
       assert.equal(dual.letterArrangement.typology, typology);
       assert.equal(dual.architecturalGeneration.typology, typology);
-      assert.equal(dual.letterArrangement.rulesetVersion, LETTER_ARRANGEMENT_RULESET_VERSION);
-      assert.equal(dual.architecturalGeneration.rulesetVersion, ARCHITECTURAL_GENERATION_RULESET_VERSION);
+      const expectedVersion=typology==='flat-deep-plan-plate'?'2.1.0':typology==='open-hall-workspace'?'1.6.0':'1.2.0';
+      assert.equal(dual.letterArrangement.rulesetVersion, expectedVersion);
+      assert.equal(dual.architecturalGeneration.rulesetVersion, expectedVersion);
       assert.notEqual(dual.letterArrangement.overall, "fail");
       assert.notEqual(dual.architecturalGeneration.overall, "fail");
     });
@@ -68,7 +83,7 @@ describe("workspace dual rulesets", () => {
   });
 
   it("fails field containment when the selected field is too small", () => {
-    // Open Hall needs ≥10 ft mezzanine bands with 25–40% opening; default 60×60 fits, 20³ cannot.
+    // Open Hall needs ≥10 ft mezzanine bands with 20–40% opening; default 60×60 fits, 20³ cannot.
     const plan = planOfficeWorkspace("open-hall-workspace", 0, [0, 0, 0], WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"]);
     assert.ok(officePlanReady(plan));
     const crampedHall = planOfficeWorkspace("open-hall-workspace", 0, [0, 0, 0], { width: 20, depth: 20, height: 20 });

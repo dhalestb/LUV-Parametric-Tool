@@ -23,7 +23,9 @@ export function meshGeometry(mesh:ProofMesh){
 export function studyOBJ(result:AmphitheaterResult,kind:'letters'|'form'){
   const group=new THREE.Group(),geometries:THREE.BufferGeometry[]=[];
   try{
-    const items=kind==='form'?[{id:'architecture',mesh:result.architecture}]:result.letters;
+    const items=kind==='form'?
+      [{id:'architecture',mesh:result.architecture},...(!(result.request.workspaceTypology==='open-hall-workspace'&&result.request.openHall?.joinWalls)&&result.perimeterWalls?.indices.length?[{id:'perimeter-walls',mesh:result.perimeterWalls}]:[])]:
+      result.letters;
     for(const item of items){
       const geometry=meshGeometry(item.mesh);
       geometries.push(geometry);
@@ -70,6 +72,13 @@ export type WorkspaceLessonRow={
   focus:'ground-letters'|'mezz-letters'|'ground-plate'|'mezzanine'|'supports';
 };
 
+export function workspaceRuleStageTitle(result:AmphitheaterResult,view:'orientation'|'generation'){
+  const typology=result.request.workspaceTypology;
+  const detailed=typology==='open-hall-workspace'||typology==='flat-deep-plan-plate';
+  if(view==='orientation')return detailed?'LETTER ARRANGEMENT':'ORIENTATION RULES';
+  return detailed?'ARCHITECTURAL GENERATION':'GENERATION RULES';
+}
+
 /** Stepped-Amphitheater-style teaching rows for workspace boards. */
 export function workspacePresentationLessons(result:AmphitheaterResult):{
   orientation:WorkspaceLessonRow[];
@@ -85,18 +94,18 @@ export function workspacePresentationLessons(result:AmphitheaterResult):{
           title:'GROUND LETTERS',
           focus:'ground-letters',
           lines:[
-            'L letters sit on the hall floor.',
-            'They keep to the perimeter.',
-            'The centre of the hall stays open.',
+            'Four L guides mark the square floor.',
+            'Their outer tips set the corners.',
+            'The smaller field span limits the square.',
           ],
         },
         {
           title:'MEZZANINE LETTERS',
           focus:'mezz-letters',
           lines:[
-            'V letters sit on the upper band.',
+            'L guides mark the upper band corners.',
             `That band wraps ${wrap}.`,
-            'Opening stays between 25% and 40%.',
+            'Every guide matches one plan slot.',
           ],
         },
       ],
@@ -105,9 +114,9 @@ export function workspacePresentationLessons(result:AmphitheaterResult):{
           title:'GROUND PLATE',
           focus:'ground-plate',
           lines:[
-            'Copy a continuous floor under the hall.',
-            'Solid 1.5 ft walls enclose the perimeter.',
-            'A designated entry opens on one side.',
+            'Build a continuous square floor.',
+            'Wall depth follows the thickness setting.',
+            faces===2?'Entry spans the south and west edges.':'Entry opens along the south edge.',
           ],
         },
         {
@@ -115,8 +124,8 @@ export function workspacePresentationLessons(result:AmphitheaterResult):{
           focus:'mezzanine',
           lines:[
             'Raise a band at mid-height.',
-            'Leave a 25–40% opening over the hall.',
-            'Keep at least 10 ft of usable width.',
+            'Leave a 20–40% opening over the hall.',
+            'Keep bands at least 10 ft wide.',
           ],
         },
         {
@@ -124,10 +133,43 @@ export function workspacePresentationLessons(result:AmphitheaterResult):{
           focus:'supports',
           lines:[
             'Stand L columns on an equal XY grid.',
-            'Include every grid node, including the centre.',
-            'Skylight bays follow roof L letters.',
+            'A center node also receives a pier.',
+            'Use a roof L for one skylight per bay.',
           ],
         },
+      ],
+    };
+  }
+  if(typology==='flat-deep-plan-plate'){
+    return {
+      orientation:[
+        {title:'GROUND GUIDES',focus:'ground-letters',lines:[
+          'Four L tips set the ground corners.',
+          'The field leaves a 2 ft margin per edge.',
+          'Grid nodes receive column L guides.',
+        ]},
+        {title:'MEZZANINE GUIDES',focus:'mezz-letters',lines:[
+          'Four L tips set the mezzanine corners.',
+          'It spans the full length and half the width.',
+          'Wall Ls trace bands and stepped ends.',
+        ]},
+      ],
+      generation:[
+        {title:'GROUND PLATE',focus:'ground-plate',lines:[
+          'Build one continuous rectangular slab.',
+          'Four 2 ft bands line the long edges.',
+          'Stepped panels close parts of the ends.',
+        ]},
+        {title:'MEZZANINE',focus:'mezzanine',lines:[
+          'Set the mezzanine at mid-height.',
+          'The selected thickness applies to all slabs.',
+          'Require more than 8 ft below the mezzanine.',
+        ]},
+        {title:'SUPPORTS AND ROOF',focus:'supports',lines:[
+          'Fill the L pocket at each grid node.',
+          'The solid roof follows the floor footprint.',
+          'Check the final union and field fit.',
+        ]},
       ],
     };
   }
@@ -186,11 +228,11 @@ export function presentationRules(result:AmphitheaterResult){
     const lessons=workspacePresentationLessons(result);
     return {
       orientation:[
-        'ORIENTATION RULES',
+        workspaceRuleStageTitle(result,'orientation'),
         ...lessons.orientation.flatMap(row=>[row.title,...row.lines]),
       ],
       terraces:[
-        'GENERATION RULES',
+        workspaceRuleStageTitle(result,'generation'),
         ...lessons.generation.flatMap(row=>[row.title,...row.lines]),
         'Geometric proof only — not certified for occupancy, circulation, accessibility, or structure.',
       ],

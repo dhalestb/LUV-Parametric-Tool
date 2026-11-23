@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import * as THREE from "three";
 import { describe, it } from "node:test";
 import {
   OFFICE_TYPOLOGIES,
@@ -7,7 +8,7 @@ import {
   officePlanReady,
   planOfficeWorkspace,
   type OfficeCheck,
-} from "./officeWorkspaceRules";
+} from "./protoWorkspaceRules";
 import {
   sectionsForTypology,
   summarizeWorkspaceChecks,
@@ -30,6 +31,67 @@ describe("workspace dual-ruleset catalog", () => {
 });
 
 describe("office reference ruleset", () => {
+  it("generates a roof guide and skylight in every 15-foot column pocket", () => {
+    const field = {width:60, depth:60, height:20, mezzanineFaces:3 as const, columnGridSpacing:15, roofSizing:"pillar" as const, roofInset:1};
+    const guides = buildOpenHallGuideLetters(field);
+    const arranged = arrangeOfficeLetters(guides,"open-hall-workspace",12,[0,0,0],field);
+    const roof = arranged.placements.filter(p=>p.openHallRole==="roof");
+    assert.equal(roof.length,9);
+    assert.equal(new Set(roof.map(p=>p.x+"/"+p.y)).size,9);
+    assert.equal(arranged.officePlan!.voids.filter(v=>v.id.startsWith("skylight-")).length,9);
+    assert.equal(arranged.officePlan!.checks.find(c=>c.label==="Roof L guides")?.status,"pass");
+  });
+  it("pillar roof sizing fits between columns and shrinks by the inset on each side", () => {
+    const field = {...WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"], columnSize: 2, columnGridSpacing: 20, roofSizing: "pillar" as const};
+    const a = planOfficeWorkspace("open-hall-workspace", 0, [0,0,0], {...field, roofInset: 0});
+    const b = planOfficeWorkspace("open-hall-workspace", 0, [0,0,0], {...field, roofInset: 2});
+    const bounds = (plan: typeof a) => { const poly = plan.voids.find(v=>v.id==="skylight-1")!.polygon; return Math.max(...poly.map(p=>p[0]))-Math.min(...poly.map(p=>p[0])); };
+    const roof = a.slots.find(s=>s.openHallRole==="roof")!;
+    assert.ok(Math.abs(roof.scale * 0.9 - (20 - 2 * 0.9)) < 1e-6);
+    // Preserve the L's unequal native proportions while its longer dimension
+    // is inset by two feet at each edge.
+    assert.ok(Math.abs(bounds(a) - bounds(b) - 4 * 0.84 / 0.9) < 1e-6);
+    assert.throws(()=>planOfficeWorkspace("open-hall-workspace",0,[0,0,0],{...field,roofInset:10}), /no space/);
+  });
+  it("wall corner tips bound the four two-channel panels in XZ and YZ", () => {
+    const plan = planOfficeWorkspace("open-hall-workspace", 0, [0,0,0], WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"]);
+    const guides = plan.slots.filter(s => s.openHallRole === "wall");
+    const walls = plan.plates.filter(p => p.role === "wall");
+    assert.equal(guides.length, 16);
+    assert.equal(walls.length, 4);
+    walls.forEach((wall, index) => {
+      const corners = guides.slice(index*4,index*4+4).map(g => new THREE.Vector3(-0.42*g.scale,-0.45*g.scale,0)
+        .applyEuler(new THREE.Euler(g.rx*Math.PI/180,g.ry*Math.PI/180,g.rz*Math.PI/180,"XYZ"))
+        .add(new THREE.Vector3(g.x,g.y,g.z)));
+      const axis = wall.id === "wall-east" || wall.id === "wall-west" ? 1 : 0;
+      const values = wall.polygon.map(p => p[axis]);
+      assert.ok(Math.abs(Math.min(...corners.map(p => axis?p.y:p.x))-Math.min(...values))<1e-6);
+      assert.ok(Math.abs(Math.max(...corners.map(p => axis?p.y:p.x))-Math.max(...values))<1e-6);
+      assert.ok(Math.abs(Math.min(...corners.map(p=>p.z))-(wall.zTop-wall.thickness))<1e-6);
+      assert.ok(Math.abs(Math.max(...corners.map(p=>p.z))-wall.zTop)<1e-6);
+    });
+  });
+  for (const faces of [2,3,4] as const) {
+    it(`channel ${faces} wall openings follow mezzanine edges`, () => {
+      const plan = planOfficeWorkspace("open-hall-workspace",0,[0,0,0],{...WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"],mezzanineFaces:faces});
+      const walls = plan.plates.filter(p=>p.role==="wall");
+      const ground=plan.plates.find(p=>p.role==="ground")!;
+      const hx=Math.max(...ground.polygon.map(p=>p[0])),hy=Math.max(...ground.polygon.map(p=>p[1]));
+      const mezz=plan.plates.filter(p=>p.role==="mezzanine");
+      const right=walls.find(p=>p.id==="wall-south-east")!;
+      const jamb=Math.min(...right.polygon.map(p=>p[0]));
+      assert.ok(jamb>0 && jamb<hx);
+      assert.ok(mezz.some(p=>p.polygon.some(v=>Math.abs(v[0]-jamb)<1e-6)), "south jamb must match a mezzanine corner");
+      assert.equal(walls.some(p=>p.id==="wall-south-west"),faces!==2);
+      const west=walls.find(p=>p.id==="wall-west")!;
+      const westBottom=Math.min(...west.polygon.map(p=>p[1]));
+      if(faces===2){
+        assert.ok(westBottom>-hy+1.5);
+        assert.ok(mezz.some(p=>p.polygon.some(v=>Math.abs(v[1]-westBottom)<1e-6)), "west jamb must match mezzanine corner");
+      } else assert.ok(Math.abs(westBottom-(-hy+1.5))<1e-6);
+      assert.equal(plan.slots.filter(s=>s.openHallRole==="wall").length,faces===2?16:20);
+    });
+  }
   const center: [number, number, number] = [0, 0, 0];
 
   for (const typology of OFFICE_TYPOLOGIES) {
@@ -207,6 +269,20 @@ describe("office reference ruleset", () => {
     assert.match(floorSize?.detail ?? "", /13\.00 ft/);
   });
 
+  it("Open Hall applies custom wall and slab thicknesses", () => {
+    const plan = planOfficeWorkspace("open-hall-workspace", 0, center, {
+      ...WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"], wallThickness: 2.25, slabThickness: 0.5,
+    });
+    for (const plate of plan.plates.filter((item) => ["ground", "mezzanine", "roof"].includes(item.role))) {
+      assert.equal(plate.thickness, 0.5, `${plate.id} slab thickness`);
+    }
+    for (const wall of plan.plates.filter((item) => item.role === "wall")) {
+      const xs = wall.polygon.map((point) => point[0]), ys = wall.polygon.map((point) => point[1]);
+      assert.ok(Math.abs(Math.min(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)) - 2.25) < 1e-6, `${wall.id} wall thickness`);
+    }
+    assert.ok(officePlanReady(plan), plan.checks.filter((item) => item.status !== "pass").map((item) => `${item.label}:${item.status}`).join("; "));
+  });
+
   for (const faces of [2, 3, 4] as const) {
     it(`Open Hall mezzanine wraps ${faces} faces at ≥10 ft usable width`, () => {
       const field = { ...WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"], mezzanineFaces: faces };
@@ -221,7 +297,7 @@ describe("office reference ruleset", () => {
       assert.equal(grid?.status, "pass", grid?.detail);
       assert.equal(walls?.status, "pass", walls?.detail);
       assert.match(width?.detail ?? "", /≥10 ft/);
-      assert.match(opening?.detail ?? "", /25–40%/);
+      assert.match(opening?.detail ?? "", /20\.0–40%/);
       assert.ok(plan.plates.filter((p) => p.role === "wall").length >= 3);
       assert.ok(plan.plates.filter((p) => p.role === "support").length >= 3);
       assert.ok(plan.voids.some((v) => v.id.startsWith("skylight")));
@@ -246,8 +322,8 @@ describe("office reference ruleset", () => {
     }
   });
 
-  it("Open Hall default field is 60 × 60 × 20", () => {
-    assert.deepEqual(WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"], { width: 60, depth: 60, height: 20 });
+  it("Open Hall default field is 40 × 40 × 20", () => {
+    assert.deepEqual(WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"], { width: 40, depth: 40, height: 20 });
   });
 
   it("Open Hall always generates perimeter wall plates for viewer toggle", () => {
@@ -262,7 +338,7 @@ describe("office reference ruleset", () => {
     assert.ok(on.plates.some((p) => p.role === "wall"));
     assert.ok(offPref.plates.some((p) => p.role === "wall"), "viewer preference must not omit wall geometry");
     assert.ok(officePlanReady(offPref), offPref.checks.filter((c) => c.status !== "pass").map((c) => `${c.label}:${c.status}`).join("; "));
-    assert.match(offPref.checks.find((c) => c.label === "Perimeter walls and entry")?.detail ?? "", /viewer may hide/i);
+    assert.match(offPref.checks.find((c) => c.label === "Perimeter walls and entry")?.detail ?? "", /Viewer visibility does not change this generation rule/i);
   });
 
   it("every typology roof and plan track the selected field bounds", () => {
