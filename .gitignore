@@ -33,6 +33,7 @@ build-output.log
 
 # generated geometry written by the app
 /exports/
+/.amphitheater-runs/
 
 # local session checkpoints
 /checkpoints/
