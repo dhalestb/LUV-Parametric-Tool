@@ -15,6 +15,7 @@ const LINKS = [
   { href: "/lobby", label: "Lobby proof" },
   { href: "/composition-presentation", label: "Presentation" },
   { href: "/evaluations", label: "Evaluations" },
+  { href: "/hybrid-generation", label: "Hybrid Generation" },
   { href: "/lattice", label: "Lattice" },
   { href: "/part3", label: "Part 3" },
 ] as const;
