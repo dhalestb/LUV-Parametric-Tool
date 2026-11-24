@@ -1,16 +1,18 @@
 // Source coordinates are Composition-local, centered in all axes. The viewer uses floor Z=0.
 const fs=require('node:fs'),path=require('node:path'),T=require('three');
 require('../proof/rule-amphitheater.cjs'); // registers the project's TypeScript glyph loader
-const {getLetterShape,getLetterVolumeGeometry}=require('../src/components/letterGeometry3d.ts');
+const {getLetterShape,getLetterVolumeGeometry,linearUBend,linearUInnerHalf}=require('../src/components/letterGeometry3d.ts');
 const v=(x,y,z)=>new T.Vector3(x,y,z),distance=(a,b)=>a.distanceTo(b);
 function derive(r){
  const letters=[],nodes=r.source.map((p,i)=>{
  const matrix=new T.Matrix4().compose(v(p.x,p.y,p.z+r.field.height/2),new T.Quaternion().setFromEuler(new T.Euler(...[p.rx,p.ry,p.rz].map(T.MathUtils.degToRad),p.rotationOrder??'XYZ')),v(p.scale*p.scaleX,p.scale*p.scaleY,p.scale*p.scaleZ));
- const g=getLetterVolumeGeometry(p.letter,12),attr=g.getAttribute('position'),positions=[],indices=[];
+ const uprightU=r.proof==='lobby'&&/linear/i.test(r.typologyName||'')&&p.letter==='U'&&Math.abs(p.ry)===90;
+ const wide=uprightU?linearUInnerHalf(p.scale*p.scaleX):undefined;
+ const g=getLetterVolumeGeometry(p.letter,12,wide,false,uprightU?linearUBend(p.scale,p.scaleY):0),attr=g.getAttribute('position'),positions=[],indices=[];
  for(let k=0;k<attr.count;k++){const q=new T.Vector3().fromBufferAttribute(attr,k).applyMatrix4(matrix);if(Math.abs(q.x)>r.field.width/2||Math.abs(q.y)>r.field.depth/2||q.z<0||q.z>r.field.height)throw Error('Letter '+(i+1)+' extends outside the selected field. Edit its pose or enlarge the field.');positions.push(...q.toArray());}
  for(let k=0;k<(g.index?.count??attr.count);k++)indices.push(g.index?g.index.getX(k):k);
  const id=p.letter+'-'+(i+1);letters.push({id,mesh:{positions,indices}});
- const shape=getLetterShape(p.letter),raw=['profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion)?require('./source-profile-envelope.cjs').featurePoints(shape,p.scale*Math.max(p.scaleX,p.scaleY,p.scaleZ)):shape.getPoints(6),center=new T.Box2().setFromPoints(shape.getPoints(16)).getCenter(new T.Vector2());
+ const shape=getLetterShape(p.letter,wide,false),raw=['profiles','vertical-walls','void-field','inserted-plate'].includes(r.envelopeVersion)?require('./source-profile-envelope.cjs').featurePoints(shape,p.scale*Math.max(p.scaleX,p.scaleY,p.scaleZ)):shape.getPoints(6),center=new T.Box2().setFromPoints(shape.getPoints(16)).getCenter(new T.Vector2());
  const line=raw.map(pt=>v(pt.x-center.x,pt.y-center.y,0).applyMatrix4(matrix));
  return {id,line,relationshipLine:shape.getPoints(6).map(pt=>v(pt.x-center.x,pt.y-center.y,0).applyMatrix4(matrix)),matrix:matrix.toArray(),p};
  });

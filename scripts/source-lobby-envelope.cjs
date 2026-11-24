@@ -1,8 +1,10 @@
 // Lobby spaces keep the saved letter poses.
 // Every typology uses horizontal terraces, vertical exterior walls, and a 0.75 ft platform.
+// 1/8 in = 1 ft-0 in. A 1/16 in model wall is 0.5 ft at full size.
+const MODEL_WALL_FT=0.5;
 // The opening cutter follows each letter's saved rotation and imprints that contour through the form.
 const T=require('three');
-const {getLetterShape}=require('../src/components/letterGeometry3d.ts');
+const {getLetterShape,linearUInnerHalf}=require('../src/components/letterGeometry3d.ts');
 const {featurePoints}=require('./source-profile-envelope.cjs');
 const {upperTriangles}=require('./source-vertical-envelope.cjs');
 
@@ -28,8 +30,8 @@ function planOf(CS,mesh){
  const hull=hull2d(pts);
  return hull?new CS([hull],'NonZero'):null;
 }
-function contourOf(w,node){
- const p=node.p,shape=getLetterShape(p.letter),range={L:[2,4],U:[5,9],V:[1,3]}[p.letter];
+function contourOf(w,node,innerHalf,even){
+ const p=node.p,shape=getLetterShape(p.letter,p.letter==='U'?innerHalf:undefined,!!even),range={L:[2,4],U:[5,9],V:[1,3]}[p.letter];
  const samples=shape.getPoints(16),center=new T.Box2().setFromPoints(samples).getCenter(new T.Vector2());
  const matrix=new T.Matrix4().fromArray(node.matrix);
  const points=featurePoints({curves:shape.curves.slice(...range)},p.scale*Math.max(p.scaleX,p.scaleY,p.scaleZ));
@@ -108,9 +110,21 @@ function loftFits(M,w,fits){
  }
  return M.union(pieces);
 }
+function axisStretch(quaternion,axis,factor){
+ const world=axis.clone().applyQuaternion(quaternion);
+ return Math.hypot(world.x*factor[0],world.y*factor[1],world.z*factor[2])/(Math.hypot(world.x,world.y,world.z)||1);
+}
 function insetFit(fit){
  const wall=1.7;
  return {...fit,hx:Math.max(.4,fit.hx-wall),hy:Math.max(.4,fit.hy-wall),hz:Math.max(.3,fit.hz-wall)};
+}
+function meshBounds(mesh){
+ const min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];
+ for(let index=0;index<mesh.positions.length;index+=3){
+  min[0]=Math.min(min[0],mesh.positions[index]);min[1]=Math.min(min[1],mesh.positions[index+1]);min[2]=Math.min(min[2],mesh.positions[index+2]);
+  max[0]=Math.max(max[0],mesh.positions[index]);max[1]=Math.max(max[1],mesh.positions[index+1]);max[2]=Math.max(max[2],mesh.positions[index+2]);
+ }
+ return {min,max};
 }
 function letterBox(M,mesh,margin){
  const min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];
@@ -138,6 +152,15 @@ function recenterOnLetters(solid,letters,clip){
  const moved=delta.some(value=>Math.abs(value)>.05)?solid.translate(delta):solid;
  return moved.intersect(clip);
 }
+function worldAxisKey(quaternion,axis){
+ const locals=[new T.Vector3(1,0,0),new T.Vector3(0,1,0),new T.Vector3(0,0,1)];
+ let best=0,score=-1;
+ locals.forEach((local,index)=>{
+  const amount=Math.abs(local.applyQuaternion(quaternion).getComponent(axis));
+  if(amount>score){score=amount;best=index;}
+ });
+ return ['hx','hy','hz'][best];
+}
 function lobbyEnvelope(w,nodes,edges,letters,field,preferred,typologyName=''){
  const M=w.Manifold,CS=w.CrossSection;
  const clip=M.cube([field.width,field.depth,field.height]).translate([-field.width/2,-field.depth/2,0]);
@@ -146,6 +169,7 @@ function lobbyEnvelope(w,nodes,edges,letters,field,preferred,typologyName=''){
  const plateTop=letters.map(letter=>{const zs=letter.mesh.positions.filter((_,i)=>i%3===2);return Math.min(field.height,Math.max(.75,Math.min(...zs)));});
  const parts=[];
  const spanOf=cs=>{const box=cs.bounds();return {center:[(box.min[0]+box.max[0])/2,(box.min[1]+box.max[1])/2],radius:Math.max(.4,Math.hypot(box.max[0]-box.min[0],box.max[1]-box.min[1])/2)};};
+ const linear=/linear/i.test(typologyName||'');
  const twist=/compressed/i.test(typologyName||'');
  let outerSolid=null,innerSolid=null;
  if(twist){
@@ -165,11 +189,19 @@ function lobbyEnvelope(w,nodes,edges,letters,field,preferred,typologyName=''){
    }
   }
   outerSolid=loftFits(M,w,fitted);
+  const pre=outerSolid.boundingBox();
+  const preSpan=pre.min.map((value,axis)=>Math.max(pre.max[axis]-value,1e-6));
+  const fieldScale=[field.width/preSpan[0],field.depth/preSpan[1],field.height/preSpan[2]];
+  const localAxes=[new T.Vector3(1,0,0),new T.Vector3(0,1,0),new T.Vector3(0,0,1)];
   const cavity=fitted.map(fit=>{
    const next={...fit};
    const along=hallAxis(fit);
    const open=along.indexOf(Math.max(...along));
-   ['hx','hy','hz'].forEach((key,axis)=>{if(axis!==open)next[key]=Math.max(.4,fit[key]-1);});
+   ['hx','hy','hz'].forEach((key,axis)=>{
+    if(axis===open)return;
+    const reduction=MODEL_WALL_FT/Math.max(axisStretch(fit.quaternion,localAxes[axis],fieldScale),1e-6);
+    next[key]=Math.max(.05,fit[key]-reduction);
+   });
    return next;
   });
   const opened=[
@@ -204,18 +236,21 @@ function lobbyEnvelope(w,nodes,edges,letters,field,preferred,typologyName=''){
   const floor=Math.max(0,Math.min(plateTop[edge.i],plateTop[edge.j])-.75);
   parts.push(terrace.extrude(.75).translate([0,0,floor]));
  }
- let solid=recenterOnLetters(twist?outerSolid.intersect(clip).subtract(innerSolid):M.union(parts),letters,clip).simplify(1e-5);
- if(twist){
+ let shaped=twist?outerSolid.intersect(clip):M.union(parts);
+ if(twist)shaped=shaped.subtract(innerSolid);
+ let solid=recenterOnLetters(shaped,letters,clip).simplify(1e-5);
+ if(twist&&!linear){
   const fitted=solid.boundingBox();
   const span=fitted.min.map((value,axis)=>Math.max(fitted.max[axis]-value,1e-6));
   const mid=fitted.min.map((value,axis)=>(value+fitted.max[axis])/2);
   const factor=[field.width/span[0],field.depth/span[1],field.height/span[2]];
   solid=solid.translate(mid.map(value=>-value)).scale(factor).translate([0,0,field.height/2]).intersect(clip).simplify(1e-5);
  }
- if(!twist)solid=M.union([solid,...letters.map(letter=>letterBox(M,letter.mesh,1))]).intersect(clip).simplify(1e-5);
+ if(!twist)solid=M.union([solid,...letters.map(letter=>letterBox(M,letter.mesh,linear?1:MODEL_WALL_FT))]).intersect(clip).simplify(1e-5);
  nodes.forEach((node,index)=>{
   if(twist)return;
-  const contour=contourOf(w,node);
+  const uprightU=/linear/i.test(typologyName)&&node.p.letter==='U'&&Math.abs(node.p.ry)===90;
+  const contour=contourOf(w,node,uprightU?linearUInnerHalf(node.p.scale*node.p.scaleX):undefined,false);
   const cut=orientedCut(w,node,contour.local,field);
   const profile=!contour.cs.isEmpty()&&contour.cs.area()>=.05?contour.cs:plans[index];
   let core=cut?.core,cutting=cut?.cutting;
@@ -239,6 +274,52 @@ function lobbyEnvelope(w,nodes,edges,letters,field,preferred,typologyName=''){
  solid=partsLeft.some(part=>part!==main&&part.volume()>main.volume()*.05)?M.union(partsLeft.filter(part=>part===main||part.volume()>main.volume()*.05)).simplify(1e-5):main;
  if(solid.decompose().filter(part=>part.volume()>1e-4).length!==1)solid=main;
  for(const tool of tools)solid=solid.subtract(tool.cuttingSolid);
+ if(linear){
+  // The 10 ft opening cuts through the bar, so the study 9 step is built above it.
+  // Upright pads rise 5.4 ft above the flat pads, clipped to the ceiling.
+  let openingTop=0;
+  nodes.forEach((node,index)=>{
+   if(node.p.letter!=='U'||Math.abs(node.p.ry)!==90)return;
+   openingTop=Math.max(openingTop,meshBounds(letters[index].mesh).max[2]-2);
+  });
+  const flatBottom=openingTop+.1,flatTop=flatBottom+.75,highTop=Math.min(field.height-.05,flatTop+5.4);
+  const caps=[];
+  nodes.forEach((node,index)=>{
+   const bounds=meshBounds(letters[index].mesh);
+   const flat=Math.abs(node.p.ry)!==90;
+   if(!flat)return;
+   const bottom=flat?flatBottom:bounds.max[2];
+   const top=flat?flatTop:highTop;
+   if(top<=bottom+.02)return;
+   const margin=1;
+   caps.push(M.cube([
+    Math.max(.8,bounds.max[0]-bounds.min[0]+margin*2),
+    Math.max(.8,bounds.max[1]-bounds.min[1]+margin*2),
+    top-bottom,
+   ],true).translate([(bounds.min[0]+bounds.max[0])/2,(bounds.min[1]+bounds.max[1])/2,(bottom+top)/2]));
+  });
+  if(caps.length){
+   solid=M.union([solid,...caps]).intersect(clip).simplify(1e-5);
+   for(const tool of tools)solid=solid.subtract(tool.cuttingSolid);
+  }
+  const ratio=53.5/48.6;
+  const min=[Infinity,Infinity,Infinity],max=[-Infinity,-Infinity,-Infinity];
+  for(const letter of letters){
+   const bounds=meshBounds(letter.mesh);
+   bounds.min.forEach((value,axis)=>{min[axis]=Math.min(min[axis],value);});
+   bounds.max.forEach((value,axis)=>{max[axis]=Math.max(max[axis],value);});
+  }
+  const letterSpan=Math.max(max[0]-min[0],1e-6);
+  const shellBox=solid.boundingBox();
+  const shellSpan=Math.max(shellBox.max[0]-shellBox.min[0],1e-6);
+  const mid=(min[0]+max[0])/2;
+  const fit=shape=>shape.translate([-mid,0,0]).scale([letterSpan*ratio/shellSpan,1,1]).translate([mid,0,0]);
+  solid=fit(solid).intersect(clip).simplify(1e-5);
+  const pieces=solid.decompose().filter(part=>part.volume()>1e-4);
+  if(pieces.length>1)solid=pieces.reduce((largest,part)=>part.volume()>largest.volume()?part:largest);
+  for(const tool of tools){tool.solid=fit(tool.solid);tool.cuttingSolid=fit(tool.cuttingSolid);}
+  for(const tool of tools)solid=solid.subtract(tool.cuttingSolid);
+ }
  solid=floatSafe(w,solid.simplify(1e-5));
  const bands=[{id:'lobby-envelope',owner:nodes[0].id,sources:nodes.map(node=>node.id),solid}];
  const report={before:solid.volume(),after:solid.volume(),removed:tools.reduce((sum,tool)=>sum+tool.removed,0),added:0,components:1,overhangs:0,addedProjections:0,operations:tools.map(tool=>({id:tool.id,sources:[tool.source],feature:'inner source contour',kind:'directional through void',profile:'closed inner contour',width:1,height:field.height,depth:field.height,bayDepth:0,alcove:false,removed:tool.removed}))};

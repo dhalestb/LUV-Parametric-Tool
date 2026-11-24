@@ -385,7 +385,7 @@ export type ConnectionWorkflow = {
   variants: Record<ArchitecturalSpaceMode,WorkflowMesh>;
   source:WorkflowMesh; intersections:WorkflowMesh; bridges:WorkflowMesh; floors?:WorkflowMesh;
   links:NonNullable<ReturnType<typeof buildFaceBridges>["links"]>;
-  settings:FaceBridgeSettings; boundaryDesignations?:{sourceIndex:number;letter:string;role:string;rotation:[number,number,number]}[]; gatheringOperations?:GatheringOperations; gatheringValidation?:{label:string;status:"pass"|"unverified";detail:string}[]; officeValidation?:{label:string;status:"pass"|"unverified";detail:string}[]; protectedVoid?:WorkflowMesh; enclosure?:WorkflowMesh; arrangedSource?:WorkflowMesh; arrangement?:{originalPlacements:IntersectionPlacement[];sourceIndices?:number[];placements:IntersectionPlacement[];sequence:number[];preservedPairs:number[][];overlapFractions?:number[];riseFractions?:number[]}; formation?:{operations:string[];supported:boolean};
+  settings:FaceBridgeSettings; boundaryDesignations?:{sourceIndex:number;letter:string;role:string;rotation:[number,number,number]}[]; gatheringOperations?:GatheringOperations; gatheringValidation?:{label:string;status:"pass"|"unverified";detail:string}[]; officeValidation?:{label:string;status:"pass"|"fail"|"unverified";detail:string}[]; protectedVoid?:WorkflowMesh; enclosure?:WorkflowMesh; arrangedSource?:WorkflowMesh; arrangement?:{originalPlacements:IntersectionPlacement[];sourceIndices?:number[];placements:IntersectionPlacement[];sequence:number[];preservedPairs:number[][];overlapFractions?:number[];riseFractions?:number[]}; formation?:{operations:string[];supported:boolean};
 };
 
 /** A, B and C share a single source, bridge graph and boolean construction. */

@@ -1,11 +1,21 @@
 import type { Manifold, ManifoldToplevel } from "manifold-3d/manifold";
 import type { OfficePlan, Pt } from "./officeWorkspaceRules";
 
+export type OfficeWorkspaceSolids = {
+  /** Massing without perimeter walls — used for the main viewer mesh. */
+  form: Manifold | null;
+  /** Separate wall solids for a live show/hide toggle. */
+  walls: Manifold | null;
+  /** form ∪ walls for validation / volume. */
+  combined: Manifold | null;
+};
+
 /** Extrudes a validated office plan. Voids are cut from plates only, so ramps and supports stay intact. */
-export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, own: (solid: Manifold) => Manifold) {
+export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, own: (solid: Manifold) => Manifold): OfficeWorkspaceSolids {
   const { Manifold } = wasm;
   const roofs = plan.plates.filter((plate) => plate.role === "roof");
-  const plates: Manifold[] = [];
+  const bodyPlates: Manifold[] = [];
+  const wallPlates: Manifold[] = [];
   const connectors: Manifold[] = [];
   let roofTied = false;
 
@@ -21,12 +31,21 @@ export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, o
   for (const plate of plan.plates) {
     if (plate.role === "support") continue;
     const polygon = plate.id.startsWith("sill-") ? extendSill(plate) : plate.polygon;
-    const solid = extrude(polygon, plate.zTop, plate.thickness);
-    if (solid) plates.push(solid);
+    let solid = extrude(polygon, plate.zTop, plate.thickness);
+    if (!solid) continue;
+    // Role-scoped voids (e.g. roof skylights) punch only matching plates.
+    const scoped = plan.voids.filter((hole) => hole.cut && hole.polygon.length >= 3 && hole.roles?.includes(plate.role));
+    for (const hole of scoped) {
+      const cutter = extrude(hole.polygon, plate.zTop + 0.05, plate.thickness + 0.1);
+      if (cutter) solid = subtract(solid, cutter, own) ?? solid;
+    }
+    if (plate.role === "wall") wallPlates.push(solid);
+    else bodyPlates.push(solid);
   }
 
-  let field = union(Manifold, plates, own);
-  const cuts = plan.voids.filter((hole) => hole.cut && hole.polygon.length >= 3);
+  let field = union(Manifold, bodyPlates, own);
+  // Legacy full-height cuts: voids without roles still shaft through the whole assembly.
+  const cuts = plan.voids.filter((hole) => hole.cut && hole.polygon.length >= 3 && !hole.roles?.length);
   if (field && cuts.length) {
     const low = Math.min(...plan.plates.map((plate) => plate.zTop - plate.thickness)) - 1;
     const high = Math.max(...plan.plates.map((plate) => plate.zTop)) + 1;
@@ -51,7 +70,7 @@ export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, o
   }
 
   if (!roofTied && roofs.length) {
-    const hosts = plan.plates.filter((plate) => plate.role !== "roof" && plate.role !== "support");
+    const hosts = plan.plates.filter((plate) => plate.role !== "roof" && plate.role !== "support" && plate.role !== "wall");
     const host = [...hosts].sort((a, b) => b.zTop - a.zTop).find((plate) => {
       const center = centroid(plate.polygon);
       return roofs.some((roof) => pointInPoly(center, roof.polygon)) && !plan.voids.some((hole) => hole.cut && pointInPoly(center, hole.polygon));
@@ -71,7 +90,10 @@ export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, o
   const sillJoin = joinSills(Manifold, plan, own);
   if (sillJoin) connectors.push(sillJoin);
 
-  return union(Manifold, [field, ...connectors].filter((solid): solid is Manifold => Boolean(solid)), own);
+  const form = union(Manifold, [field, ...connectors].filter((solid): solid is Manifold => Boolean(solid)), own);
+  const walls = union(Manifold, wallPlates, own);
+  const combined = union(Manifold, [form, walls].filter((solid): solid is Manifold => Boolean(solid)), own);
+  return { form, walls, combined };
 }
 
 function extrudeLink(Manifold: ManifoldToplevel["Manifold"], link: OfficePlan["links"][number], own: (solid: Manifold) => Manifold) {

@@ -2,11 +2,12 @@
 import {useEffect,useState} from 'react';
 import type {AmphitheaterResult} from './amphitheaterInteractiveTypes';
 import {createAmphitheaterPlate,type PresentationOptions} from './amphitheaterPresentationRender';
+import {createAmphitheaterPlate as createGatheringProofBoard} from './protoformPresentationRender';
 import {PLATE_LABELS,presentationRules,downloadStudyBlob,studyOBJ,type ExportView} from './amphitheaterPresentationExport';
 import {LOBBY_TYPOLOGIES} from './lobbyProof';
 import {savePresentationGraphic} from './presentationGraphics';
 
-export default function AmphitheaterPresentation({result,disabled=false}:{result:AmphitheaterResult;disabled?:boolean}){
+export default function AmphitheaterPresentation({result,disabled=false,onExportMp4,exportingMp4=false}:{result:AmphitheaterResult;disabled?:boolean;onExportMp4?:()=>void;exportingMp4?:boolean}){
   const [view,setView]=useState<ExportView>('board');
   const [resolution,setResolution]=useState(4096);
   const [transparent,setTransparent]=useState(false);
@@ -45,9 +46,9 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
     if(!lobbyTypology)return;
     setExporting(true);setError('');setMessage('Rendering the PNG for Lobby Proofs…');
     try{
-      const blob=await createAmphitheaterPlate(result,{view,size:resolution,transparent,iso,ruleSource:activeSource});
+      const blob=await createGatheringProofBoard(result,{view:'board',size:resolution,transparent,iso,ruleSource:activeSource});
       await savePresentationGraphic(lobbyTypology.id,lobbyTypology.name,blob,'lobby-proofs');
-      setMessage(lobbyTypology.name+' PNG sent to Lobby Proofs. Sending another PNG for this typology replaces it.');
+      setMessage(lobbyTypology.name+' proof board sent to its Lobby Proofs column. Sending another replaces it.');
     }catch(e){setError(e instanceof Error?e.message:String(e));setMessage('');}
     finally{setExporting(false);}
   }
@@ -94,6 +95,7 @@ export default function AmphitheaterPresentation({result,disabled=false}:{result
     </div>
     <div className="flex flex-wrap gap-3">
       <button className="border rounded p-2" disabled={blocked||previewing||!preview||!lobbyTypology} onClick={()=>void exportPngToBoard()}>{exporting?'Exporting PNG…':'Export PNG to Board'}</button>
+      <button className="border rounded p-2" disabled={blocked||exportingMp4||!onExportMp4} onClick={()=>onExportMp4?.()}>{exportingMp4?'Exporting MP4…':'Export MP4'}</button>
     </div>
     <p role="status">{message}</p>
     {error&&<p role="alert" style={{color:'#ed8989'}}>{error}</p>}

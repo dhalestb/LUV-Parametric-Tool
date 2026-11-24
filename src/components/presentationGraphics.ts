@@ -101,10 +101,23 @@ export async function loadPresentationPdfs(ids: string[]): Promise<Map<string, B
   });
 }
 export type PdfBoard = { id: string; title: string };
+export const BUILT_IN_BOARD_IDS = ['geometry', 'rules', 'lobby-proofs', 'video'] as const;
+/** Keep a saved sequence, then append any PDF or built-in tab that is missing. */
+export function resolveTabOrder(saved: string[] | null | undefined, pdfIds: string[]) {
+  const allowed = new Set<string>([...pdfIds, ...BUILT_IN_BOARD_IDS]);
+  const next: string[] = [];
+  for (const id of saved ?? []) if (allowed.has(id) && !next.includes(id)) next.push(id);
+  for (const id of [...pdfIds, ...BUILT_IN_BOARD_IDS]) if (!next.includes(id)) next.push(id);
+  return next;
+}
+function boardRecord(board: PdfBoard): PdfBoard {
+  return { id: board.id, title: board.title };
+}
 type EncodedBlob = { type: string; data: string };
 export type PresentationBackup = {
   version: 1;
   boards: PdfBoard[];
+  tabOrder?: string[];
   pdfs: { id: string; file: EncodedBlob }[];
   geometry: { typology: PrototypeTypologyId; name: string; image: EncodedBlob }[];
   rules: { typology: PrototypeTypologyId; name: string; image: EncodedBlob }[];
@@ -138,14 +151,16 @@ export async function exportPresentationBackup(): Promise<PresentationBackup> {
     loadPresentationGraphics('rules'),
   ]);
   const encodeGraphics = (records: PresentationGraphic[]) => Promise.all(records.map(async record => ({ ...record, image: await encodeBlob(record.image) })));
-  return { version: 1, boards, pdfs: pdfs.filter((item): item is NonNullable<typeof item> => item !== null), geometry: await encodeGraphics(geometry), rules: await encodeGraphics(rules) };
+  const tabOrder = await loadTabOrder();
+  return { version: 1, boards, ...(tabOrder ? { tabOrder } : {}), pdfs: pdfs.filter((item): item is NonNullable<typeof item> => item !== null), geometry: await encodeGraphics(geometry), rules: await encodeGraphics(rules) };
 }
 
 export async function importPresentationBackup(backup: PresentationBackup): Promise<void> {
   if (backup?.version !== 1 || !Array.isArray(backup.boards) || !Array.isArray(backup.pdfs) || !Array.isArray(backup.geometry) || !Array.isArray(backup.rules)
     || backup.boards.some(board => !board || typeof board.id !== 'string' || typeof board.title !== 'string')
     || new Set(backup.boards.map(board => board.id)).size !== backup.boards.length
-    || backup.boards.some(board => ['boards', 'geometry', 'rules', 'lobby-proofs', 'video'].includes(board.id))) throw new Error('Invalid GitHub board backup.');
+    || backup.boards.some(board => ['boards', 'tabOrder', 'geometry', 'rules', 'lobby-proofs', 'video'].includes(board.id))
+    || (backup.tabOrder !== undefined && (!Array.isArray(backup.tabOrder) || backup.tabOrder.some(id => typeof id !== 'string')))) throw new Error('Invalid GitHub board backup.');
   const ids = new Set(backup.boards.map(board => board.id));
   const pdfs = backup.pdfs.map(item => {
     if (!item || !ids.has(item.id)) throw new Error('Invalid PDF board in backup.');
@@ -162,7 +177,8 @@ export async function importPresentationBackup(backup: PresentationBackup): Prom
       const tx = db.transaction(['pdfBoard', 'geometry', 'graphics'], 'readwrite');
       const pdfStore = tx.objectStore('pdfBoard');
       pdfStore.clear();
-      pdfStore.put(backup.boards, 'boards');
+      pdfStore.put(backup.boards.map(boardRecord), 'boards');
+      if (backup.tabOrder) pdfStore.put(backup.tabOrder, 'tabOrder');
       for (const item of pdfs) pdfStore.put(item.file, item.id);
       for (const [name, records] of [['geometry', geometry], ['graphics', rules]] as const) {
         const store = tx.objectStore(name);
@@ -187,10 +203,10 @@ export async function loadPdfBoards(publishedBoards?: PdfBoard[]): Promise<PdfBo
     return await new Promise((resolve, reject) => {
       const request = db.transaction('pdfBoard', 'readonly').objectStore('pdfBoard').get('boards');
       request.onsuccess = () => {
-        const localBoards = request.result as PdfBoard[] | undefined;
-        if (!localBoards) { resolve(publishedBoards?.length ? publishedBoards : [{id:'current', title:'Blank Board'}]); return; }
+        const localBoards = (request.result as PdfBoard[] | undefined)?.map(boardRecord);
+        if (!localBoards) { resolve((publishedBoards?.length ? publishedBoards : [{id:'current', title:'Blank Board'}]).map(boardRecord)); return; }
         const ids = new Set(localBoards.map(board => board.id));
-        resolve([...localBoards, ...(publishedBoards ?? []).filter(board => !ids.has(board.id))]);
+        resolve([...localBoards, ...(publishedBoards ?? []).filter(board => !ids.has(board.id)).map(boardRecord)]);
       };
       request.onerror = () => reject(request.error);
     });
@@ -201,7 +217,7 @@ export async function savePdfBoards(boards: PdfBoard[]) {
   try {
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction('pdfBoard', 'readwrite');
-      tx.objectStore('pdfBoard').put(boards, 'boards');
+      tx.objectStore('pdfBoard').put(boards.map(boardRecord), 'boards');
       tx.oncomplete = () => resolve();
       tx.onabort = tx.onerror = () => reject(tx.error);
     });
@@ -215,9 +231,33 @@ export async function deletePdfBoard(id: string, boards: PdfBoard[]) {
       const tx = db.transaction('pdfBoard', 'readwrite');
       const store = tx.objectStore('pdfBoard');
       store.delete(id);
-      store.put(boards, 'boards');
+      store.put(boards.map(boardRecord), 'boards');
       tx.oncomplete = () => resolve();
       tx.onabort = tx.onerror = () => reject(tx.error ?? new Error('Could not delete the PDF board.'));
+    });
+  } finally { /* Keep the database open so the next slide does not pay to reconnect. */ }
+}
+export async function loadTabOrder(): Promise<string[] | null> {
+  const db = await openStore();
+  try {
+    return await new Promise((resolve, reject) => {
+      const request = db.transaction('pdfBoard', 'readonly').objectStore('pdfBoard').get('tabOrder');
+      request.onsuccess = () => {
+        const value = request.result;
+        resolve(Array.isArray(value) && value.every((id: unknown) => typeof id === 'string') ? value as string[] : null);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } finally { /* Keep the database open so the next slide does not pay to reconnect. */ }
+}
+export async function saveTabOrder(order: string[]) {
+  const db = await openStore();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction('pdfBoard', 'readwrite');
+      tx.objectStore('pdfBoard').put(order, 'tabOrder');
+      tx.oncomplete = () => resolve();
+      tx.onabort = tx.onerror = () => reject(tx.error ?? new Error('Could not save the board order.'));
     });
   } finally { /* Keep the database open so the next slide does not pay to reconnect. */ }
 }

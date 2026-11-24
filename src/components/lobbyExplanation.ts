@@ -28,9 +28,15 @@ const ORIENTATION: { test: RegExp; lines: string[]; form?: string[] }[] = [
   {
     test: /linear/i,
     lines: [
-      'Every letter is the same size and turns in 15° steps along the gallery.',
-      'The openings puncture the sides.',
-      'The row is twice as long as it is tall, in a 2:1:1 field.',
+      'Order is L, then U, then V. Flat and upright letters alternate in 90° steps inside a 2:1:1 field.',
+      'Upright letters except U stretch to the field height. Each upright U turns 180°, is 1 ft thick, and bows 4 ft in plan. Its arms are 2 ft tall around a curved opening that is 10 ft across the mouth.',
+      'L keeps its length on X, scales up on Y to the field depth, and a flat L scales up on Z by the same amount. Every L sits on the bottom of the field.',
+    ],
+    form: [
+      'Each letter adds a 0.75 ft plate, two stepped terraces, and a wall strip. Neighbors are joined by a hulled 0.75 ft terrace.',
+      'The finished bar is 10% wider than the letters, with half of that extra width past each end. It is clipped to the field and is not stretched to fill the box.',
+      'Each letter cuts its inner contour through the bar. Above the opening, flat pads are 0.75 ft thick and upright pads rise 5.4 ft higher, clipped to the ceiling. An upright U cuts its curved inner contour. The outside of the shell stays the boxes around the letters.',
+      'No bridges are added.',
     ],
   },
   {

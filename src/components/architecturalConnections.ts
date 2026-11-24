@@ -6,6 +6,8 @@ import type { Letter } from "./letterTypes";
 export type IntersectionPlacement = {
   letterRules?: LetterPlacementRules;
   letter: Letter;
+  openHallRole?: "column" | "floor" | "mezzanine" | "wall" | "roof";
+  rotationOrder?: "XYZ" | "ZYX";
   x: number;
   y: number;
   z: number;

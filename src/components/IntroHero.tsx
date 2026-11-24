@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import AppNav from "./AppNav";
 
@@ -18,8 +19,8 @@ export type IntroHeroSettings = {
 };
 
 const TITLE_GOLD = "#D6AD4F";
-const TITLE_HOVER = "#FFFFFF";
 const TITLE_CHARS = new Set(["L", "U", "V"]);
+const PRESENTATION_BOARD_HREF = "/composition-presentation?presentationBoard=7407x2160";
 
 function distanceToSegment(px: number, py: number, ax: number, ay: number, bx: number, by: number) {
   const abx = bx - ax;
@@ -169,10 +170,8 @@ void main(){
   }
   float shade=mix(uBrightness.x,uBrightness.y,shadeNoise*0.5+0.5);
   float opacity=mix(0.42,1.0,shade);
-  vec3 pale=vec3(0.607843,0.835294,0.894118);
-  vec3 glyphColor=mix(vec3(shade)*opacity,pale,influence);
-  vec3 wash=pale*(influence*0.55);
-  fragColor=vec4(mix(wash,glyphColor,glyph),1.0);
+  vec3 glyphColor=vec3(shade)*opacity;
+  fragColor=vec4(mix(vec3(0.0),glyphColor,glyph),1.0);
 }`;
 
 function compile(gl: WebGL2RenderingContext, type: number, source: string) {
@@ -200,6 +199,7 @@ export default function IntroHero({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const titleRef = useRef<HTMLCanvasElement>(null);
   const ribbonRef = useRef<HTMLDivElement>(null);
+  const presentationRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -353,57 +353,33 @@ export default function IntroHero({
         return (row === leftCap.top && col >= leftCap.lo && col <= leftCap.hi)
           || (row === rightCap.top && col >= rightCap.lo && col <= rightCap.hi);
       };
-      let hover = -1;
-      const paint = () => {
-        ctx.clearRect(0, 0, title.width, title.height);
-        chars.forEach((char, index) => {
-          ctx.fillStyle = index === hover ? TITLE_HOVER : TITLE_GOLD;
-          for (let row = 0; row < rows; row += 1) {
-            for (let col = 0; col < cols; col += 1) {
-              if (!covers(char, col, row)) continue;
-              const gridCol = originCol + index * (cols + gap) + col;
-              const gridRow = originRow + row;
-              const x0 = Math.floor(gridCol * pitch);
-              const y0 = Math.floor(gridRow * pitch);
-              const x1 = Math.floor((gridCol + 1) * pitch);
-              const y1 = Math.floor((gridRow + 1) * pitch);
-              ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
-            }
+      ctx.clearRect(0, 0, title.width, title.height);
+      ctx.fillStyle = TITLE_GOLD;
+      chars.forEach((char, index) => {
+        for (let row = 0; row < rows; row += 1) {
+          for (let col = 0; col < cols; col += 1) {
+            if (!covers(char, col, row)) continue;
+            const gridCol = originCol + index * (cols + gap) + col;
+            const gridRow = originRow + row;
+            const x0 = Math.floor(gridCol * pitch);
+            const y0 = Math.floor(gridRow * pitch);
+            const x1 = Math.floor((gridCol + 1) * pitch);
+            const y1 = Math.floor((gridRow + 1) * pitch);
+            ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
           }
-        });
-      };
-      const letterAt = (px: number, py: number) => {
-        const gridCol = Math.floor(px / pitch);
-        const gridRow = Math.floor(py / pitch);
-        let next = -1;
-        chars.forEach((char, index) => {
-          const localCol = gridCol - originCol - index * (cols + gap);
-          const localRow = gridRow - originRow;
-          if (covers(char, localCol, localRow)) next = index;
-        });
-        return next;
-      };
-      const onPointerMove = (event: PointerEvent) => {
-        const bounds = title.getBoundingClientRect();
-        const px = (event.clientX - bounds.left) * (title.width / Math.max(1, bounds.width));
-        const py = (event.clientY - bounds.top) * (title.height / Math.max(1, bounds.height));
-        const next = letterAt(px, py);
-        if (next === hover) return;
-        hover = next;
-        paint();
-      };
-      const onPointerLeave = () => {
-        if (hover < 0) return;
-        hover = -1;
-        paint();
-      };
-      title.addEventListener("pointermove", onPointerMove);
-      title.addEventListener("pointerleave", onPointerLeave);
-      paint();
-      return () => {
-        title.removeEventListener("pointermove", onPointerMove);
-        title.removeEventListener("pointerleave", onPointerLeave);
-      };
+        }
+      });
+      const presentation = presentationRef.current;
+      const uIndex = chars.indexOf("U");
+      if (presentation && uIndex >= 0) {
+        const letterHeight = rows * pitch / dpr;
+        const centerX = (originCol + uIndex * (cols + gap) + cols / 2) * pitch / dpr;
+        const bottomY = (originRow + rows) * pitch / dpr;
+        presentation.style.left = `${centerX}px`;
+        presentation.style.top = `${bottomY + Math.max(16, letterHeight * 0.14)}px`;
+        presentation.style.fontSize = `${Math.max(13, Math.min(22, letterHeight * 0.07))}px`;
+      }
+      return () => {};
     };
     let clearTitlePointer = () => {};
 
@@ -472,7 +448,6 @@ export default function IntroHero({
       canvas.parentElement?.removeEventListener("pointermove", onPointerMove);
       gl.deleteVertexArray(vao);
       gl.deleteProgram(program);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, [brightness, gridPitch, heading, noiseScale, referenceSize, shapeThresholds, speed]);
 
@@ -480,7 +455,15 @@ export default function IntroHero({
     <main className="relative h-dvh w-full overflow-hidden bg-black">
       <h1 className="sr-only">{heading}</h1>
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />
-      <canvas ref={titleRef} className="absolute inset-0 z-[1] h-full w-full" aria-hidden="true" />
+      <canvas ref={titleRef} className="pointer-events-none absolute inset-0 z-[1] h-full w-full" aria-hidden="true" />
+      <Link
+        ref={presentationRef}
+        href={PRESENTATION_BOARD_HREF}
+        className="absolute z-[2] -translate-x-1/2 whitespace-nowrap rounded-full border border-[#D6AD4F] bg-black/80 px-7 py-2 font-medium tracking-[0.14em] text-[#D6AD4F] uppercase hover:border-white hover:text-white focus-visible:border-white focus-visible:text-white active:border-white active:text-white"
+        style={{ left: "50%", top: "64%" }}
+      >
+        Presentation
+      </Link>
       <div ref={ribbonRef} className="absolute inset-x-0 top-0 z-10 flex items-center overflow-x-auto bg-black px-4" style={{ backgroundColor: "#000000", height: 44 }}>
         <AppNav />
       </div>

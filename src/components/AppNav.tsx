@@ -11,11 +11,14 @@ const LINKS = [
   { href: "/shapes", label: "Shapes" },
   { href: "/voids", label: "Voids" },
   { href: "/composition", label: "Composition" },
-  { href: "/amphitheater", label: "Amphitheater proof" },
+  { href: "/amphitheater", label: "Proto-Form Generation" },
   { href: "/lobby", label: "Lobby proof" },
   { href: "/composition-presentation", label: "Presentation" },
   { href: "/evaluations", label: "Evaluations" },
+  { href: "/hybrid-generation", label: "Hybrid Generation" },
   { href: "/lattice", label: "Lattice" },
+  { href: "/site-development", label: "Site Development" },
+  { href: "/experiment/site-polygon-morphogenesis", label: "Polygon-Driven Architecture" },
   { href: "/part3", label: "Part 3" },
 ] as const;
 

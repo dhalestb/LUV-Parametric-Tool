@@ -1,0 +1,48 @@
+import type {TerritoryState,Ring} from './territories';
+import { polygonArea, polygonSelfIntersects } from '../siteDevelopment/geometry';
+import type { SiteCoordinates, SiteDevelopmentProject } from '../siteDevelopment/types';
+
+export const STORAGE_KEY = 'luv-experiment-site-polygon-morphogenesis-v1';
+export const TYPOLOGIES = ['linear-edge-gallery','inserted-plate','vertical-walls','room-within-volume','void-field'] as const;
+export type Typology = typeof TYPOLOGIES[number];
+export type Five<T> = [T,T,T,T,T];
+export const DESCRIPTORS = ['Open Volume','Visually Connected','Circulation Activated','Vertically Integrated','Centralized'] as const;
+export type RuleProfile = { scale:'percentage'|'ordinal'; values:Five<number|null>; archivedScales?:Partial<Record<'percentage'|'ordinal',Five<number|null>>> };
+export type Zone = { id:string; name:string; polygon:[number,number][]; holes:Ring[]; enabled:boolean; areaFeet2:number; inputParameters:Record<string,unknown> };
+export type SiteInput = { name:string; revision:string; fingerprint:string; coordinates:SiteCoordinates; zones:Zone[]; exclusions:{id:string;polygon:[number,number][]}[]; constraints:unknown; protectionMetadataComplete:boolean; corridors:{id:string;points:Ring;widthFeet:number}[]; reservedAreas:{id:string;polygon:Ring}[]; origin:'file'|'fixture' };
+export type Assignment = { shares:Record<Typology,number>; variants:Record<Typology,string>; targets:Five<number|null> };
+export type Experiment = { version:2; territoryByZone:Record<string,TerritoryState>; descriptorAllocation:boolean; descriptorSpatialTargeting:boolean; legacyDescriptorDrafts?:unknown; site:SiteInput|null; selected:string[]; focus:string|null; unitsConfirmed:boolean; transform:'within'|'derived'; allocation:'territories'|'blended'; seedMethod:'letters'|'features'; assignments:Record<string,Assignment>; descriptorIds:Five<string|null>; profiles:Record<Typology,RuleProfile> };
+export type Rule = { entry:string; statements:string[]; parameters:Record<string,unknown>; bindings:{category:'A'|'B';sourceFile:string;sha256:string}[] };
+export type RegistryItem = { id:Typology; name:string; A:Rule; B:Rule; variants:string[]; evidence:{id:string;variant:string;sourceCount:number;request:Record<string,unknown>;validation:unknown;architecturalValidation:unknown}[] };
+export type Registry = { snapshot:string; boardCommit:string; siteCommit:string; counts:{boardFiles:number;siteFiles:number;savedStudies:number}; items:RegistryItem[] };
+const emptyFive = ():Five<null> => [null,null,null,null,null];
+export function initialState():Experiment { return {version:2,territoryByZone:{},descriptorAllocation:false,descriptorSpatialTargeting:false,site:null,selected:[],focus:null,unitsConfirmed:false,transform:'within',allocation:'territories',seedMethod:'letters',assignments:{},descriptorIds:[...DESCRIPTORS],profiles:Object.fromEntries(TYPOLOGIES.map(id=>[id,{scale:'percentage',values:emptyFive()}])) as Experiment['profiles']}; }
+export function newAssignment():Assignment { return {shares:{'linear-edge-gallery':100,'inserted-plate':0,'vertical-walls':0,'room-within-volume':0,'void-field':0},variants:{'linear-edge-gallery':'print-contour','inserted-plate':'edge-connected','vertical-walls':'vertical-walls','room-within-volume':'perimeter-room/fullProfiles/suspendedLLV/edgePlatforms','void-field':'face-normal/neighbor-taper/adjacent'},targets:emptyFive()}; }
+export async function fingerprint(value:unknown) { const bytes=new TextEncoder().encode(JSON.stringify(value)); const digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),n=>n.toString(16).padStart(2,'0')).join(''); }
+export function validRing(ring:unknown):ring is [number,number][] { return Array.isArray(ring)&&ring.length>=3&&ring.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))&&!polygonSelfIntersects(ring)&&polygonArea(ring)>0; }
+export async function importSite(raw:string,origin:SiteInput['origin']):Promise<SiteInput> {
+ const json=JSON.parse(raw);
+ if(json.version!==1)throw Error('Only version 1 Site Development projects are supported.');
+ // Require explicit coordinate metadata before the legacy parser can add defaults.
+ if(!json.coordinates||!['feet','inches','meters','millimeters'].includes(json.coordinates.unit)||!['confirmed','unresolved'].includes(json.coordinates.unitAssumption)||!Number.isFinite(json.coordinates.feetPerModel)||json.coordinates.feetPerModel<=0||!Array.isArray(json.coordinates.origin)||json.coordinates.origin.length!==3||!json.coordinates.origin.every(Number.isFinite)||!Number.isFinite(json.coordinates.elevationDatum)||!Number.isFinite(json.coordinates.northDeg))throw Error('Site JSON must include declared units, positive feetPerModel, origin, datum, north and unit confirmation state.');
+ if(!Array.isArray(json.zones)||!json.zones.every((z:Zone)=>typeof z.id==='string'&&validRing(z.polygon))||!Array.isArray(json.exclusions)||!json.exclusions.every((z:Zone)=>validRing(z.polygon)))throw Error('Every zone and exclusion must have a finite, simple, nonzero-area polygon.');
+ if(new Set(json.zones.map((z:Zone)=>z.id)).size!==json.zones.length)throw Error('Duplicate polygon IDs cannot be assigned independently.');
+ if(json.zones.some((z:{holes?:unknown[]})=>z.holes!==undefined&&(!Array.isArray(z.holes)||!z.holes.every(validRing))))throw Error('Invalid zone holes.');
+ if(json.corridors!==undefined&&(!Array.isArray(json.corridors)||!json.corridors.every((c:{points:Ring;widthFeet:number})=>Array.isArray(c.points)&&c.points.length>=2&&c.points.every(p=>p.length===2&&p.every(Number.isFinite))&&Number.isFinite(c.widthFeet)&&c.widthFeet>0)))throw Error('Invalid corridor geometry or width.');
+ if(json.reservedAreas!==undefined&&(!Array.isArray(json.reservedAreas)||!json.reservedAreas.every((r:{polygon:Ring})=>validRing(r.polygon))))throw Error('Invalid protected-area geometry.');
+ // Read the established Site schema directly; never import the legacy storage writer.
+ const project=json as SiteDevelopmentProject;
+ return {protectionMetadataComplete:true,corridors:structuredClone(json.corridors??[]),reservedAreas:structuredClone(json.reservedAreas??[]),name:project.name,revision:`site-diagram:${encodeURIComponent(project.name)}:v${project.version}:${project.savedAt||'unsaved'}`,fingerprint:await fingerprint(json),coordinates:structuredClone(project.coordinates),origin,zones:project.zones.map(zone=>{const {polygon,...parameters}=zone;return {id:zone.id,name:zone.name,polygon:structuredClone(polygon),holes:structuredClone((zone as typeof zone & {holes?:Ring[]}).holes??[]),enabled:zone.enabled!==false,areaFeet2:polygonArea(polygon),inputParameters:parameters};}),exclusions:project.exclusions.map(z=>({id:z.id,polygon:structuredClone(z.polygon)})),constraints:structuredClone(project.constraints)};
+}
+/** Board X/Y plan, Z up -> Site X/Z plan, Y up. Both domains already use feet. */
+export function boardToSite(p:[number,number,number],origin:[number,number,number]):[number,number,number] {return [origin[0]+p[0],origin[1]+p[2],origin[2]+p[1]];}
+export function siteToBoard(p:[number,number,number],origin:[number,number,number]):[number,number,number] {return [p[0]-origin[0],p[2]-origin[2],p[1]-origin[1]];}
+export function provenance(state:Experiment,registry:Registry) {return {version:1,status:'phase-b-derived-territories',source:state.site?{revision:state.site.revision,fingerprint:state.site.fingerprint,coordinates:state.site.coordinates}:null,sourceCommits:{site:registry.siteCommit,board:registry.boardCommit},snapshot:registry.snapshot,ruleBindings:registry.items.map(t=>({typology:t.id,A:t.A.bindings,B:t.B.bindings})),selectedPolygons:state.selected,assignments:state.assignments,transformation:state.transform,allocation:state.allocation,seedMethod:state.seedMethod,descriptorProfiles:state.profiles,descriptorIds:state.descriptorIds,descriptorAllocationEnabled:false,territoryResults:state.territoryByZone,descriptorSpatialTargetingEnabled:false,components:[],validationFindings:['2D territories only; authentic architectural generators remain gated.'],componentContract:['polygonId','polygonRevision','polygonFingerprint','typologyId','generatorSourceHash','savedVariant','orientationParameters','generationParameters','sourceLetterIdsOrFeatureIds','geometryId','validationFindings']};}
+export function loadState(raw:string):Experiment {
+ const parsed=JSON.parse(raw),state=parsed.settings??parsed;
+ if(![1,2].includes(state.version)||!Array.isArray(state.selected)||!state.profiles||!state.assignments)throw Error('Unsupported experimental settings.');
+ if(state.version===1){const migrated=initialState();return {...migrated,...state,version:2,descriptorIds:[...DESCRIPTORS],profiles:migrated.profiles,legacyDescriptorDrafts:{descriptorIds:state.descriptorIds,profiles:state.profiles},descriptorAllocation:false,descriptorSpatialTargeting:false,territoryByZone:{},site:state.site?{...state.site,protectionMetadataComplete:false,corridors:[],reservedAreas:[],zones:state.site.zones.map((z:Zone)=>({...z,holes:z.holes??[]}))}:null};}
+ if(!state.territoryByZone)throw Error('Missing territory state.');
+ for(const id of TYPOLOGIES){const p=state.profiles[id];if(!p||!['percentage','ordinal'].includes(p.scale)||!Array.isArray(p.values)||p.values.length!==5||p.values.some((v:number|null)=>v!==null&&(!Number.isFinite(v)||v<(p.scale==='ordinal'?1:0)||v>(p.scale==='ordinal'?15:100)||(p.scale==='ordinal'&&!Number.isInteger(v)))))throw Error('Invalid descriptor profile.');}
+ return {...state,descriptorIds:[...DESCRIPTORS],descriptorAllocation:false,descriptorSpatialTargeting:false} as Experiment;
+}

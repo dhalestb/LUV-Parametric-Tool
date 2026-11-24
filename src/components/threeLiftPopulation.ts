@@ -4,7 +4,7 @@ import type {AmphitheaterRequest,AmphitheaterSource} from './amphitheaterInterac
 
 type Field=AmphitheaterRequest['field'];
 type Lift=NonNullable<AmphitheaterSource['lift']>;
-const liftNames:Lift[]=['lower','middle','top'];
+export type LiftLayout={levels:number;spacing?:number};
 
 function hull(points:THREE.Vector2[]){
   const sorted=points.slice().sort((a,b)=>a.x-b.x||a.y-b.y);
@@ -25,20 +25,25 @@ function outline(p:AmphitheaterSource){
   const geometry=getLetterVolumeGeometry(p.letter,12),positions=geometry.getAttribute('position'),m=matrix(p);
   return Array.from({length:positions.count},(_,i)=>new THREE.Vector3().fromBufferAttribute(positions,i).applyMatrix4(m));
 }
-export function populateThreeLifts(existing:AmphitheaterSource[],count:number,field:Field,size:number,seed:number){
+export function populateThreeLifts(existing:AmphitheaterSource[],count:number,field:Field,size:number,seed:number,layout?:LiftLayout,spread=false){
   const result=existing.slice();
   let state=seed>>>0;
   const random=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};
-  const targets=liftNames.map((_,i)=>Math.floor(count/3)+(i<count%3?1:0));
+  const levels=layout?.levels??3;
+  if(layout&&(!Number.isSafeInteger(levels)||levels<2||levels>count))throw Error('Choose at least two levels and provide a letter for each level.');
+  const liftNames:Lift[]=Array.from({length:levels},(_,i)=>i===0?'lower':i===levels-1?'top':'middle');
+  const targets=liftNames.map((_,i)=>Math.floor(count/levels)+(i<count%levels?1:0));
   const totalHeight=Math.min(field.height-1,size*3);
   const lower=size*.28,top=totalHeight-size*.24;
-  const elevations=[lower,(lower+top)/2,top];
-  const middleUprights=Math.min(2,Math.max(0,targets[1]-1));
+  const spacing=layout?.spacing??(layout?(field.height-size*.24-lower)/(levels-1):(top-lower)/2);
+  if(layout&&(!(spacing>0)||lower+(levels-1)*spacing>=field.height))throw Error('Reduce the level count or spacing to fit the field.');
+  const elevations=liftNames.map((_,i)=>lower+i*spacing);
+
   // Place the surrounding terrace letters before testing the actual footprints of interior sources.
-  const tasks=liftNames.flatMap((lift,i)=>Array.from({length:targets[i]},(_,slot)=>({lift,slot,index:i,upright:lift==='middle'&&slot<middleUprights})));
+  const tasks=liftNames.flatMap((lift,i)=>Array.from({length:targets[i]},(_,slot)=>({lift,slot,index:i,upright:lift==='middle'&&slot<Math.min(2,targets[i]-1)})));
   tasks.sort((a,b)=>Number(a.upright)-Number(b.upright));
   for(const task of tasks){
-    const already=result.filter(p=>p.lift===task.lift).length;
+    const already=result.filter(p=>layout?p.levelIndex===task.index:p.lift===task.lift).length;
     if(existing.length&&already>=targets[task.index])continue;
     if(existing.length&&result.length>=count)break;
     let best:AmphitheaterSource|undefined,bestScore=-Infinity;
@@ -47,16 +52,18 @@ export function populateThreeLifts(existing:AmphitheaterSource[],count:number,fi
       const letter=(['L','U','V'] as const)[Math.floor(random()*3)];
       const parent=result.length?result[Math.floor(random()*result.length)]:undefined;
       const p:AmphitheaterSource={
-        letter,lift:task.lift,architecturalRole:'terrace',rotationOrder:'ZYX',
+        letter,...(layout?{levelIndex:task.index}:{}),lift:task.lift,architecturalRole:'terrace',rotationOrder:'ZYX',
         x:parent?parent.x+(random()-.5)*size*1.4:0,y:parent?parent.y+(random()-.5)*size*1.4:0,
-        z:elevations[task.index]-field.height/2+(random()-.5)*size*.12,
+        z:elevations[task.index]-field.height/2+(layout?0:(random()-.5)*size*.12),
         rx:(random()-.5)*24,ry:0,rz:[0,-15,15][Math.floor(random()*3)],
         scale:size/.92,scaleX:1,scaleY:1,scaleZ:1
       };
+      if(spread&&!task.upright){p.x=(random()-.5)*field.width;p.y=(random()-.5)*field.depth;}
       if(task.upright){
-        p.x=(random()-.5)*size*.8;p.y=(random()-.5)*size*.8;
+        p.x=(random()-.5)*(spread?field.width*.72:size*.8);
+        p.y=(random()-.5)*(spread?field.depth*.72:size*.8);
         p.rx=90;p.rz=task.slot%2?0:90;
-        p.z=elevations[1]-field.height/2+(task.slot%2?1:-1)*size*.08;
+        p.z=elevations[task.index]-field.height/2+(layout?0:(task.slot%2?1:-1)*size*.08);
         p.architecturalRole='interior';p.voidKind='through';
       }
       const geometry=getLetterVolumeGeometry(letter,12);
@@ -74,7 +81,15 @@ export function populateThreeLifts(existing:AmphitheaterSource[],count:number,fi
       const nearest=result.length?Math.min(...result.map(other=>Math.hypot(p.x-other.x,p.y-other.y))):0;
       const focus=result.length?result.reduce((v,other)=>v.add(new THREE.Vector2(other.x,other.y)),new THREE.Vector2()).divideScalar(result.length):new THREE.Vector2();
       const setback=Math.hypot(p.x-focus.x,p.y-focus.y);
-      const score=task.upright?-setback:-Math.abs(nearest-size*.55)-.3*Math.abs(setback-size*.65);
+      const peers=spread?result.filter(q=>layout?q.levelIndex===task.index:q.lift===task.lift):[];
+      const separation=peers.length?Math.min(...peers.map(q=>Math.hypot(q.x-p.x,q.y-p.y))):0;
+      // Separate the origins of the horizontal cuts across both middle levels.
+      // Keep the first cut near the gathering focus and reward separation up to one letter span.
+      const interiors=result.filter(q=>q.architecturalRole==='interior');
+      const cutSpacing=interiors.length?Math.min(size,...interiors.map(q=>Math.hypot(p.x-q.x,p.y-q.y))):0;
+      const interiorScore=spread?cutSpacing-.18*setback:-setback;
+      const score=task.upright?interiorScore:spread?
+        Math.min(separation,size*1.8)*.55-Math.abs(nearest-size*.72)-.25*Math.abs(Math.hypot(p.x/field.width,p.y/field.depth)-.29)*Math.min(field.width,field.depth):-Math.abs(nearest-size*.55)-.3*Math.abs(setback-size*.65);
       if(score>bestScore){best=p;bestScore=score;}
     }
     if(!best)throw Error('No contained '+task.lift+' lift placement found. Change seed, letter quantity or field.');

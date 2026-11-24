@@ -313,7 +313,7 @@ export async function createAmphitheaterPlate(result:AmphitheaterResult,options:
   try{
     if(options.view==='board'){
       const margin=canvas.width*.04,gap=canvas.width*.03,width=(canvas.width-2*margin-gap)/2;
-      text((result.request.typologyName??'Stepped Amphitheater').toUpperCase(),margin,canvas.width*.075,canvas.width*.045,PRESENTATION_COLORS.form);
+      text((result.request.typologyName??'Stepped Amphitheater').toUpperCase(),margin,canvas.width*.055,canvas.width*.0328,PRESENTATION_COLORS.form);
       ctx.strokeStyle=PRESENTATION_COLORS.form;ctx.lineWidth=canvas.width*.0007;
       ctx.beginPath();ctx.moveTo(margin,canvas.width*.105);ctx.lineTo(canvas.width-margin,canvas.width*.105);ctx.stroke();
       for(const [i,view] of views.entries())await panel(view,margin+(i%2)*(width+gap),canvas.width*.135+Math.floor(i/2)*(width+gap),width);

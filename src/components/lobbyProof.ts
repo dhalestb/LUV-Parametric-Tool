@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { AmphitheaterSource, ProofMesh, ProofObject } from './amphitheaterInteractiveTypes';
-import { getLetterShape, getLetterVolumeGeometry } from './letterGeometry3d';
+import { getLetterShape, getLetterVolumeGeometry, LINEAR_U_BOW_FT, LINEAR_U_OPENING_FT, LINEAR_U_WIDTH_FT, linearUBend, linearUInnerHalf } from './letterGeometry3d';
 import type { Letter } from './letterTypes';
 
 function boundsOf(positions: number[]) {
@@ -84,7 +84,9 @@ function controllingOpening(mesh: ProofMesh) {
 }
 
 /** Clear height of the compressed void, in feet. The black end opening uses this same height. */
-const COMPRESSED_MIN_CLEAR_HEIGHT = 9;
+const COMPRESSED_MIN_CLEAR_HEIGHT = 10;
+/** 1/8 in = 1 ft-0 in, so a 1/16 in model wall is 0.5 ft. */
+const MODEL_WALL_FT = 0.5;
 
 function zHits(mesh: ProofMesh, x: number, y: number) {
   const { positions, indices } = mesh;
@@ -124,7 +126,7 @@ function enforceCompressedClearHeight(architecture: ProofMesh): ProofMesh {
   const zMin = bounds.center[2] - bounds.size[2] / 2;
   const zMax = bounds.center[2] + bounds.size[2] / 2;
   for (let pass = 0; pass < 5; pass += 1) {
-    const sections: { x: number; outerLow: number; outerHigh: number; center: number; scale: number }[] = [];
+    const sections: { x: number; outerLow: number; outerHigh: number; innerLow: number; innerHigh: number; newInnerLow: number; newInnerHigh: number; moved: boolean }[] = [];
     for (let x = xMin + 0.45; x <= xMax - 0.3; x += 0.7) {
       const hits = zHits(mesh, x, bounds.center[1]);
       if (hits.length < 4) continue;
@@ -134,15 +136,16 @@ function enforceCompressedClearHeight(architecture: ProofMesh): ProofMesh {
       const outerHigh = hits[hits.length - 1];
       const clear = innerHigh - innerLow;
       if (clear < 0.4 || clear > bounds.size[2] * 0.92) continue;
-      sections.push({
-        x,
-        outerLow,
-        outerHigh,
-        center: (innerLow + innerHigh) / 2,
-        scale: clear < COMPRESSED_MIN_CLEAR_HEIGHT - 0.05 ? COMPRESSED_MIN_CLEAR_HEIGHT / clear : 1,
-      });
+      const targetClear = Math.max(clear, COMPRESSED_MIN_CLEAR_HEIGHT);
+      let newInnerLow = (innerLow + innerHigh) / 2 - targetClear / 2;
+      let newInnerHigh = newInnerLow + targetClear;
+      if (newInnerLow - MODEL_WALL_FT < zMin + 0.15) { const shift = zMin + 0.15 + MODEL_WALL_FT - newInnerLow; newInnerLow += shift; newInnerHigh += shift; }
+      if (newInnerHigh + MODEL_WALL_FT > zMax - 0.15) { const shift = newInnerHigh + MODEL_WALL_FT - (zMax - 0.15); newInnerLow -= shift; newInnerHigh -= shift; }
+      const lowerWall = innerLow - outerLow;
+      const upperWall = outerHigh - innerHigh;
+      sections.push({ x, outerLow, outerHigh, innerLow, innerHigh, newInnerLow, newInnerHigh, moved: Math.abs(targetClear - clear) > 0.05 || Math.abs(lowerWall - MODEL_WALL_FT) > 0.05 || Math.abs(upperWall - MODEL_WALL_FT) > 0.05 });
     }
-    if (!sections.some((section) => section.scale > 1.001)) break;
+    if (!sections.some((section) => section.moved)) break;
     for (let index = 0; index < positions.length; index += 3) {
       let x = positions[index];
       const z = positions[index + 2];
@@ -152,16 +155,21 @@ function enforceCompressedClearHeight(architecture: ProofMesh): ProofMesh {
       let right = sections[sections.length - 1];
       for (const section of sections) if (section.x <= x) left = section;
       for (const section of sections) if (section.x >= x) { right = section; break; }
-      if (left.scale <= 1.001 && right.scale <= 1.001) continue;
+      if (!left.moved && !right.moved) continue;
       const span = Math.max(right.x - left.x, 1e-6);
       const t = left === right ? 0 : Math.min(1, Math.max(0, (x - left.x) / span));
       const mix = (from: number, to: number) => from + (to - from) * t;
       const outerLow = mix(left.outerLow, right.outerLow);
       const outerHigh = mix(left.outerHigh, right.outerHigh);
+      const innerLow = mix(left.innerLow, right.innerLow);
+      const innerHigh = mix(left.innerHigh, right.innerHigh);
+      const newInnerLow = mix(left.newInnerLow, right.newInnerLow);
+      const newInnerHigh = mix(left.newInnerHigh, right.newInnerHigh);
       if (z < outerLow - 0.3 || z > outerHigh + 0.3) continue;
-      const center = mix(left.center, right.center);
-      const scale = mix(left.scale, right.scale);
-      const next = center + (z - center) * scale;
+      let next: number;
+      if (z <= innerLow) next = newInnerLow - MODEL_WALL_FT + Math.min(1, Math.max(0, (z - outerLow) / Math.max(innerLow - outerLow, 1e-6))) * MODEL_WALL_FT;
+      else if (z >= innerHigh) next = newInnerHigh + Math.min(1, Math.max(0, (z - innerHigh) / Math.max(outerHigh - innerHigh, 1e-6))) * MODEL_WALL_FT;
+      else next = newInnerLow + ((z - innerLow) / Math.max(innerHigh - innerLow, 1e-6)) * (newInnerHigh - newInnerLow);
       positions[index + 2] = Math.min(zMax - 0.15, Math.max(zMin + 0.15, next));
     }
   }
@@ -209,7 +217,7 @@ function adjustOpeningToLetters(architecture: ProofMesh, letters: { center: numb
   return enforceCompressedClearHeight({ ...architecture, positions });
 }
 
-/** Scale letter solids up to the architecture cross-section. The flat end L is 8 ft on Z and keeps its plan size. The rightmost V is 75% of that fitted size. The compressed opening stays at least 9 ft clear, and the black end opening uses that height. */
+/** Scale letter solids up to the architecture cross-section. The flat end L is 8 ft on Z and keeps its plan size. The rightmost V is 75% of that fitted size. The compressed opening stays at least 10 ft clear, and the black end opening uses that height. */
 export function fitLobbyLettersToArchitecture(letters: ProofObject[], architecture: ProofMesh): { letters: ProofObject[]; architecture: ProofMesh } {
   if (!letters.length || !architecture.positions.length) return { letters, architecture };
   const architectureSize = boundsOf(architecture.positions).size;
@@ -278,11 +286,13 @@ export const LOBBY_TYPOLOGIES: { id: LobbyTypologyId; label: string; name: strin
     label: 'Vertical Void',
     name: 'Vertical Void Lobby',
     rules: [
+      'Taken from Vertical Final, study 26: letters stack on one vertical axis inside a 1:1:1 field.',
       'Letter order is L, then U, then V, at 140%, 100%, and 75%.',
       'Three letters lie on XY and form the floor plates. The other letters stand as walls.',
-      'Letters stack on one vertical axis and intersect slightly. The overlap replaces bridges.',
-      'V tilts 45°–135° from horizontal, starting at 45°.',
-      'Each letter is drawn as its actual outline. The closest outline pairs become the relationships, and tangent alignment prefers edges that point the same way.',
+      'Letters intersect slightly. The overlap replaces bridges.',
+      'V tilts from 45° in 15° steps. Plan rotation steps by 15°.',
+      'The shell uses the same 0.75 ft terraces, letter boxes, and contour cuts as studies 77, 66, 65, and 12.',
+      'Level quantity and the Z interval do not apply. Each letter is drawn as its actual outline.',
     ],
   },
   {
@@ -334,12 +344,19 @@ export const LOBBY_TYPOLOGIES: { id: LobbyTypologyId; label: string; name: strin
     label: 'Linear',
     name: 'Linear Gallery Lobby',
     rules: [
-      'Letter order is L, then U, then V, all at the same scale.',
-      'Every rotation uses 90° steps.',
-      'Every letter is the same size, close to the vertical void, and the openings puncture the sides.',
-      'The letters turn in 15° steps along the gallery and intersect slightly.',
-      'The row is twice as long as it is tall, in a 2:1:1 width to depth to height field.',
-      'Each letter is drawn as its actual outline. The closest outline pairs become the relationships, and tangent alignment prefers edges that point the same way.',
+      'The field is 40 ft wide, 20 ft deep, and 20 ft tall, a 2:1:1 box. The finished shell is clipped to that box.',
+      'Level quantity and the Z interval do not apply.',
+      'Letter order is L, then U, then V, all from the same preferred size.',
+      'Flat and upright letters alternate. Even letters lie flat in plan. Odd letters stand with a 90° turn, so the face is across the row.',
+      'An upright letter overlaps the flat letter beside it. A gap of 0.45 times one flat letter separates each pair. The row is then scaled to 98% of the plan box.',
+      'Every upright letter except U stretches in height until it reaches the top and bottom of the field.',
+      'Each upright U turns 180° in plan. It is 1 ft thick, centered on its place in the row, and bows 4 ft in plan. Each arm is 2 ft tall.',
+      'The U opening follows the letter’s curved inner contour and is 10 ft across the mouth. The outside of the shell stays the boxes around the letters.',
+      'L keeps its length on X. It scales up on Y to the field depth, and a flat L scales up on Z by the same amount. Every L sits on the bottom of the field.',
+      'A 0.75 ft plate, two stepped terraces, and a wall strip are built from each letter outline. Neighboring outlines are hulled into 0.75 ft terraces, so the shell is one bar.',
+      'The finished bar is 10% wider than the letters, the same proportion as the earlier linear shell: half of that extra width past each end. It is clipped to the field and is not stretched to fill the box.',
+      'A box 1 ft outside each letter is joined on last. Above the 10 ft opening, each flat letter gets a 0.75 ft pad and each upright pad rises 5.4 ft higher, the same step as the earlier linear top, clipped to the ceiling.',
+      'Each letter then cuts its inner contour through the bar along its saved rotation. An upright U cuts its curved inner contour. No bridges are added.',
     ],
   },
 ];
@@ -351,6 +368,25 @@ const ORDER: Record<LobbyTypologyId, Letter[]> = {
   'topographic-ground-field-lobby': ['U', 'L', 'V'],
   'linear-gallery-lobby': ['L', 'U', 'V'],
 };
+
+/** Place letters on evenly spaced Z levels. Plan position and rotation stay as generated. */
+export function applyLobbyZLevels(placed: AmphitheaterSource[], field: { height: number }, levels: number, interval: number) {
+  if (!Number.isInteger(levels) || levels < 1) throw Error('Choose at least 1 level.');
+  if (![10, 12, 15].includes(interval)) throw Error('Z interval must be 10, 12, or 15 feet.');
+  const reach = (levels - 1) * interval;
+  if (reach > field.height + 1e-6) throw Error(levels + ' levels at ' + interval + ' ft need ' + reach + ' ft on Z. This field is ' + field.height + ' ft high.');
+  const next = placed.map((item, index) => {
+    const level = Math.min(levels - 1, Math.floor(index * levels / placed.length));
+    const worldZ = (field.height - reach) / 2 + level * interval;
+    return { ...item, z: worldZ - field.height / 2 };
+  });
+  for (const item of next) {
+    const size = sizeOf(item.letter, item.scale, item.rx, item.ry, item.rz, item.scaleX, item.scaleY, item.scaleZ);
+    const center = item.z + field.height / 2;
+    if (center - size.z / 2 < -0.05 || center + size.z / 2 > field.height + 0.05) throw Error('A letter does not fit these Z levels. Choose fewer levels, a shorter interval, or a taller field.');
+  }
+  return next;
+}
 
 function source(letter: Letter, scale: number, x: number, y: number, z: number, rx: number, ry: number, rz: number): AmphitheaterSource {
   return { letter, x, y, z, rx, ry, rz, scale, scaleX: 1, scaleY: 1, scaleZ: 1 };
@@ -584,18 +620,15 @@ export function populateLobby(id: LobbyTypologyId, preferred: number, count: num
       const factor = letter === 'L' ? 1.4 : letter === 'U' ? 1 : 0.75;
       const scale = preferred * factor;
       const rotation = poseFor(index, floors, letter === 'V' ? { rx: 45 + (vCount % 7) * 15, ry: 0, rz: (index % 4) * 15 } : { rx: 0, ry: 90, rz: (index % 4) * 15 });
-      const rx = rotation.rx;
-      const ry = rotation.ry;
-      const rz = rotation.rz;
       if (letter === 'V' && !floors.has(index)) vCount++;
-      const height = sizeOf(letter, scale, rx, ry, rz).z;
+      const height = sizeOf(letter, scale, rotation.rx, rotation.ry, rotation.rz).z;
       let z = 0;
       if (placed.length) {
         const previous = placed[placed.length - 1];
         const previousHeight = sizeOf(previous.letter, previous.scale, previous.rx, previous.ry, previous.rz).z;
         z = previous.z + previousHeight / 2 + height / 2 - OVERLAP;
       }
-      placed.push(source(letter, scale, 0, 0, z, rx, ry, rz));
+      placed.push(source(letter, scale, 0, 0, z, rotation.rx, rotation.ry, rotation.rz));
     }
     center(placed);
     fitInside(placed, box);
@@ -669,7 +702,103 @@ export function populateLobby(id: LobbyTypologyId, preferred: number, count: num
     return { source: placed, links: [] };
   }
   if (id === 'linear-gallery-lobby') {
-    const placed = placeLong(order, count, preferred, (index) => ({ rx: index * 15, ry: 90, rz: 0 }), false, box, { keepSize: true });
+    const placed: AmphitheaterSource[] = [];
+    const flatReach = sizeOf(order[0], preferred, 0, 0, 0);
+    for (let index = 0; index < count; index++) {
+      const letter = order[index % order.length];
+      const upright = letter === 'U' || index % 2 === 1;
+      const pose = letter === 'U' ? { rx: 0, ry: 90, rz: 180 } : upright ? { rx: 0, ry: 90, rz: 0 } : { rx: 0, ry: 0, rz: 0 };
+      const reach = sizeOf(letter, preferred, pose.rx, pose.ry, pose.rz);
+      const item = source(letter, preferred, 0, 0, 0, pose.rx, pose.ry, pose.rz);
+      const previous = placed[placed.length - 1];
+      if (previous && upright) {
+        const previousReach = sizeOf(previous.letter, previous.scale, previous.rx, previous.ry, previous.rz);
+        item.x = previous.x + previousReach.x / 2 - reach.x * 0.2;
+      } else if (previous) {
+        const previousReach = sizeOf(previous.letter, previous.scale, previous.rx, previous.ry, previous.rz);
+        item.x = previous.x + previousReach.x / 2 + reach.x / 2 + flatReach.x * 0.45;
+      }
+      placed.push(item);
+    }
+    const stand = sizeOf(order[0], preferred, 0, 90, 0);
+    for (const item of placed) if (item.ry === 0) item.z = -stand.z * 0.2;
+    center(placed);
+    const span = bounds(placed).span;
+    const plan = Math.min(box.width / Math.max(span[0], 0.001), box.depth / Math.max(span[1], 0.001)) * 0.98;
+    placed.forEach((item) => { item.x *= plan; item.y *= plan; item.z *= plan; item.scale *= plan; });
+    for (const item of placed) {
+      if (Math.abs(item.ry) !== 90) continue;
+      const reach = sizeOf(item.letter, item.scale, item.rx, item.ry, item.rz, item.scaleX, item.scaleY, item.scaleZ);
+      if (item.letter === 'U') {
+        const factor = Math.min(box.height * 0.99 / Math.max(reach.z, 0.001), box.depth * 0.99 / Math.max(reach.y, 0.001));
+        item.scaleY *= factor;
+        const depth = sizeOf(item.letter, item.scale, item.rx, item.ry, item.rz, item.scaleX, item.scaleY, 1).y;
+        item.scaleY *= Math.max(0.35, (depth - LINEAR_U_BOW_FT * 2) / Math.max(depth, 0.001));
+        const thick = sizeOf(item.letter, item.scale, item.rx, item.ry, item.rz, item.scaleX, item.scaleY, 1).x;
+        item.scaleZ = LINEAR_U_WIDTH_FT / Math.max(thick, 0.001);
+        // 0.43 is the centered outer half of the even U, including the bevel.
+        // A 2 ft arm on each side then leaves the 10 ft opening.
+        const armScale = (2 + LINEAR_U_OPENING_FT / 2) / 0.43;
+        item.scaleX *= Math.min(factor, armScale / Math.max(item.scale, 0.001));
+        const geometry = getLetterVolumeGeometry('U', 12, linearUInnerHalf(item.scale * item.scaleX), false, linearUBend(item.scale, item.scaleY));
+        geometry.computeBoundingBox();
+        const fitted = geometry.boundingBox!.clone().applyMatrix4(new THREE.Matrix4().compose(
+          new THREE.Vector3(),
+          new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.MathUtils.degToRad(item.rx), THREE.MathUtils.degToRad(item.ry), THREE.MathUtils.degToRad(item.rz), 'XYZ')),
+          new THREE.Vector3(item.scale * item.scaleX, item.scale * item.scaleY, item.scale * item.scaleZ),
+        ));
+        item.y = -((fitted.min.y + fitted.max.y) / 2);
+        item.z = 0;
+        continue;
+      }
+      item.scaleX *= box.height * 0.99 / Math.max(reach.z, 0.001);
+      item.z = 0;
+    }
+    for (const item of placed) {
+      if (item.letter !== 'L') continue;
+      const reach = sizeOf(item.letter, item.scale, item.rx, item.ry, item.rz, item.scaleX, item.scaleY, item.scaleZ);
+      item.scaleY *= 10 / Math.max(reach.y, 0.001);
+    }
+    const lift = box.depth * 0.98 / 10;
+    for (const item of placed) {
+      if (item.letter !== 'L') continue;
+      if (Math.abs(item.ry) === 90) item.scaleY *= lift;
+      else { item.scaleY *= lift; item.scaleZ *= lift; }
+    }
+    for (const item of placed) {
+      if (item.letter !== 'L') continue;
+      const reach = sizeOf(item.letter, item.scale, item.rx, item.ry, item.rz, item.scaleX, item.scaleY, item.scaleZ);
+      item.z = reach.z / 2 + 0.05 - box.height / 2;
+    }
+    // Study 9's shell is 53.5 ft wide around letters 48.6 ft wide.
+    const shellToLetters = 53.5 / 48.6;
+    const reachX = placed.map((item) => sizeOf(item.letter, item.scale, item.rx, item.ry, item.rz, item.scaleX, item.scaleY, item.scaleZ).x);
+    let minX = Infinity;
+    let maxX = -Infinity;
+    placed.forEach((item, index) => {
+      minX = Math.min(minX, item.x - reachX[index] / 2);
+      maxX = Math.max(maxX, item.x + reachX[index] / 2);
+    });
+    const current = { min: minX, max: maxX, span: maxX - minX };
+    const limit = (box.width - 0.2) / shellToLetters;
+    if (current.span > limit) {
+      const mid = (current.min + current.max) / 2;
+      let low = 0;
+      let high = 1;
+      for (let step = 0; step < 24; step++) {
+        const scale = (low + high) / 2;
+        let min = Infinity;
+        let max = -Infinity;
+        placed.forEach((item, index) => {
+          const x = mid + (item.x - mid) * scale;
+          min = Math.min(min, x - reachX[index] / 2);
+          max = Math.max(max, x + reachX[index] / 2);
+        });
+        if (max - min > limit) high = scale;
+        else low = scale;
+      }
+      placed.forEach((item) => { item.x = mid + (item.x - mid) * low; });
+    }
     return { source: placed, links: [] };
   }
   const tilts = { L: [0, 15, 30, 45], U: [45, 60, 75, 90], V: [90, 105, 120] };

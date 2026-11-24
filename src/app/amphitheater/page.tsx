@@ -1,2 +1,2 @@
-import AmphitheaterStudio from '@/components/AmphitheaterStudio';
-export default function AmphitheaterPage(){ return <AmphitheaterStudio/>; }
+import ProtoFormStudio from '@/components/ProtoFormStudio';
+export default function AmphitheaterPage(){ return <ProtoFormStudio/>; }

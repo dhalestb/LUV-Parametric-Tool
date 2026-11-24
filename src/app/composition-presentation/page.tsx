@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { loadPresentationGraphics, loadPresentationPdfs, savePresentationGraphic, savePresentationPdf, loadPdfBoards, savePdfBoards, deletePdfBoard, exportPresentationBackup, importPresentationBackup, loadPublishedPresentation, type PublishedPresentation, type PdfBoard } from "@/components/presentationGraphics";
+import { loadPresentationGraphics, loadPresentationPdfs, savePresentationGraphic, savePresentationPdf, loadPdfBoards, savePdfBoards, deletePdfBoard, loadTabOrder, saveTabOrder, resolveTabOrder, exportPresentationBackup, importPresentationBackup, loadPublishedPresentation, type PublishedPresentation, type PdfBoard } from "@/components/presentationGraphics";
 import { lightenBoardFile } from "@/components/boardRaster";
 import type { PrototypeCategory, PrototypeTypologyId } from "@/components/amphitheaterPrototype";
 import AppNav from "@/components/AppNav";
@@ -54,12 +54,12 @@ export default function CompositionPresentationPage() {
     window.dispatchEvent(new PopStateEvent('popstate'));
   };
   const [graphics, setGraphics] = useState<Partial<Record<PrototypeTypologyId, DisplayGraphic>>>({});
-  const [isoGraphics, setIsoGraphics] = useState<Partial<Record<PrototypeTypologyId, DisplayGraphic>>>({});
   const [error, setError] = useState("");
   const [zoom, setZoom] = useState(100);
   const [exportingLobby, setExportingLobby] = useState(false);
   const [board, setBoard] = useState('current');
   const [pdfBoards, setPdfBoards] = useState<PdfBoard[]>([{id:'current', title:'Blank Board'}]);
+  const [tabOrder, setTabOrder] = useState<string[]>(['current', 'geometry', 'rules', 'lobby-proofs', 'video']);
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState('');
   const [localApp, setLocalApp] = useState(false);
@@ -77,8 +77,9 @@ export default function CompositionPresentationPage() {
       catch { if (!request.signal.aborted) setError('Could not load the published presentation.'); }
       if (request.signal.aborted) return;
       const boards = await loadPdfBoards(snapshot?.boards.length ? snapshot.boards : undefined);
+      const savedOrder = await loadTabOrder();
       if (request.signal.aborted) return;
-      setPublished(snapshot); setPdfBoards(boards);
+      setPublished(snapshot); setPdfBoards(boards); setTabOrder(resolveTabOrder(savedOrder, boards.map(item => item.id)));
       setBoard(current => boards.some(item => item.id === current) ? current : boards[0]?.id ?? 'geometry');
     })().catch(() => { if (!request.signal.aborted) setError('Could not load board titles.'); })
       .finally(() => { if (!request.signal.aborted) setCatalogReady(true); });
@@ -92,7 +93,6 @@ export default function CompositionPresentationPage() {
   checkedRef.current = checkedBoards;
   const seenRevision = useRef(boardRevision);
   const graphicCache = useRef<Partial<Record<GraphicBoard, { graphics: Partial<Record<PrototypeTypologyId, DisplayGraphic>>; urls: string[] }>>>({});
-  const isoUrlRef = useRef<string[]>([]);
   const [pdfError, setPdfError] = useState('');
   const [draggingPdf, setDraggingPdf] = useState(false);
   const graphicRevision = useRef(boardRevision);
@@ -121,18 +121,6 @@ export default function CompositionPresentationPage() {
         graphicCache.current[board] = { graphics: next, urls: nextUrls };
         setGraphics(next); setError("");
         previous?.urls.forEach(URL.revokeObjectURL);
-        if (board === 'lobby-proofs') {
-          const isoRecords = await loadPresentationGraphics('lobby-isos');
-          if (!active) return;
-          const isoNext: Partial<Record<PrototypeTypologyId, DisplayGraphic>> = {}; const isoUrls: string[] = [];
-          for (const record of isoRecords) {
-            const url = URL.createObjectURL(record.image); isoUrls.push(url); isoNext[record.typology] = { name: record.name, url };
-          }
-          const previousIso = isoUrlRef.current;
-          isoUrlRef.current = isoUrls;
-          setIsoGraphics(isoNext);
-          previousIso.forEach(URL.revokeObjectURL);
-        }
       } catch { if (active) setError("Could not load the saved presentation graphics."); }
     };
     if (!cached || published) void refresh();
@@ -151,7 +139,7 @@ export default function CompositionPresentationPage() {
       setReadyBoards({});
       setCheckedBoards({});
     }
-    const order = [...pdfBoards.map(item => item.id), 'geometry', 'rules', 'lobby-proofs', 'video'];
+    const order = tabOrder;
     const index = order.indexOf(board);
     const wanted = [order[index - 1], order[index], order[index + 1]].filter((id): id is string => Boolean(id) && !isGraphicBoard(id) && id !== 'video');
     const missing = wanted.filter(id => !readyRef.current[id] && !checkedRef.current[id]);
@@ -188,7 +176,7 @@ export default function CompositionPresentationPage() {
       for (const id of missing) checkedRef.current[id] = true;
     }).catch(() => { if (active) setPdfError('Could not convert this PDF into a WebP slide.'); });
     return () => { active = false; };
-  }, [board, pdfBoards, boardRevision, published, catalogReady]);
+  }, [board, tabOrder, boardRevision, published, catalogReady]);
   useEffect(() => () => { for (const item of Object.values(readyRef.current)) URL.revokeObjectURL(item.url); }, []);
   const addPdf = async (file?: File) => {
     if (!file) return;
@@ -207,16 +195,31 @@ export default function CompositionPresentationPage() {
     }
     catch { setPdfError('Could not add this PDF to the board.'); }
   };
-  const boardOrder = [...pdfBoards.map(item => item.id), 'geometry', 'rules', 'lobby-proofs', 'video'];
-  const updateBoards = (next: PdfBoard[]) => { setPdfBoards(next); void savePdfBoards(next).catch(() => setError('Could not save board order or title.')); };
+  const boardOrder = tabOrder;
+  const updateBoards = (next: PdfBoard[]) => { setPdfBoards(next); void savePdfBoards(next).catch(() => setError('Could not save the board title.')); };
+  const updateTabOrder = (next: string[]) => { setTabOrder(next); void saveTabOrder(next).catch(() => setError('Could not save the board order.')); };
+  const tabTitle = (id: string) => pdfBoards.find(item => item.id === id)?.title || (id === 'geometry' ? 'Geometry Board' : id === 'rules' ? 'Graphic Rules Board' : id === 'lobby-proofs' ? 'Lobby Proofs' : id === 'video' ? 'Demo' : 'Untitled Board');
+  const placeTab = (targetId: string) => {
+    if (!draggedBoard || draggedBoard === targetId) return;
+    const next = [...boardOrder];
+    const from = next.indexOf(draggedBoard);
+    const to = next.indexOf(targetId);
+    if (from < 0 || to < 0) return;
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    updateTabOrder(next);
+    setDraggedBoard(null);
+  };
   const currentTitle = pdfBoards.find(item => item.id === board)?.title ?? 'PDF Board';
   const boardIndex = boardOrder.indexOf(board);
   const removeCurrentBoard = async () => {
     if (!isPdfBoard || !pdfBoards.some(item => item.id === board)) return;
     if (!window.confirm(`Delete "${currentTitle}" and its PDF from this browser?`)) return;
     const next = pdfBoards.filter(item => item.id !== board);
+    const nextOrder = tabOrder.filter(id => id !== board);
     try {
       await deletePdfBoard(board, next);
+      await saveTabOrder(nextOrder);
       setReadyBoards(current => {
         if (current[board]) URL.revokeObjectURL(current[board].url);
         const rest = { ...current };
@@ -224,7 +227,8 @@ export default function CompositionPresentationPage() {
         return rest;
       });
       setPdfBoards(next);
-      setBoard(next[Math.min(boardIndex, next.length - 1)]?.id ?? 'geometry');
+      setTabOrder(nextOrder);
+      setBoard(nextOrder[Math.min(Math.max(boardIndex, 0), nextOrder.length - 1)] ?? 'geometry');
       setPdfError('');
       setError('');
     } catch { setError('Could not delete the PDF board.'); }
@@ -243,7 +247,8 @@ export default function CompositionPresentationPage() {
       if (action === 'load') {
         await importPresentationBackup(result);
         setPdfBoards(result.boards);
-        setBoard(result.boards[0]?.id ?? 'geometry');
+        setTabOrder(resolveTabOrder(result.tabOrder, result.boards.map((item: PdfBoard) => item.id)));
+        setBoard(resolveTabOrder(result.tabOrder, result.boards.map((item: PdfBoard) => item.id))[0] ?? 'geometry');
         setBoardRevision(value => value + 1);
         if (typeof BroadcastChannel !== 'undefined') {
           const channel = new BroadcastChannel('composition-presentation');
@@ -260,42 +265,51 @@ export default function CompositionPresentationPage() {
     setError("");
     try {
       const width = 4096;
-      const height = Math.round(width * 2 / 5);
+      const header = Math.round(width * 0.045);
+      const columnWidth = width / 5;
+      const columnHeight = columnWidth * (5156 / 4096);
+      const height = header + columnHeight;
       const canvas = document.createElement("canvas");
       canvas.width = width;
-      canvas.height = height;
+      canvas.height = Math.round(height);
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Could not export the Lobby Proofs board.");
       ctx.fillStyle = "#000000";
       ctx.fillRect(0, 0, width, height);
-      const gap = Math.round(width * 8 / 1200);
-      const border = Math.max(1, Math.round(width / 1400));
-      const cellWidth = (width - gap * 4) / 5;
-      const cellHeight = (height - gap) / 2;
+      const titleSize = Math.round(width * 0.0105);
+      ctx.font = `700 ${titleSize}px Arial, sans-serif`;
+      ctx.letterSpacing = `${titleSize * 0.08}px`;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      const titleX = Math.round(width * 0.008);
+      ctx.fillStyle = "#D6AD4F";
+      ctx.fillText("LOBBY", titleX, header / 2);
+      const lobbyWidth = ctx.measureText("LOBBY").width;
+      ctx.fillStyle = "#F7F6F5";
+      ctx.fillText(" PROTO-FORMS", titleX + lobbyWidth, header / 2);
+      const rule = Math.max(1, Math.round(width / 3200));
       const load = async (url?: string) => url ? createImageBitmap(await (await fetch(url)).blob()) : null;
-      for (const [sources, row] of [[isoGraphics, 0], [graphics, 1]] as const) {
-        for (const [col, item] of lobbyTypologies.entries()) {
-          const x = col * (cellWidth + gap);
-          const y = row * (cellHeight + gap);
-          ctx.strokeStyle = "#b9bec6";
-          ctx.lineWidth = border;
-          ctx.strokeRect(x + border / 2, y + border / 2, cellWidth - border, cellHeight - border);
-          const bitmap = await load(sources[item.id]?.url);
-          if (bitmap) {
-            const scale = Math.min((cellWidth - border * 2) / bitmap.width, (cellHeight - border * 2) / bitmap.height);
-            const drawWidth = bitmap.width * scale;
-            const drawHeight = bitmap.height * scale;
-            ctx.drawImage(bitmap, x + (cellWidth - drawWidth) / 2, y + (cellHeight - drawHeight) / 2, drawWidth, drawHeight);
-            bitmap.close();
-          } else {
-            ctx.fillStyle = "#d6ad4f";
-            ctx.font = `600 ${Math.round(cellWidth * 0.045)}px Arial, sans-serif`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(item.name, x + cellWidth / 2, y + cellHeight / 2, cellWidth * 0.9);
-          }
+      for (const [col, item] of lobbyTypologies.entries()) {
+        const x = col * columnWidth;
+        const y = header;
+        const bitmap = await load(graphics[item.id]?.url);
+        if (bitmap) {
+          const scale = Math.min(columnWidth / bitmap.width, columnHeight / bitmap.height);
+          const drawWidth = bitmap.width * scale;
+          const drawHeight = bitmap.height * scale;
+          ctx.drawImage(bitmap, x + (columnWidth - drawWidth) / 2, y + (columnHeight - drawHeight) / 2, drawWidth, drawHeight);
+          bitmap.close();
+        } else {
+          ctx.fillStyle = "#d6ad4f";
+          ctx.font = `600 ${Math.round(columnWidth * 0.045)}px Arial, sans-serif`;
+          ctx.letterSpacing = "0px";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(item.name, x + columnWidth / 2, y + columnHeight / 2, columnWidth * 0.86);
         }
       }
+      ctx.fillStyle = "#F7F6F5";
+      for (let col = 1; col < lobbyTypologies.length; col++) ctx.fillRect(Math.round(col * columnWidth) - rule, header, rule, columnHeight);
       const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error("Could not export the Lobby Proofs board.")), "image/png"));
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -321,16 +335,12 @@ export default function CompositionPresentationPage() {
         <button type="button" disabled={syncing} onClick={() => void syncBoards('load')} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor:'var(--line)'}}>Restore boards from GitHub</button>
         <span role="status" aria-live="polite">{syncing ? 'Connecting to GitHub…' : syncMessage}</span>
       </div>}</>}
-      <div className={presentationMode && isPdfBoard ? "absolute left-1/2 top-10 z-30 w-max max-w-[95%] -translate-x-1/2 rounded bg-black/90 px-3 pb-3" : ""}><div className={`mt-4 flex flex-wrap items-center gap-3 text-xs ${presentationMode ? 'justify-center' : ''}`} aria-label="Board navigation">
+      <div className={presentationMode && isPdfBoard ? "absolute inset-x-0 top-10 z-30 px-3 pb-3" : ""}><div className={`mt-4 flex w-full flex-wrap items-center gap-3 text-xs ${presentationMode ? 'justify-end' : ''}`} aria-label="Board navigation">
         {!presentationMode && <><button type="button" aria-label="Previous board" disabled={boardIndex === 0} onClick={() => setBoard(boardOrder[boardIndex - 1])} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor: "var(--line)"}}>←</button>
         <span aria-live="polite" className="min-w-32 text-center font-semibold" style={{color:"#d6ad4f"}}>{boardLabel(board, currentTitle)}</span>
         <button type="button" aria-label="Next board" disabled={boardIndex === boardOrder.length - 1} onClick={() => setBoard(boardOrder[boardIndex + 1])} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor: "var(--line)"}}>→</button></>}
       <div className="flex flex-wrap items-center gap-2 text-xs" aria-label="Board tabs">
-        {pdfBoards.map(item => <button key={item.id} type="button" draggable onDragStart={event => {setDraggedBoard(item.id);event.dataTransfer.effectAllowed='move';}} onDragEnd={() => setDraggedBoard(null)} onDragOver={event => {if(draggedBoard)event.preventDefault();}} onDrop={event => {event.preventDefault();if(!draggedBoard || draggedBoard===item.id)return;const next=[...pdfBoards];const from=next.findIndex(value=>value.id===draggedBoard),to=next.findIndex(value=>value.id===item.id);if(from<0||to<0)return;const [moved]=next.splice(from,1);next.splice(to,0,moved);updateBoards(next);setDraggedBoard(null);}} onClick={() => setBoard(item.id)} aria-pressed={board===item.id} title="Drag to reorder PDF boards" className="rounded border px-3 py-1" style={{borderColor:board===item.id?'#d6ad4f':'var(--line)'}}>{item.title || 'Untitled Board'}</button>)}
-        <button type="button" aria-pressed={board==='geometry'} onClick={() => setBoard('geometry')} className="rounded border px-3 py-1" style={{borderColor:board==='geometry'?'#d6ad4f':'var(--line)'}}>Geometry Board</button>
-        <button type="button" aria-pressed={board==='rules'} onClick={() => setBoard('rules')} className="rounded border px-3 py-1" style={{borderColor:board==='rules'?'#d6ad4f':'var(--line)'}}>Graphic Rules Board</button>
-        <button type="button" aria-pressed={board==='lobby-proofs'} onClick={() => setBoard('lobby-proofs')} className="rounded border px-3 py-1" style={{borderColor:board==='lobby-proofs'?'#d6ad4f':'var(--line)'}}>Lobby Proofs</button>
-        <button type="button" aria-pressed={board==='video'} onClick={() => setBoard('video')} className="rounded border px-3 py-1" style={{borderColor:board==='video'?'#d6ad4f':'var(--line)'}}>Demo</button>
+        {boardOrder.map(id => <button key={id} type="button" draggable onDragStart={event => {setDraggedBoard(id);event.dataTransfer.effectAllowed='move';}} onDragEnd={() => setDraggedBoard(null)} onDragOver={event => {if(draggedBoard)event.preventDefault();}} onDrop={event => {event.preventDefault();placeTab(id);}} onClick={() => setBoard(id)} aria-pressed={board===id} title="Drag to place this tab before, between, or after the others" className="rounded border px-3 py-1" style={{borderColor:board===id?'#d6ad4f':'var(--line)'}}>{tabTitle(id)}</button>)}
       </div>
       </div>
       <div className={`mt-3 flex items-center gap-2 text-xs ${presentationMode ? 'justify-center' : ''}`} aria-label="Board zoom controls">
@@ -343,32 +353,29 @@ export default function CompositionPresentationPage() {
         {presentationMode && <button data-board-edit-control type="button" onClick={() => setPresentationMode(false)} className="rounded border px-3 py-1" style={{borderColor:'var(--line)',color:'#d6ad4f'}}>Exit presentation mode</button>}
       </div></div>
       {!presentationMode && <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-        <label className="flex items-center gap-2">Board <select aria-label="Select board to edit" value={board} onChange={event => setBoard(event.target.value)} className="rounded border bg-black px-2 py-1 text-white" style={{borderColor:'var(--line)'}}>{pdfBoards.map(item => <option key={item.id} value={item.id}>{item.title || 'Untitled Board'}</option>)}<option value="geometry">Geometry Board</option><option value="rules">Graphic Rules Board</option><option value="lobby-proofs">Lobby Proofs</option><option value="video">Demo</option></select></label>
-        <button type="button" onClick={() => {const item={id:'pdf-'+crypto.randomUUID(),title:'PDF Board '+(pdfBoards.length+1)};updateBoards([...pdfBoards,item]);setBoard(item.id);}} className="rounded border px-3 py-1" style={{borderColor:'var(--line)'}}>Add Board</button>
+        <label className="flex items-center gap-2">Board <select aria-label="Select board to edit" value={board} onChange={event => setBoard(event.target.value)} className="rounded border bg-black px-2 py-1 text-white" style={{borderColor:'var(--line)'}}>{boardOrder.map(id => <option key={id} value={id}>{tabTitle(id)}</option>)}</select></label>
+        <button type="button" onClick={() => {const item={id:'pdf-'+crypto.randomUUID(),title:'PDF Board '+(pdfBoards.length+1)};updateBoards([...pdfBoards,item]);updateTabOrder([...tabOrder,item.id]);setBoard(item.id);}} className="rounded border px-3 py-1" style={{borderColor:'var(--line)'}}>Add Board</button>
         {isPdfBoard && <label className="flex items-center gap-2">Title <input aria-label="PDF board title" value={currentTitle} onChange={event => updateBoards(pdfBoards.map(item => item.id===board ? {...item,title:event.target.value} : item))} className="rounded border bg-black px-2 py-1 text-white" style={{borderColor:'var(--line)'}} /></label>}
         {isPdfBoard && <button type="button" onClick={() => void removeCurrentBoard()} className="rounded border px-3 py-1" style={{borderColor:'var(--line)'}}>Delete board</button>}
       </div>}
       <div className={`presentation-board-viewport relative mt-2 flex min-h-0 w-full flex-1 ${isPdfBoard || board === 'video' ? 'pdf-board-viewport overflow-hidden' : 'overflow-auto'} ${isGraphicBoard(board) ? 'graphic-board-viewport' : ''}`} style={presentationMode ? undefined : {height:'calc(100dvh - 17rem)'}} aria-label="Presentation board viewport">
       <div onDragEnter={event => {if(!isPdfBoard)return;event.preventDefault();setDraggingPdf(true);}} onDragOver={event => {if(isPdfBoard)event.preventDefault();}} onDragLeave={event => {if(!isPdfBoard)return;if(!event.currentTarget.contains(event.relatedTarget as Node|null))setDraggingPdf(false);}} onDrop={event => {if(!isPdfBoard)return;event.preventDefault();setDraggingPdf(false);void addPdf(event.dataTransfer.files[0]);}} className="presentation-pdf-board relative min-h-0 w-full flex-1 overflow-hidden border border-dashed" style={isPdfBoard ? {borderColor:draggingPdf?'#d6ad4f':'#b9bec6',background:'#050709'} : {position:'absolute',inset:0,visibility:'hidden',pointerEvents:'none'}} aria-hidden={!isPdfBoard}>
-        {(() => { const index = boardOrder.indexOf(board); return [boardOrder[index - 1], board, boardOrder[index + 1]].filter((id): id is string => Boolean(id) && Boolean(readyBoards[id])).map(id => { const item = readyBoards[id]; const active = id === board; return <img key={item.url} alt={active ? 'Presentation board' : ''} src={item.url} decoding={active ? 'sync' : 'async'} className="absolute inset-0 h-full w-full" style={{visibility: active ? 'visible' : 'hidden', objectFit:'cover', transform:`scale(${Math.max(zoom, 1) / 100})`}} />; }); })()}
+        {(() => { const index = boardOrder.indexOf(board); return [boardOrder[index - 1], board, boardOrder[index + 1]].filter((id): id is string => Boolean(id) && Boolean(readyBoards[id])).map(id => { const item = readyBoards[id]; const active = id === board; return <img key={item.url} alt={active ? 'Presentation board' : ''} src={item.url} decoding={active ? 'sync' : 'async'} className="absolute inset-0 h-full w-full" style={{visibility: active ? 'visible' : 'hidden', objectFit:'contain', transform:`scale(${Math.max(zoom, 1) / 100})`}} />; }); })()}
         {isPdfBoard && (readyBoards[board] ? <div aria-hidden="true" className="absolute inset-0 z-10" /> : checkedBoards[board] ? <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-2 text-center text-xs text-white"><span>Drop a PDF, WebP, or JPEG here</span><span className="text-[#d6ad4f]">PDFs are saved and shown as WebP</span><input type="file" accept="application/pdf,image/webp,image/jpeg,.pdf,.webp,.jpg,.jpeg" className="sr-only" onChange={event => void addPdf(event.target.files?.[0])}/></label> : <p className="text-xs text-white">Loading slide…</p>)}
         {isPdfBoard && pdfError && <p role="alert" className="absolute bottom-2 left-2 bg-black/80 p-2 text-xs text-red-300">{pdfError}</p>}
       </div>
       {(board === 'video' || boardOrder[boardIndex - 1] === 'video' || boardOrder[boardIndex + 1] === 'video') && <div className={board === 'video' ? 'relative min-h-0 w-full flex-1 overflow-hidden bg-black' : 'absolute h-px w-px overflow-hidden'} aria-hidden={board !== 'video'}><video className="absolute inset-0 h-full w-full" style={{objectFit:'contain'}} controls preload="auto" playsInline aria-label="Vertical Void Lobby walkthrough"><source src={walkthroughUrl} type="video/mp4" />Your browser does not support video playback.</video></div>}
-      {board === 'lobby-proofs' ? <div className={presentationMode ? 'lobby-proofs-frame' : 'mx-auto'} style={presentationMode ? undefined : {width: zoom + "%", minWidth: (11 * zoom) + "px"}}>
-        <div className={`grid grid-cols-5 grid-rows-2 gap-2 ${presentationMode ? 'lobby-proofs-board' : ''}`} style={presentationMode ? {height: zoom + "%"} : {aspectRatio: "5 / 2", width: "100%"}} aria-label="Lobby proofs, five typologies wide by two rows">
-          {lobbyTypologies.map((item) => {
-            const isoGraphic = isoGraphics[item.id];
-            return <article key={item.id} aria-label={`Lobby isometric: ${item.name}`} className="relative min-h-0 min-w-0 overflow-hidden border border-[#b9bec6]">
-              {isoGraphic ? <img alt={`${isoGraphic.name} isometric view`} src={isoGraphic.url} className="absolute inset-0 h-full w-full object-contain object-center" /> : <div className="flex h-full flex-col items-center justify-center p-2 text-center"><h3 className="truncate text-[10px] font-semibold sm:text-xs" style={{ color: "#d6ad4f" }}>{item.name}</h3><p className="mt-1 text-[9px] text-white sm:text-[10px]">Export ISO to Board for this typology to fill this panel.</p></div>}
-            </article>;
-          })}
-          {lobbyTypologies.map((item) => {
-            const graphic = graphics[item.id];
-            return <article key={item.id + "-rules"} aria-label={`Lobby rules: ${item.name}`} className="relative flex min-h-0 min-w-0 items-center justify-center overflow-hidden border border-[#b9bec6] p-2 text-center">
-              {graphic ? <img alt={`${graphic.name} presentation export`} src={graphic.url} className="absolute inset-0 h-full w-full object-contain object-center" /> : <h3 className="text-[10px] font-semibold sm:text-xs" style={{ color: "#d6ad4f" }}>{item.name}<span className="mt-1 block text-[9px] font-normal text-white sm:text-[10px]">Export PNG to Board for this typology to fill this panel.</span></h3>}
-            </article>;
-          })}
+      {board === 'lobby-proofs' ? <div className={presentationMode ? 'lobby-proofs-frame' : 'mx-auto'} style={{width: zoom + "%", minWidth: (11 * zoom) + "px"}}>
+        <div className="lobby-proofs-board flex min-h-0 flex-col bg-black" style={{ aspectRatio: "4096 / 1182", width: "100%", "--lobby-zoom": zoom / 100 } as React.CSSProperties} aria-label="Lobby proofs, five typology columns">
+          <h2 className="lobby-proof-title shrink-0"><span>LOBBY</span> PROTO-FORMS</h2>
+          <div className={`lobby-proof-columns grid min-h-0 flex-1 grid-cols-5 ${presentationMode ? "" : "border border-[#b9bec6]"}`}>
+            {lobbyTypologies.map((item) => {
+              const graphic = graphics[item.id];
+              return <article key={item.id} aria-label={`Lobby proof: ${item.name}`} className="relative min-h-0 min-w-0 overflow-hidden bg-black">
+                {graphic ? <img alt={`${graphic.name} proof board`} src={graphic.url} className="absolute inset-0 h-full w-full object-contain object-center" /> : <div className="flex h-full flex-col items-center justify-center p-2 text-center"><h3 className="lobby-proof-text text-xs font-semibold uppercase" style={{ color: "#d6ad4f" }}>{item.name}</h3><p className="lobby-proof-text mt-1 text-xs text-white">Export PNG to Board to fill this column.</p></div>}
+              </article>;
+            })}
+          </div>
         </div>
       </div> : board !== 'video' && !isPdfBoard ? <div className={`space-y-2 ${presentationMode ? 'mx-auto' : ''}`} style={{width: zoom + "%", minWidth: (11 * zoom) + "px"}}>
         {rows.map((row) => <section key={row.category} aria-label={`${row.title} typologies`}>

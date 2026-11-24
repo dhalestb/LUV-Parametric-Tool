@@ -48,7 +48,7 @@ function voidFieldEnvelope(w,nodes,edges,letters,field,preferred,config={}){
  const entries=interiors.map(n=>({node:n,...innerProfile(w,n)})).sort((a,b)=>b.cs.area()-a.cs.area());
  if(config.primarySource){const index=entries.findIndex(e=>e.node.id===config.primarySource);if(index<0)throw Error('Primary void source is not classified interior.');entries.unshift(...entries.splice(index,1));}
  const facadeSolids=[];
- const bands=[],tools=[],voids=[],walls=[],floorRecords=[],connections=[],thickness=.85,floorThickness=.75;
+ const bands=[],tools=[],voids=[],walls=[],floorRecords=[],connections=[],thickness=.5,floorThickness=.75;
  const neighbors=id=>{const i=nodes.findIndex(n=>n.id===id);return edges.filter(e=>e.i===i||e.j===i).map(e=>nodes[e.i===i?e.j:e.i].id);};
  const add=(id,owner,solid,sources)=>{if(!solid.isEmpty())bands.push({id,owner,sources:[...new Set([owner,...sources].filter(Boolean))],solid:solid.intersect(clip)});};
  // Floor levels are measured from surrounding source undersides, grouped by lift.

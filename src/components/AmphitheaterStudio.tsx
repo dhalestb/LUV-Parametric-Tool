@@ -1,5 +1,6 @@
 "use client";
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react';
+import { flushSync } from 'react-dom';
 import * as THREE from 'three';
 import {toCreasedNormals} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { OrbitControls } from '@react-three/drei';
@@ -7,7 +8,7 @@ import { useThree } from '@react-three/fiber';
 import { BoardCanvas } from './BoardCanvas';
 import { BoardOrthographicCamera } from './BoardOrthographicCamera';
 import { AxisIndicator } from './AxisIndicator';
-import {getLetterVolumeGeometry} from './letterGeometry3d';
+import {getLetterVolumeGeometry,linearUBend,linearUInnerHalf} from './letterGeometry3d';
 import {populateInsertedPlate} from './insertedPlatePopulation';
 import {populateVoidField,applyVoidFieldSpacing,addVoidFieldFourthLevel} from './voidFieldPopulation';
 import {populate,suggestedCount} from './sourcePopulation';
@@ -17,8 +18,11 @@ import AmphitheaterPresentation from './AmphitheaterPresentation';
 import { LETTER_SIZE_PRESETS } from './architecturalLetterSizing';
 import { OPTIMIZER_SESSION_KEY } from './browserSession';
 import { collectCompositionSources,mergeCompositionSources,compositionRefreshMessage,type ProofSource as Source } from './amphitheaterCompositionSources';
-import { LOBBY_TYPOLOGIES, fitLobbyLettersToArchitecture, populateLobby, type LobbyLink, type LobbyTypologyId } from './lobbyProof';
+import { LOBBY_TYPOLOGIES, applyLobbyZLevels, fitLobbyLettersToArchitecture, populateLobby, type LobbyLink, type LobbyTypologyId } from './lobbyProof';
 import { savePresentationGraphic } from './presentationGraphics';
+import { createAmphitheaterPlate as createGatheringProofBoard } from './protoformPresentationRender';
+import { downloadStudyBlob } from './amphitheaterPresentationExport';
+import { encodeSectionMp4 } from './sectionMp4';
 import TopographicLobbyBoard from './TopographicLobbyBoard';
 import type { LobbyStudy } from './lobbyStudy';
 
@@ -45,74 +49,16 @@ function Camera({field,view,reset,iso}:{field:AmphitheaterRequest['field'];view:
  const position:[number,number,number]=view==='plan'?[0,0,field.height/2+span*3]:view==='section'?[-span*3,0,field.height/2]:view==='elevation'?[0,-span*3,field.height/2]:[(iso.includes('E')?1:-1)*span*2,(iso.includes('N')?1:-1)*span*2,field.height/2+span*2];
  return <><BoardOrthographicCamera key={view+iso+reset+parameterKey({field,preferredFeet:0} as AmphitheaterRequest)} makeDefault position={position} up={view==='plan'?[0,1,0]:[0,0,1]} zoom={Math.min(size.width,size.height)*.82/frameSpan} near={.01} far={span*20}/><OrbitControls key={view+iso+reset+span} makeDefault target={target} enableRotate={view==='isometric'} enablePan enableZoom/></>;
 }
-const ISO_EXPORT_WIDTH=4096;
-function IsoCapture({onReady}:{onReady:(capture:()=>Promise<Blob>)=>void}){
+function SectionFrames({onReady}:{onReady:(grab:()=>Promise<ImageBitmap>)=>void}){
  const gl=useThree(state=>state.gl),scene=useThree(state=>state.scene),camera=useThree(state=>state.camera);
- useEffect(()=>{onReady(()=>new Promise((resolve,reject)=>{
-  const previousSize=new THREE.Vector2(),previousRatio=gl.getPixelRatio();
-  gl.getSize(previousSize);
-  const hidden:THREE.Object3D[]=[];
-  const restore=()=>{hidden.forEach(object=>{object.visible=true;});gl.setPixelRatio(previousRatio);gl.setSize(previousSize.x,previousSize.y,false);};
-  try{
-   scene.traverse(object=>{if(object.name==='field-outline'){object.visible=false;hidden.push(object);}});
-   const ortho=camera as THREE.OrthographicCamera;
-   const frame={left:ortho.left,right:ortho.right,top:ortho.top,bottom:ortho.bottom};
-   const half=Math.min(ortho.right-ortho.left,ortho.top-ortho.bottom)/2;
-   const centerX=(ortho.left+ortho.right)/2,centerY=(ortho.top+ortho.bottom)/2;
-   ortho.left=centerX-half;ortho.right=centerX+half;ortho.top=centerY+half;ortho.bottom=centerY-half;ortho.updateProjectionMatrix();
-   gl.setPixelRatio(1);gl.setSize(ISO_EXPORT_WIDTH,ISO_EXPORT_WIDTH,false);gl.render(scene,camera);
-   const view=document.createElement('canvas');
-   view.width=gl.domElement.width;view.height=gl.domElement.height;
-   const viewCtx=view.getContext('2d');
-   ortho.left=frame.left;ortho.right=frame.right;ortho.top=frame.top;ortho.bottom=frame.bottom;ortho.updateProjectionMatrix();
-   if(!viewCtx||view.width<ISO_EXPORT_WIDTH){restore();reject(new Error('Could not export the isometric view at 4096 px.'));return;}
-   viewCtx.drawImage(gl.domElement,0,0);restore();
-   view.toBlob(blob=>blob?resolve(blob):reject(new Error('Could not export the isometric view.')),'image/png');
-  }catch(error){restore();reject(error instanceof Error?error:new Error('Could not export the isometric view.'));}
- }));},[camera,gl,onReady,scene]);
+ const latest=useRef({gl,scene,camera});
+ latest.current={gl,scene,camera};
+ useEffect(()=>{onReady(()=>{
+  const state=latest.current;
+  state.gl.render(state.scene,state.camera);
+  return createImageBitmap(state.gl.domElement);
+ });},[onReady]);
  return null;
-}
-async function labelIsoExport(blob:Blob,name:string){
- const bitmap=await createImageBitmap(blob);
- const width=ISO_EXPORT_WIDTH;
- const source=document.createElement('canvas');
- source.width=width;source.height=width;
- const sourceCtx=source.getContext('2d',{willReadFrequently:true});
- const canvas=document.createElement('canvas');
- canvas.width=width;canvas.height=width;
- const ctx=canvas.getContext('2d');
- if(!sourceCtx||!ctx){bitmap.close();throw new Error('Could not label the isometric view.');}
- sourceCtx.fillStyle='#080b10';sourceCtx.fillRect(0,0,width,width);
- const fit=Math.min(width/bitmap.width,width/bitmap.height);
- sourceCtx.drawImage(bitmap,(width-bitmap.width*fit)/2,(width-bitmap.height*fit)/2,bitmap.width*fit,bitmap.height*fit);bitmap.close();
- const plateRatio=1.125;
- const fontSize=width*.045/plateRatio;
- const textX=width*(.04/plateRatio+(1-1/plateRatio)/2);
- const textY=width*.075/plateRatio;
- const clearance=Math.ceil(textY+fontSize*.45);
- const bottom=width-Math.round(width*.015);
- const pixels=sourceCtx.getImageData(0,0,width,width).data;
- let minX=width,minY=width,maxX=0,maxY=0,found=false;
- for(let y=0;y<width;y+=2)for(let x=0;x<width;x+=2){
-  const i=(y*width+x)*4;
-  if(pixels[i]+pixels[i+1]+pixels[i+2]>60){found=true;if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y;}
- }
- ctx.fillStyle='#080b10';ctx.fillRect(0,0,width,width);
- if(!found||(minY>=clearance&&maxY<=bottom))ctx.drawImage(source,0,0);
- else{
-  const contentHeight=Math.max(1,maxY-minY+1);
-  const shift=Math.max(0,clearance-minY);
-  if(maxY+shift<=bottom)ctx.drawImage(source,0,shift);
-  else{
-   const scale=Math.min(1,(bottom-clearance)/contentHeight);
-   ctx.drawImage(source,(width-width*scale)/2,clearance-minY*scale,width*scale,width*scale);
-  }
- }
- ctx.font=fontSize+'px Arial, sans-serif';
- ctx.fillStyle='#D6AD4F';
- ctx.textAlign='left';ctx.textBaseline='alphabetic';
- ctx.fillText(name.toUpperCase(),textX,textY);
- return await new Promise<Blob>((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('Could not label the isometric view.')),'image/png'));
 }
 function Surface({mesh,tint,opacity=1,planes,selected,onPick,wire=false,sharp=false}:{mesh:ProofMesh;tint:THREE.ColorRepresentation;opacity?:number;planes:THREE.Plane[];selected?:boolean;onPick?:()=>void;wire?:boolean;sharp?:boolean}){
  const geometry=useMemo(()=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(mesh.positions,3));g.setIndex(mesh.indices);if(sharp){const creased=toCreasedNormals(g,Math.PI/6);if(creased!==g)g.dispose();return creased;}g.computeVertexNormals();return g;},[mesh,sharp]);
@@ -141,12 +87,13 @@ function LobbyConnections({links,lift}:{links:LobbyLink[];lift:number}){
   return <mesh key={index} position={mid} quaternion={quaternion}><cylinderGeometry args={[link.kind==='bridge'?.28:.16,link.kind==='bridge'?.28:.16,length,16]}/><meshStandardMaterial color={link.kind==='bridge'?'#d7c4a3':'#8fb8c9'}/></mesh>;
  })}</>;
 }
-function Viewer({result,draft,field,mode,view,cut,selected,onPick,isolate,reset,iso,onCapture,sightlines=false,links=[],letters,architecture}:{result?:AmphitheaterResult;draft?:AmphitheaterRequest['source'];field:AmphitheaterRequest['field'];mode:Mode;view:View;cut:number;selected:string;onPick:(id:string)=>void;isolate:boolean;reset:number;iso:IsoDirection;onCapture?:(capture:()=>Promise<Blob>)=>void;sightlines?:boolean;links?:LobbyLink[];letters?:AmphitheaterResult['letters'];architecture?:AmphitheaterResult['architecture']}){
+function linearUOpening(letter:string,scale:number,scaleX:number,ry:number){return letter==='U'&&Math.abs(ry)===90?linearUInnerHalf(scale*scaleX):undefined;}
+function Viewer({result,draft,field,mode,view,cut,selected,onPick,isolate,reset,iso,onSectionFrame,sightlines=false,links=[],letters,architecture,linearU=false}:{result?:AmphitheaterResult;draft?:AmphitheaterRequest['source'];field:AmphitheaterRequest['field'];mode:Mode;view:View;cut:number;selected:string;onPick:(id:string)=>void;isolate:boolean;reset:number;iso:IsoDirection;onSectionFrame?:(grab:()=>Promise<ImageBitmap>)=>void;sightlines?:boolean;links?:LobbyLink[];letters?:AmphitheaterResult['letters'];architecture?:AmphitheaterResult['architecture'];linearU?:boolean}){
  const planes=useMemo(()=>view==='section'?[new THREE.Plane(new THREE.Vector3(1,0,0),-cut)]:[],[view,cut]);
  const picked=result?.components.find(c=>c.id===selected);
- const shownLetters=letters??result?.letters??[];
+ const shownLetters=useMemo(()=>{const base=letters??result?.letters??[];if(!linearU||!result)return base;return base.map((letter,index)=>{const source=result.request.source[index];const opening=source?linearUOpening(source.letter,source.scale,source.scaleX,source.ry):undefined;if(opening===undefined||!source)return letter;const geometry=getLetterVolumeGeometry('U',12,opening,false,linearUBend(source.scale,source.scaleY)),attr=geometry.getAttribute('position'),matrix=new THREE.Matrix4().compose(new THREE.Vector3(source.x,source.y,source.z+result.request.field.height/2),new THREE.Quaternion().setFromEuler(new THREE.Euler(source.rx*Math.PI/180,source.ry*Math.PI/180,source.rz*Math.PI/180,source.rotationOrder??'XYZ')),new THREE.Vector3(source.scale*source.scaleX,source.scale*source.scaleY,source.scale*source.scaleZ)),positions:number[]=[];for(let vertex=0;vertex<attr.count;vertex++)positions.push(...new THREE.Vector3().fromBufferAttribute(attr,vertex).applyMatrix4(matrix).toArray());const indices:number[]=[];for(let vertex=0;vertex<(geometry.index?.count??attr.count);vertex++)indices.push(geometry.index?geometry.index.getX(vertex):vertex);return {...letter,mesh:{positions,indices}};});},[letters,result,linearU]);
  const shell=architecture??result?.architecture;
- return <div style={{height:580,background:'#080b10',borderRadius:8}}><BoardCanvas dpr={[1,1.5]} gl={{antialias:true,preserveDrawingBuffer:true}} onCreated={({gl})=>{gl.localClippingEnabled=true;}}><color attach="background" args={['#080b10']}/><ambientLight intensity={1.1}/><directionalLight position={[50,-60,90]} intensity={2}/><directionalLight position={[-40,30,50]} intensity={1}/><Camera field={field} view={view} reset={reset} iso={iso}/>{onCapture&&<IsoCapture onReady={onCapture}/>}<FieldOutline field={field}/>{mode==='A'&&draft?.map((p,i)=><mesh dispose={null} key={i} geometry={getLetterVolumeGeometry(p.letter,12)} position={[p.x,p.y,p.z+field.height/2]} rotation={[p.rx*Math.PI/180,p.ry*Math.PI/180,p.rz*Math.PI/180,p.rotationOrder??'XYZ']} scale={[p.scale*p.scaleX,p.scale*p.scaleY,p.scale*p.scaleZ]}><meshStandardMaterial color={color(i)} clippingPlanes={planes}/></mesh>)}{mode==='A'&&links.length>0&&<LobbyConnections links={links} lift={field.height/2}/>}{result&&<>
+ return <div style={{height:580,background:'#080b10',borderRadius:8}}><BoardCanvas dpr={[1,1.5]} gl={{antialias:true,preserveDrawingBuffer:true}} onCreated={({gl})=>{gl.localClippingEnabled=true;}}><color attach="background" args={['#080b10']}/><ambientLight intensity={1.1}/><directionalLight position={[50,-60,90]} intensity={2}/><directionalLight position={[-40,30,50]} intensity={1}/><Camera field={field} view={view} reset={reset} iso={iso}/>{onSectionFrame&&<SectionFrames onReady={onSectionFrame}/>}<FieldOutline field={field}/>{mode==='A'&&draft?.map((p,i)=><mesh dispose={null} key={i} geometry={getLetterVolumeGeometry(p.letter,12,linearU?linearUOpening(p.letter,p.scale,p.scaleX,p.ry):undefined,false,linearU&&p.letter==='U'&&Math.abs(p.ry)===90?linearUBend(p.scale,p.scaleY):0)} position={[p.x,p.y,p.z+field.height/2]} rotation={[p.rx*Math.PI/180,p.ry*Math.PI/180,p.rz*Math.PI/180,p.rotationOrder??'XYZ']} scale={[p.scale*p.scaleX,p.scale*p.scaleY,p.scale*p.scaleZ]}><meshStandardMaterial color={color(i)} clippingPlanes={planes}/></mesh>)}{mode==='A'&&links.length>0&&<LobbyConnections links={links} lift={field.height/2}/>}{result&&<>
  {(mode==='B'||mode==='C')&&shell&&(isolate&&picked?<Surface sharp={['profiles','vertical-walls','void-field','inserted-plate'].includes(result.request.envelopeVersion??'')} mesh={picked.mesh} tint="#e2d5b9" planes={planes}/>:<Surface sharp={['profiles','vertical-walls','void-field','inserted-plate'].includes(result.request.envelopeVersion??'')} mesh={shell} tint="#e2d5b9" planes={planes}/>)}
  {((mode==='A'&&!draft)||mode==='B')&&shownLetters.filter(l=>!isolate||!selected||l.id===selected).map(l=><Surface key={l.id} mesh={l.mesh} tint={color(shownLetters.findIndex(item=>item.id===l.id))} opacity={mode==='B'?.7:1} planes={planes} selected={l.id===selected} onPick={()=>onPick(l.id)}/>)}
  {mode==='B'&&result.voidFieldReport?.voids.map(v=><Surface key={v.source} mesh={v.cutterMesh} tint="#71BEDA" opacity={.22} planes={planes}/>)}
@@ -155,6 +102,12 @@ function Viewer({result,draft,field,mode,view,cut,selected,onPick,isolate,reset,
  </>}<AxisIndicator/></BoardCanvas></div>;
 }
 function voidSettingsKey(value:AmphitheaterRequest['voidField']){return JSON.stringify(value,Object.keys(value??{}).sort());}
+function studyMatches(query:string,parts:Array<string|number|undefined>){
+ const needle=query.trim().toLowerCase();
+ if(!needle)return true;
+ const haystack=parts.filter(part=>part!==undefined&&part!=='').join(' ').toLowerCase();
+ return needle.split(/\s+/).every(word=>haystack.includes(word));
+}
 function LobbyStudyName({study,index,total,draft,busy,compareDisabled,onDraft,onSave,onOpen,onDelete,onCompare}:{study:LobbyStudy;index:number;total:number;draft:string;busy:boolean;compareDisabled:boolean;onDraft:(value:string)=>void;onSave:()=>void;onOpen:()=>void;onDelete:()=>void;onCompare:()=>void}){
  const nameChanged=draft.trim()!==study.name&&draft.trim().length>0;
  return <form className="space-y-2 border-t py-2" onSubmit={event=>{event.preventDefault();onSave();}}><div className="flex flex-wrap gap-2 items-center"><span>Study {total-index} · {study.field.width}/{study.field.depth}/{study.field.height} · {study.preferredFeet}′ · {study.sourceCount} letters</span><input aria-label={'Name for study '+(total-index)} name="name" value={draft} onChange={event=>onDraft(event.target.value)} className="min-w-40 border p-1" style={{background:'var(--input-background)'}}/></div><div className="flex flex-wrap gap-2"><button className="border p-1" type="submit" disabled={!nameChanged||busy}>Save</button><button className="border p-1" type="button" onClick={onOpen}>Open</button><button className="border p-1" type="button" onClick={onDelete}>Delete</button><button className="border p-1" type="button" disabled={compareDisabled||busy} onClick={onCompare}>Compare</button></div></form>;
@@ -171,33 +124,72 @@ export default function AmphitheaterStudio({heading = 'Interactive Gathering Pro
  const [envelopeVersion,setEnvelopeVersion]=useState<'profiles'|'vertical-walls'|'void-field'|'inserted-plate'>('vertical-walls');
  const [voidTaper,setVoidTaper]=useState(.35),[voidMode,setVoidMode]=useState<'straight'|'neighbor-taper'>('neighbor-taper'),[voidConnectivity,setVoidConnectivity]=useState<'adjacent'|'none'>('adjacent');
  const [editing,setEditing]=useState(false),[seed,setSeed]=useState<number|undefined>();
- const [field,setField]=useState({width:40,depth:40,height:60}),[preferred,setPreferred]=useState(13),[population,setPopulation]=useState('auto');
+ const [field,setField]=useState(variant==='lobby'?{width:40,depth:40,height:40}:{width:40,depth:40,height:60}),[preferred,setPreferred]=useState(13),[population,setPopulation]=useState('auto');
  const [articulation,setArticulation]=useState(.75),[primary,setPrimary]=useState(false);
  const [elevationMode,setElevationMode]=useState<'feature'|undefined>('feature');
  const [organization,setOrganization]=useState<'proximity'|'alignment'>('proximity'),[generator,setGenerator]=useState<AmphitheaterRequest['generator']>('source-preserving'),[sources,setSources]=useState<Source[]>([]),[sourceId,setSourceId]=useState('fixture'),[sourceText,setSourceText]=useState('');
  const [studies,setStudies]=useState<AmphitheaterSummary[]>([]),[lobbyStudies,setLobbyStudies]=useState<LobbyStudy[]>([]),[result,setResult]=useState<AmphitheaterResult>(),[comparison,setComparison]=useState<AmphitheaterResult>();
  const [mode,setMode]=useState<Mode>('C'),[view,setView]=useState<View>('isometric'),[iso,setIso]=useState<IsoDirection>('SE'),[cut,setCut]=useState(0),[selected,setSelected]=useState(''),[isolate,setIsolate]=useState(false),[reset,setReset]=useState(0);
- const [exportingIso,setExportingIso]=useState(false);
- const captureIso=useRef<(()=>Promise<Blob>)|null>(null);
- const registerCapture=useCallback((capture:()=>Promise<Blob>)=>{captureIso.current=capture;},[]);
- async function exportIso(){
-  const typology=LOBBY_TYPOLOGIES.find(item=>item.name===result?.request.typologyName)??LOBBY_TYPOLOGIES.find(item=>item.id===lobbyId);
-  if(!typology)return;
-  setExportingIso(true);setError('');
+ const [exportingMp4,setExportingMp4]=useState(false),[exportingFinals,setExportingFinals]=useState(false);
+ const [zLevelCount,setZLevelCount]=useState(2);
+ const [zInterval,setZInterval]=useState<10|12|15>(10);
+ const grabSection=useRef<(()=>Promise<ImageBitmap>)|null>(null);
+ const registerSectionFrame=useCallback((grab:()=>Promise<ImageBitmap>)=>{grabSection.current=grab;},[]);
+ async function exportSectionMp4(){
+  if(!result)return;
+  const span=displayField.width;
+  const cuts:number[]=[];
+  for(let x=-span/2;x<=span/2+1e-6;x+=1)cuts.push(Math.round(x));
+  const previousView=view,previousCut=cut;
+  setExportingMp4(true);setError('');setMessage('Recording a 15 second section at 1 foot intervals…');
   try{
-   if(view!=='isometric')setView('isometric');
-   if(view!=='isometric')await new Promise(resolve=>setTimeout(resolve,500));
-   const capture=captureIso.current;
-   if(!capture)throw new Error('The isometric view is not ready.');
-   const blob=await labelIsoExport(await capture(),typology.name);
-   await savePresentationGraphic(typology.id,typology.name,blob,'lobby-isos');
-   setMessage(typology.name+' '+iso+' isometric view sent to the top row of Lobby Proofs. Sending another replaces it.');
-  }catch(e){setError(e instanceof Error?e.message:String(e));}
-  finally{setExportingIso(false);}
+   document.querySelector('canvas')?.scrollIntoView({block:'center'});
+   for(let attempt=0;attempt<40&&(document.querySelector('canvas')?.clientWidth??0)<500;attempt+=1)await new Promise(resolve=>setTimeout(resolve,150));
+   flushSync(()=>{setView('section');setReset(count=>count+1);});
+   let grab=grabSection.current;
+   for(let attempt=0;attempt<40&&!grab;attempt+=1){await new Promise(resolve=>setTimeout(resolve,150));grab=grabSection.current;}
+   if(!grab)throw new Error('The section view is not ready.');
+   const frames:ImageBitmap[]=[];
+   for(const value of cuts){flushSync(()=>setCut(value));frames.push(await grab());}
+   const blob=await encodeSectionMp4(frames,15);
+   frames.forEach(frame=>frame.close());
+   downloadStudyBlob(blob,(result.request.typologyName??'section').replace(/\s+/g,'-')+'-section.mp4');
+   setMessage('15 second section MP4 exported. The cut steps 1 foot at a time across '+span+' ft.');
+  }catch(e){setError(e instanceof Error?e.message:String(e));setMessage('');}
+  finally{setView(previousView);setCut(previousCut);setExportingMp4(false);}
+ }
+ async function exportFinalTypologies(){
+  const finals:{typologyId:LobbyTypologyId;name:string}[]=[
+   {typologyId:'vertical-void-lobby',name:'Vertical Final'},
+   {typologyId:'compressed-sequential-lobby',name:'Compressed Final New'},
+   {typologyId:'continuous-hall-lobby',name:'Continuous Hall Final'},
+   {typologyId:'topographic-ground-field-lobby',name:'Topo Final 2'},
+   {typologyId:'linear-gallery-lobby',name:'Linear Final New'},
+  ];
+  setExportingFinals(true);setError('');
+  const size=Number(document.querySelector<HTMLSelectElement>('select[aria-label="PNG resolution"]')?.value)||4096;
+  setMessage('Exporting the five full boards to Lobby Proofs at '+size+' px…');
+  try{
+   const newest=[...lobbyStudies].sort((left,right)=>right.created.localeCompare(left.created));
+   for(const approved of finals){
+    const study=newest.find(item=>item.typologyId===approved.typologyId&&item.name===approved.name);
+    const typology=LOBBY_TYPOLOGIES.find(item=>item.id===approved.typologyId);
+    if(!study?.architectureStudyId||!typology)throw Error('Saved final "'+approved.name+'" is not in the lobby repository.');
+    setMessage('Rendering '+typology.name+' at '+size+' px…');
+    const response=await fetch('/api/amphitheater?id='+encodeURIComponent(study.architectureStudyId));
+    const data:AmphitheaterResult&{error?:string}=await response.json();
+    if(!response.ok)throw Error(data.error??'Could not open '+approved.name+'.');
+    const blob=await createGatheringProofBoard(data,{view:'board',size,transparent:false,iso:'SE',ruleSource:''});
+    await savePresentationGraphic(typology.id,typology.name,blob,'lobby-proofs');
+   }
+   setMessage('The five full boards were sent to Lobby Proofs at '+size+' px. Sending again replaces each column.');
+  }catch(e){setError(e instanceof Error?e.message:String(e));setMessage('');}
+  finally{setExportingFinals(false);}
  }
  const [busy,setBusy]=useState(false),[message,setMessage]=useState('Choose the field and letter quantity, then Generate Design.'),[error,setError]=useState('');
  const [sourceMessage,setSourceMessage]=useState('');
  const [nameDrafts,setNameDrafts]=useState<Record<string,string>>({});
+ const [studyQuery,setStudyQuery]=useState('');
  const source=sources.find(s=>s.id===sourceId);
  const displayStudy=useCallback((data:AmphitheaterResult)=>{
   setLevelCount(data.request.voidField?.levelCount??3);setFacadeMode(data.request.voidField?.facadeMode??'vertical');setAtriumBoundary(data.request.voidField?.atriumBoundary??'enclosed');setShowSightlines(false);setFloorSpacing((data.request.sourceSnapshot as {floorSpacing?:number}|undefined)?.floorSpacing??12);setEnvelopeVersion(data.request.envelopeVersion==='inserted-plate'?'inserted-plate':data.request.envelopeVersion==='void-field'?'void-field':data.request.envelopeVersion==='vertical-walls'?'vertical-walls':'profiles');setVoidTaper(data.request.voidField?.taper??.35);setVoidMode(data.request.voidField?.profileMode??'neighbor-taper');setVoidConnectivity(data.request.voidField?.connectivity??'adjacent');setResult(data);setField(data.request.field);setPreferred(data.request.preferredFeet);setPopulation(String(data.request.population));setEditing(false);setGenerator(data.generator);setElevationMode(data.request.articulationElevation);setArticulation(data.request.articulation??0);setPrimary(false);setOrganization(data.request.organization??'proximity');setSelected('');setComparison(undefined);
@@ -261,6 +253,7 @@ export default function AmphitheaterStudio({heading = 'Interactive Gathering Pro
     const count=population==='auto'?6:Number(population);
     const active=(['L','U','V'] as const).filter(letter=>letterOn[letter]);
     const placed=populateLobby(lobbyId,preferred,count,field,organization,active);
+    if(lobbyId!=='linear-gallery-lobby'&&lobbyId!=='vertical-void-lobby')placed.source=applyLobbyZLevels(placed.source,field,zLevelCount,zInterval);
     const typology=LOBBY_TYPOLOGIES.find(item=>item.id===lobbyId)!;
     const name=typology.name+' · '+placed.source.length+' letters';
     const sourceId=crypto.randomUUID();
@@ -308,17 +301,20 @@ export default function AmphitheaterStudio({heading = 'Interactive Gathering Pro
  const fitted=useMemo(()=>{if(variant!=='lobby'||!result||!/compressed/i.test(result.request.typologyName??''))return undefined;const architecture=primary&&result.primary?result.primary:result.architecture;return fitLobbyLettersToArchitecture(result.letters,architecture);},[variant,result,primary]);
  const lobbyBoard=useMemo(()=>{if(variant!=='lobby'||!(preferred>0))return null;const typology=LOBBY_TYPOLOGIES.find(item=>item.id===lobbyId);if(!typology)return null;const saved=lobbyStudies.find(study=>study.id===sourceId);try{const letters=populateLobby(lobbyId,preferred,6,field,'proximity',(['L','U','V'] as const).filter(letter=>letterOn[letter])).source;const form=saved?.typologyId===lobbyId&&result?.architecture.positions.length?result.architecture:undefined;return {title:typology.name,letters,form};}catch{return null;}},[variant,lobbyId,lobbyStudies,sourceId,preferred,field,result,letterOn]);
  const lobbyComparable=(study:LobbyStudy)=>Boolean(result&&study.architectureStudyId&&study.id!==sourceId&&parameterKey({field:study.field,preferredFeet:study.preferredFeet} as AmphitheaterRequest)===parameterKey(result.request));
- const comparisonPanel=comparison?<section style={panel}><h2>Comparison study · matching field and size</h2><div className="flex flex-wrap gap-2">{ISO_DIRECTIONS.map(direction=><button key={direction} className="border p-1" aria-label={`Comparison isometric ${direction}`} aria-pressed={iso===direction&&view==='isometric'} onClick={()=>{setIso(direction);setView('isometric');setReset(count=>count+1);}}>{direction}</button>)}</div><button className="border p-1" onClick={()=>setComparison(undefined)}>Close comparison</button><p>{comparison.request.sourceName} · {comparison.sourceCount} letters · {comparison.volume.toFixed(3)} ft³ · population {comparison.request.population}</p><Viewer result={comparison} field={comparison.request.field} mode={mode} view={view} iso={iso} cut={cut} selected="" onPick={()=>{}} isolate={false} reset={reset}/></section>:null;
+ const comparisonPanel=comparison?<section style={panel}><h2>Comparison study · matching field and size</h2><div className="flex flex-wrap gap-2">{ISO_DIRECTIONS.map(direction=><button key={direction} className="border p-1" aria-label={`Comparison isometric ${direction}`} aria-pressed={iso===direction} onClick={()=>{setIso(direction);setView('isometric');setReset(count=>count+1);}}>{direction}</button>)}</div><button className="border p-1" onClick={()=>setComparison(undefined)}>Close comparison</button><p>{comparison.request.sourceName} · {comparison.sourceCount} letters · {comparison.volume.toFixed(3)} ft³ · population {comparison.request.population}</p><Viewer result={comparison} field={comparison.request.field} mode={mode} view={view} iso={iso} cut={cut} selected="" onPick={()=>{}} isolate={false} reset={reset}/></section>:null;
  const visibleStudies=studies.filter(s=>studyProof(s.request)==='gathering');
+ const shownLobby=lobbyStudies.map((study,index)=>({study,index,number:lobbyStudies.length-index})).filter(({study,number})=>studyMatches(studyQuery,['study',number,study.name,LOBBY_TYPOLOGIES.find(item=>item.id===study.typologyId)?.label,LOBBY_TYPOLOGIES.find(item=>item.id===study.typologyId)?.name,study.field.width,study.field.depth,study.field.height,study.field.width+'/'+study.field.depth+'/'+study.field.height,study.preferredFeet,study.sourceCount,'letters']));
+ const shownGathering=visibleStudies.map((study,index)=>({study,index,number:visibleStudies.length-index})).filter(({study,number})=>studyMatches(studyQuery,['study',number,study.request.sourceName,study.request.typologyName,study.request.field.width,study.request.field.depth,study.request.field.height,study.request.field.width+'/'+study.request.field.depth+'/'+study.request.field.height,study.request.preferredFeet,study.sourceCount,'letters']));
  return <main className="p-4 space-y-4" style={{color:'var(--ink)'}}><AppNav/><header><h1 className="text-2xl font-semibold">{heading}</h1><p>Existing LUV application · Z-up geometry in feet · isolated comparison workspace</p></header>
- <style jsx>{`.proof-layout {display:grid;grid-template-columns:minmax(270px,340px) minmax(0,1fr);gap:20px} @media(max-width:900px){.proof-layout{grid-template-columns:1fr}}`}</style><div className="proof-layout">
+ <style jsx>{`.proof-layout {display:grid;grid-template-columns:minmax(270px,340px) minmax(0,1fr);gap:20px} @media(max-width:900px){.proof-layout{grid-template-columns:1fr}} button[aria-pressed="true"]{background:var(--accent-dark);border-color:var(--accent-gold);color:var(--accent-pale)}`}</style><div className="proof-layout">
  <aside className="space-y-4"><section style={panel} className="space-y-3"><h2>Generation controls</h2>
- {variant==='lobby'?<label className="block">Typology<select aria-label="Typology" className="block w-full" value={lobbyId} disabled={busy} onChange={e=>{const id=e.target.value as LobbyTypologyId;setLobbyId(id);if(id==='topographic-ground-field-lobby')setField({width:40,depth:40,height:40});else if(id!=='vertical-void-lobby')setField({width:40,depth:20,height:20});}}>{LOBBY_TYPOLOGIES.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}</select></label>:<label className="block">Typology<select aria-label="Typology" className="block w-full" value={envelopeVersion==='inserted-plate'?'inserted-plate':envelopeVersion==='void-field'?'void-field':'stepped'} disabled={busy} onChange={e=>{setEnvelopeVersion(e.target.value==='inserted-plate'?'inserted-plate':e.target.value==='void-field'?'void-field':'vertical-walls');}}><option value="stepped">Stepped Amphitheater</option><option value="inserted-plate">Inserted Horizontal Plate · nine-letter pilot</option><option value="void-field">Void Field Gathering · 9–15 letters</option></select></label>}
+ {variant==='lobby'?<label className="block">Typology<select aria-label="Typology" className="block w-full" value={lobbyId} disabled={busy} onChange={e=>{const id=e.target.value as LobbyTypologyId;setLobbyId(id);if(id==='topographic-ground-field-lobby'||id==='vertical-void-lobby')setField({width:40,depth:40,height:40});else setField({width:40,depth:20,height:20});}}>{LOBBY_TYPOLOGIES.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}</select></label>:<label className="block">Typology<select aria-label="Typology" className="block w-full" value={envelopeVersion==='inserted-plate'?'inserted-plate':envelopeVersion==='void-field'?'void-field':'stepped'} disabled={busy} onChange={e=>{setEnvelopeVersion(e.target.value==='inserted-plate'?'inserted-plate':e.target.value==='void-field'?'void-field':'vertical-walls');}}><option value="stepped">Stepped Amphitheater</option><option value="inserted-plate">Inserted Horizontal Plate · nine-letter pilot</option><option value="void-field">Void Field Gathering · 9–15 letters</option></select></label>}
  {variant==='lobby'&&<div><p className="text-xs font-semibold">{LOBBY_TYPOLOGIES.find(item=>item.id===lobbyId)?.name}</p><ul className="list-disc space-y-1 pl-4 text-xs">{LOBBY_TYPOLOGIES.find(item=>item.id===lobbyId)?.rules.map(rule=><li key={rule}>{rule}</li>)}</ul></div>}
  {variant==='lobby'&&<fieldset className="flex flex-wrap gap-3"><legend className="text-xs">Letters</legend>{(['L','U','V'] as const).map(letter=><label key={letter} className="text-xs"><input type="checkbox" checked={letterOn[letter]} disabled={busy} onChange={event=>{const next={...letterOn,[letter]:event.target.checked};if(!next.L&&!next.U&&!next.V){setError('Leave at least one of L, U, or V on.');return;}setError('');setLetterOn(next);}}/> {letter}</label>)}</fieldset>}
  {(['width','depth','height'] as const).map((axis,i)=><label className="block" key={axis}>{['Width X','Depth Y','Height Z'][i]} (ft)<select aria-label={axis} className="block w-full" value={field[axis]} disabled={busy} onChange={e=>setField(f=>({...f,[axis]:+e.target.value}))}>{[20,40,60].map(n=><option key={n}>{n}</option>)}</select></label>)}
  <label className="block">Preferred letter size (ft)<input aria-label="Preferred letter size" className="block w-full" type="number" min="0.1" step="0.1" value={preferred} disabled={busy} onChange={e=>setPreferred(+e.target.value)}/></label>
- <div className="flex gap-2">{([20,40,60] as const).map(h=><button key={h} disabled={busy} onClick={()=>setPreferred(LETTER_SIZE_PRESETS[h].preferredFeet)} className="border p-1">{LETTER_SIZE_PRESETS[h].preferredFeet}′ preset</button>)}</div><p className="text-xs">Letter presets and field dimensions are independent.</p>
+ <div className="flex gap-2">{([20,40,60] as const).map(h=>{const feet=LETTER_SIZE_PRESETS[h].preferredFeet;return <button key={h} type="button" disabled={busy} aria-pressed={preferred===feet} onClick={()=>setPreferred(feet)} className="border p-1">{feet}′ preset</button>;})}</div><p className="text-xs">Letter presets and field dimensions are independent.</p>
+ {variant==='lobby'&&<div className="space-y-2"><p className="text-xs">Level quantity</p><div className="flex flex-wrap gap-2">{[1,2,3,4,5].map(count=><button key={count} type="button" className="border p-1" aria-label={count===1?'1 level':count+' levels'} aria-pressed={zLevelCount===count} disabled={busy} onClick={()=>setZLevelCount(count)}>{count}</button>)}</div><p className="text-xs">Z interval</p><div className="flex flex-wrap gap-2">{([10,12,15] as const).map(interval=><button key={interval} type="button" className="border p-1" aria-label={interval+' foot Z interval'} aria-pressed={zInterval===interval} disabled={busy} onClick={()=>setZInterval(interval)}>{interval}′</button>)}</div><p className="text-xs">{lobbyId==='linear-gallery-lobby'?'Linear letters alternate flat and upright. Upright letters except U reach the field height. Each upright U turns 180°, is 1 ft thick, and bows 4 ft in plan. Its arms are 2 ft tall around a curved opening that is 10 ft across the mouth. L keeps its X length, scales up on Y and Z, and sits on the bottom of the field. Level quantity applies to the other lobbies.':lobbyId==='vertical-void-lobby'?'Vertical void stacks L, U, and V on one axis, the same arrangement as study 26. Three letters lie flat. The others stand, and V tilts from 45°. Level quantity does not apply.':(zLevelCount-1)*zInterval>field.height?zLevelCount+' levels at '+zInterval+' ft need '+((zLevelCount-1)*zInterval)+' ft on Z. This field is '+field.height+' ft high.':'Generate Design places letters on Z at '+Array.from({length:zLevelCount},(_,index)=>((field.height-(zLevelCount-1)*zInterval)/2+index*zInterval)+' ft').join(', ')+'.'}</p></div>}
  <label className="block">Letter quantity<input aria-label="Letter quantity" className="block w-full" value={population==='auto'?'Automatic':population} disabled={busy} onChange={e=>setPopulation(/^auto(matic)?$/i.test(e.target.value)?'auto':e.target.value)} placeholder="Automatic or a whole number"/></label>
  {envelopeVersion==='void-field'&&<div><label className="block">Occupied levels<select className="block w-full" aria-label="Occupied levels" value={levelCount} disabled={busy} onChange={e=>setLevelCount(+e.target.value as 3|4)}><option value={3}>3 levels</option><option value={4}>4 levels · 15 letters required</option></select></label><label className="block">Atrium boundary<select className="block w-full" aria-label="Atrium boundary" value={atriumBoundary} disabled={busy} onChange={e=>setAtriumBoundary(e.target.value as typeof atriumBoundary)}><option value="open">Open toward floors · validate sightlines</option><option value="enclosed">Enclosed lightwell · comparison baseline</option></select></label><label className="block">Exterior façade sweep<select className="block w-full" aria-label="Facade sweep" value={facadeMode} disabled={busy} onChange={e=>setFacadeMode(e.target.value as typeof facadeMode)}><option value="vertical">Global Z · vertical comparison</option><option value="face-normal">Face-Normal Façade · source-perpendicular sweep</option></select></label><p>Face-Normal sweeps follow the saved source-face normal. For four levels, automatic upper façade supports stop at the preceding floor; explicit support Z overrides remain available.</p><p>Level settings apply to new compositions. Regeneration retains existing source poses. Enclosed mode is a lightwell comparison and does not validate floor-facing atrium views.</p>{source?.source.length===12&&<button disabled={busy} className="border p-2" onClick={()=>void addFourthLevel()}>Add fourth level at 15 ft · retain existing 12 letters</button>}</div>}
  {envelopeVersion==='void-field'&&<p className="text-xs">9–15 letters; Automatic uses {levelCount===4?15:9}. Generate Design / New Design uses this quantity. Regenerate Architecture keeps the existing source letters. New Design checks up to eight compositions when no seed is specified; rejected candidates do not change the selected dimensions or size.</p>}
@@ -334,12 +330,12 @@ export default function AmphitheaterStudio({heading = 'Interactive Gathering Pro
  <label className="block">{variant==='lobby'?'Lobby alternatives':'Source composition'}<select aria-label={variant==='lobby'?'Lobby alternatives':'Source composition'} className="block w-full" value={sourceId} disabled={busy} onChange={e=>variant==='lobby'?void load(e.target.value):setSourceId(e.target.value)}>{sources.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label>{variant==='lobby'?<p role="status" className="text-xs">{sourceMessage}</p>:<><button className="border p-1" disabled={busy} onClick={refreshSources}>Refresh Composition source list</button><p role="status" className="text-xs">{sourceMessage}</p><a className="underline text-sm" href="/composition" target="_blank" rel="noreferrer">Open Composition to create a study</a><p className="text-xs">Reads current and saved alternatives from Composition on this app origin. Selected windows are localized by translation only before submission. The baseline then rearranges them.</p></>}
 
  <button disabled={busy||!source} onClick={()=>void generate()}>Generate from selected source</button><details style={panel}><summary>Inspect / edit input composition</summary><p className="text-xs">Edit x/y/z in feet, rx/ry/rz in degrees and scale per instance. Apply before generating.</p><button className="border p-1" onClick={()=>setSourceText(JSON.stringify(source?.source??[],null,2))}>Copy selected source into editor</button><textarea aria-label="Source JSON" style={{width:'100%',height:220,fontSize:11}} value={sourceText} onChange={e=>setSourceText(e.target.value)}/><button disabled={busy} className="border p-1" onClick={applySource}>Use edited source</button></details></details></section>
- </aside><section className="space-y-3" style={{minWidth:0}}><section style={panel}><div className="flex flex-wrap gap-2">{(['A','B','C'] as const).map(m=><button aria-pressed={mode===m} className="border rounded p-2" key={m} onClick={()=>setMode(m)}>{m} — {m==='A'?'Original Letters':m==='B'?'Letters + Architecture':'Architecture Only'}</button>)}</div><p className="text-xs my-2">{result?.generator==='typology-baseline'?'Baseline: rearranged source population.':'Original poses; all geometry uses the same field-center to floor translation.'}</p><div className="flex flex-wrap gap-2">{(['isometric','plan','elevation','section'] as const).map(v=><button className="border p-2" key={v} aria-pressed={view===v} onClick={()=>setView(v)}>{v}</button>)}<button className="border p-2" onClick={()=>setReset(r=>r+1)}>Reset camera</button>{variant==='lobby'&&ISO_DIRECTIONS.map(direction=><button key={direction} className="border p-2" aria-label={`Isometric ${direction}`} aria-pressed={iso===direction&&view==='isometric'} onClick={()=>{setIso(direction);setView('isometric');setReset(count=>count+1);}}>{direction}</button>)}{variant==='lobby'&&<button className="border p-2" disabled={busy||exportingIso} onClick={()=>void exportIso()}>{exportingIso?'Exporting ISO…':'Export ISO to Board'}</button>}</div>{view==='section'&&<label>Section X = {cut.toFixed(1)} ft<input aria-label="Section position" type="range" min={-displayField.width/2} max={displayField.width/2} step="0.1" value={cut} onChange={e=>setCut(+e.target.value)}/></label>}
+ </aside><section className="space-y-3" style={{minWidth:0}}><section style={panel}><div className="flex flex-wrap gap-2">{(['A','B','C'] as const).map(m=><button aria-pressed={mode===m} className="border rounded p-2" key={m} onClick={()=>setMode(m)}>{m} — {m==='A'?'Original Letters':m==='B'?'Letters + Architecture':'Architecture Only'}</button>)}</div><p className="text-xs my-2">{result?.generator==='typology-baseline'?'Baseline: rearranged source population.':'Original poses; all geometry uses the same field-center to floor translation.'}</p><div className="flex flex-wrap gap-2">{(['isometric','plan','elevation','section'] as const).map(v=><button className="border p-2" key={v} aria-pressed={view===v} onClick={()=>setView(v)}>{v}</button>)}<button className="border p-2" onClick={()=>setReset(r=>r+1)}>Reset camera</button>{variant==='lobby'&&ISO_DIRECTIONS.map(direction=><button key={direction} className="border p-2" aria-label={`Isometric ${direction}`} aria-pressed={iso===direction} onClick={()=>{setIso(direction);setView('isometric');setReset(count=>count+1);}}>{direction}</button>)}</div>{view==='section'&&<label>Section X = {cut.toFixed(1)} ft<input aria-label="Section position" type="range" min={-displayField.width/2} max={displayField.width/2} step="0.1" value={cut} onChange={e=>setCut(+e.target.value)}/></label>}
  <p className="text-xs my-2">Orbit: left drag in isometric. Pan: right drag. Zoom: wheel. Section clips at X; A/B/C share exact coordinates and field framing.</p>
  {stale&&<p style={{color:'#e4c67f'}}>Controls differ from the displayed study. Generate to evaluate the new settings.</p>}
  {result?.voidFieldReport?.visibility&&<label className="block"><input type="checkbox" checked={showSightlines} onChange={e=>setShowSightlines(e.target.checked)}/> Show validated cross-level sightlines</label>}
  {result?.primary&&<button className="border p-2" onClick={()=>setPrimary(!primary)}>{primary?'Viewing primary envelope · show articulated':'Viewing articulated envelope · show primary'}</button>}
- <Viewer sightlines={showSightlines} links={variant==='lobby'?lobbyLinks:[]} letters={fitted?.letters} architecture={fitted?.architecture} draft={sourceId==='custom'&&generator==='source-preserving'?source?.source:undefined} result={primary&&result?.primary?{...result,architecture:result.primary,components:[]}:result} field={mode==='A'&&sourceId==='custom'?field:displayField} mode={mode} view={view} iso={iso} cut={cut} selected={selected} onPick={setSelected} isolate={isolate} reset={reset} onCapture={variant==='lobby'?registerCapture:undefined}/>
+ <Viewer sightlines={showSightlines} links={variant==='lobby'?lobbyLinks:[]} letters={fitted?.letters} architecture={fitted?.architecture} linearU={variant==='lobby'&&lobbyId==='linear-gallery-lobby'} draft={sourceId==='custom'&&generator==='source-preserving'?source?.source:undefined} result={primary&&result?.primary?{...result,architecture:result.primary,components:[]}:result} field={mode==='A'&&sourceId==='custom'?field:displayField} mode={mode} view={view} iso={iso} cut={cut} selected={selected} onPick={setSelected} isolate={isolate} reset={reset} onSectionFrame={registerSectionFrame}/>
  <p>{result?`Displayed study: ${displayField.width} × ${displayField.depth} × ${displayField.height} ft · ${result.request.preferredFeet} ft letters · ${result.sourceCount} actual instances · ${result.volume.toFixed(3)} ft³`:variant==='lobby'&&source?`${source.name} · original letters follow the selected rules.`:'No saved geometry is preloaded. Generate a new study.'}</p>
  {lobbyBoard&&<TopographicLobbyBoard title={lobbyBoard.title} letters={lobbyBoard.letters} form={lobbyBoard.form}/>}
  {envelopeVersion==='inserted-plate'&&<p>Inserted Plate pilot: three horizontal L plates, three horizontal U edges and recesses, three upright V boundaries. L/U X and Y tilt 0°; V X tilt 90°; common-axis Z variations −15° / 0° / +15°. New designs only; regeneration preserves all poses.</p>}
@@ -349,7 +345,7 @@ export default function AmphitheaterStudio({heading = 'Interactive Gathering Pro
  {result?.voidFieldReport?.visibility&&<section><h2>Atrium visibility checks</h2><p>{result.voidFieldReport.visibility.floorViews.map(f=>f.portalCount).join(' / ')} floor-facing views across {result.voidFieldReport.floors.length} occupied levels · {result.voidFieldReport.visibility.crossLevel.reduce((n,p)=>n+p.views.length,0)} cross-level paths · {result.voidFieldReport.visibility.sky.length} open-to-sky paths. Rays are backed by actual floor material and checked against the exported solid. Daylight levels, guarding and circulation are not verified.</p></section>}
  {result?.voidFieldReport?.facadeMode==='face-normal'&&<details><summary>Face-Normal Façade test details</summary><p>Source caps and poses are preserved. Sweep direction follows each source-face normal. Horizontal support cuts and field-boundary cuts remain planar.</p>{result.voidFieldReport.walls?.map(w=><p key={w.source}>{w.source} · support {(w.supportZ??0).toFixed(2)} ft ({w.supportRule??'reported support'}) · {(w.maximumPlanShift??0).toFixed(2)} ft potential lateral travel · {(w.fieldTrimVolume??0).toFixed(2)} ft³ trimmed at field boundaries · {w.floorContacts?.filter(c=>c.volume>1e-6).length??0} positive floor contacts.</p>)}<p>Geometric contacts and mesh connectivity are tested; structural performance is not verified.</p></details>}
  <details><summary>Advanced result details</summary>{result?.articulationReport&&<section><h2>Envelope articulation</h2><p>Primary {result.articulationReport.before.toFixed(2)} ft³ · Final {result.volume.toFixed(2)} ft³ · Removed {result.articulationReport.removed.toFixed(2)} ft³ · Added {(result.articulationReport.added??0).toFixed(2)} ft³ · {result.articulationReport.components} connected component(s)</p><p>{result.articulationReport.operations.filter(o=>o.kind==='backed pocket').length} backed pockets · {result.articulationReport.operations.filter(o=>o.alcove).length} alcove candidates · {result.articulationReport.operations.filter(o=>(o.kind==='through opening'||o.kind==='directional through void'||o.kind==='vertical canyon void')).length} through openings · {result.articulationReport.overhangs} sheltered cuts · {result.articulationReport.addedProjections} outward additions</p>{result.articulationReport.operations.map(o=><p key={o.id}>{o.kind} · {o.sources.join(' / ')} · {o.feature} · {o.profile} · W × D × H {o.width.toFixed(1)} × {o.depth.toFixed(1)} × {o.height.toFixed(1)} ft · bay {o.bayDepth.toFixed(1)} ft{o.alcove?' · alcove candidate':''}</p>)}</section>}{result?.contributions&&<section><h2>Visible source contributions</h2>{result.contributions.map(c=><p key={c.letter}>{c.letter} · {c.component} · {c.exposedArea.toFixed(1)} ft² exposed surface · {c.relationships.join(', ')}</p>)}</section>}{result?.features&&<details open><summary>Source derivation · plan</summary><svg viewBox={[-displayField.width/2,-displayField.depth/2,displayField.width,displayField.depth].join(" ")} style={{width:"100%",height:170}}><g transform="scale(1,-1)">{result.features.map(f=><polyline key={f.id} fill="none" stroke="#67bace" strokeWidth=".28" points={f.line.map(p=>p.slice(0,2).join(",")).join(" ")}/>)}{result.paths?.map((f,i)=><polyline key={i} fill="none" stroke="orange" strokeWidth=".4" points={f.line.map(p=>p.slice(0,2).join(",")).join(" ")}/>)}</g></svg>Blue: source edges. Orange: cross-letter trajectories.</details>}{result&&<><p style={{color:result.architecturalValidation?.passed?'#9bd4a5':'#edb780'}}>{result.architecturalValidation?(result.architecturalValidation.passed?'Architectural relationship checks passed.':'Architectural relationship checks FAILED — comparison only.'):'Functional architectural compliance has not been verified.'}</p><label>Inspect instance / component<select aria-label="Inspect object" className="block w-full" value={selected} onChange={e=>setSelected(e.target.value)}><option value="">All objects</option><optgroup label="Source instances">{result.letters.map(l=><option key={l.id}>{l.id}</option>)}</optgroup><optgroup label="Architectural components">{result.components.map(c=><option key={c.id}>{c.id}</option>)}</optgroup></select></label><label><input type="checkbox" checked={isolate} onChange={e=>setIsolate(e.target.checked)}/> Isolate selected object</label><p className="text-xs">{result.components.find(c=>c.id===selected)?.sources?.join(' · ')}</p><p>Independent geometry check: {result.validation.selfIntersectionPairs} crossings / overlaps across {result.validation.nonAdjacentTriangleChecks.toLocaleString()} pairs.</p>{result.warnings.map(w=><p className="text-xs mt-2" key={w}>{w}</p>)}<a className="underline" href={'/api/amphitheater?id='+result.id} target="_blank" rel="noreferrer">Full study snapshot and meshes (JSON)</a></>}
- </details></section>{result&&<AmphitheaterPresentation result={result} disabled={busy}/>}{variant==='lobby'&&comparisonPanel}<section style={panel}><h2>Saved studies and alternatives</h2><p className="text-xs">{variant==='lobby'?'Lobby studies and alternatives are stored in the lobby repository. Gathering runs are not listed here. Compare is available for matching field dimensions and preferred letter size; no rescaling is applied.':'Saved gathering studies retain their source composition and generation settings. Lobby runs are stored separately. Compare is available for matching field dimensions and preferred letter size; no rescaling is applied.'}</p>{variant==='lobby'?<>{lobbyStudies.length===0&&<p className="text-xs">No saved lobby studies.</p>}{lobbyStudies.map((s,i)=><LobbyStudyName key={s.id} study={s} index={i} total={lobbyStudies.length} draft={nameDrafts[s.id]??s.name} busy={busy} compareDisabled={!lobbyComparable(s)} onDraft={value=>setNameDrafts(current=>({...current,[s.id]:value}))} onSave={()=>void renameLobby(s.id,nameDrafts[s.id]??s.name)} onOpen={()=>void load(s.id)} onDelete={()=>void deleteLobby(s.id)} onCompare={()=>void compareLobby(s)}/>)}</>:<>{visibleStudies.length===0&&<p className="text-xs">No saved gathering studies.</p>}{visibleStudies.map((s,i)=><div className="flex gap-2 items-center border-t py-2" key={s.id}><span>Study {visibleStudies.length-i} · {s.request.field.width}/{s.request.field.depth}/{s.request.field.height} · {s.request.preferredFeet}′ · {s.sourceCount} letters · {s.request.sourceName}</span><button className="border p-1" onClick={()=>void load(s.id)}>Open</button><button className="border p-1" disabled={!result||result.id===s.id||parameterKey(result.request)!==parameterKey(s.request)} onClick={()=>void load(s.id,true)}>Compare</button></div>)}</>}</section>
+ </details></section>{result&&<AmphitheaterPresentation result={result} disabled={busy||exportingMp4} exportingMp4={exportingMp4} onExportMp4={()=>void exportSectionMp4()}/>}{variant==='lobby'&&comparisonPanel}<section style={panel}><h2>Saved studies and alternatives</h2><p className="text-xs">{variant==='lobby'?'Lobby studies and alternatives are stored in the lobby repository. Gathering runs are not listed here. Compare is available for matching field dimensions and preferred letter size; no rescaling is applied.':'Saved gathering studies retain their source composition and generation settings. Lobby runs are stored separately. Compare is available for matching field dimensions and preferred letter size; no rescaling is applied.'}</p>{variant==='lobby'&&<button className="my-2 border p-2" type="button" disabled={busy||exportingFinals||lobbyStudies.length===0} onClick={()=>void exportFinalTypologies()}>{exportingFinals?'Exporting finals…':'Export final typology studies'}</button>}<label className="block text-xs">Search<input aria-label="Search saved studies and alternatives" className="mt-1 block w-full border p-1" style={{background:'var(--input-background)'}} value={studyQuery} onChange={event=>setStudyQuery(event.target.value)} placeholder="Name, study number, size, or typology"/></label>{variant==='lobby'?<>{lobbyStudies.length===0&&<p className="text-xs">No saved lobby studies.</p>}{lobbyStudies.length>0&&shownLobby.length===0&&<p className="text-xs">No studies match that search.</p>}{shownLobby.map(({study:s,index})=> <LobbyStudyName key={s.id} study={s} index={index} total={lobbyStudies.length} draft={nameDrafts[s.id]??s.name} busy={busy} compareDisabled={!lobbyComparable(s)} onDraft={value=>setNameDrafts(current=>({...current,[s.id]:value}))} onSave={()=>void renameLobby(s.id,nameDrafts[s.id]??s.name)} onOpen={()=>void load(s.id)} onDelete={()=>void deleteLobby(s.id)} onCompare={()=>void compareLobby(s)}/>)}</>:<>{visibleStudies.length===0&&<p className="text-xs">No saved gathering studies.</p>}{visibleStudies.length>0&&shownGathering.length===0&&<p className="text-xs">No studies match that search.</p>}{shownGathering.map(({study:s,number})=> <div className="flex gap-2 items-center border-t py-2" key={s.id}><span>Study {number} · {s.request.field.width}/{s.request.field.depth}/{s.request.field.height} · {s.request.preferredFeet}′ · {s.sourceCount} letters · {s.request.sourceName}</span><button className="border p-1" onClick={()=>void load(s.id)}>Open</button><button className="border p-1" disabled={!result||result.id===s.id||parameterKey(result.request)!==parameterKey(s.request)} onClick={()=>void load(s.id,true)}>Compare</button></div>)}</>}</section>
  {variant!=='lobby'&&comparisonPanel}
  </section></div></main>;
 }
