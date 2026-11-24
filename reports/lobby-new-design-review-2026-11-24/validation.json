@@ -1,0 +1,402 @@
+{
+  "allPassed": true,
+  "approvedAssetsUnchanged": 20,
+  "generatedThrough": "Existing Proto-Form controls, quantity 8; Generate Design for Vertical and New Design for remaining four",
+  "collisionNote": "Positive-volume source overlaps are reported. Original rules permit some overlaps; no threshold or engine rule was changed.",
+  "cases": [
+    {
+      "type": "vertical-void-lobby",
+      "name": "Vertical Void Lobby",
+      "url": "http://127.0.0.1:3015/amphitheater?typology=vertical-void-lobby&lobbyStudy=a0462c5d-8882-42d1-881c-dad25e557eea",
+      "id": "a0462c5d-8882-42d1-881c-dad25e557eea",
+      "created": "2026-11-24T05:03:40.820Z",
+      "engine": "bf7fc3c",
+      "field": {
+        "width": 40,
+        "depth": 40,
+        "height": 60
+      },
+      "preferred": 13,
+      "count": 8,
+      "meshHash": "09fa1fad5d241bf077c9fe489a484e298f37717089dce0ad5c7bddda8e3bf474",
+      "sourceHash": "2ef9a60647b8a915ddb8c234cb352159551783c0cce01965abd53b945501fc28",
+      "recordHash": "05a5856a2c0ab739c6ce8ad840a92f632875ddff4a3e057e5498dd01913ca1b0",
+      "newGeometry": true,
+      "placementReplayDifferences": [],
+      "reopenExact": true,
+      "triangles": 4372,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 161606,
+        "legacyFlags": 20
+      },
+      "manifoldStatus": "NoError",
+      "connectedSolids": 1,
+      "architectureExcessFt": 0,
+      "sourceExcessFt": 0,
+      "sourceOverlapPairs": 1,
+      "overlaps": [
+        {
+          "a": "L-7",
+          "b": "U-8",
+          "volumeFt3": 0.12891370505917824
+        }
+      ],
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bf7fc3c. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "name": "Compressed Sequential Lobby",
+      "url": "http://127.0.0.1:3015/amphitheater?typology=compressed-sequential-lobby&lobbyStudy=414c91ae-a8ea-4ab1-a7d0-75f3664a6bf8",
+      "id": "414c91ae-a8ea-4ab1-a7d0-75f3664a6bf8",
+      "created": "2026-11-24T05:04:29.212Z",
+      "engine": "bfce854",
+      "field": {
+        "width": 40,
+        "depth": 20,
+        "height": 20
+      },
+      "preferred": 13,
+      "count": 8,
+      "meshHash": "b1e738c219d5976d222469ddeb373c820c24fd929671f692a65cc1029f0da0f0",
+      "sourceHash": "c563d5cc6480e5a8df6136bf011232163823b18ab3ac97d10cd3b758a520bcb8",
+      "recordHash": "0d48ce7ce57d0f1396636648e513b862020492d97d5c939dd6887d3b6f4c82a4",
+      "newGeometry": true,
+      "placementReplayDifferences": [
+        {
+          "index": 0,
+          "key": "x",
+          "absoluteDifference": 2.8991541611844696e-8
+        },
+        {
+          "index": 0,
+          "key": "scale",
+          "absoluteDifference": 1.7285344711126527e-8
+        },
+        {
+          "index": 1,
+          "key": "x",
+          "absoluteDifference": 2.6875857983554852e-8
+        },
+        {
+          "index": 1,
+          "key": "scale",
+          "absoluteDifference": 1.2938717652843934e-8
+        },
+        {
+          "index": 2,
+          "key": "x",
+          "absoluteDifference": 8.844022403309282e-9
+        },
+        {
+          "index": 2,
+          "key": "rx",
+          "absoluteDifference": 2.1316282072803006e-14
+        },
+        {
+          "index": 2,
+          "key": "ry",
+          "absoluteDifference": 8.537736420066722e-7
+        },
+        {
+          "index": 3,
+          "key": "x",
+          "absoluteDifference": 9.342437934378722e-9
+        },
+        {
+          "index": 3,
+          "key": "rx",
+          "absoluteDifference": 1.7763568394002505e-15
+        },
+        {
+          "index": 3,
+          "key": "scale",
+          "absoluteDifference": 1.5147652021596514e-8
+        },
+        {
+          "index": 4,
+          "key": "x",
+          "absoluteDifference": 1.1851316372712972e-8
+        },
+        {
+          "index": 4,
+          "key": "scale",
+          "absoluteDifference": 8.365019787959227e-9
+        },
+        {
+          "index": 5,
+          "key": "x",
+          "absoluteDifference": 1.49893537582102e-8
+        },
+        {
+          "index": 5,
+          "key": "ry",
+          "absoluteDifference": 7.105427357601002e-15
+        },
+        {
+          "index": 5,
+          "key": "scale",
+          "absoluteDifference": 5.23340748515011e-9
+        },
+        {
+          "index": 6,
+          "key": "x",
+          "absoluteDifference": 2.3440181351475076e-8
+        },
+        {
+          "index": 6,
+          "key": "scale",
+          "absoluteDifference": 1.4853839047646034e-8
+        },
+        {
+          "index": 7,
+          "key": "x",
+          "absoluteDifference": 3.0201514178429534e-8
+        }
+      ],
+      "reopenExact": true,
+      "triangles": 1412,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 52459,
+        "legacyFlags": 0
+      },
+      "manifoldStatus": "NoError",
+      "connectedSolids": 1,
+      "architectureExcessFt": 0,
+      "sourceExcessFt": 0,
+      "sourceOverlapPairs": 0,
+      "overlaps": [],
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "name": "Continuous Hall Lobby",
+      "url": "http://127.0.0.1:3015/amphitheater?typology=continuous-hall-lobby&lobbyStudy=12eb8d26-78e1-45b9-a0de-75a8c221f696",
+      "id": "12eb8d26-78e1-45b9-a0de-75a8c221f696",
+      "created": "2026-11-24T05:04:46.321Z",
+      "engine": "bf7fc3c",
+      "field": {
+        "width": 40,
+        "depth": 20,
+        "height": 20
+      },
+      "preferred": 13,
+      "count": 8,
+      "meshHash": "1f7ad34c51a9b0d1d0ba8ac83f6d40b01b2f00dd0070c40dc94ab86a03653e6d",
+      "sourceHash": "eb9875f87db609729cac48ef597dfcd53dd16fa0607e10da42337ecce191a827",
+      "recordHash": "af11131f362bfff053679c420e341dd684650ccc8e25243d99fe8968f5515268",
+      "newGeometry": true,
+      "placementReplayDifferences": [],
+      "reopenExact": true,
+      "triangles": 3018,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 99942,
+        "legacyFlags": 21
+      },
+      "manifoldStatus": "NoError",
+      "connectedSolids": 1,
+      "architectureExcessFt": 0,
+      "sourceExcessFt": 0,
+      "sourceOverlapPairs": 6,
+      "overlaps": [
+        {
+          "a": "L-2",
+          "b": "V-3",
+          "volumeFt3": 13.766717126449294
+        },
+        {
+          "a": "V-3",
+          "b": "U-4",
+          "volumeFt3": 19.037800013247285
+        },
+        {
+          "a": "U-4",
+          "b": "L-5",
+          "volumeFt3": 19.305010174563925
+        },
+        {
+          "a": "L-5",
+          "b": "V-6",
+          "volumeFt3": 13.766717633489497
+        },
+        {
+          "a": "V-6",
+          "b": "U-7",
+          "volumeFt3": 19.037808156182244
+        },
+        {
+          "a": "U-7",
+          "b": "L-8",
+          "volumeFt3": 0.9787415954274736
+        }
+      ],
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bf7fc3c. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "name": "Topographic Lobby",
+      "url": "http://127.0.0.1:3015/amphitheater?typology=topographic-ground-field-lobby&lobbyStudy=1dd269b8-7eda-468c-b9cd-73c609cb0be1",
+      "id": "1dd269b8-7eda-468c-b9cd-73c609cb0be1",
+      "created": "2026-11-24T05:05:02.958Z",
+      "engine": "bfce854",
+      "field": {
+        "width": 40,
+        "depth": 40,
+        "height": 40
+      },
+      "preferred": 13,
+      "count": 8,
+      "meshHash": "4a630e404be37c8b01e0372cddc6605ddcea22536673f2b190dfc4d4a279a92d",
+      "sourceHash": "e36e72c4e62e96a4359333855cdf2cf6c730344d39910b3bf4e50abac977f4a0",
+      "recordHash": "68f034491a54bd078bbd7db3e83f3db5d0f71827b0fc58c4901174eb716f27c2",
+      "newGeometry": true,
+      "placementReplayDifferences": [
+        {
+          "index": 0,
+          "key": "x",
+          "absoluteDifference": 1.7763568394002505e-15
+        },
+        {
+          "index": 1,
+          "key": "x",
+          "absoluteDifference": 8.881784197001252e-16
+        },
+        {
+          "index": 2,
+          "key": "x",
+          "absoluteDifference": 8.881784197001252e-16
+        },
+        {
+          "index": 3,
+          "key": "y",
+          "absoluteDifference": 1.7763568394002505e-15
+        },
+        {
+          "index": 3,
+          "key": "z",
+          "absoluteDifference": 1.3322676295501878e-15
+        },
+        {
+          "index": 4,
+          "key": "x",
+          "absoluteDifference": 1.7763568394002505e-15
+        },
+        {
+          "index": 4,
+          "key": "y",
+          "absoluteDifference": 3.1086244689504383e-15
+        },
+        {
+          "index": 4,
+          "key": "z",
+          "absoluteDifference": 3.1086244689504383e-15
+        },
+        {
+          "index": 5,
+          "key": "x",
+          "absoluteDifference": 1.7763568394002505e-15
+        },
+        {
+          "index": 5,
+          "key": "y",
+          "absoluteDifference": 3.1086244689504383e-15
+        },
+        {
+          "index": 5,
+          "key": "z",
+          "absoluteDifference": 3.552713678800501e-15
+        },
+        {
+          "index": 6,
+          "key": "x",
+          "absoluteDifference": 1.7763568394002505e-15
+        },
+        {
+          "index": 6,
+          "key": "y",
+          "absoluteDifference": 2.6645352591003757e-15
+        },
+        {
+          "index": 6,
+          "key": "z",
+          "absoluteDifference": 5.329070518200751e-15
+        },
+        {
+          "index": 7,
+          "key": "x",
+          "absoluteDifference": 1.7763568394002505e-15
+        }
+      ],
+      "reopenExact": true,
+      "triangles": 5358,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 181613,
+        "legacyFlags": 60
+      },
+      "manifoldStatus": "NoError",
+      "connectedSolids": 1,
+      "architectureExcessFt": 0,
+      "sourceExcessFt": 0,
+      "sourceOverlapPairs": 0,
+      "overlaps": [],
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "name": "Linear Gallery Lobby",
+      "url": "http://127.0.0.1:3015/amphitheater?typology=linear-gallery-lobby&lobbyStudy=aa686595-c222-4a55-b705-f2ab41697f7d",
+      "id": "aa686595-c222-4a55-b705-f2ab41697f7d",
+      "created": "2026-11-24T05:05:17.743Z",
+      "engine": "bfce854",
+      "field": {
+        "width": 40,
+        "depth": 20,
+        "height": 20
+      },
+      "preferred": 13,
+      "count": 8,
+      "meshHash": "c758d41f040f5ea96d67667e95c3f79729656d9df89c3ec7560f6b274c8f323a",
+      "sourceHash": "819f84694bd3cb8d1e6e70913d91bc5273954ae2148e745338a63546aaa1bbbb",
+      "recordHash": "05b70c811c2a669986263c5b6eae4e90c7cb177b60d99dfb19eae6614d727eb9",
+      "newGeometry": true,
+      "placementReplayDifferences": [],
+      "reopenExact": true,
+      "triangles": 4062,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 127376,
+        "legacyFlags": 22
+      },
+      "manifoldStatus": "NoError",
+      "connectedSolids": 1,
+      "architectureExcessFt": 0,
+      "sourceExcessFt": 0,
+      "sourceOverlapPairs": 0,
+      "overlaps": [],
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    }
+  ]
+}

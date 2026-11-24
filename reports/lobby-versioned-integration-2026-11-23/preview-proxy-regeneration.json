@@ -1,0 +1,12 @@
+{
+  "parent": "50a5ce70-2b88-47ff-a205-a1d6f10e12c6",
+  "id": "c729099d-ee28-4ee1-a8e6-c0e79025021f",
+  "engine": "bfce854",
+  "sourceAndArchitectureExact": true,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 105016,
+    "legacyFlags": 19
+  }
+}

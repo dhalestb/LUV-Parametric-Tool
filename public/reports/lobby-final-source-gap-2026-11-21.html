@@ -1,0 +1,95 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Final Lobby generator source gap</title><style>body{max-width:1100px;margin:30px auto;padding:24px;background:#10151b;color:#e9eef5;font:16px/1.6 system-ui}a{color:#83d7f4}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#17212b;padding:24px}strong{color:#f3cc68}</style><h1>Final Lobby generator source gap</h1><p><strong>Required: the final source-lobby-envelope.cjs revision and matching workflow/runtime/settings evidence.</strong></p><p>The ZIP contains the final saved studies and three newer source modules, but omits their solid engine. The relevant remote branch files still match the older pinned source.</p><p><a href="/lobby-transfer-review">Open one Lobby Presentation Board</a> · <a href="/amphitheater">Proto-Form Generation</a></p><h2>Developer handoff</h2><pre># Required final Lobby generator handoff
+
+Please provide a source snapshot from the working folder/revision that produced these five approved finals: Study 77 Linear Final New, 66 Compressed Final New, 65 Topo Final 2, 26 Vertical Final, and 10 Continuous Hall Final.
+
+The existing ZIP supplies all five saved configurations/meshes and four source files. Its newer lobbyProof.ts, letterGeometry3d.ts and source-envelope.cjs differ from the published bf7fc3c implementation. The final solid engine is absent; the current remote branch still supplies the older engine. Please do not regenerate or overwrite the five originals.
+
+## Minimum source/configuration package
+
+1. **scripts/source-lobby-envelope.cjs — exact final revision.** Include every new local module it imports. This is the common solid engine for all five types, not just Linear.
+2. **Final workflow wiring:** src/components/AmphitheaterStudio.tsx and src/app/api/amphitheater/route.ts, or focused exports of the exact handlers they use. Include New Design/Generate Design, request construction/normalization, applyLobbyZLevels invocation/settings, enabled-letter composition, and fitLobbyLettersToArchitecture invocation/order. We will adapt these privately, not replace application files.
+3. **Final helper/validator revisions or an explicit unchanged/hash confirmation:** scripts/source-profile-envelope.cjs (featurePoints), scripts/source-vertical-envelope.cjs (upperTriangles), proof/rule-amphitheater.cjs (loader), proof/rule-validation.cjs, and every transitive local dependency of the final engine. Existing pinned copies are available but are not proof of the final revision.
+4. **Reproducible runtime:** package.json, package-lock.json, Node version, final Git commit/tag or a source hash manifest. Confirm Three, Manifold and three-mesh-bvh versions. No global dependency upgrade will be inferred.
+5. **Per-typology new-design rule settings:** active letter types, population/default behavior, floor/level counts and spacing, placement mode, transform/fitting settings and any manual steps that produced the approved configurations. No seed or sourceSnapshot/rule variant is recorded in the finals. Do not invent a seed or substitute default arrangements.
+
+The three newer source modules and worker already supplied in the ZIP should remain part of the same coherent snapshot. Another copy is only needed if they have changed. The saved meshes/configurations/reference images are already available; new OBJ/GLB files are optional verification artifacts, not a replacement for the missing source.
+
+## Specific points to confirm
+
+- Linear: alternating flat L / upright U, the supplied variable-U glyph/bend/opening rules, and the final shell/roof-pad/step/field-clipping implementation. ZIP Rule A text describes shell operations, but it cannot prove their implementation in the absent Rule B engine.
+- Compressed: 10-ft clear-height target and 0.5-ft model-wall treatment; specify which geometry is changed at generation time versus display time, the coordinate frame, and when fitting occurs relative to saving and mesh validation. The older Git implementation uses 9 ft.
+- Topographic: the approved 15-letter arrangement has four source-center groups at 10-ft intervals (world Z 15/25/35/45 ft in its 60-ft field). Supply the actual level-operation settings/sequence for new designs; these center elevations do not assert floor surface elevations.
+- Vertical and Continuous: confirm the exact final generator/helper revisions and new-design rules, including the saved letter compositions (Vertical L4/U3/V3; Continuous U8/L7). Their configuration arrays are available, but that alone does not specify a complete new-design workflow.
+
+Once supplied, validation will use a new private source package and temporary derived results, retain strict mesh thresholds, compare the five original saved-source cases against their original meshes, test distinct new arrangements, and preserve the existing generators, stores, provenance and Presentation Board renderer.
+</pre><details><summary>Full investigation and presentation validation</summary><pre># Final Lobby source gap and single-board correction
+
+## Finding
+
+The primary missing source is **the final revision of scripts/source-lobby-envelope.cjs**. A file with that name exists in Git, but it is the older pinned engine. The supplied ZIP does not contain it. All four relevant files fetched from feature/envelope-typology-development during this audit still match bf7fc3c after newline normalization. This was a read-only GitHub check; no fetch/checkout/merge or generator operation changed the application.
+
+The ZIP was rechecked: **25 entries**, SHA-256 **1dabf4ea8dcedc6cc39ddb0c708a17249a2e428ec7b8d3f78c21c65f7574ac01**. Its four supplied code files are lobbyProof.ts, letterGeometry3d.ts, source-envelope.cjs and amphitheater-interactive-worker.cjs. The first three differ materially from the published source; the worker is the same after newline normalization. Saved final data is complete; a coherent final live-generator source package is incomplete.
+
+| File | Status | Consequence |
+|---|---|---|
+| scripts/source-lobby-envelope.cjs | Final revision absent from ZIP; current remote blob 8b094a2c9eb3c477892f1c04d2444077f337a6dc matches the old pinned file | Cannot establish final solid-generation rules for any of the five typologies. |
+| src/components/lobbyProof.ts | Newer ZIP version already supplied | Contains newer Linear placement, applyLobbyZLevels, 10-ft Compressed fitting and 0.5-ft model-wall logic. Do not request it as an entirely missing file. |
+| src/components/letterGeometry3d.ts | Newer ZIP version already supplied | Contains the variable-U opening/width/bow and cache behavior; must be private and version-consistent. |
+| scripts/source-envelope.cjs | Newer ZIP version already supplied | derive uses the newer U geometry. Combining it with an unconfirmed old solid engine is not verified final behavior. |
+| scripts/amphitheater-interactive-worker.cjs | Supplied; matches pinned worker after newline normalization | Dispatcher alone is insufficient; its dependency closure and validation/runtime versions must be confirmed. |
+| Final AmphitheaterStudio.tsx / /api/amphitheater/route.ts handlers | Not supplied at the final revision | Need placement/levels/fitting call order, settings and request normalization, particularly Compressed's generation-versus-display transformations. Focused handler exports can replace a full UI-source handoff. |
+| Final profile/vertical helpers, loader, validator and dependency lock | Exact final versions unconfirmed | Supply changed files or explicit unchanged/hash confirmation. Existing files are not assumed missing; their final provenance is unresolved. |
+
+Remote source evidence:
+- [scripts/source-lobby-envelope.cjs](https://github.com/dhalestb/LUV-Parametric-Tool/blob/feature/envelope-typology-development/scripts/source-lobby-envelope.cjs) — remote matches pinned: true; supplied in ZIP: false.
+- [src/components/lobbyProof.ts](https://github.com/dhalestb/LUV-Parametric-Tool/blob/feature/envelope-typology-development/src/components/lobbyProof.ts) — remote matches pinned: true; supplied in ZIP: true.
+- [src/components/letterGeometry3d.ts](https://github.com/dhalestb/LUV-Parametric-Tool/blob/feature/envelope-typology-development/src/components/letterGeometry3d.ts) — remote matches pinned: true; supplied in ZIP: true.
+- [scripts/source-envelope.cjs](https://github.com/dhalestb/LUV-Parametric-Tool/blob/feature/envelope-typology-development/scripts/source-envelope.cjs) — remote matches pinned: true; supplied in ZIP: true.
+
+## What new designs need
+
+Use the final ZIP placement/glyph/derive modules with the **confirmed matching final solid engine and workflow settings**, isolated from shared application generators. The current pinned generators passed mesh tests, but that does not establish approved-final rule parity. This audit did not switch or mix their source revisions.
+
+| Approved final | Field ft | Preferred ft | Saved composition |
+|---|---|---|---|
+| 77 — Linear Gallery Lobby | 40 × 20 × 20 | 13 | L8 / U7 (15 total) |
+| 66 — Compressed Sequential Lobby | 60 × 20 × 20 | 13 | L2 / U7 / V6 (15 total) |
+| 65 — Topographic Lobby | 60 × 60 × 60 | 13 | U5 / L5 / V5 (15 total) |
+| 26 — Vertical Void Lobby | 40 × 40 × 40 | 13 | L4 / U3 / V3 (10 total) |
+| 10 — Continuous Hall Lobby | 40 × 20 × 20 | 9 | U8 / L7 (15 total) |
+
+All originals preserve exact ordered transforms and saved meshes. They store organization=proximity, articulationElevation=feature and articulation=0.75, but no seed or sourceSnapshot/rule configuration. A/B/C in the source UI are display modes, not stored algorithm variants. Saved arrays support faithful loading; they do not uniquely define a general new-design algorithm. Preferred size is nominal, so actual nonuniform scales must not be normalized to 13 or 9 ft.
+
+The developer handoff is [DEVELOPER-HANDOFF.md](DEVELOPER-HANDOFF.md). It identifies the exact minimum files, the distinction between missing versus unconfirmed revisions, per-typology questions, and the future acceptance gate. OBJ/GLB exports are optional; the supplied architecture JSON already provides authoritative raw mesh arrays.
+
+## What was at the bottom
+
+The screenshot shows **study UUIDs followed by PNG SHA-256 filenames** printed by the temporary five-column comparison/evidence page. They are internal audit identifiers, not an architectural annotation. Their layout overflowed across columns in that review screenshot. They were not needed in the presentation view.
+
+The live review now shows one selected typology and one saved study, with no visible UUID/hash footer. Identifiers remain in the existing immutable data and audit files. Historical screenshots and evidence were preserved rather than edited or discarded.
+
+## Presentation correction
+
+- [Single Lobby Presentation Board](http://127.0.0.1:3014/lobby-transfer-review): defaults to the approved read-only Linear reference; choose any of the five types individually. Existing generated studies remain separately selectable and are identified as using pinned Git rules.
+- [Previous live review URL](http://127.0.0.1:3014/reports/lobby-live-transfer-2026-11-21.html): now displays a single selectable captured board; audit details are collapsed outside the board.
+- The existing board renderer/layout/colors/cameras/text/detail sizes remain unchanged. Only selection UI and export sizing were adjusted.
+- Default **4096 × 5156**, **300 ppi**: the canonical export Blob is returned byte-for-byte without re-encoding.
+- Selected **2048 px**: exports **2048 × 2578**, **300 ppi**, preserving the board aspect ratio and layout. This uses an export-only resized copy; stored geometry and approved PNG evidence are unchanged. Non-board views continue to export at their selected square resolution.
+- Browser export confirmation was observed for 2048 × 2578. The actual resize helper was also tested using a real raster canvas, checking PNG dimensions, visible content and pHYs print-density metadata.
+
+## Preservation / validation
+
+872 files were checkpointed before the change. Exactly three existing files changed: the single-board review page, Presentation &amp; Export's sizing UI/call, and the live report HTML. All other checkpointed files match their hashes, including **286 existing architecture records**, approved Lobby assets, generated studies, **103 private generator source files**, and all shared architectural generators. No architectural geometry was regenerated. Gathering renderer equivalence checks pass.
+
+The only added application helper is presentationExportSizing.ts. New audit/checkpoint/report/test scripts and report artifacts are listed in modified-files.json. Existing archived reports/PNG evidence and original source worktrees remain preserved. No commit, push, merge, deployment, reset, stash or discard occurred.
+
+TypeScript: **54 existing errors versus 54 before; 0 new diagnostics**. Production build was not rerun for this audit; its previously reported tooling blocker remains unresolved. See validation.json, typescript-comparison.json, gathering-board-equivalence.log, source-gap-verification.json and zip-inventory.json.
+
+## Future acceptance gate
+
+1. Obtain the final source package, settings and hashes; do not assume the older remote engine plus three ZIP replacements is equivalent.
+2. Add it in a new private versioned namespace, without replacing any current generator/shared utility.
+3. On temporary copies, feed each exact saved final source array to the confirmed final pipeline. Compare source correspondence, geometry arrays/topology/bounds and intended generation/display stages against the approved originals. Investigate discrepancies; do not relax thresholds or overwrite originals.
+4. Exercise Generate / New Design on distinct valid configurations for every type, capacity conflicts and exact edited-pose regeneration. Retain strict crossings/coplanar/manifold/containment tests and evaluate circulation separately.
+5. Verify each individual board uses its current selected study and selected export resolution. Preserve the five approved references and all existing typologies/studies/board rendering rules.
+</pre></details></html>

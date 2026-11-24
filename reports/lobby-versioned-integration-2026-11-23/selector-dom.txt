@@ -1,0 +1,155 @@
+- main:
+  - navigation "Application":
+    - link "Slide":
+      - /url: /
+    - link "Crops":
+      - /url: /crops
+    - link "Shapes":
+      - /url: /shapes
+    - link "Voids":
+      - /url: /voids
+    - link "Composition":
+      - /url: /composition
+    - link "Architectural Forms":
+      - /url: /architectural-forms
+    - link "Lobby":
+      - /url: /lobby
+    - link "Proto-Form Generation":
+      - /url: /amphitheater
+    - link "Presentation":
+      - /url: /composition-presentation
+    - link "Evaluations":
+      - /url: /evaluations
+    - link "Lattice":
+      - /url: /lattice
+    - link "Part 3":
+      - /url: /part3
+    - button "Board mode"
+  - heading "Proto-Form Generation" [level=1]
+  - paragraph: Existing LUV application · Z-up geometry in feet · isolated comparison workspace
+  - complementary:
+    - heading "Generation controls" [level=2]
+    - text: Typology
+    - combobox "Typology":
+      - option "Stepped Amphitheater"
+      - option "Linear Edge Gallery"
+      - option "Inserted Horizontal Plate"
+      - option "Void-Field"
+      - option "Room Within Volume"
+      - option "Open Hall Workspace"
+      - option "Flat-Deep Plan Plate"
+      - option "Cascaded Workspace"
+      - option "Void-Edge Workspace"
+      - option "Undulating Workspace"
+      - option "Vertical Void Lobby"
+      - option "Compressed Sequential Lobby"
+      - option "Continuous Hall Lobby"
+      - option "Topographic Lobby"
+      - option "Linear Gallery Lobby" [selected]
+    - text: Width X (ft)
+    - combobox "width":
+      - option "20"
+      - option "40" [selected]
+      - option "60"
+    - text: Depth Y (ft)
+    - combobox "depth":
+      - option "20" [selected]
+      - option "40"
+      - option "60"
+    - text: Height Z (ft)
+    - combobox "height":
+      - option "20" [selected]
+      - option "40"
+      - option "60"
+    - text: Preferred letter size (ft)
+    - spinbutton "Preferred letter size": "13"
+    - text: Letter quantity
+    - textbox "Letter quantity": "7"
+    - paragraph: "Automatic uses the developer’s six-letter default. Original source rules are deterministic: change quantity, field, preferred size or enabled letters for a different arrangement."
+    - group "Letters":
+      - generic: Letters
+      - checkbox "L" [checked]
+      - text: L
+      - checkbox "U" [checked]
+      - text: U
+      - checkbox "V"
+      - text: V
+    - button "Generate Design"
+    - button "New Design"
+    - button "Edit Letters"
+    - button "Regenerate Architecture"
+    - button "Open approved reference"
+    - generic "Original orientation rules and engine"
+  - button "A — Original Letters"
+  - button "B — Letters + Architecture"
+  - button "C — Architecture Only" [pressed]
+  - button "isometric"
+  - button "plan"
+  - button "elevation"
+  - button "section"
+  - button "Reset camera"
+  - paragraph: "Displayed study: 40 × 20 × 20 ft · 7 actual instances · 2576.053 ft³"
+  - heading "Presentation & Export" [level=2]
+  - paragraph: Proposed presentation adaptation — camera, section and detail layout require review.
+  - paragraph: Exports use the displayed saved study. The four-view board follows a 2 × 2 layout for placement in InDesign.
+  - text: Presentation view
+  - combobox "Presentation view":
+    - option "Original Letters"
+    - option "Architectural Form"
+    - option "Orientation Rules"
+    - option "Generation Rules"
+    - option "Atrium Sightlines"
+    - option "Four-view Board" [selected]
+  - text: PNG resolution
+  - combobox "PNG resolution":
+    - option "2048 px"
+    - option "4096 px" [selected]
+  - generic: 4096 × 5156 px · 300 ppi
+  - text: Isometric direction
+  - combobox "Presentation isometric direction":
+    - option "SE" [selected]
+    - option "SW"
+    - option "NE"
+    - option "NW"
+  - checkbox "Transparent PNG background"
+  - text: Transparent PNG background
+  - generic "Proposed section settings"
+  - option "X"
+  - option "Y" [selected]
+  - option "Longest plan direction"
+  - generic "Measured orientation and terracing rules"
+  - img "Four-view Board presentation preview"
+  - button "Export high-resolution PNG"
+  - button "Export Letters OBJ"
+  - button "Export Form OBJ"
+  - status
+  - heading "Saved studies and alternatives" [level=2]
+  - paragraph:
+    - text: Linear Gallery Lobby · 7 letters
+    - button "Open"
+  - paragraph:
+    - text: Linear Gallery Lobby · 6 letters
+    - button "Open"
+  - paragraph:
+    - text: Linear Gallery Lobby · 7 letters
+    - button "Open"
+  - paragraph:
+    - text: Linear Gallery Lobby · 7 letters
+    - button "Open"
+  - paragraph:
+    - text: Linear Gallery Lobby · 6 letters
+    - button "Open"
+  - paragraph:
+    - text: Linear Gallery Lobby · 6 letters
+    - button "Open"
+  - paragraph:
+    - text: Linear Gallery Lobby · 15 letters
+    - button "Open"
+  - paragraph:
+    - text: Linear Gallery Lobby · 7 letters
+    - button "Open"
+  - paragraph:
+    - text: Linear Gallery Lobby · 6 letters
+    - button "Open"
+- button "Open Next.js Dev Tools":
+- alert

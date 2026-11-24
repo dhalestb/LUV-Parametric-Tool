@@ -42,7 +42,7 @@ function contributionReport(solid,bands,nodes){
     const center=a.map((v,k)=>(v+b[k]+c[k])/3),start=center.map((v,k)=>v+n[k]/length*.02),end=center.map((v,k)=>v-n[k]/length*.02);
     for(const band of bands.filter(b=>b.owner))if(band.solid.rayCast(start,end).length)areas.set(band.owner,areas.get(band.owner)+length/2);
   }
-  return nodes.map(n=>({letter:n.id,sourceCenterZ:n.p.z,exposedArea:areas.get(n.id),component:'contour-'+n.id,relationships:bands.filter(b=>b.sources.includes(n.id)).map(b=>b.id)}));
+  return nodes.map(n=>({letter:n.id,sourceCenterZ:n.p.z,exposedArea:areas.get(n.id)??0,component:'contour-'+n.id,relationships:bands.filter(b=>b.sources.includes(n.id)).map(b=>b.id)}));
 }
 module.exports={levelEnvelope,contributionReport};
 

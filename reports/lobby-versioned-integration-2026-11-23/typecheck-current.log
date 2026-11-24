@@ -1,0 +1,69 @@
+src/components/amphitheaterCompositionSources.ts(12,71): error TS2339: Property 'heightRouting' does not exist on type '{ centerX: number; centerY: number; centerZ: number; width: number; height: number; depth: number; evaluatedPositions: number; totalPositions: number; exhaustive: boolean; }'.
+src/components/architectural-forms/openHallLetterLayout.ts(32,41): error TS2339: Property 'openHallRole' does not exist on type '{ letter: "L"; letterRules: { architectural: boolean; yaw: number; level: number; supportZ: number; strokeWidth: number; footTilt: number; armRoll: number; deviations: string[]; mirrored?: boolean | undefined; enclosed?: boolean | undefined; }; ... 9 more ...; scaleZ: number; }'.
+src/components/architecturalLetterSizing.ts(130,5): error TS2353: Object literal may only specify known properties, and 'preferredLetterSize' does not exist in type 'GenerationRules'.
+src/components/architecturalLetterSizing.ts(140,51): error TS2339: Property 'preferredLetterSize' does not exist on type 'GenerationRules'.
+src/components/architecturalLetterSizing.ts(145,29): error TS2339: Property 'letterSizeVariation' does not exist on type 'GenerationRules'.
+src/components/architecturalLetterSizing.ts(157,55): error TS2339: Property 'preferredLetterSize' does not exist on type 'GenerationRules'.
+src/components/architecturalLetterSizing.ts(158,53): error TS2339: Property 'letterSizeVariation' does not exist on type 'GenerationRules'.
+src/components/evaluations/ArchitecturalEvaluations.tsx(113,127): error TS2339: Property 'geometryPersisted' does not exist on type 'LatticeSourceValue'.
+src/components/evaluations/ArchitecturalEvaluations.tsx(225,33): error TS2339: Property 'note' does not exist on type '{ imported: number; error?: string | undefined; }'.
+src/components/evaluations/comparisonBoard.ts(364,9): error TS2339: Property 'arc' does not exist on type 'DrawContext'.
+src/components/evaluations/descriptorCache.test.ts(13,19): error TS2352: Conversion of type '{ rotation: 0; mirror: "none"; occupied: number[]; floor: never[]; passage: never[]; voidCells: never[]; vertical: never[]; bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number; }; faces: {}; }' to type 'TileVariant' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'faces' are incompatible.
+    Type '{}' is missing the following properties from type 'Record<Direction, FaceLayer>': "+X", "-X", "+Y", "-Y", and 2 more.
+src/components/evaluations/descriptorRank.test.ts(101,25): error TS2339: Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'.
+src/components/evaluations/descriptorRank.test.ts(102,25): error TS2339: Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'.
+src/components/evaluations/descriptorRank.test.ts(103,25): error TS2339: Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'.
+src/components/evaluations/descriptorRank.test.ts(104,25): error TS2339: Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'.
+src/components/evaluations/descriptorRank.test.ts(105,25): error TS2339: Property 'tieBreakUsed' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'.
+src/components/evaluations/descriptorRank.test.ts(106,25): error TS2339: Property 'tieBreakUsed' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'.
+src/components/evaluations/descriptorRank.test.ts(107,25): error TS2339: Property 'tieBreakUsed' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'.
+src/components/evaluations/openVolumeCache.test.ts(28,19): error TS2352: Conversion of type '{ rotation: 0; mirror: "none"; occupied: never[]; floor: never[]; passage: never[]; voidCells: never[]; vertical: never[]; bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number; }; faces: {}; }' to type 'TileVariant' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'faces' are incompatible.
+    Type '{}' is missing the following properties from type 'Record<Direction, FaceLayer>': "+X", "-X", "+Y", "-Y", and 2 more.
+src/components/evaluations/openVolumeClearance.ts(155,46): error TS2345: Argument of type 'Pick<ObjFace, "vertices">' is not assignable to parameter of type 'ObjFace'.
+  Property 'normals' is missing in type 'Pick<ObjFace, "vertices">' but required in type 'ObjFace'.
+src/components/evaluations/presentEvidence.ts(249,21): error TS2741: Property 'kind' is missing in type '{}' but required in type 'Pick<EvidenceLayer, "kind" | "segments" | "arrows">'.
+src/components/evaluations/presentEvidence.ts(256,5): error TS2741: Property 'kind' is missing in type '{ arrows: { a: Vec3; b: Vec3; }[]; }' but required in type 'Pick<EvidenceLayer, "kind" | "segments" | "arrows">'.
+src/components/evaluations/presentEvidence.ts(258,3): error TS2741: Property 'kind' is missing in type '{}' but required in type 'Pick<EvidenceLayer, "kind" | "segments" | "arrows">'.
+src/components/evaluations/presentEvidence.ts(352,5): error TS2741: Property 'color' is missing in type '{ pointShape: "circle"; pointScale: number; }' but required in type 'Pick<EvidenceLayer, "color" | "pointShape" | "pointScale">'.
+src/components/evaluations/presentEvidence.ts(364,3): error TS2741: Property 'color' is missing in type '{}' but required in type 'Pick<EvidenceLayer, "color" | "pointShape" | "pointScale">'.
+src/components/letterIntersectionSpaces.ts(900,382): error TS2322: Type 'OfficeCheck[] | undefined' is not assignable to type '{ label: string; status: "pass" | "unverified"; detail: string; }[] | undefined'.
+  Type 'OfficeCheck[]' is not assignable to type '{ label: string; status: "pass" | "unverified"; detail: string; }[]'.
+    Type 'OfficeCheck' is not assignable to type '{ label: string; status: "pass" | "unverified"; detail: string; }'.
+      Types of property 'status' are incompatible.
+        Type '"pass" | "fail" | "unverified"' is not assignable to type '"pass" | "unverified"'.
+          Type '"fail"' is not assignable to type '"pass" | "unverified"'.
+src/components/selectionFieldGeometry.test.ts(143,118): error TS2353: Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'.
+src/components/selectionFieldGeometry.test.ts(155,35): error TS2339: Property 'heightRouting' does not exist on type '{ centerX: number; centerY: number; centerZ: number; width: number; height: number; depth: number; evaluatedPositions: number; totalPositions: number; exhaustive: boolean; }'.
+src/components/selectionFieldGeometry.test.ts(186,35): error TS2339: Property 'heightRouting' does not exist on type '{ centerX: number; centerY: number; centerZ: number; width: number; height: number; depth: number; evaluatedPositions: number; totalPositions: number; exhaustive: boolean; }'.
+src/components/selectionHeightRouting.test.ts(103,25): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.test.ts(104,40): error TS2345: Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, "enabled" | "heightRouting">'.
+  Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, "enabled" | "heightRouting">'.
+src/components/selectionHeightRouting.test.ts(106,26): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.test.ts(107,40): error TS2345: Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, "enabled" | "heightRouting">'.
+  Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, "enabled" | "heightRouting">'.
+src/components/selectionHeightRouting.test.ts(117,27): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.test.ts(124,30): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.test.ts(135,23): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.test.ts(139,23): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.test.ts(164,7): error TS2353: Object literal may only specify known properties, and 'heightRouting' does not exist in type 'Partial<SelectionVolume>'.
+src/components/selectionHeightRouting.test.ts(170,27): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.test.ts(171,79): error TS2353: Object literal may only specify known properties, and 'heightRouting' does not exist in type 'Partial<SelectionVolume>'.
+src/components/selectionHeightRouting.test.ts(173,25): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.ts(217,5): error TS2353: Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'.
+src/components/selectionHeightRouting.ts(222,11): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.ts(224,21): error TS2353: Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'.
+src/components/selectionHeightRouting.ts(227,72): error TS2344: Type '"enabled" | "heightRouting"' does not satisfy the constraint 'keyof SelectionVolume'.
+  Type '"heightRouting"' is not assignable to type 'keyof SelectionVolume'.
+src/components/selectionHeightRouting.ts(245,40): error TS2345: Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, "enabled" | "heightRouting">'.
+  Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, "enabled" | "heightRouting">'.
+src/components/selectionHeightRouting.ts(270,29): error TS2345: Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, "enabled" | "heightRouting">'.
+  Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, "enabled" | "heightRouting">'.
+src/components/selectionHeightRouting.ts(270,75): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.ts(271,58): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.ts(287,5): error TS2353: Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'.
+src/components/selectionHeightRouting.ts(287,30): error TS2339: Property 'heightRouting' does not exist on type 'SelectionVolume'.
+src/components/selectionHeightRouting.ts(295,57): error TS2339: Property 'heightRouting' does not exist on type 'Partial<SelectionVolume>'.
+src/components/selectionHeightRouting.ts(295,84): error TS2339: Property 'heightRouting' does not exist on type 'Partial<SelectionVolume>'.
+src/components/selectionHeightRouting.ts(300,5): error TS2353: Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'.

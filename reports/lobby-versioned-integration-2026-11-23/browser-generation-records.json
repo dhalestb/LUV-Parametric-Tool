@@ -1,0 +1,22 @@
+{
+  "linear-gallery-lobby": {
+    "6": "00fd1d6c-5167-4727-88fd-2ba3fe402e0b",
+    "7": "134ef19a-726c-4dfe-bf31-32b35d77d209"
+  },
+  "topographic-ground-field-lobby": {
+    "6": "82043795-3e5b-430f-b61f-c20c64bd7a05",
+    "7": "01525436-7a33-4906-9cbc-5b524b89bc5c"
+  },
+  "compressed-sequential-lobby": {
+    "6": "112cd8bc-1101-4c68-b51d-8dfb444ddc50",
+    "7": "c6e49c76-4de5-4050-b84e-d0801109d2a7"
+  },
+  "vertical-void-lobby": {
+    "6": "7bdaa190-1674-4962-8cbf-cba63fca3b1c",
+    "7": "3e780e85-0564-49d4-89f9-1c8adc13a631"
+  },
+  "continuous-hall-lobby": {
+    "6": "41fd9af5-f5ae-4ad8-bc35-dff0d43f2390",
+    "7": "3c75f1ad-d877-49b9-a7cc-ec2017d7e2b7"
+  }
+}

@@ -17,6 +17,7 @@ export type IntersectionPlacement = {
   scaleY: number;
   scaleZ: number;
   /** Open Hall L-guide role when letters drive generation. */
+  rotationOrder?: "XYZ" | "ZYX";
   openHallRole?: "column" | "floor" | "mezzanine" | "wall" | "roof";
 };
 

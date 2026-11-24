@@ -1,0 +1,192 @@
+[
+  {
+    "id": "approved-stepped",
+    "name": "Stepped Amphitheater",
+    "group": "approved",
+    "category": "gathering",
+    "studyId": "1c16cdee-59af-4ca0-ad74-9695a120d4b8",
+    "file": "approved-stepped.json",
+    "sha256": "eda547e809305fea730f312b6669bd5ee15ce6c6f893070b480861d7c5bfec4c"
+  },
+  {
+    "id": "approved-linear",
+    "name": "Linear Edge Gallery",
+    "group": "approved",
+    "category": "gathering",
+    "studyId": "7f45b9b2-b404-4ce9-bab5-11997e124ed6",
+    "file": "approved-linear.json",
+    "sha256": "c16aa507163e160474ff8c3b553390c6849c3e89ae22584f0f45c3afe94e2c53"
+  },
+  {
+    "id": "approved-plate",
+    "name": "Inserted Horizontal Plate · Study 135",
+    "group": "approved",
+    "category": "gathering",
+    "studyId": "51c37bd5-0170-47a5-8184-5961d97e7e3a",
+    "file": "approved-plate.json",
+    "sha256": "3a541ea94198d4d0eb6fa22c0d1bae4391dcf6a9873808a23f5a0d877e74cb3c"
+  },
+  {
+    "id": "approved-void",
+    "name": "Void-Field · four levels, face-normal walls",
+    "group": "approved",
+    "category": "gathering",
+    "studyId": "c1fbdb4a-6f45-4b98-86d3-0255b7fdab01",
+    "file": "approved-void.json",
+    "sha256": "859df512ba518ff475c44f47464220dee145b5da5844098e8a7b15afe01e9a69"
+  },
+  {
+    "id": "approved-room",
+    "name": "Room Within Volume · joined top planks",
+    "group": "approved",
+    "category": "gathering",
+    "studyId": "72883ed3-ea47-4475-8172-3dc491735798",
+    "file": "approved-room.json",
+    "sha256": "6c30a8af6a28ecefd40cef983452ac454317b13ec5e88c06d155a52f3645d5a4"
+  },
+  {
+    "id": "workspace-open-hall-workspace",
+    "name": "Open Hall Workspace",
+    "group": "workspace",
+    "category": "workspace",
+    "typology": "open-hall-workspace",
+    "studyId": "0206fb18-a1fb-4e71-97cf-83e58c48967e",
+    "file": "workspace-open-hall-workspace.json",
+    "sha256": "0fff76cb740fdb407811a7d20c04e983ecc7859e16d940865e713bd464326a4b"
+  },
+  {
+    "id": "lobby-10",
+    "name": "Continuous Hall Lobby",
+    "group": "lobby",
+    "category": "lobby",
+    "studyId": "d8dd7d39-3992-45f1-8fe8-8ecda105f299",
+    "lobbyNumber": 10,
+    "sha256": "7871608b1f4a5d63a84ce3280305f16ce9a4e8c7b84028384c2c77d965ff9eaa",
+    "typology": "continuous-hall-lobby"
+  },
+  {
+    "id": "lobby-26",
+    "name": "Vertical Void Lobby",
+    "group": "lobby",
+    "category": "lobby",
+    "studyId": "54376fdf-c5f2-4480-a34f-fd1a4eecf5c0",
+    "lobbyNumber": 26,
+    "sha256": "cdecfb0f11ef526ecb72aa256e8137ca19b63cd6a2129bf30fbc6b7a161690d9",
+    "typology": "vertical-void-lobby"
+  },
+  {
+    "id": "lobby-65",
+    "name": "Topographic / Ground-Field Lobby",
+    "group": "lobby",
+    "category": "lobby",
+    "studyId": "8ee69779-cc51-4090-9efe-34678d9aa84e",
+    "lobbyNumber": 65,
+    "sha256": "1c103424d00e224e3f8b9394ab0c7cb51eca71dede47bc4bd2482e851034e98a",
+    "typology": "topographic-ground-field-lobby"
+  },
+  {
+    "id": "lobby-66",
+    "name": "Compressed Sequential Lobby",
+    "group": "lobby",
+    "category": "lobby",
+    "studyId": "bb7ebcd5-c9f6-45ca-b17b-c4fff24aeab5",
+    "lobbyNumber": 66,
+    "sha256": "dc9c20bf0f5b942ed502366f271f6d4840421ae3a21577b3f2623382c011d41c",
+    "typology": "compressed-sequential-lobby"
+  },
+  {
+    "id": "lobby-77",
+    "name": "Linear Gallery Lobby",
+    "group": "lobby",
+    "category": "lobby",
+    "studyId": "4b487d8c-aebe-4d4c-97c9-1d08c5584062",
+    "lobbyNumber": 77,
+    "sha256": "e5ada0eac99095b08dae830b8e3f8d20096368fd306c969b3d9daa716b66d808",
+    "typology": "linear-gallery-lobby"
+  },
+  {
+    "id": "new-stepped",
+    "name": "New Stepped Amphitheater",
+    "group": "new-gathering",
+    "category": "gathering",
+    "studyId": "e10c1258-3231-4c52-a6e8-084f8d8d702a",
+    "file": "new-stepped.json",
+    "sha256": "81569d0fa2949adff5688330482bb8fed22ba50edf00b92293a13e5f34b32446"
+  },
+  {
+    "id": "new-plate",
+    "name": "New Inserted Horizontal Plate",
+    "group": "new-gathering",
+    "category": "gathering",
+    "studyId": "509a9fc3-81bf-4cb9-b1dd-5de12317908c",
+    "file": "new-plate.json",
+    "sha256": "00b69addc646cca05f058cc15545a1c91b96cc2dcf323b64a3f7701ba8ad3768"
+  },
+  {
+    "id": "new-void",
+    "name": "New Void Field Gathering",
+    "group": "new-gathering",
+    "category": "gathering",
+    "studyId": "4a113bc2-5193-4d30-955a-a0bf6f980802",
+    "file": "new-void.json",
+    "sha256": "3ae04bb6f1586f239d6b042e64480eec283bee6bedcf12d0e39ed1e3159c02ae"
+  },
+  {
+    "id": "new-room",
+    "name": "New Room Within Volume",
+    "group": "new-gathering",
+    "category": "gathering",
+    "studyId": "dbefd8fa-72e7-4b01-a255-5cee265cf027",
+    "file": "new-room.json",
+    "sha256": "1e22e6bd868c3f0edf4b89e636f46f4160b70005d3a0eed2619c58169922ad9a"
+  },
+  {
+    "id": "new-linear",
+    "name": "New Linear Edge Gallery",
+    "group": "new-gathering",
+    "category": "gathering",
+    "studyId": "e450eb5b-22e5-4140-8f9d-1d7620e15872",
+    "file": "new-linear.json",
+    "sha256": "b14bf12c1da42168cc507c90c0c593f082bb9dd4cf466ab26c3d2d24375d0ead"
+  },
+  {
+    "id": "new-workspace-flat-deep-plan-plate",
+    "name": "Flat-Deep Plan Plate",
+    "typology": "flat-deep-plan-plate",
+    "group": "new-workspace",
+    "category": "workspace",
+    "studyId": "594eaf9c-7dc0-4b5a-9ed1-762d9059b0f2",
+    "file": "new-workspace-flat-deep-plan-plate.json",
+    "sha256": "fae8c24e41610767f49d683f5deb7747cdac3bb90763931011482d5a65f19794"
+  },
+  {
+    "id": "new-workspace-cascaded-terraced-plates",
+    "name": "Cascaded Workspace",
+    "typology": "cascaded-terraced-plates",
+    "group": "new-workspace",
+    "category": "workspace",
+    "studyId": "c276f1d2-826c-4dab-a0ee-9faa516c5901",
+    "file": "new-workspace-cascaded-terraced-plates.json",
+    "sha256": "d8fcf02a2a7279965539970b5fe4f64edb192714f2b8822c44e1563c688e326d"
+  },
+  {
+    "id": "new-workspace-void-edge-workspace",
+    "name": "Void-Edge Workspace",
+    "typology": "void-edge-workspace",
+    "group": "new-workspace",
+    "category": "workspace",
+    "studyId": "905c62b3-d5bd-49d9-9202-eb4ea261722f",
+    "file": "new-workspace-void-edge-workspace.json",
+    "sha256": "5274ca7298406e4d95c57b9dd2b500bb7af6f426920b1d80341d43c624f134d3"
+  },
+  {
+    "id": "new-workspace-folded-undulating-work-surface",
+    "name": "Undulating Workspace",
+    "typology": "folded-undulating-work-surface",
+    "group": "new-workspace",
+    "category": "workspace",
+    "studyId": "097e35c3-47d0-4e20-84af-2f921b4226ee",
+    "file": "new-workspace-folded-undulating-work-surface.json",
+    "sha256": "dcbed5c83549c5b92f7685f1865c1ce2d30185a20b31634076ddfb2fa3b4ffe4"
+  }
+]

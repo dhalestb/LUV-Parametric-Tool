@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/voids", label: "Voids" },
   { href: "/composition", label: "Composition" },
   { href: "/architectural-forms", label: "Architectural Forms" },
+  { href: "/lobby", label: "Lobby" },
   { href: "/amphitheater", label: "Proto-Form Generation" },
   { href: "/composition-presentation", label: "Presentation" },
   { href: "/evaluations", label: "Evaluations" },

@@ -41,7 +41,7 @@ function verticalEnvelope(w,nodes,edges,letters,field,preferred){
  function floatSafe(solid){
   // Remove coplanar Boolean run seams before conversion to Float32.
   const mesh=solid.asOriginal().simplify(1e-5).getMesh(),p=[],ix=[],map=new Map(),remap=[];
-  for(let i=0;i<mesh.vertProperties.length;i+=3){const q=Array.from(mesh.vertProperties.slice(i,i+3),Math.fround),key=q.join(',');if(!map.has(key)){map.set(key,p.length/3);p.push(...q);}remap.push(map.get(key));}
+  for(let i=0;i<mesh.vertProperties.length;i+=3){const q=Array.from(mesh.vertProperties.slice(i,i+3),v=>Math.fround(Math.round(v*1e5)/1e5)),key=q.join(',');if(!map.has(key)){map.set(key,p.length/3);p.push(...q);}remap.push(map.get(key));}
   for(let i=0;i<mesh.triVerts.length;i+=3){const t=Array.from(mesh.triVerts.slice(i,i+3),j=>remap[j]);if(new Set(t).size<3)continue;const [a,b,c]=t.map(j=>new T.Vector3().fromArray(p,j*3));if(b.sub(a).cross(c.sub(a)).lengthSq()===0)continue;ix.push(...t);}
   const mesh32=new w.Mesh({numProp:3,vertProperties:new Float32Array(p),triVerts:new Uint32Array(ix)});mesh32.merge();const result=new M(mesh32);if(result.status()!=='NoError')throw Error('Float32-safe wall export failed: '+result.status());return result;
  }
@@ -55,17 +55,17 @@ function verticalEnvelope(w,nodes,edges,letters,field,preferred){
   const low=Math.min(...letters[index].mesh.positions.filter((_,i)=>i%3===2));
   if(support>=low-.1)throw Error(node.id+': supporting elevation must be below the source underside.');
   const crown=node.p.lift==='top' && role!=='interior';
-  const plateBottom=Math.max(support,low-.75-(crown?.125:0)),plate=(crown?footprint:footprint.offset(.8,'Round',2,32)).extrude(.75).translate([0,0,plateBottom]);
-  const parts=[plate];
+  const plateBottom=Math.max(support,low-.75),plate=(crown?footprint:footprint.offset(.8,'Round',2,32)).extrude(.75).translate([0,0,plateBottom]);
+  // Retain the two stepped crown terraces; omit only the source-shaped covering cap.
+  const parts=crown?[]:[plate];
   // A pair of source-shaped setbacks connects a perimeter terrace to the lower bank.
   // Retain the original thin plate for studies saved before opening roles were introduced.
   if(role!=='interior' && nodes.some(n=>n.p.voidKind)){
    const rise=Math.min(preferred*.12,(plateBottom-support)/3);
    for(let tier=1;tier<=2 && rise>.05;tier++){
     const top=plateBottom-(tier-1)*rise+.04;
-    if(crown)continue; // The upper platform ends at the source outline, without projecting bands.
     const base=footprint.offset(.8+tier*preferred*.075,'Round',2,32);
-    const baseZ=0; // Carry the side setback to field ground before subtracting openings.
+    const baseZ=Math.max(support,top-preferred*.45); // Study 120: suspended terrace banks, not full-height infill.
     parts.push(base.extrude(top-baseZ).translate([0,0,baseZ]));
    }
   }
@@ -100,6 +100,7 @@ function verticalEnvelope(w,nodes,edges,letters,field,preferred){
    pendingOpenings.push({node,plateBottom});
   }
   if(!node.p.architecturalRole)ambiguities.push({source:node.id,kind:'automatic role',resolution:role+' from source-center XY convex hull; editable architecturalRole overrides'});
+  if(!parts.length)continue;
   bands.push({id:'contour-'+node.id,owner:node.id,sources:[node.id,...neighbors(index)],solid:M.union(parts).intersect(clip)});
  }
  // Retain graph connections as horizontal stepped runs, with vertical risers.

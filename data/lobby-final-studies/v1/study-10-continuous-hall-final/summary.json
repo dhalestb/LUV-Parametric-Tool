@@ -1,0 +1,262 @@
+{
+  "studyNumber": 10,
+  "name": "Continuous Hall Final",
+  "typologyId": "continuous-hall-lobby",
+  "lobbyStudyId": "1765eba0-d4e5-4549-8f16-c648d47116df",
+  "architectureStudyId": "d8dd7d39-3992-45f1-8fe8-8ecda105f299",
+  "created": "2026-11-14T01:25:14.750Z",
+  "fieldFeet": {
+    "width": 40,
+    "depth": 20,
+    "height": 20
+  },
+  "preferredFeet": 9,
+  "population": 15,
+  "sourceCount": 15,
+  "links": [],
+  "parameters": {
+    "proof": "lobby",
+    "typologyName": "Continuous Hall Lobby",
+    "generator": "source-preserving",
+    "organization": "proximity",
+    "articulationElevation": "feature",
+    "articulation": 0.75,
+    "field": {
+      "width": 40,
+      "depth": 20,
+      "height": 20
+    },
+    "preferredFeet": 9,
+    "population": 15,
+    "sourceId": "2f920fe4-c867-463f-af55-fa060b85fddc",
+    "sourceName": "Continuous Hall Lobby · 15 letters"
+  },
+  "generationSeed": null,
+  "ruleVariant": null,
+  "displayModes": {
+    "A": "Original letters",
+    "B": "Letters + architecture",
+    "C": "Architecture only"
+  },
+  "sourceMatchesArchitectureRequest": true,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 249274,
+    "legacyFlags": 40
+  },
+  "volume": 2395.3970585847933,
+  "bounds": {
+    "min": [
+      -20,
+      -5.314204216003418,
+      0
+    ],
+    "max": [
+      20,
+      4.462849140167236,
+      20
+    ]
+  },
+  "warnings": [
+    "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review."
+  ],
+  "letters": [
+    {
+      "letter": "U",
+      "x": -15.837988826669147,
+      "y": 0,
+      "z": -6.611720974490923,
+      "rx": -90,
+      "ry": 0,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": -13.575418994287839,
+      "y": 0,
+      "z": 0,
+      "rx": 0,
+      "ry": 90,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": -11.312849161906533,
+      "y": 0,
+      "z": 0,
+      "rx": -90,
+      "ry": 0,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": -9.050279329525225,
+      "y": 0,
+      "z": 0,
+      "rx": 15,
+      "ry": 90,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": -6.787709497143917,
+      "y": 0,
+      "z": 0,
+      "rx": -90,
+      "ry": 0,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": -4.52513966476261,
+      "y": 0,
+      "z": 0,
+      "rx": 30,
+      "ry": 90,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": -2.2625698323813017,
+      "y": 0,
+      "z": 0,
+      "rx": -90,
+      "ry": 0,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 5.954268636780853e-15,
+      "y": 0,
+      "z": 0,
+      "rx": 45,
+      "ry": 90,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 2.2625698323813137,
+      "y": 0,
+      "z": 0,
+      "rx": -90,
+      "ry": 0,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 4.525139664762619,
+      "y": 0,
+      "z": 0,
+      "rx": 60,
+      "ry": 90,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 6.787709497143925,
+      "y": 0,
+      "z": 0,
+      "rx": -90,
+      "ry": 0,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 9.05027932952523,
+      "y": 0,
+      "z": 0,
+      "rx": 75,
+      "ry": 90,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 11.312849161906536,
+      "y": 0,
+      "z": 0,
+      "rx": -90,
+      "ry": 0,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 13.575418994287842,
+      "y": 0,
+      "z": 0,
+      "rx": 90,
+      "ry": 90,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 15.837988826669147,
+      "y": 0,
+      "z": 6.611720974490923,
+      "rx": -90,
+      "ry": 0,
+      "rz": 0,
+      "scale": 5.02793287760064,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    }
+  ],
+  "screenshot": "reference-isometric.png"
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "typology": "Vertical Void Lobby",
+    "referenceStudy": 26,
+    "currentGeometryMatches": true,
+    "sourcePosesMatch": true,
+    "lettersMatch": true,
+    "componentsMatch": true,
+    "engine": "bf7fc3c"
+  },
+  {
+    "typology": "Compressed Sequential Lobby",
+    "referenceStudy": 66,
+    "currentGeometryMatches": true,
+    "sourcePosesMatch": true,
+    "lettersMatch": true,
+    "componentsMatch": true,
+    "engine": "bfce854"
+  },
+  {
+    "typology": "Continuous Hall Lobby",
+    "referenceStudy": 10,
+    "currentGeometryMatches": true,
+    "sourcePosesMatch": true,
+    "lettersMatch": true,
+    "componentsMatch": true,
+    "engine": "bf7fc3c"
+  },
+  {
+    "typology": "Topographic Lobby",
+    "referenceStudy": 65,
+    "currentGeometryMatches": true,
+    "sourcePosesMatch": true,
+    "lettersMatch": true,
+    "componentsMatch": true,
+    "engine": "bfce854"
+  },
+  {
+    "typology": "Linear Gallery Lobby",
+    "referenceStudy": 77,
+    "currentGeometryMatches": true,
+    "sourcePosesMatch": true,
+    "lettersMatch": true,
+    "componentsMatch": true,
+    "engine": "bfce854"
+  }
+]

@@ -1,0 +1,48 @@
+{
+  "checks": [
+    {
+      "type": "continuous-hall-lobby",
+      "generateCount": 6,
+      "newDesignCount": 7,
+      "url": "http://127.0.0.1:3015/amphitheater?typology=continuous-hall-lobby&lobbyStudy=3c75f1ad-d877-49b9-a7cc-ec2017d7e2b7"
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "generateCount": 6,
+      "newDesignCount": 7,
+      "url": "http://127.0.0.1:3015/amphitheater?typology=topographic-ground-field-lobby&lobbyStudy=01525436-7a33-4906-9cbc-5b524b89bc5c"
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "generateCount": 6,
+      "newDesignCount": 7,
+      "url": "http://127.0.0.1:3015/amphitheater?typology=linear-gallery-lobby&lobbyStudy=134ef19a-726c-4dfe-bf31-32b35d77d209"
+    },
+    {
+      "type": "vertical-void-lobby",
+      "reopened": true,
+      "sourceCount": 7,
+      "url": "http://127.0.0.1:3015/amphitheater?typology=vertical-void-lobby&lobbyStudy=9651281f-c4a9-4adf-b8f8-239faebe3653"
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "reopened": true,
+      "sourceCount": 7,
+      "url": "http://127.0.0.1:3015/amphitheater?typology=compressed-sequential-lobby&lobbyStudy=0cabc668-bb29-49c1-bae1-8e6c181aa160"
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "reopened": true,
+      "sourceCount": 7,
+      "url": "http://127.0.0.1:3015/amphitheater?typology=continuous-hall-lobby&lobbyStudy=d61f793e-3482-4cde-9dcc-5d4257975edc"
+    },
+    {
+      "approvedConfigurationDerivative": "compressed-sequential-lobby",
+      "url": "http://127.0.0.1:3015/amphitheater?typology=compressed-sequential-lobby&lobbyStudy=552408ef-fce4-4879-a740-068f6c0c2c8a",
+      "approvedOriginalReadOnly": true
+    }
+  ],
+  "crossFamilySwitchPreserved": true,
+  "reloadPreserved": true,
+  "selectOptionsVerified": 15
+}

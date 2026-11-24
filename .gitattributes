@@ -1,0 +1,10 @@
+# Keep verified engines, saved geometry and evidence byte-identical on every platform.
+/src/** text eol=lf
+/scripts/** text eol=lf
+/*.ts text eol=lf
+/vendor/** -text
+/data/** -text
+/.amphitheater-runs/** -text
+/public/reports/** -text
+/reports/** -text
+/docs/** text eol=lf

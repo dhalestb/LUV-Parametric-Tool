@@ -6,9 +6,7 @@
 
 import type { WorkspaceTypology } from "./workspaceDualRulesets";
 import {
-  ARCHITECTURAL_GENERATION_RULESET_ID,
   ARCHITECTURAL_GENERATION_RULESET_VERSION,
-  LETTER_ARRANGEMENT_RULESET_ID,
   LETTER_ARRANGEMENT_RULESET_VERSION,
   WORKSPACE_TYPOLOGIES,
   workspaceTypologyName,
@@ -46,7 +44,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "letter-arrangement",
     axis: "letter-arrangement",
     title: "Open Hall · Letter arrangement",
-    rulesetId: LETTER_ARRANGEMENT_RULESET_ID,
+    rulesetId: "open-hall-workspace/letter-arrangement",
     rulesetVersion: LETTER_ARRANGEMENT_RULESET_VERSION,
     requirements: [
       "Letter-arrangement ruleset orients L-only role sets: 4 floor corner Ls (outer tips), mezzanine 2/3/4-channel outer + pocket Ls (inner crooks), column grid Ls, vertical wall Ls, roof quadrant Ls; orthogonal 0/90/180/270.",
@@ -60,7 +58,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "architectural-generation",
     axis: "architectural-generation",
     title: "Open Hall · Architectural generation",
-    rulesetId: ARCHITECTURAL_GENERATION_RULESET_ID,
+    rulesetId: "open-hall-workspace/architectural-generation",
     rulesetVersion: ARCHITECTURAL_GENERATION_RULESET_VERSION,
     requirements: [
       "Architectural-generation ruleset fills L footprints from arranged letters: ground from floor L outer edges + L corner fills; mezz pads from mezz letters (25–40% opening, ≥10 ft band); filled-pocket piers from column L letters on every equal XY column-grid node (including centre).",
@@ -74,7 +72,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "letter-arrangement",
     axis: "letter-arrangement",
     title: "Flat-Deep Plan Plate · Letter arrangement",
-    rulesetId: LETTER_ARRANGEMENT_RULESET_ID,
+    rulesetId: "flat-deep-plan-plate/letter-arrangement",
     rulesetVersion: LETTER_ARRANGEMENT_RULESET_VERSION,
     requirements: [
       "L/V variations form one continuous rectangular plate; ratio 3:2–5:2; 15° rotation; ≥5 ft longitudinal strip joining short ends.",
@@ -88,7 +86,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "architectural-generation",
     axis: "architectural-generation",
     title: "Flat-Deep Plan Plate · Architectural generation",
-    rulesetId: ARCHITECTURAL_GENERATION_RULESET_ID,
+    rulesetId: "flat-deep-plan-plate/architectural-generation",
     rulesetVersion: ARCHITECTURAL_GENERATION_RULESET_VERSION,
     requirements: [
       "One continuous working plate at a single elevation; protected longitudinal route ≥5 ft; repeating supports; daylight edges; >10 ft clear headroom; field containment.",
@@ -101,7 +99,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "letter-arrangement",
     axis: "letter-arrangement",
     title: "Cascaded Workspace · Letter arrangement",
-    rulesetId: LETTER_ARRANGEMENT_RULESET_ID,
+    rulesetId: "cascaded-terraced-plates/letter-arrangement",
     rulesetVersion: LETTER_ARRANGEMENT_RULESET_VERSION,
     requirements: [
       "L/V variations establish a horizontal main plate and adjacent rectangular plates; breaks on a 10 ft grid; combined break area ≤40% of the main plate; remaining main stays connected.",
@@ -115,7 +113,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "architectural-generation",
     axis: "architectural-generation",
     title: "Cascaded Workspace · Architectural generation",
-    rulesetId: ARCHITECTURAL_GENERATION_RULESET_ID,
+    rulesetId: "cascaded-terraced-plates/architectural-generation",
     rulesetVersion: ARCHITECTURAL_GENERATION_RULESET_VERSION,
     requirements: [
       "Generate main plate and rectangular breaks; displaced plates and voids; directional elevation sequences; stairs/ramps between consecutive plates; >10 ft headroom; field containment.",
@@ -128,7 +126,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "letter-arrangement",
     axis: "letter-arrangement",
     title: "Void-Edge Workspace · Letter arrangement",
-    rulesetId: LETTER_ARRANGEMENT_RULESET_ID,
+    rulesetId: "void-edge-workspace/letter-arrangement",
     rulesetVersion: LETTER_ARRANGEMENT_RULESET_VERSION,
     requirements: [
       "U variations form a continuous footprint; ratio 1:1–5:4; 15° rotation; one internal opening 10–25% offset from center; ≥5 ft at the narrowest band; continuous loop and entry.",
@@ -141,7 +139,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "architectural-generation",
     axis: "architectural-generation",
     title: "Void-Edge Workspace · Architectural generation",
-    rulesetId: ARCHITECTURAL_GENERATION_RULESET_ID,
+    rulesetId: "void-edge-workspace/architectural-generation",
     rulesetVersion: ARCHITECTURAL_GENERATION_RULESET_VERSION,
     requirements: [
       "Continuous plate with offset internal void 10–25%; ≥5 ft narrowest band; continuous route; level band; void through overhead; supports outside; >10 ft clear height; field containment.",
@@ -154,7 +152,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "letter-arrangement",
     axis: "letter-arrangement",
     title: "Undulating Workspace · Letter arrangement",
-    rulesetId: LETTER_ARRANGEMENT_RULESET_ID,
+    rulesetId: "folded-undulating-work-surface/letter-arrangement",
     rulesetVersion: LETTER_ARRANGEMENT_RULESET_VERSION,
     requirements: [
       "L variations form a horizontal square main plate; 15° rotation; 10 ft grid breaks ≤40%; remaining main connected; adjacent plates distributed; some breaks left as voids.",
@@ -167,7 +165,7 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     stage: "architectural-generation",
     axis: "architectural-generation",
     title: "Undulating Workspace · Architectural generation",
-    rulesetId: ARCHITECTURAL_GENERATION_RULESET_ID,
+    rulesetId: "folded-undulating-work-surface/architectural-generation",
     rulesetVersion: ARCHITECTURAL_GENERATION_RULESET_VERSION,
     requirements: [
       "Square main plate with distributed elevated plates and voids; rise-and-fall neighbors; connections ≤1:12; ≥3 clear 5×5 working patches; >10 ft headroom; field containment.",

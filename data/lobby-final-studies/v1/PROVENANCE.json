@@ -1,0 +1,188 @@
+{
+  "archiveName": "lobby-final-typology-export.zip",
+  "archiveSha256": "1dabf4ea8dcedc6cc39ddb0c708a17249a2e428ec7b8d3f78c21c65f7574ac01",
+  "sourceReferenceCommit": "bf7fc3c8a9235fc3d4910b7b266821d484af93bf",
+  "note": "The archive includes source supplements newer than the reference commit. Phase 1 loads original snapshots only. No generation package is imported.",
+  "entries": [
+    {
+      "id": "lobby-final-v1-77",
+      "number": 77,
+      "name": "Linear Final New",
+      "typologyId": "linear-gallery-lobby",
+      "lobbyStudyId": "1aee9c6b-aa83-44e4-826f-7d9ff4123f59",
+      "architectureStudyId": "4b487d8c-aebe-4d4c-97c9-1d08c5584062",
+      "folder": "study-77-linear-final-new",
+      "field": {
+        "width": 40,
+        "depth": 20,
+        "height": 20
+      },
+      "preferredFeet": 13,
+      "count": 15,
+      "types": "L 8 · U 7",
+      "archiveSha256": "1dabf4ea8dcedc6cc39ddb0c708a17249a2e428ec7b8d3f78c21c65f7574ac01",
+      "files": {
+        "architecture.json": {
+          "bytes": 1726123,
+          "sha256": "e5ada0eac99095b08dae830b8e3f8d20096368fd306c969b3d9daa716b66d808"
+        },
+        "reference-isometric.png": {
+          "bytes": 94666,
+          "sha256": "26578d981ae872aa8ee5352ef4e6dea1baefdadfaa05b3a767bc5a01ff408da8"
+        },
+        "study.json": {
+          "bytes": 3181,
+          "sha256": "e04f7604992525a5aa2b26811b2539cdd59db8f40622dbca3e1ff906d7162e38"
+        },
+        "summary.json": {
+          "bytes": 5964,
+          "sha256": "18f51c84e03c7cef197ce9585e2a7b7173ed94065321d67297f1f6585160c690"
+        }
+      }
+    },
+    {
+      "id": "lobby-final-v1-66",
+      "number": 66,
+      "name": "Compressed Final New",
+      "typologyId": "compressed-sequential-lobby",
+      "lobbyStudyId": "142cde46-bc56-4d4f-9bdd-7680d6b3d74d",
+      "architectureStudyId": "bb7ebcd5-c9f6-45ca-b17b-c4fff24aeab5",
+      "folder": "study-66-compressed-final-new",
+      "field": {
+        "width": 60,
+        "depth": 20,
+        "height": 20
+      },
+      "preferredFeet": 13,
+      "count": 15,
+      "types": "L 2 · U 7 · V 6",
+      "archiveSha256": "1dabf4ea8dcedc6cc39ddb0c708a17249a2e428ec7b8d3f78c21c65f7574ac01",
+      "files": {
+        "architecture.json": {
+          "bytes": 1146394,
+          "sha256": "dc9c20bf0f5b942ed502366f271f6d4840421ae3a21577b3f2623382c011d41c"
+        },
+        "reference-isometric.png": {
+          "bytes": 48952,
+          "sha256": "af882e4e895d5791aa1f2311a50b33875010241c9cbb620e4ee5306308eb567f"
+        },
+        "study.json": {
+          "bytes": 2556,
+          "sha256": "fc29abc705f65f8941ee782a8a782cf8387ada6755909c1d1b538327a6c099c9"
+        },
+        "summary.json": {
+          "bytes": 5320,
+          "sha256": "075e87edb2a8dfe074680150f81e269c0f1cfaeffdd25bad144c2c41d7528cce"
+        }
+      }
+    },
+    {
+      "id": "lobby-final-v1-65",
+      "number": 65,
+      "name": "Topo Final 2",
+      "typologyId": "topographic-ground-field-lobby",
+      "lobbyStudyId": "c1a4f058-850d-4dde-a043-fb997247d3e3",
+      "architectureStudyId": "8ee69779-cc51-4090-9efe-34678d9aa84e",
+      "folder": "study-65-topo-final-2",
+      "field": {
+        "width": 60,
+        "depth": 60,
+        "height": 60
+      },
+      "preferredFeet": 13,
+      "count": 15,
+      "types": "U 5 · L 5 · V 5",
+      "archiveSha256": "1dabf4ea8dcedc6cc39ddb0c708a17249a2e428ec7b8d3f78c21c65f7574ac01",
+      "files": {
+        "architecture.json": {
+          "bytes": 1850425,
+          "sha256": "1c103424d00e224e3f8b9394ab0c7cb51eca71dede47bc4bd2482e851034e98a"
+        },
+        "reference-isometric.png": {
+          "bytes": 40856,
+          "sha256": "5462259832a1f3e744f2730d4dde6669ba2e50ecd501335f6260f3ee3ccc23e2"
+        },
+        "study.json": {
+          "bytes": 2773,
+          "sha256": "c2deb24a6b8a5fa9a855b8f71b299876a2df132f6b7d793a0b7a93aa36db7f42"
+        },
+        "summary.json": {
+          "bytes": 5637,
+          "sha256": "6ceb0d9325888e53a1342a4d07efadb5279d74a35701b1d65b14d0b0ec114380"
+        }
+      }
+    },
+    {
+      "id": "lobby-final-v1-26",
+      "number": 26,
+      "name": "Vertical Final",
+      "typologyId": "vertical-void-lobby",
+      "lobbyStudyId": "6dafc1cb-4b29-49ae-92b5-42c702d07af4",
+      "architectureStudyId": "54376fdf-c5f2-4480-a34f-fd1a4eecf5c0",
+      "folder": "study-26-vertical-final",
+      "field": {
+        "width": 40,
+        "depth": 40,
+        "height": 40
+      },
+      "preferredFeet": 13,
+      "count": 10,
+      "types": "L 4 · U 3 · V 3",
+      "archiveSha256": "1dabf4ea8dcedc6cc39ddb0c708a17249a2e428ec7b8d3f78c21c65f7574ac01",
+      "files": {
+        "architecture.json": {
+          "bytes": 966791,
+          "sha256": "cdecfb0f11ef526ecb72aa256e8137ca19b63cd6a2129bf30fbc6b7a161690d9"
+        },
+        "reference-isometric.png": {
+          "bytes": 24499,
+          "sha256": "4bc12474a065d3c6b4b2723f57374f9c6352937b721e614b1e96dc1e62a8500b"
+        },
+        "study.json": {
+          "bytes": 1634,
+          "sha256": "eb0811112ae5bc3f2b0c5b1a48da93b9864839c6eff00038909a8c1ebc0b0852"
+        },
+        "summary.json": {
+          "bytes": 3952,
+          "sha256": "3ccb360af01aeb95a1655224a3ca1b4f1a451ba03132f9651500d54590a2bce1"
+        }
+      }
+    },
+    {
+      "id": "lobby-final-v1-10",
+      "number": 10,
+      "name": "Continuous Hall Final",
+      "typologyId": "continuous-hall-lobby",
+      "lobbyStudyId": "1765eba0-d4e5-4549-8f16-c648d47116df",
+      "architectureStudyId": "d8dd7d39-3992-45f1-8fe8-8ecda105f299",
+      "folder": "study-10-continuous-hall-final",
+      "field": {
+        "width": 40,
+        "depth": 20,
+        "height": 20
+      },
+      "preferredFeet": 9,
+      "count": 15,
+      "types": "U 8 · L 7",
+      "archiveSha256": "1dabf4ea8dcedc6cc39ddb0c708a17249a2e428ec7b8d3f78c21c65f7574ac01",
+      "files": {
+        "architecture.json": {
+          "bytes": 2002580,
+          "sha256": "7871608b1f4a5d63a84ce3280305f16ce9a4e8c7b84028384c2c77d965ff9eaa"
+        },
+        "reference-isometric.png": {
+          "bytes": 52421,
+          "sha256": "8799c93fd04e5a846679ac5c79af78e978bf48c8e588bff6c2e43ed7d3da236d"
+        },
+        "study.json": {
+          "bytes": 2327,
+          "sha256": "60225f6e89d0436ccc8ee6403bb2f40655e62984ba1af4fb962977a2e8771a88"
+        },
+        "summary.json": {
+          "bytes": 5110,
+          "sha256": "1a64974db2710d39045c632ec13e4f722a92510fc8ce2febfa3ac444b3049e2d"
+        }
+      }
+    }
+  ]
+}

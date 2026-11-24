@@ -1,0 +1,3318 @@
+{
+  "method": "Exact Manifold intersections of saved source-letter meshes; field bounds from actual vertices; original strict triangle validator unchanged. Source overlaps are measured, not prohibited by an invented rule. Connected pieces are reported without fabricating bridges or certifying structural connections.",
+  "rows": [
+    {
+      "type": "linear-gallery-lobby",
+      "studyId": "b20f670e-bf5d-40aa-84ed-d0678d81adc7",
+      "approvedStudy": 77,
+      "engine": "bfce854",
+      "sourceCount": 15,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -19.899999618530273,
+          -10,
+          0
+        ],
+        "max": [
+          19.899999618530273,
+          10,
+          18
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "L-1",
+          "bounds": {
+            "min": [
+              -18.077382269738756,
+              -9.8,
+              0.04999999999999971
+            ],
+            "max": [
+              -14.666272281636777,
+              9.8,
+              1.138382057152076
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-2",
+          "bounds": {
+            "min": [
+              -15.413005470710702,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              -14.413005470710702,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-3",
+          "bounds": {
+            "min": [
+              -13.399717333827965,
+              -9.8,
+              0.04999999999999971
+            ],
+            "max": [
+              -9.988607345725985,
+              9.8,
+              1.138382057152076
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              -10.73534053479991,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              -9.73534053479991,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-5",
+          "bounds": {
+            "min": [
+              -8.722052397917174,
+              -9.8,
+              0.04999999999999971
+            ],
+            "max": [
+              -5.310942409815195,
+              9.8,
+              1.138382057152076
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-6",
+          "bounds": {
+            "min": [
+              -6.057675598889119,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              -5.0576755988891176,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-7",
+          "bounds": {
+            "min": [
+              -4.04438746200638,
+              -9.8,
+              0.04999999999999971
+            ],
+            "max": [
+              -0.6332774739044014,
+              9.8,
+              1.138382057152076
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-8",
+          "bounds": {
+            "min": [
+              -1.3800106629783255,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              -0.3800106629783241,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-9",
+          "bounds": {
+            "min": [
+              0.6332774739044111,
+              -9.8,
+              0.04999999999999971
+            ],
+            "max": [
+              4.04438746200639,
+              9.8,
+              1.138382057152076
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-10",
+          "bounds": {
+            "min": [
+              3.297654272932464,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              4.297654272932466,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-11",
+          "bounds": {
+            "min": [
+              5.310942409815201,
+              -9.8,
+              0.04999999999999971
+            ],
+            "max": [
+              8.72205239791718,
+              9.8,
+              1.138382057152076
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-12",
+          "bounds": {
+            "min": [
+              7.975319208843254,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              8.975319208843255,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-13",
+          "bounds": {
+            "min": [
+              9.98860734572599,
+              -9.8,
+              0.04999999999999971
+            ],
+            "max": [
+              13.39971733382797,
+              9.8,
+              1.138382057152076
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-14",
+          "bounds": {
+            "min": [
+              12.652984144754043,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              13.652984144754043,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-15",
+          "bounds": {
+            "min": [
+              14.666272281636777,
+              -9.8,
+              0.04999999999999971
+            ],
+            "max": [
+              18.077382269738756,
+              9.8,
+              1.138382057152076
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 105,
+        "positiveVolumePairs": 0,
+        "maximumIntersectionVolumeFt3": 0,
+        "pairs": []
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 4029.645447672962,
+        "savedVolumeFt3": 4029.645447672962,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "L-1",
+              "U-2",
+              "L-3",
+              "U-4",
+              "L-5",
+              "U-6",
+              "L-7",
+              "U-8",
+              "L-9",
+              "U-10",
+              "L-11",
+              "U-12",
+              "L-13",
+              "U-14",
+              "L-15"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 9,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 239165,
+        "legacyFlags": 79
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "studyId": "93f48dcc-f9f1-4cbc-8085-9143ce86f75e",
+      "approvedStudy": 66,
+      "engine": "bfce854",
+      "sourceCount": 15,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -30,
+          -10,
+          0
+        ],
+        "max": [
+          30,
+          10,
+          20
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "L-1",
+          "bounds": {
+            "min": [
+              -26.80924867456733,
+              -0.6466832654294158,
+              9.308199296405272
+            ],
+            "max": [
+              -26.38815259996447,
+              0.6466832654294156,
+              10.691800703594728
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-2",
+          "bounds": {
+            "min": [
+              -23.388152599779986,
+              -0.5551148437403779,
+              9.405679821504203
+            ],
+            "max": [
+              -23.04149507974011,
+              0.6498799815195088,
+              10.691800703512623
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -20.041495079555624,
+              -0.38126417274184954,
+              9.460640129991626
+            ],
+            "max": [
+              -19.72857829791071,
+              0.6969437292234962,
+              10.690000159841224
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              -16.72857829791071,
+              -0.5223579779623262,
+              9.47069551251993
+            ],
+            "max": [
+              -16.42566571356651,
+              0.6840918833950003,
+              10.691800703594728
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-5",
+          "bounds": {
+            "min": [
+              -13.42566571356651,
+              -0.48299188894492007,
+              9.567624380184265
+            ],
+            "max": [
+              -13.130136971427152,
+              0.688400858160224,
+              10.690623926736073
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-6",
+          "bounds": {
+            "min": [
+              -10.130136971427154,
+              -0.5679310252091647,
+              9.454020792186995
+            ],
+            "max": [
+              -9.80376768518145,
+              0.7163015265407809,
+              10.691800703594728
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-7",
+          "bounds": {
+            "min": [
+              -6.803767685181447,
+              -0.5950319472013025,
+              9.559688063030771
+            ],
+            "max": [
+              -6.459129903528017,
+              0.6789919791709903,
+              10.691310926128628
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-8",
+          "bounds": {
+            "min": [
+              -3.459129903528015,
+              -0.7642019294850659,
+              9.308199296405272
+            ],
+            "max": [
+              -3.23389246793596,
+              0.7642019294850659,
+              10.691800703594728
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-9",
+          "bounds": {
+            "min": [
+              -0.23016315039320231,
+              -0.6695760609070542,
+              9.311438311886732
+            ],
+            "max": [
+              0.2665009554324692,
+              0.6695760609070542,
+              10.688561688113268
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-10",
+          "bounds": {
+            "min": [
+              3.277414810069425,
+              -0.7865387622872075,
+              9.315383820117257
+            ],
+            "max": [
+              4.089778091735978,
+              0.7865387622872075,
+              10.684616179882743
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-11",
+          "bounds": {
+            "min": [
+              7.109008146270304,
+              -0.7718582216344018,
+              9.318661161618797
+            ],
+            "max": [
+              8.255162272787581,
+              0.7718582216344018,
+              10.681338838381203
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-12",
+          "bounds": {
+            "min": [
+              11.280568764317588,
+              -1.0178980669123003,
+              9.321560295381907
+            ],
+            "max": [
+              12.881755527312526,
+              1.0178980669123003,
+              10.678439704618093
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-13",
+          "bounds": {
+            "min": [
+              15.906331190729075,
+              -1.1889720386281617,
+              9.321111595800533
+            ],
+            "max": [
+              18.236986352749568,
+              1.1889720386281617,
+              10.678888404199467
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-14",
+          "bounds": {
+            "min": [
+              21.252896373712872,
+              -1.002284283645096,
+              9.658794988585012
+            ],
+            "max": [
+              23.078396996115373,
+              1.002284283645096,
+              10.341205011414988
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-15",
+          "bounds": {
+            "min": [
+              26.08309232775201,
+              -0.38840920934689627,
+              9.940894251572129
+            ],
+            "max": [
+              26.809248674567332,
+              0.38840920934689627,
+              10.059105748427871
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 105,
+        "positiveVolumePairs": 0,
+        "maximumIntersectionVolumeFt3": 0,
+        "pairs": []
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 1710.2780390003277,
+        "savedVolumeFt3": 1710.2780390003277,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "L-1",
+              "U-2",
+              "V-3",
+              "U-4",
+              "V-5",
+              "U-6",
+              "V-7",
+              "U-8",
+              "V-9",
+              "U-10",
+              "V-11",
+              "U-12",
+              "V-13",
+              "U-14",
+              "L-15"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 0,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 95094,
+        "legacyFlags": 1
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "studyId": "e1a9ad93-eee5-4852-8fc3-45f36e740963",
+      "approvedStudy": 65,
+      "engine": "bfce854",
+      "sourceCount": 15,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -19.250534057617188,
+          -23.66533851623535,
+          7.349353790283203
+        ],
+        "max": [
+          19.05859375,
+          24.161619186401367,
+          52.091365814208984
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "U-1",
+          "bounds": {
+            "min": [
+              -16.50053500531684,
+              -20.63274941572092,
+              14.64114373441928
+            ],
+            "max": [
+              -12.091729402188655,
+              -15.762535015637145,
+              15.35885626558072
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-2",
+          "bounds": {
+            "min": [
+              -14.950862742289138,
+              -20.919316991872297,
+              14.565492954107668
+            ],
+            "max": [
+              -8.821126547573266,
+              -14.97639095002948,
+              15.434507045892332
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -10.418282020937381,
+              -18.067228795153145,
+              12.666241838632926
+            ],
+            "max": [
+              -6.772491120789384,
+              -17.50081782461493,
+              16.965765727766932
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              -6.554367026966592,
+              -18.01889087551952,
+              12.320397220299181
+            ],
+            "max": [
+              -1.4929585104348173,
+              -14.870996167494429,
+              17.154183315370442
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-5",
+          "bounds": {
+            "min": [
+              -4.273883957520092,
+              -16.431516014451397,
+              24.144291891656366
+            ],
+            "max": [
+              2.911027593784622,
+              -10.938743421452257,
+              26.316047788311987
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-6",
+          "bounds": {
+            "min": [
+              0.836008666741668,
+              -13.095118484751426,
+              22.60527756747709
+            ],
+            "max": [
+              4.836204826855506,
+              -11.571622221170045,
+              26.63814745363346
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-7",
+          "bounds": {
+            "min": [
+              4.055115174941973,
+              -9.91366284200499,
+              22.24037282161869
+            ],
+            "max": [
+              9.028381098519105,
+              -8.073544709233344,
+              27.1233688851175
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-8",
+          "bounds": {
+            "min": [
+              5.810885176159686,
+              -6.768939824080139,
+              24.615926807648744
+            ],
+            "max": [
+              12.541731592917099,
+              -1.8869204078866986,
+              25.384073192351256
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-9",
+          "bounds": {
+            "min": [
+              9.486290605095087,
+              -2.5653661831176984,
+              33.15414954236632
+            ],
+            "max": [
+              13.09228690423588,
+              -0.6713914991079302,
+              36.00495900779628
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-10",
+          "bounds": {
+            "min": [
+              10.615948545887369,
+              1.570902458449844,
+              32.87629493076453
+            ],
+            "max": [
+              14.818788333879203,
+              2.137313428988062,
+              36.81402757511392
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-11",
+          "bounds": {
+            "min": [
+              10.944399909951365,
+              4.083023789163166,
+              33.274163036285714
+            ],
+            "max": [
+              15.977079062358229,
+              7.7053623673023734,
+              36.89650161442492
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-12",
+          "bounds": {
+            "min": [
+              11.854359024372572,
+              9.488684552834425,
+              33.23622419793518
+            ],
+            "max": [
+              15.748932257980352,
+              10.055095523372643,
+              37.040849557030874
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-13",
+          "bounds": {
+            "min": [
+              10.983076994492084,
+              12.115260256467854,
+              43.15714703150628
+            ],
+            "max": [
+              16.308593164207768,
+              16.078434586426038,
+              47.12032136146446
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-14",
+          "bounds": {
+            "min": [
+              9.234353467958904,
+              12.956449065724794,
+              44.56549295410767
+            ],
+            "max": [
+              15.27594421580492,
+              20.01200663556882,
+              45.43450704589233
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-15",
+          "bounds": {
+            "min": [
+              10.096297495724206,
+              17.717040272042368,
+              44.742011441501425
+            ],
+            "max": [
+              14.185481301616239,
+              21.41559817736021,
+              45.257988558498575
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 105,
+        "positiveVolumePairs": 5,
+        "maximumIntersectionVolumeFt3": 2.1830468202022444,
+        "pairs": [
+          {
+            "a": "U-1",
+            "b": "L-2",
+            "intersectionVolumeFt3": 2.1830468202022444
+          },
+          {
+            "a": "L-2",
+            "b": "V-3",
+            "intersectionVolumeFt3": 0.5223466779809314
+          },
+          {
+            "a": "L-5",
+            "b": "V-6",
+            "intersectionVolumeFt3": 0.020625903342768426
+          },
+          {
+            "a": "U-13",
+            "b": "L-14",
+            "intersectionVolumeFt3": 1.0882182333486852
+          },
+          {
+            "a": "L-14",
+            "b": "V-15",
+            "intersectionVolumeFt3": 1.7514567148180915
+          }
+        ]
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 15442.862043003928,
+        "savedVolumeFt3": 15442.862043003928,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "U-1",
+              "L-2",
+              "V-3",
+              "U-4",
+              "L-5",
+              "V-6",
+              "U-7",
+              "L-8",
+              "V-9",
+              "U-10",
+              "L-11",
+              "V-12",
+              "U-13",
+              "L-14",
+              "V-15"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 15,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 327686,
+        "legacyFlags": 95
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "vertical-void-lobby",
+      "studyId": "0bf17147-9ba3-4eb6-85be-cc9b5d4bd9bb",
+      "approvedStudy": 26,
+      "engine": "bf7fc3c",
+      "sourceCount": 10,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -6.009787559509277,
+          -6.595719337463379,
+          1
+        ],
+        "max": [
+          6.009787559509277,
+          5.560997486114502,
+          39
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "L-1",
+          "bounds": {
+            "min": [
+              -2.6276713953092217,
+              -2.8109973108451656,
+              1.9999999999999978
+            ],
+            "max": [
+              2.6276713953092217,
+              2.8109973108451656,
+              2.8555209088147486
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-2",
+          "bounds": {
+            "min": [
+              -0.30554318171955425,
+              -2.1011404262676514,
+              3.0794208739551765
+            ],
+            "max": [
+              0.30554318171955425,
+              2.4884704810167277,
+              7.403575041631613
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -2.086801347270054,
+              -1.2429245665589306,
+              7.639502074063739
+            ],
+            "max": [
+              1.198429081382105,
+              1.603211105940211,
+              10.485637746562881
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-4",
+          "bounds": {
+            "min": [
+              -0.42776045440737626,
+              -3.8457195227488334,
+              10.361278239613725
+            ],
+            "max": [
+              0.42776045440737626,
+              1.512361622368676,
+              18.05271728511139
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-5",
+          "bounds": {
+            "min": [
+              -0.30554318171955425,
+              -2.0733381944020493,
+              17.90162450358566
+            ],
+            "max": [
+              0.30554318171955425,
+              2.0733381944020493,
+              21.65544078259883
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-6",
+          "bounds": {
+            "min": [
+              -1.879225572742799,
+              -1.5877158993404454,
+              21.504348001073094
+            ],
+            "max": [
+              1.1027491122901145,
+              1.8484336549976432,
+              21.962662773652422
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-7",
+          "bounds": {
+            "min": [
+              -0.42776045440737565,
+              -3.748230778816266,
+              21.81156999212669
+            ],
+            "max": [
+              0.42776045440737565,
+              2.098297584522252,
+              29.17382766524283
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-8",
+          "bounds": {
+            "min": [
+              -0.30554318171955447,
+              -2.126478038004627,
+              29.689502815776564
+            ],
+            "max": [
+              0.30554318171955436,
+              2.7932459700640955,
+              34.60922682384529
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-9",
+          "bounds": {
+            "min": [
+              -1.5435836810002177,
+              -0.9350334084170245,
+              34.47450242966782
+            ],
+            "max": [
+              1.5435836810002177,
+              0.9350334084170245,
+              37.279203485362714
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-10",
+          "bounds": {
+            "min": [
+              -3.2656753035089086,
+              -3.3953063015516065,
+              37.14447909118525
+            ],
+            "max": [
+              3.2656753035089086,
+              2.5412380338913496,
+              38
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 45,
+        "positiveVolumePairs": 4,
+        "maximumIntersectionVolumeFt3": 0.12465961815705046,
+        "pairs": [
+          {
+            "a": "L-4",
+            "b": "U-5",
+            "intersectionVolumeFt3": 0.013430162472701701
+          },
+          {
+            "a": "U-5",
+            "b": "V-6",
+            "intersectionVolumeFt3": 0.12465961815705046
+          },
+          {
+            "a": "V-6",
+            "b": "L-7",
+            "intersectionVolumeFt3": 0.021017982695397314
+          },
+          {
+            "a": "V-9",
+            "b": "L-10",
+            "intersectionVolumeFt3": 0.015760872980127908
+          }
+        ]
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 3277.978972051938,
+        "savedVolumeFt3": 3277.978972051938,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "L-1",
+              "U-2",
+              "V-3",
+              "L-4",
+              "U-5",
+              "V-6",
+              "L-7",
+              "U-8",
+              "V-9",
+              "L-10"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 10,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 146712,
+        "legacyFlags": 7
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bf7fc3c. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "studyId": "65208c7e-225e-4727-9f49-49e5ba11fc28",
+      "approvedStudy": 10,
+      "engine": "bf7fc3c",
+      "sourceCount": 15,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -20,
+          -5.314204216003418,
+          0
+        ],
+        "max": [
+          20,
+          4.462849140167236,
+          20
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "U-1",
+          "bounds": {
+            "min": [
+              -18,
+              -0.35195530293048605,
+              0.9999999999999996
+            ],
+            "max": [
+              -13.675977653338293,
+              0.35195530293048605,
+              5.776558051018155
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-2",
+          "bounds": {
+            "min": [
+              -13.927374297218325,
+              -2.312849165652636,
+              7.837988826669147
+            ],
+            "max": [
+              -13.223463691357352,
+              2.312849165652636,
+              12.162011173330853
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-3",
+          "bounds": {
+            "min": [
+              -13.474860335237386,
+              -0.35195530293048605,
+              7.611720974490922
+            ],
+            "max": [
+              -9.15083798857568,
+              0.35195530293048605,
+              12.388279025509078
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-4",
+          "bounds": {
+            "min": [
+              -9.402234632455711,
+              -2.793610408797476,
+              7.313048158433821
+            ],
+            "max": [
+              -8.698324026594738,
+              2.090895015706436,
+              12.686951841566179
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-5",
+          "bounds": {
+            "min": [
+              -8.94972067047477,
+              -0.35195530293048605,
+              7.611720974490922
+            ],
+            "max": [
+              -4.625698323813063,
+              0.35195530293048605,
+              12.388279025509078
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-6",
+          "bounds": {
+            "min": [
+              -4.877094967693095,
+              -3.0839917192422526,
+              6.971218817803361
+            ],
+            "max": [
+              -4.173184361832124,
+              1.7264498258072314,
+              13.028781182196639
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-7",
+          "bounds": {
+            "min": [
+              -4.424581005712156,
+              -0.35195530293048605,
+              7.611720974490922
+            ],
+            "max": [
+              -0.10055865905044792,
+              0.35195530293048605,
+              12.388279025509078
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-8",
+          "bounds": {
+            "min": [
+              -0.35195530293048033,
+              -3.1642040905579583,
+              6.835795909442043
+            ],
+            "max": [
+              0.3519553029304922,
+              1.2443499333725005,
+              13.164204090557957
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-9",
+          "bounds": {
+            "min": [
+              0.10055865905045991,
+              -0.35195530293048605,
+              7.611720974490922
+            ],
+            "max": [
+              4.4245810057121675,
+              0.35195530293048605,
+              12.388279025509078
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-10",
+          "bounds": {
+            "min": [
+              4.173184361832133,
+              -3.0287811821966386,
+              6.916008280757747
+            ],
+            "max": [
+              4.877094967693106,
+              1.444982300278943,
+              13.083991719242253
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-11",
+          "bounds": {
+            "min": [
+              4.6256983238130704,
+              -0.35195530293048605,
+              7.611720974490922
+            ],
+            "max": [
+              8.949720670474779,
+              0.35195530293048605,
+              12.388279025509078
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-12",
+          "bounds": {
+            "min": [
+              8.698324026594744,
+              -2.68695184156618,
+              7.206389591202524
+            ],
+            "max": [
+              9.402234632455716,
+              1.8671172130614244,
+              12.793610408797477
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-13",
+          "bounds": {
+            "min": [
+              9.150837988575683,
+              -0.35195530293048605,
+              7.611720974490922
+            ],
+            "max": [
+              13.47486033523739,
+              0.35195530293048605,
+              12.388279025509078
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-14",
+          "bounds": {
+            "min": [
+              13.223463691357356,
+              -2.1620111733308542,
+              7.687150834347364
+            ],
+            "max": [
+              13.927374297218329,
+              2.162011173330854,
+              12.312849165652636
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-15",
+          "bounds": {
+            "min": [
+              13.675977653338293,
+              -0.35195530293048605,
+              14.223441948981844
+            ],
+            "max": [
+              18,
+              0.35195530293048605,
+              19
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 105,
+        "positiveVolumePairs": 12,
+        "maximumIntersectionVolumeFt3": 0.2726297794320847,
+        "pairs": [
+          {
+            "a": "L-2",
+            "b": "U-3",
+            "intersectionVolumeFt3": 0.09587512152022779
+          },
+          {
+            "a": "U-3",
+            "b": "L-4",
+            "intersectionVolumeFt3": 0.09558864722736773
+          },
+          {
+            "a": "L-4",
+            "b": "U-5",
+            "intersectionVolumeFt3": 0.09558831292290029
+          },
+          {
+            "a": "U-5",
+            "b": "L-6",
+            "intersectionVolumeFt3": 0.19640103823241395
+          },
+          {
+            "a": "L-6",
+            "b": "U-7",
+            "intersectionVolumeFt3": 0.1964011146279403
+          },
+          {
+            "a": "U-7",
+            "b": "L-8",
+            "intersectionVolumeFt3": 0.2649679663036106
+          },
+          {
+            "a": "L-8",
+            "b": "U-9",
+            "intersectionVolumeFt3": 0.26496796609682527
+          },
+          {
+            "a": "U-9",
+            "b": "L-10",
+            "intersectionVolumeFt3": 0.2726297794320847
+          },
+          {
+            "a": "L-10",
+            "b": "U-11",
+            "intersectionVolumeFt3": 0.2726297442993572
+          },
+          {
+            "a": "U-11",
+            "b": "L-12",
+            "intersectionVolumeFt3": 0.26040159283126857
+          },
+          {
+            "a": "L-12",
+            "b": "U-13",
+            "intersectionVolumeFt3": 0.2604026143126031
+          },
+          {
+            "a": "U-13",
+            "b": "L-14",
+            "intersectionVolumeFt3": 0.2525604774115171
+          }
+        ]
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 2395.3970585847933,
+        "savedVolumeFt3": 2395.3970585847933,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "U-1",
+              "L-2",
+              "U-3",
+              "L-4",
+              "U-5",
+              "L-6",
+              "U-7",
+              "L-8",
+              "U-9",
+              "L-10",
+              "U-11",
+              "L-12",
+              "U-13",
+              "L-14",
+              "U-15"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 15,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 249274,
+        "legacyFlags": 40
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bf7fc3c. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "vertical-void-lobby",
+      "studyId": "6d00a5db-5ffa-4b42-bdbc-e0fb9a432a2b",
+      "approvedStudy": null,
+      "engine": "bf7fc3c",
+      "sourceCount": 6,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -13.058343887329102,
+          -13.058343887329102,
+          6.817781448364258
+        ],
+        "max": [
+          13.058343887329102,
+          10.28480052947998,
+          53.18221664428711
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "L-1",
+          "bounds": {
+            "min": [
+              -7.043400117158889,
+              -7.534800136685371,
+              12.407062983789562
+            ],
+            "max": [
+              7.043400117158889,
+              7.534800136685371,
+              14.700262993552801
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-2",
+          "bounds": {
+            "min": [
+              -0.8190000034868729,
+              -5.632048493947739,
+              15.30042062495114
+            ],
+            "max": [
+              0.8190000034868727,
+              6.670275936644303,
+              26.89119564560063
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -5.593612991368566,
+              -3.331624743241772,
+              27.523591496482066
+            ],
+            "max": [
+              3.2123558323471446,
+              4.297362794894252,
+              35.15257903461809
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-4",
+          "bounds": {
+            "min": [
+              -10.308344256988725,
+              -10.308344256988725,
+              34.81923683384705
+            ],
+            "max": [
+              10.308344256988725,
+              4.053843280097283,
+              37.11243684361029
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-5",
+          "bounds": {
+            "min": [
+              -0.8190000034868729,
+              -5.557525384426118,
+              36.70743684361029
+            ],
+            "max": [
+              0.8190000034868729,
+              5.557525384426118,
+              46.769437010980134
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-6",
+          "bounds": {
+            "min": [
+              -5.037211899042269,
+              -4.2558283244216435,
+              46.36443701098013
+            ],
+            "max": [
+              2.955888335416092,
+              4.954675019643673,
+              47.592937016210435
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 15,
+        "positiveVolumePairs": 2,
+        "maximumIntersectionVolumeFt3": 2.4008222341634533,
+        "pairs": [
+          {
+            "a": "L-4",
+            "b": "U-5",
+            "intersectionVolumeFt3": 0.08971509005457283
+          },
+          {
+            "a": "U-5",
+            "b": "V-6",
+            "intersectionVolumeFt3": 2.4008222341634533
+          }
+        ]
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 9552.612172613266,
+        "savedVolumeFt3": 9552.612172613266,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "L-1",
+              "U-2",
+              "V-3",
+              "L-4",
+              "U-5",
+              "V-6"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 5,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 94667,
+        "legacyFlags": 37
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bf7fc3c. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "vertical-void-lobby",
+      "studyId": "9651281f-c4a9-4adf-b8f8-239faebe3653",
+      "approvedStudy": null,
+      "engine": "bf7fc3c",
+      "sourceCount": 7,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -13.058343887329102,
+          -13.058343887329102,
+          4.879643440246582
+        ],
+        "max": [
+          13.058343887329102,
+          10.28480052947998,
+          55.120357513427734
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "L-1",
+          "bounds": {
+            "min": [
+              -7.043400117158889,
+              -7.534800136685371,
+              7.466087176732014
+            ],
+            "max": [
+              7.043400117158889,
+              7.534800136685371,
+              9.759287186495254
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-2",
+          "bounds": {
+            "min": [
+              -0.8190000034868729,
+              -5.632048493947739,
+              10.359444817893593
+            ],
+            "max": [
+              0.8190000034868727,
+              6.670275936644303,
+              21.95021983854308
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -5.593612991368566,
+              -3.331624743241772,
+              22.582615689424518
+            ],
+            "max": [
+              3.2123558323471446,
+              4.297362794894252,
+              30.21160322756054
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-4",
+          "bounds": {
+            "min": [
+              -10.308344256988725,
+              -10.308344256988725,
+              29.8782610267895
+            ],
+            "max": [
+              10.308344256988725,
+              4.053843280097283,
+              32.17146103655274
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-5",
+          "bounds": {
+            "min": [
+              -0.8190000034868729,
+              -5.557525384426118,
+              31.766461036552734
+            ],
+            "max": [
+              0.8190000034868729,
+              5.557525384426118,
+              41.82846120392258
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-6",
+          "bounds": {
+            "min": [
+              -5.037211899042269,
+              -2.6093911501245817,
+              42.08568157150326
+            ],
+            "max": [
+              2.955888335416092,
+              2.961417406552054,
+              50.58871143733715
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-7",
+          "bounds": {
+            "min": [
+              -9.867163498820574,
+              -10.047028389387437,
+              50.24071281350474
+            ],
+            "max": [
+              9.867163498820574,
+              5.624428335689613,
+              52.53391282326798
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 21,
+        "positiveVolumePairs": 1,
+        "maximumIntersectionVolumeFt3": 0.08971348650195307,
+        "pairs": [
+          {
+            "a": "L-4",
+            "b": "U-5",
+            "intersectionVolumeFt3": 0.08971348650195307
+          }
+        ]
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 13094.478236054587,
+        "savedVolumeFt3": 13094.478236054587,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "L-1",
+              "U-2",
+              "V-3",
+              "L-4",
+              "U-5",
+              "V-6",
+              "L-7"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 7,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 99803,
+        "legacyFlags": 39
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bf7fc3c. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "studyId": "3456896d-7e8c-4468-b818-d9401ff8bb69",
+      "approvedStudy": null,
+      "engine": "bfce854",
+      "sourceCount": 6,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -20,
+          -10,
+          0
+        ],
+        "max": [
+          20,
+          10,
+          20
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "L-1",
+          "bounds": {
+            "min": [
+              -9.346046507502793,
+              -1.4514992996887326,
+              8.44723330497019
+            ],
+            "max": [
+              -8.400884184519446,
+              1.451499299688732,
+              11.55276669502981
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-2",
+          "bounds": {
+            "min": [
+              -6.4008841845194455,
+              -1.172425597098186,
+              8.807206688554194
+            ],
+            "max": [
+              -5.718384181613719,
+              1.528499172210336,
+              11.55276669502981
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -3.7183841816137195,
+              -1.2779055425456314,
+              9.193252027664176
+            ],
+            "max": [
+              -2.982206694554654,
+              1.5288593769406302,
+              11.551313814391973
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              -0.9766348363391247,
+              -0.8564704937718675,
+              9.22918850032225
+            ],
+            "max": [
+              -0.26852236663664375,
+              0.8564704937718675,
+              10.77081149967775
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-5",
+          "bounds": {
+            "min": [
+              1.7643936543794325,
+              -2.139950433534257,
+              8.478716657429533
+            ],
+            "max": [
+              5.641702316807272,
+              2.139950433534257,
+              11.521283342570467
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-6",
+          "bounds": {
+            "min": [
+              7.66904647960782,
+              -0.8970000162720682,
+              9.863499999418854
+            ],
+            "max": [
+              9.346046507502793,
+              0.8970000162720682,
+              10.136500000581146
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 15,
+        "positiveVolumePairs": 0,
+        "maximumIntersectionVolumeFt3": 0,
+        "pairs": []
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 1303.8448441033504,
+        "savedVolumeFt3": 1303.8448441033504,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "L-1",
+              "U-2",
+              "V-3",
+              "U-4",
+              "V-5",
+              "L-6"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 0,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 40150,
+        "legacyFlags": 1
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "studyId": "0cabc668-bb29-49c1-bae1-8e6c181aa160",
+      "approvedStudy": null,
+      "engine": "bfce854",
+      "sourceCount": 7,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -20,
+          -10,
+          0
+        ],
+        "max": [
+          20,
+          10,
+          20
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "L-1",
+          "bounds": {
+            "min": [
+              -10.376797622323355,
+              -1.4271906812649346,
+              8.47323787355576
+            ],
+            "max": [
+              -9.447464166954948,
+              1.427190681264934,
+              11.52676212644424
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-2",
+          "bounds": {
+            "min": [
+              -7.447464166954948,
+              -1.1563143637752602,
+              8.809286186970503
+            ],
+            "max": [
+              -6.764964164049221,
+              1.486611785651216,
+              11.52676212644424
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -4.764964164049222,
+              -1.1407200317684574,
+              9.124423947904422
+            ],
+            "max": [
+              -4.095271738479407,
+              1.5129784864003257,
+              11.524623620651177
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              -2.0952717384794064,
+              -1.6865472336624312,
+              8.47323787355576
+            ],
+            "max": [
+              -1.5981864011380487,
+              1.6865472336624312,
+              11.52676212644424
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-5",
+          "bounds": {
+            "min": [
+              0.4216388205132948,
+              -1.5841250999627228,
+              8.490456627152327
+            ],
+            "max": [
+              2.423296438826426,
+              1.5841250999627228,
+              11.509543372847673
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-6",
+          "bounds": {
+            "min": [
+              4.45697000697883,
+              -1.315598711056756,
+              9.250467309073489
+            ],
+            "max": [
+              6.68594924792732,
+              1.315598711056756,
+              10.749532690926511
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-7",
+          "bounds": {
+            "min": [
+              8.69979759442838,
+              -0.8970000162720682,
+              9.863499999418854
+            ],
+            "max": [
+              10.376797622323354,
+              0.8970000162720682,
+              10.136500000581146
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 21,
+        "positiveVolumePairs": 0,
+        "maximumIntersectionVolumeFt3": 0,
+        "pairs": []
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 1247.0801703033587,
+        "savedVolumeFt3": 1247.0801703033587,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "L-1",
+              "U-2",
+              "V-3",
+              "U-4",
+              "V-5",
+              "U-6",
+              "L-7"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 0,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 37251,
+        "legacyFlags": 1
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "studyId": "e9f3658d-b522-42ae-9f96-c6c4eac96a27",
+      "approvedStudy": null,
+      "engine": "bf7fc3c",
+      "sourceCount": 6,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -15.42650032043457,
+          -10,
+          1.6368969678878784
+        ],
+        "max": [
+          15.42650032043457,
+          10,
+          18.36310386657715
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "U-1",
+          "bounds": {
+            "min": [
+              -12.676500195264824,
+              -5.557525384426118,
+              3.6617499023675886
+            ],
+            "max": [
+              -2.61450002789498,
+              5.557525384426118,
+              5.299749909341332
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-2",
+          "bounds": {
+            "min": [
+              -3.019500027894981,
+              -5.3820000976324085,
+              4.968999916315078
+            ],
+            "max": [
+              -1.381500020921235,
+              5.3820000976324085,
+              15.031000083684923
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -1.7865000209212358,
+              -5.674437765895523,
+              6.058815552778546
+            ],
+            "max": [
+              -0.14850001394749013,
+              6.6062333595248965,
+              16.716282532056358
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              -0.5535000139474897,
+              -5.715426302541585,
+              4.449691053878751
+            ],
+            "max": [
+              1.0844999930262538,
+              7.328458206932357,
+              17.13573657112584
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-5",
+          "bounds": {
+            "min": [
+              0.6794999930262542,
+              -7.363103040706234,
+              2.636896959293768
+            ],
+            "max": [
+              2.317500000000001,
+              2.895602342926632,
+              17.363103040706232
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-6",
+          "bounds": {
+            "min": [
+              1.9125000000000032,
+              -5.51671085357666,
+              14.700250090658669
+            ],
+            "max": [
+              12.67650019526482,
+              5.516710853576662,
+              16.33825009763241
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 15,
+        "positiveVolumePairs": 5,
+        "maximumIntersectionVolumeFt3": 19.305009479935812,
+        "pairs": [
+          {
+            "a": "U-1",
+            "b": "L-2",
+            "intersectionVolumeFt3": 0.04237873897470107
+          },
+          {
+            "a": "L-2",
+            "b": "V-3",
+            "intersectionVolumeFt3": 13.76671734429872
+          },
+          {
+            "a": "V-3",
+            "b": "U-4",
+            "intersectionVolumeFt3": 19.03780062185791
+          },
+          {
+            "a": "U-4",
+            "b": "L-5",
+            "intersectionVolumeFt3": 19.305009479935812
+          },
+          {
+            "a": "L-5",
+            "b": "V-6",
+            "intersectionVolumeFt3": 0.4295984180868486
+          }
+        ]
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 3277.77906799262,
+        "savedVolumeFt3": 3277.77906799262,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "U-1",
+              "L-2",
+              "V-3",
+              "U-4",
+              "L-5",
+              "V-6"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 6,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 70588,
+        "legacyFlags": 20
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bf7fc3c. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "studyId": "d61f793e-3482-4cde-9dcc-5d4257975edc",
+      "approvedStudy": null,
+      "engine": "bf7fc3c",
+      "sourceCount": 7,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -16.217927932739258,
+          -10,
+          1.6368969678878784
+        ],
+        "max": [
+          16.217927932739258,
+          10,
+          18.40118408203125
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "U-1",
+          "bounds": {
+            "min": [
+              -13.468525485545403,
+              -5.557525384426118,
+              3.2657372572272982
+            ],
+            "max": [
+              -3.40652531817556,
+              5.557525384426118,
+              4.903737264201042
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-2",
+          "bounds": {
+            "min": [
+              -3.8115253181755615,
+              -5.3820000976324085,
+              4.968999916315078
+            ],
+            "max": [
+              -2.1735253112018156,
+              5.3820000976324085,
+              15.031000083684923
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -2.5785253112018167,
+              -5.674437765895523,
+              6.058815552778546
+            ],
+            "max": [
+              -0.9405253042280709,
+              6.6062333595248965,
+              16.716282532056358
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              -1.3455253042280706,
+              -5.715426302541585,
+              4.449691053878751
+            ],
+            "max": [
+              0.2924747027456729,
+              7.328458206932357,
+              17.13573657112584
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-5",
+          "bounds": {
+            "min": [
+              -0.11252529725432658,
+              -7.363103040706234,
+              2.636896959293768
+            ],
+            "max": [
+              1.5254747097194201,
+              2.895602342926632,
+              17.363103040706232
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-6",
+          "bounds": {
+            "min": [
+              1.1204747097194212,
+              -4.283141109796195,
+              4.419828122135352
+            ],
+            "max": [
+              2.758474716693167,
+              7.458150655158089,
+              17.401185011660257
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-7",
+          "bounds": {
+            "min": [
+              2.353474716693168,
+              -5.031000083684922,
+              15.096262735798957
+            ],
+            "max": [
+              13.468525485545404,
+              5.031000083684923,
+              16.7342627427727
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 21,
+        "positiveVolumePairs": 5,
+        "maximumIntersectionVolumeFt3": 19.30501160719745,
+        "pairs": [
+          {
+            "a": "L-2",
+            "b": "V-3",
+            "intersectionVolumeFt3": 13.766717126449297
+          },
+          {
+            "a": "V-3",
+            "b": "U-4",
+            "intersectionVolumeFt3": 19.037800013247285
+          },
+          {
+            "a": "U-4",
+            "b": "L-5",
+            "intersectionVolumeFt3": 19.30501160719745
+          },
+          {
+            "a": "L-5",
+            "b": "V-6",
+            "intersectionVolumeFt3": 13.766717697601452
+          },
+          {
+            "a": "V-6",
+            "b": "U-7",
+            "intersectionVolumeFt3": 0.5497569568804292
+          }
+        ]
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 3864.1839924558785,
+        "savedVolumeFt3": 3864.1839924558785,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "U-1",
+              "L-2",
+              "V-3",
+              "U-4",
+              "L-5",
+              "V-6",
+              "U-7"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 7,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 108281,
+        "legacyFlags": 36
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bf7fc3c. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "studyId": "facc6256-6867-47ac-9876-3efa6ad4259c",
+      "approvedStudy": null,
+      "engine": "bfce854",
+      "sourceCount": 6,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -17.437973022460938,
+          -17.94508171081543,
+          1.5
+        ],
+        "max": [
+          16.787965774536133,
+          20,
+          38.5
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "U-1",
+          "bounds": {
+            "min": [
+              -14.68797362629171,
+              -15.19755764394774,
+              1.9999999999999998
+            ],
+            "max": [
+              -6.004799949584942,
+              -5.605636092967952,
+              3.4135398833647344
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-2",
+          "bounds": {
+            "min": [
+              -12.689289253759865,
+              -14.992039503905687,
+              6.597788146838387
+            ],
+            "max": [
+              1.4900814604855288,
+              -3.1260361821119087,
+              8.30931751912866
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -3.588249302491993,
+              -8.478087476011746,
+              8.318851957693468
+            ],
+            "max": [
+              5.2007781822467,
+              -7.362537081572549,
+              16.93710466753002
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              2.1902682250469123,
+              -5.6379461514996985,
+              22.9880845029987
+            ],
+            "max": [
+              12.213819919125042,
+              3.868063858937632,
+              24.302294556721588
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-5",
+          "bounds": {
+            "min": [
+              3.1163580225107186,
+              0.8066711601955188,
+              28.52440850220016
+            ],
+            "max": [
+              14.037965049996327,
+              11.74767068497034,
+              32.85195722882733
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-6",
+          "bounds": {
+            "min": [
+              4.729027908094645,
+              10.386331595251498,
+              36.98377943520265
+            ],
+            "max": [
+              12.782704204764178,
+              17.670667430436616,
+              38
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 15,
+        "positiveVolumePairs": 0,
+        "maximumIntersectionVolumeFt3": 0,
+        "pairs": []
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 10515.84461134749,
+        "savedVolumeFt3": 10515.84461134749,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "U-1",
+              "L-2",
+              "V-3",
+              "U-4",
+              "L-5",
+              "V-6"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 6,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 120441,
+        "legacyFlags": 47
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "studyId": "cf04bf68-069e-4ec1-b33d-19398dff5437",
+      "approvedStudy": null,
+      "engine": "bfce854",
+      "sourceCount": 7,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -15.645805358886719,
+          -17.905698776245117,
+          1.478953242301941
+        ],
+        "max": [
+          15.645805358886719,
+          19.685991287231445,
+          38.52104568481445
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "U-1",
+          "bounds": {
+            "min": [
+              -12.895805219074125,
+              -15.13743813131955,
+              1.9999999999999964
+            ],
+            "max": [
+              -6.049313543670861,
+              -7.574418722175234,
+              3.114545142666959
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-2",
+          "bounds": {
+            "min": [
+              -11.141305669151242,
+              -15.159950726947361,
+              5.62525494071836
+            ],
+            "max": [
+              -0.31834504694615084,
+              -5.771613612649973,
+              6.974758248596196
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-3",
+          "bounds": {
+            "min": [
+              -3.839955787902477,
+              -10.156462082580736,
+              6.983364772768879
+            ],
+            "max": [
+              2.8938219112017736,
+              -9.276875105124647,
+              13.941380446954943
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              1.5062185077982155,
+              -8.904343140111422,
+              18.861347058802092
+            ],
+            "max": [
+              9.75799445823029,
+              -0.8789420236515229,
+              19.897572813065434
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-5",
+          "bounds": {
+            "min": [
+              3.3132523724163914,
+              -2.8201935082685545,
+              23.832230310270816
+            ],
+            "max": [
+              12.895805219074125,
+              5.331513351843854,
+              27.114331143808567
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "V-6",
+          "bounds": {
+            "min": [
+              6.208094796973346,
+              4.436737349069277,
+              28.037836271706364
+            ],
+            "max": [
+              12.008272261359709,
+              6.5528029847893565,
+              33.34975023130935
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-7",
+          "bounds": {
+            "min": [
+              4.352680567326622,
+              9.521413139001066,
+              37.042093634140286
+            ],
+            "max": [
+              11.980775777319062,
+              16.94024324084481,
+              38
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 21,
+        "positiveVolumePairs": 0,
+        "maximumIntersectionVolumeFt3": 0,
+        "pairs": []
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 9800.810652506074,
+        "savedVolumeFt3": 9800.810652506074,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "U-1",
+              "L-2",
+              "V-3",
+              "U-4",
+              "L-5",
+              "V-6",
+              "U-7"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 7,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 147864,
+        "legacyFlags": 56
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "studyId": "6077b888-7323-42c2-97af-534a19690861",
+      "approvedStudy": null,
+      "engine": "bfce854",
+      "sourceCount": 6,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -19.901142120361328,
+          -10,
+          0
+        ],
+        "max": [
+          19.89885711669922,
+          10,
+          18
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "L-1",
+          "bounds": {
+            "min": [
+              -18.305759425904984,
+              -9.800000000000002,
+              0.05000000000000049
+            ],
+            "max": [
+              -8.618403099724901,
+              9.800000000000002,
+              3.1409424918660385
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-2",
+          "bounds": {
+            "min": [
+              -9.83489016739941,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              -8.83489016739941,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-3",
+          "bounds": {
+            "min": [
+              -5.0720546615784,
+              -9.800000000000002,
+              0.05000000000000049
+            ],
+            "max": [
+              4.615301664601685,
+              9.800000000000002,
+              3.1409424918660385
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              3.398814596927174,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              4.398814596927176,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-5",
+          "bounds": {
+            "min": [
+              8.16165010274818,
+              -9.800000000000002,
+              0.05000000000000049
+            ],
+            "max": [
+              17.849006428928266,
+              9.800000000000002,
+              3.1409424918660385
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-6",
+          "bounds": {
+            "min": [
+              16.632519361253763,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              17.632519361253763,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 15,
+        "positiveVolumePairs": 3,
+        "maximumIntersectionVolumeFt3": 0.333796100859887,
+        "pairs": [
+          {
+            "a": "L-1",
+            "b": "U-2",
+            "intersectionVolumeFt3": 0.3337958813224025
+          },
+          {
+            "a": "L-3",
+            "b": "U-4",
+            "intersectionVolumeFt3": 0.3337959362067738
+          },
+          {
+            "a": "L-5",
+            "b": "U-6",
+            "intersectionVolumeFt3": 0.333796100859887
+          }
+        ]
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 3238.95553356655,
+        "savedVolumeFt3": 3238.95553356655,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "L-1",
+              "U-2",
+              "L-3",
+              "U-4",
+              "L-5",
+              "U-6"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 4,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 88808,
+        "legacyFlags": 13
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "studyId": "50a5ce70-2b88-47ff-a205-a1d6f10e12c6",
+      "approvedStudy": null,
+      "engine": "bfce854",
+      "sourceCount": 7,
+      "componentCount": 1,
+      "architectureBounds": {
+        "min": [
+          -19.899999618530273,
+          -10,
+          0
+        ],
+        "max": [
+          19.899999618530273,
+          10,
+          18
+        ]
+      },
+      "architectureMaximumFieldExcessFt": 0,
+      "letterBounds": [
+        {
+          "source": "L-1",
+          "bounds": {
+            "min": [
+              -18.077382975400106,
+              -9.800000000000002,
+              0.05000000000000049
+            ],
+            "max": [
+              -10.945586907889739,
+              9.800000000000002,
+              2.3255404845403547
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-2",
+          "bounds": {
+            "min": [
+              -11.994356959269677,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              -10.994356959269677,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-3",
+          "bounds": {
+            "min": [
+              -8.403059680970156,
+              -9.800000000000002,
+              0.05000000000000049
+            ],
+            "max": [
+              -1.2712636134597899,
+              9.800000000000002,
+              2.3255404845403547
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-4",
+          "bounds": {
+            "min": [
+              -2.320033664839728,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              -1.3200336648397264,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-5",
+          "bounds": {
+            "min": [
+              1.2712636134597899,
+              -9.800000000000002,
+              0.05000000000000049
+            ],
+            "max": [
+              8.403059680970156,
+              9.800000000000002,
+              2.3255404845403547
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "U-6",
+          "bounds": {
+            "min": [
+              7.354289629590219,
+              -6.368422174382569,
+              2.999999883563019
+            ],
+            "max": [
+              8.35428962959022,
+              6.368422174382568,
+              17.000000116436983
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        },
+        {
+          "source": "L-7",
+          "bounds": {
+            "min": [
+              10.945586907889739,
+              -9.800000000000002,
+              0.05000000000000049
+            ],
+            "max": [
+              18.077382975400106,
+              9.800000000000002,
+              2.3255404845403547
+            ]
+          },
+          "maximumFieldExcessFt": 0
+        }
+      ],
+      "sourceCollisions": {
+        "pairsTested": 21,
+        "positiveVolumePairs": 0,
+        "maximumIntersectionVolumeFt3": 0,
+        "pairs": []
+      },
+      "junctions": {
+        "solidStatus": "NoError",
+        "connectedSolidCount": 1,
+        "meshVolumeFt3": 2576.053004618408,
+        "savedVolumeFt3": 2576.053004618408,
+        "sourceAssociations": [
+          {
+            "component": "lobby-envelope",
+            "sources": [
+              "L-1",
+              "U-2",
+              "L-3",
+              "U-4",
+              "L-5",
+              "U-6",
+              "L-7"
+            ]
+          }
+        ],
+        "wallRecords": 0,
+        "voidRecords": 5,
+        "addedAdapterBridges": 0
+      },
+      "strictNative": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 105016,
+        "legacyFlags": 19
+      },
+      "warnings": [
+        "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review.",
+        "Versioned Lobby engine bfce854. New derivative; approved references remain immutable."
+      ]
+    }
+  ]
+}

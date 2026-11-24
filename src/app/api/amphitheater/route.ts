@@ -9,10 +9,6 @@ import { promisify } from 'node:util';
 import type { AmphitheaterRequest,AmphitheaterResult } from '@/components/amphitheaterInteractiveTypes';
 import { arrangeOfficeLetters } from '@/components/officeWorkspaceRules';
 import {
-  ARCHITECTURAL_GENERATION_RULESET_ID,
-  ARCHITECTURAL_GENERATION_RULESET_VERSION,
-  LETTER_ARRANGEMENT_RULESET_ID,
-  LETTER_ARRANGEMENT_RULESET_VERSION,
   workspaceDualReports,
 } from '@/components/workspaceDualRulesets';
 import { WORKSPACE_TYPOLOGIES, workspaceTypologyName } from '@/components/workspaceDualRulesets';
@@ -111,12 +107,12 @@ export async function POST(req:NextRequest){
    ...r,
    typologyName:workspaceTypologyName(r.workspaceTypology!),
    envelopeVersion:'workspace-ten-rule',
-   letterArrangementRulesetId:LETTER_ARRANGEMENT_RULESET_ID,
-   letterArrangementRulesetVersion:LETTER_ARRANGEMENT_RULESET_VERSION,
-   architecturalGenerationRulesetId:ARCHITECTURAL_GENERATION_RULESET_ID,
-   architecturalGenerationRulesetVersion:ARCHITECTURAL_GENERATION_RULESET_VERSION,
-   rulesetId:`${LETTER_ARRANGEMENT_RULESET_ID}+${ARCHITECTURAL_GENERATION_RULESET_ID}`,
-   rulesetVersion:`${LETTER_ARRANGEMENT_RULESET_VERSION}/${ARCHITECTURAL_GENERATION_RULESET_VERSION}`,
+   letterArrangementRulesetId:dual.letterArrangement.rulesetId,
+   letterArrangementRulesetVersion:dual.letterArrangement.rulesetVersion,
+   architecturalGenerationRulesetId:dual.architecturalGeneration.rulesetId,
+   architecturalGenerationRulesetVersion:dual.architecturalGeneration.rulesetVersion,
+   rulesetId:`${dual.letterArrangement.rulesetId}+${dual.architecturalGeneration.rulesetId}`,
+   rulesetVersion:`${dual.letterArrangement.rulesetVersion}/${dual.architecturalGeneration.rulesetVersion}`,
    workspacePlan:arranged.officePlan,
    letterArrangementReport:dual.letterArrangement,
    architecturalGenerationReport:dual.architecturalGeneration,
