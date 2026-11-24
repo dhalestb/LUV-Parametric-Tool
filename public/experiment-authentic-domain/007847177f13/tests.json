@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "replaySourceHash": "970d39010ed5977131170acacb9067fef5969c00025c35962e93d42b453a5d62",
+  "replayArchitectureHash": "007847177f13b5a617e70c2de9fdbfa3f78bd28661cd572a72d4d88869936bdf",
+  "nativeExportValidationPassed": true,
+  "nativeRulesUnchanged": [
+    {
+      "name": "source-derived walls, recesses and partial returns",
+      "sha256": "bdf6c4a2d4164b927ac3f56d6ad1f2819d6acd5986406a804a369b2b9d9330f6",
+      "unchanged": true
+    },
+    {
+      "name": "original contour floors and roofs",
+      "sha256": "3fa508fe17c372ec6e928b114e22276c95a5a2c1ee14bddfb9aab2b64bc8a525",
+      "unchanged": true
+    },
+    {
+      "name": "original rotation and terrace-threshold formation",
+      "sha256": "f305a7868c136667bee9d02cc57c1ee42794f236ee2c59f005cb1652522811ae",
+      "unchanged": true
+    },
+    {
+      "name": "native seeded running-bond search",
+      "sha256": "3d1289eebfdd93dd91b67c475fc3ecb081c80ab22f9441a5fad42b62ae1a8f9e",
+      "unchanged": true
+    }
+  ],
+  "sourceSizesFeet": [
+    4,
+    5,
+    6
+  ],
+  "sourceAffineDeformation": false,
+  "partialReturnCount": 33,
+  "negativeTests": [
+    "missing height",
+    "legacy 48-ft height",
+    "hole",
+    "exclusion",
+    "stale height source",
+    "allocation without territory"
+  ],
+  "sourceBindings": [
+    {
+      "file": "scripts/linear-gallery-automatic.cjs",
+      "sha256": "44f03e0ac0425b8c4728165e8c4d63853b0e6849d5a3509192f48423cc63406e"
+    },
+    {
+      "file": "src/components/linearGalleryPerimeter.ts",
+      "sha256": "20f5be90b7e5179d4984259f64ea41db9addc79b203c8207d098ddd9eaf5a124"
+    },
+    {
+      "file": "scripts/source-envelope.cjs",
+      "sha256": "78c1df5575eb8d6d0ebc287aa18598d791c0b558cb8b9780538da67cafa0c695"
+    },
+    {
+      "file": "scripts/source-linear-gallery.cjs",
+      "sha256": "b366a94c970ddd797e055ecb43b55f538eed19444cfcebfa11199872b335faf5"
+    },
+    {
+      "file": "scripts/linear-gallery-current-edges.cjs",
+      "sha256": "60f51476e0c5e33744f96cafdc440e2ed91d74acc63983e067323b8cd3a39954"
+    },
+    {
+      "file": "scripts/linear-gallery-print.cjs",
+      "sha256": "0ca95098fe2fd7d6e55d934d6228eda91f293430803f0bfe4109fac8cd15c379"
+    },
+    {
+      "file": "src/components/letterGeometry3d.ts",
+      "sha256": "ade11f4e8cd6123ed9c63a0e17629f09988c2685fd13dd9b5b9d86115a0f5b47"
+    }
+  ],
+  "replayPath": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Site-Polygon-Morphogenesis\\reports\\authentic-polygon-adapter\\tests\\replay-1795284738414",
+  "adapterHash": "107cc042c8f46ae461588fe619674f1fb48f9c611006a8a0df317e521101da9b"
+}

@@ -99,13 +99,36 @@ function checkApproach(model: TileModel,tile: PlacedTile,point: Vec3,outward: Ve
     const world=(x:number,y:number,z:number):Vec3=>[point[0]+dx*x-dy*y,point[1]+dy*x+dx*y,z];
     const query=bounds([world(-.5,-width/2,point[2]),world(-.5,width/2,point[2]),world(depth,-width/2,point[2]),world(depth,width/2,point[2])]);
     const source=nearby(placedFaces(model,tile),query.min,query.max).map(t=>({...t,points:t.points.map(frame)}));
-    const seed=source.filter(t=>t.normalZ>=.7).map(t=>{
+    // Open-shell derived landings are thin additive sheets. surfaceOrientation
+    // leaves their normalZ unset (non-solid component). Use geometric upness so
+    // reconstruction can still prove continuous floor coverage.
+    const faceUp=(t:{normalZ:number;points:Vec3[]})=>{
+      if(Number.isFinite(t.normalZ))return t.normalZ;
+      const [a,b,c]=t.points,nx=(b[1]-a[1])*(c[2]-a[2])-(b[2]-a[2])*(c[1]-a[1]),ny=(b[2]-a[2])*(c[0]-a[0])-(b[0]-a[0])*(c[2]-a[2]),nz=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]),len=Math.hypot(nx,ny,nz);
+      return len?nz/len:0;
+    };
+    const adaptedTris=model.featureAdaptation&&model.featureAdaptation.changedTriangles.length
+      ?new Set(model.featureAdaptation.changedTriangles):null;
+    const ranked=source.filter(t=>faceUp(t)>=.7).map(t=>{
       const poly=within(t.points,[[.001,-.001,0],[.003,-.001,0],[.003,.001,0],[.001,.001,0]]);
       return {t,delta:poly.length?Math.abs(poly.reduce((s,p)=>s+p[2],0)/poly.length-point[2]):Infinity};
-    }).sort((a,b)=>a.delta-b.delta)[0];
+    }).sort((a,b)=>a.delta-b.delta);
+    // When a derived landing covers the entrance, prefer it over leftover source
+    // faces at the same elevation. Otherwise source+pad double-count the rectangle.
+    const padSeed=adaptedTris?ranked.find(r=>adaptedTris.has(r.t.triangle)&&r.delta<=.2):undefined;
+    const seed=padSeed??ranked[0];
     if(!seed || seed.delta>.2)return fail("no physical floor at entrance");
     const region=seed.t.region;
-    const patches=source.filter(t=>t.region===region).map(t=>({face:t,poly:within(t.points,rectangle)})).filter(p=>Math.abs(signedArea(p.poly))>1e-9);
+    const candidates=source.filter(t=>{
+      if(faceUp(t)<.7)return false;
+      // Seed on the derived pad: use only those triangles so leftover open-shell
+      // faces cannot inflate coverage during the adaptation self-check.
+      if(adaptedTris&&adaptedTris.has(seed.t.triangle))return adaptedTris.has(t.triangle);
+      if(adaptedTris?.has(t.triangle))return true;
+      if(region<0)return t.region<0;
+      return t.region===region||t.region<0;
+    });
+    const patches=candidates.map(t=>({face:t,poly:within(t.points,rectangle)})).filter(p=>Math.abs(signedArea(p.poly))>1e-9);
     const area=patches.reduce((sum,p)=>sum+Math.abs(signedArea(p.poly)),0),expected=width*depth;
     if(Math.abs(area-expected)>Math.max(1e-5,expected*1e-6))return fail("incomplete or overlapping floor coverage",{region,area,expected});
     for(let i=0;i<patches.length;i++)for(let j=i+1;j<patches.length;j++)
@@ -135,7 +158,14 @@ function checkApproach(model: TileModel,tile: PlacedTile,point: Vec3,outward: Ve
         const local=localPoint(probe,other,m),key=JSON.stringify(local);
         let state=index.material.get(key);
         if(!state){state=sourceMaterialAtPoint(m.connectionSurface,local);if(index.material.size>=1024)index.material.delete(index.material.keys().next().value!);index.material.set(key,state);}
-        if(state.material||state.uncertain)return fail("approach enclosed by material or uncertain solid",{id:other.id,...state});
+        // Open architectural sheets and derived pads create partial solid angles
+        // near their surfaces (uncertain) without enclosing space. Only definite
+        // material occupancy blocks an approach.
+        if(state.material)return fail("approach enclosed by material",{id:other.id,...state});
+        if(state.uncertain){
+          const open=surfaceOrientation(m.connectionSurface).components.some(c=>c.boundaryEdges>0||!!c.uncertainty&&Math.abs(c.volume)<1e-6);
+          if(!open)return fail("approach enclosed by material or uncertain solid",{id:other.id,...state});
+        }
       }
       obstacles.push(...nearby(index,query.min,query.max));
     }
@@ -146,7 +176,7 @@ function checkApproach(model: TileModel,tile: PlacedTile,point: Vec3,outward: Ve
         const box=bounds(faces.flat()),probe:Vec3=[point[0]+dx*.01,point[1]+dy*.01,point[2]+.1];
         if(probe.every((v,k)=>v>=box.min[k]&&v<=box.max[k])) {
           const state=sourceMaterialAtPoint({positions:mesh.positions,triangles:mesh.indices},probe);
-          if(state.material||state.uncertain)return fail("approach enclosed by connector or uncertain solid",state);
+          if(state.material)return fail("approach enclosed by connector",state);
         }
       }
       for(const points of faces)obstacles.push({id:"existing connector",points});

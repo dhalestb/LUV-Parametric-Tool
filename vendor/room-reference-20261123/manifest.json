@@ -1,0 +1,116 @@
+{
+  "authority": "Exact original Room reference dependencies; preserved copies, no rule edits",
+  "reference": "72883ed3",
+  "files": [
+    {
+      "scope": "fixture",
+      "file": "src/components/fourLevelStudy.ts",
+      "sha256": "989e98d32e6620852974cd183f91f9abd82b1a6eef92a6050d540cf34b050045"
+    },
+    {
+      "scope": "fixture",
+      "file": "src/components/perimeterRoomLayout.ts",
+      "sha256": "b0dd6b0e5922863da8e5b18fa557d5b09d69c9de3fc497e5b1a4ef4f7a65cc17"
+    },
+    {
+      "scope": "fixture",
+      "file": "proof/fixtures/room-full-profile-current.json",
+      "sha256": "00ce48ff46d174d1418aaa2b1a7ca8a0f0cef55891df1ad232e81f2431ab7a23"
+    },
+    {
+      "scope": "fixture",
+      "file": "proof/fixtures/room-suspended-llv.json",
+      "sha256": "d01ec3492996a389bc8260dc74f0c8b64151114a05215b81bb525dd6906a6d03"
+    },
+    {
+      "scope": "native",
+      "file": "proof/rule-amphitheater.cjs",
+      "sha256": "e6333f82b22da3d731d640f5edd553fbd8714b68be6865451dbc0ba8599f37da"
+    },
+    {
+      "scope": "native",
+      "file": "proof/render.cjs",
+      "sha256": "e32f6f1e9d8ff3058b4a10a2d6a95cdb5c6f6177ba76e79fa1641a263f6d946f"
+    },
+    {
+      "scope": "native",
+      "file": "proof/field-config.cjs",
+      "sha256": "ab4638d193c69f8e98a2596f78691477d8a035c664f8f470dad9476954c37396"
+    },
+    {
+      "scope": "native",
+      "file": "src/components/letterGeometry3d.ts",
+      "sha256": "ade11f4e8cd6123ed9c63a0e17629f09988c2685fd13dd9b5b9d86115a0f5b47"
+    },
+    {
+      "scope": "native",
+      "file": "src/components/architecturalLetterSizing.ts",
+      "sha256": "6abc8deffdb15e1423d88e8a71c1d98210b939e6656d8b39c1f63f823a8a2d2f"
+    },
+    {
+      "scope": "native",
+      "file": "src/components/letterVolumeLayout.ts",
+      "sha256": "5c722c04c38431db93c714a12517e2a55e2f32f78c67f04742644b8ac50bce71"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/source-envelope.cjs",
+      "sha256": "78c1df5575eb8d6d0ebc287aa18598d791c0b558cb8b9780538da67cafa0c695"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/source-profile-envelope.cjs",
+      "sha256": "fb288d212d8dc9d8840e2b8052f9462518e1221eea7040fb80b980fed8677bbe"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/source-room-volume.cjs",
+      "sha256": "95e3de4384d3626e301370d55fadfa3b451840abb32e9d786e6c6d0e8aa2bde7"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/live-perimeter-room.cjs",
+      "sha256": "2b112edabf9586521ab3f33c7bdaf49cf17e895064019d42be7fe9d42bc75d38"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/perimeter-letter-panels.cjs",
+      "sha256": "5a3651cd1e014a453c3b291077838aa087cc9f3fa17e149ce678b357cc398dd3"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/full-perimeter-lofts.cjs",
+      "sha256": "692cc1807328f425b6258d2898ebdf457e19ccca2a27c4623d3208cb6661a6e5"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/suspended-polygon-room.cjs",
+      "sha256": "f052a094111e12d89961fe668f52f16ca45ed1e85b7395f2a7a9e49a432de704"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/room-edge-platforms.cjs",
+      "sha256": "1feb597e9c4938b60a893b918c50a136ff63533155b2527c6f6e25bf0910da7a"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/room-top-planks.cjs",
+      "sha256": "2c8e08e8ceea32c6c3e4e69709dd3e9f72e84b026172ecb9d4950be882f131ff"
+    },
+    {
+      "scope": "native",
+      "file": "scripts/source-level-envelope.cjs",
+      "sha256": "22e4bf20457cf5649e0b914406c24a70303d6cf49d46ca5c605d3e8a7251929c"
+    },
+    {
+      "scope": "native",
+      "file": "proof/rule-validation.cjs",
+      "sha256": "e5ff6cbe0562a5756cdcf398d75d51386202792baeb2257d3f8a511fbde95ad5"
+    },
+    {
+      "scope": "native",
+      "file": "src/components/perimeterRoomLayout.ts",
+      "sha256": "b0dd6b0e5922863da8e5b18fa557d5b09d69c9de3fc497e5b1a4ef4f7a65cc17"
+    }
+  ]
+}

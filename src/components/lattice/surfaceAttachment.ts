@@ -214,9 +214,22 @@ function buildIndex(surface: { positions: Float32Array; triangles: number[] }): 
     const ac = sub(c, a);
     const normal: Vec3 = [ab[1] * ac[2] - ab[2] * ac[1], ab[2] * ac[0] - ab[0] * ac[2], ab[0] * ac[1] - ab[1] * ac[0]];
     const length = hypot3(normal);
-    const nz = length > 1e-8 ? orientation.triangles[index / 3].normalZ : NaN;
+    // Open-shell derived pads leave orientation.normalZ unset (NaN). Geometric
+    // NZ is computed in local mesh space; mirror variants can invert it relative
+    // to world up, so treat near-horizontal geometric faces as walkable floors.
+    // Prefer geometric walkability whenever orientation is non-finite — a prior
+    // path that trusted a finite-but-stale oriented value left contact points on
+    // real pads classified as "uncertain" and rejected by fitLoftContact.
+    const geometricNz = length > 1e-8 ? normal[2] / length : NaN;
+    const orientedNz = orientation.triangles[index / 3]?.normalZ;
+    let nz = geometricNz;
+    if (Number.isFinite(orientedNz) && !(Number.isFinite(geometricNz) && Math.abs(geometricNz) >= WALKABLE_NORMAL_Z && orientedNz < WALKABLE_NORMAL_Z && Math.abs(geometricNz) > Math.abs(orientedNz) + 0.2)) {
+      nz = orientedNz;
+    }
+    if (!Number.isFinite(nz) && Number.isFinite(geometricNz)) nz = geometricNz;
+    if (Number.isFinite(nz) && Math.abs(nz) >= WALKABLE_NORMAL_Z) nz = Math.abs(nz);
     const box = boundsOf([a, b, c]);
-    const triangle = { a, b, c, nz, min: box.min, max: box.max, walkable: nz >= WALKABLE_NORMAL_Z };
+    const triangle = { a, b, c, nz, min: box.min, max: box.max, walkable: Number.isFinite(nz) && nz >= WALKABLE_NORMAL_Z };
     triangles.push(triangle);
     for (let axis = 0; axis < 3; axis += 1) {
       min[axis] = Math.min(min[axis], box.min[axis]);
@@ -353,12 +366,13 @@ export function enumerateApproachWindows(model: TileModel, tile: PlacedTile, lim
  * Windows are proposals only; callers must validate the emitted section and circulation.
  */
 export function enumerateWalkableAttachments(model: TileModel, tile: PlacedTile, limit = 64) {
-  if (!Number.isInteger(limit) || limit < 1 || limit > 256) throw new Error("Attachment budget must be 1..256");
+  if (!Number.isInteger(limit) || limit < 1 || limit > 512) throw new Error("Attachment budget must be 1..512");
   const finish = beginGeometryValidation();
   try {
     const index = surfaceIndex(model);
     const groups = (index?.runs ?? []).map((run, runIndex) => {
       const windows: Array<WalkableAnchor & { id: string }> = [];
+      const seenLocal = new Set<string>();
       for (const width of [3, 2.1]) {
         if (width > run.length) continue;
         for (const fraction of [.5, .2, .8]) {
@@ -366,6 +380,9 @@ export function enumerateWalkableAttachments(model: TileModel, tile: PlacedTile,
           const point = worldFromLocal(add(run.a, scale(sub(run.b, run.a), t)), tile, model);
           const profile = edgeWindow([worldFromLocal(run.a, tile, model), worldFromLocal(run.b, tile, model)], point, width);
           if (!profile) continue;
+          const key = JSON.stringify([profile, worldDirection(run.outward, tile, model)]);
+          if (seenLocal.has(key)) continue;
+          seenLocal.add(key);
           windows.push({ id: `surface-${runIndex}-${width}-${fraction}`, point: profileMidpoint(profile), run: profile,
             width, outward: worldDirection(run.outward, tile, model), kind: "edge", snap: 0 });
         }

@@ -10,7 +10,8 @@ function plate(id: string, width: number, height: number, solid = false): TileMo
       for (let z = 0; z < height; z += solid ? 1 : 4) occupied.push(packCell(x, y, z));
     }
   }
-  const variant = {
+  const emptyFace = () => ({ cells: new Map(), projection: 0, recess: 0 });
+  const variant: TileVariant = {
     rotation: 0,
     mirror: "none",
     occupied,
@@ -19,8 +20,8 @@ function plate(id: string, width: number, height: number, solid = false): TileMo
     voidCells: [],
     vertical: [],
     bounds: { minX: 0, minY: 0, minZ: 0, maxX: width - 1, maxY: width - 1, maxZ: Math.max(0, height - 1) },
-    faces: {},
-  } as TileVariant;
+    faces: { "+X": emptyFace(), "-X": emptyFace(), "+Y": emptyFace(), "-Y": emptyFace(), "+Z": emptyFace(), "-Z": emptyFace() },
+  };
   return {
     id,
     filename: `${id}.obj`,

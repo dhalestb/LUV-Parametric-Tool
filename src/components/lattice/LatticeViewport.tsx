@@ -19,6 +19,23 @@ import { worldFromLocal } from "./surfaceAttachment";
 
 export type LatticeViewportHandle = { capture: () => string };
 
+export type SiteViewportOverlay = {
+  id: string;
+  name: string;
+  kind: "zone" | "exclusion" | "selected";
+  color: string;
+  ringLattice: Array<[number, number]>;
+  selected?: boolean;
+};
+
+export type SiteFootprintOverlay = {
+  id: string;
+  zoneId: string;
+  ringLattice: Array<[number, number]>;
+  breached: boolean;
+  colliding: boolean;
+};
+
 type Props = {
   meshes: ImportedObj[];
   models: TileModel[];
@@ -47,6 +64,15 @@ type Props = {
   onSelect: (id: string) => void;
   /** When set, shows RAW | REGISTERED | COPY+20'X side-by-side for one source mesh. */
   fidelityMesh?: ImportedObj | null;
+  siteOverlays?: SiteViewportOverlay[];
+  footprintOverlays?: SiteFootprintOverlay[];
+  showSiteBoundaries?: boolean;
+  showSelectedPolygons?: boolean;
+  showExclusionPolygons?: boolean;
+  showObjFootprints?: boolean;
+  showBoundingEnvelopes?: boolean;
+  showCollisionRegions?: boolean;
+  highlightZoneId?: string | null;
 };
 
 function geometryKey(id: string) {
@@ -169,10 +195,24 @@ function WorkingForm({model,placement}:{model:TileModel;placement:Placement}){
   return <mesh geometry={geometry}><meshStandardMaterial color="#B9BEC6" side={THREE.DoubleSide}/></mesh>;
 }
 
+function polygonLineGeometry(ring: Array<[number, number]>, y = 0.35) {
+  const positions: number[] = [];
+  for (let i = 0; i < ring.length - 1; i += 1) {
+    const [x0, z0] = ring[i];
+    const [x1, z1] = ring[i + 1];
+    positions.push(x0, y, z0, x1, y, z1);
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(positions), 3));
+  return geometry;
+}
+
 function Scene({
   meshes, models, placements, unitScale, upAxisMode, field, colorMode, showLattice, showConnections,
   showGeneratedConnectors = true, showOriginalTiles = true, showConnectionPorts = false, portPairs, portCandidates, connectors = [], cameraMode, diagnostic,
   continuityOverlay = "all", presentation, selectedId, connections, onSelect, fidelityMesh = null, architecturalMarkers=[],workingModels=[],
+  siteOverlays = [], footprintOverlays = [], showSiteBoundaries = true, showSelectedPolygons = true, showExclusionPolygons = true,
+  showObjFootprints = false, showBoundingEnvelopes = false, showCollisionRegions = true, highlightZoneId = null,
 }: Props) {
   const { camera, invalidate } = useThree();
   const fidelityMode = diagnostic === "obj-fidelity" && !!fidelityMesh;
@@ -263,6 +303,44 @@ function Scene({
     return geometry;
   }, [field.cellsX, field.cellsY, field.cellsZ]);
   useEffect(() => () => latticeGeometry.dispose(), [latticeGeometry]);
+
+  const siteBoundaryGeometries = useMemo(() => {
+    if (fidelityMode) return [];
+    return siteOverlays
+      .filter((overlay) => {
+        if (overlay.kind === "exclusion") return showExclusionPolygons;
+        if (overlay.kind === "selected" || overlay.selected) return showSelectedPolygons || showSiteBoundaries;
+        return showSiteBoundaries;
+      })
+      .map((overlay) => ({
+        id: overlay.id,
+        color: highlightZoneId === overlay.id ? "#f5d76e" : overlay.color,
+        lineWidth: highlightZoneId === overlay.id || overlay.selected ? 2 : 1,
+        geometry: polygonLineGeometry(overlay.ringLattice, overlay.kind === "exclusion" ? 0.55 : 0.4),
+        label: overlay.name,
+        centroid: overlay.ringLattice.reduce(
+          (acc, point, _, all) => [acc[0] + point[0] / all.length, acc[1] + point[1] / all.length] as [number, number],
+          [0, 0] as [number, number],
+        ),
+      }));
+  }, [siteOverlays, showSiteBoundaries, showSelectedPolygons, showExclusionPolygons, highlightZoneId, fidelityMode]);
+  useEffect(() => () => siteBoundaryGeometries.forEach((item) => item.geometry.dispose()), [siteBoundaryGeometries]);
+
+  const footprintGeometries = useMemo(() => {
+    if (fidelityMode || (!showObjFootprints && !showBoundingEnvelopes && !showCollisionRegions)) return [];
+    return footprintOverlays
+      .filter((item) => {
+        if (showCollisionRegions && (item.colliding || item.breached)) return true;
+        if (showObjFootprints || showBoundingEnvelopes) return true;
+        return false;
+      })
+      .map((item) => ({
+        id: item.id,
+        color: item.breached ? "#e47079" : item.colliding ? "#d6ad4f" : "#7ec8e3",
+        geometry: polygonLineGeometry(item.ringLattice, 0.7),
+      }));
+  }, [footprintOverlays, showObjFootprints, showBoundingEnvelopes, showCollisionRegions, fidelityMode]);
+  useEffect(() => () => footprintGeometries.forEach((item) => item.geometry.dispose()), [footprintGeometries]);
 
   const connectionGeometry = useMemo(() => {
     if (fidelityMode || !showConnections) return null;
@@ -493,6 +571,21 @@ function Scene({
       <lineSegments visible={!fidelityMode && showLattice} geometry={latticeGeometry} renderOrder={2}>
         <lineBasicMaterial color="#9a9a9a" depthWrite={false} />
       </lineSegments>
+      {siteBoundaryGeometries.map((item) => (
+        <group key={`site-boundary-${item.id}`}>
+          <lineSegments geometry={item.geometry} renderOrder={3}>
+            <lineBasicMaterial color={item.color} depthWrite={false} />
+          </lineSegments>
+          <Html position={[item.centroid[0], 1.2, item.centroid[1]]} style={{ fontSize: 10, color: item.color, whiteSpace: "nowrap", background: "#000000b8", padding: "2px 4px" }}>
+            {item.label}
+          </Html>
+        </group>
+      ))}
+      {footprintGeometries.map((item) => (
+        <lineSegments key={`footprint-${item.id}`} geometry={item.geometry} renderOrder={4}>
+          <lineBasicMaterial color={item.color} depthWrite={false} />
+        </lineSegments>
+      ))}
       {connectionGeometry && (
         <lineSegments visible={!fidelityMode && showConnections} geometry={connectionGeometry}>
           <lineBasicMaterial vertexColors />

@@ -10,6 +10,7 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -31,13 +32,17 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".next-organic-features-qa/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-organic-features-qa/types/**/*.ts"
+    ".next-site-polygon-morphogenesis/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "checkpoints",
-    "reports/connection-search-*/source-before"
+    "reports/connection-search-*/source-before",
+    "vendor",
+    "reports",
+    "scripts"
   ]
 }

@@ -1,0 +1,55 @@
+<!doctype html><meta charset="utf-8"><title>Polygon-Adaptive Print-Contour prototype</title><style>body{background:#081018;color:#eee;font:16px system-ui;margin:24px}img{height:75vh}pre{white-space:pre-wrap}a{color:#91bdd8}</style><h1>Polygon-Adaptive Print-Contour v1 — connection prototype</h1><p>Three unchanged native L meshes. Experimental source-derived nodes, oblique connectors and irregular floor. Not a full-zone design or structural certification.</p><a href="result.json">Exact A/B meshes, interfaces and provenance</a><br><img src="plan.svg"><pre>{
+  "id": "2b728509f523d6ec8f7baa7238f7e1ad6c12030e356c686508474cbb1cd87235",
+  "validation": {
+    "deterministicReplay": true,
+    "ruleAUnchanged": true,
+    "nativeSourceBindingsVerified": 26,
+    "originalSnapshotUnchanged": true
+  },
+  "measurements": {
+    "zoneAreaFeet2": 3834.147941022576,
+    "buildingFootprintFeet2": 114.02630774578196,
+    "buildingCoveragePercent": 2.9739673455419897,
+    "floorAreaFeet2": 114.02630838735628,
+    "sourceLetterFootprintFeet2": 57.5472612349932,
+    "protectedRecessAreaFeet2": 21.704631988288597,
+    "exportedRecessOverlapFeet2": 0.0000021531098762239687,
+    "exportAreaToleranceFeet2": 0.00001,
+    "outsideAreaFeet2": 0,
+    "protectedOverlapFeet2": 0,
+    "solidComponents": 1,
+    "floorRegions": 1,
+    "heightFeet": 6
+  },
+  "connections": [
+    {
+      "id": "connection-0",
+      "contactAreas": [
+        0.18593749690065486,
+        0.1876175121100836
+      ],
+      "angles": [
+        32.11703749034246,
+        57.88296258172485
+      ]
+    },
+    {
+      "id": "connection-1",
+      "contactAreas": [
+        0.1927033562129452,
+        0.18593749972582962
+      ],
+      "angles": [
+        62.55267480316899,
+        38.94421284419892
+      ]
+    }
+  ],
+  "limitations": [
+    "Small single-level connection prototype; not full Print-Contour architectural formation.",
+    "Upper rotation, running bond across multiple courses and terraces not implemented in this prototype.",
+    "3-ft floor ribbons are not a certified walkable route; source nodes may obstruct circulation.",
+    "Snapshot source alignment only; no live Site publication or browser storage mutation.",
+    "L-only demonstration; U/V placement and junctions not validated."
+  ]
+}</pre><script type="module" src="../viewer.js"></script>

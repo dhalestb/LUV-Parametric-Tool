@@ -47,3 +47,7 @@ next-env.d.ts
 
 # Generated descriptor calibration snapshots
 reports/descriptor-calibration/*.json
+
+/.next-site-polygon-morphogenesis/
+/.experiment-data/
+/experiment-server.*.log

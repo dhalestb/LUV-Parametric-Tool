@@ -134,7 +134,9 @@ export function placedConnectionFeatures(model:TileModel,tile:PlacedTile,policy:
   if(!windows){
     const features=connectionFeatures(model).features,identity=model.variants.findIndex(v=>v.rotation===0&&v.mirror==="none"),root={id:model.id,ix:0,iy:0,iz:0,variant:identity};
     if(identity<0)throw new Error("Canonical source transform unavailable");
-    const raw=enumerateWalkableAttachments(model,root,256).anchors,seen=new Set<string>();windows=[];
+    // 512 keeps mid/end fractions on long perimeters after walkable-run growth;
+    // the previous 256 cap dropped known dual-qualified windows (e.g. surface-*.8).
+    const raw=enumerateWalkableAttachments(model,root,512).anchors,seen=new Set<string>();windows=[];
     // Existing surface windows are cheap geometric proposals. Restrict them to
     // the already classified true perimeter BEFORE any walking or route tests.
     // No internal triangle or unrelated source surface enters the route pool.

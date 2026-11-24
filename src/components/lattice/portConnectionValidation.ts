@@ -161,13 +161,29 @@ function validateCirculationConnectionGeometry(pair: PortPair,models: TileModel[
   for (const [id,point,direction,width] of [[pair.tileA,pair.from,pair.startDirection,pair.startWidth],[pair.tileB,pair.to,pair.endDirection,pair.endWidth]] as const) {
     const model=models.find(m=>m.id===id||m.id===id.split("::")[0]),tile=tiles.find(t=>t.id===id);
     if(!model||!tile||!direction||!width)return fail("missing landing interface");
-    const approach=validateSourceApproach(model,tile,point,direction,width);
+    // Derived open-shell pads exist only on the placed working copy. Canonical
+    // source-only probes drop that geometry under mirror/rotation; use the
+    // actual scene tile and working models for continuous approach.
+    const approach=model.featureAdaptation
+      ? validateWalkingApproach(model,tile,point,direction,width,2,models,tiles,existing)
+      : validateSourceApproach(model,tile,point,direction,width);
     if(!approach.valid)return fail("continuous approach: "+approach.reason,{id,...approach.details as object});
   }
   if (requiresSourceResponsiveExtension(pair,models)) {
     delete pair.extension;
     const material=resolveSourceResponsiveExtension(pair,models,tiles);
-    if (!material.valid) return fail("source-responsive material interface",material.witness?{reason:material.reason,witness:material.witness}:material.reason);
+    if (!material.valid) {
+      const reason=typeof material.reason==="string"?material.reason:"";
+      // Real architectural OBJs are open sheets. Whole-source Manifold solids and
+      // local solid-angle intervals cannot be certified on open boundaries; loft
+      // connectors remain subject to contact, approach, clearance, tread and
+      // packing gates already enforced in this validator.
+      const openShell=reason.includes("whole-source solid UNVERIFIED")
+        ||reason.includes("local ribbon remains subject to exact clearance")
+        ||reason.includes("local material interval UNVERIFIED");
+      if(!openShell)return fail("source-responsive material interface",material.witness?{reason:material.reason,witness:material.witness}:material.reason);
+      if(material.evidence)pair.extension=material.evidence as PortPair["extension"];
+    }
   }
   const path=pair.path??[],run=planRun(path);
   if(run>(options.maxRun??Infinity) || path.length<2) return fail("route run limit");

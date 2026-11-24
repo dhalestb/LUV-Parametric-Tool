@@ -13,7 +13,7 @@ import { placedArchitecturalSurfaces } from "./architecturalSurfaces";
 import type { AdaptedCandidate, BranchStudy } from "./branchAdaptationStudy";
 import { workingBranchesToObj } from "./branchAdaptation";
 import { assembledObj, assemblyManifest, voxelUnionObj } from "./exportAssembly";
-import type { LatticeViewportHandle } from "./LatticeViewport";
+import type { LatticeViewportHandle, SiteFootprintOverlay, SiteViewportOverlay } from "./LatticeViewport";
 
 const LatticeViewport = dynamic(() => import("./LatticeViewport"), { ssr: false });
 const ObjFidelityViewport = dynamic(() => import("./ObjFidelityViewport"), { ssr: false });
@@ -44,9 +44,18 @@ import { DEFAULT_DISTRIBUTION_PREFS } from "./distribution";
 import { LATTICE_SLOTS, slotById } from "./slots";
 import { DESCRIPTOR_RANK_STORAGE_KEY, type DescriptorRankSnapshot } from "../evaluations/descriptorRank";
 import { useLatticeSource } from "./latticeSource";
+import LatticeSiteSourcePanel from "./LatticeSiteSourcePanel";
+import {
+  generateSiteConstrainedArrangement,
+  type SiteConstrainedArrangement,
+  type SiteZonePlacementReport,
+} from "./siteConstrainedArrangement";
+import { bayOutline } from "../siteDevelopment/geometry";
+import { loadSiteSessionProject, readAssignmentState, type LatticeSourceMode } from "./latticeSiteBridge";
 import {
   clampLatticeCells,
   DEFAULT_LATTICE_FIELD,
+  LATTICE_FEET,
   latticePerformanceWarning,
   MAX_LATTICE_CELLS_PER_AXIS,
   REQUIRED_TILES,
@@ -129,6 +138,54 @@ function boardFromTiles(
   return { meshes: instanceMeshes, models: instanceModels, placements: instancePlacements };
 }
 
+type PreviewBoard = { meshes: ImportedObj[]; models: TileModel[]; placements: Record<string, Placement> };
+
+/** Drop duplicated instance geometry so autosave stays under the 30-mesh project limit. */
+function compactPreviewForStorage(preview: PreviewBoard | null, sourceMeshes: ImportedObj[]): PreviewBoard | null {
+  if (!preview) return null;
+  const sourceIds = new Set(sourceMeshes.map((mesh) => mesh.id));
+  const meshes = preview.meshes.filter((mesh) => {
+    const sourceId = sourceIdOf(mesh.id);
+    return mesh.id === sourceId || !sourceIds.has(sourceId);
+  });
+  return {
+    meshes,
+    models: preview.models,
+    placements: preview.placements,
+  };
+}
+
+/** Rebuild instance meshes/models from source library after a compact restore. */
+function expandPreviewFromSources(
+  preview: PreviewBoard | null,
+  sourceMeshes: ImportedObj[],
+  sourceModels: TileModel[],
+): PreviewBoard | null {
+  if (!preview) return null;
+  const placementIds = Object.keys(preview.placements);
+  if (!placementIds.length) return preview;
+  const needsExpand = preview.meshes.length < placementIds.length;
+  if (!needsExpand) return preview;
+  const meshById = new Map<string, ImportedObj>();
+  for (const mesh of sourceMeshes) meshById.set(mesh.id, mesh);
+  for (const mesh of preview.meshes) meshById.set(mesh.id, mesh);
+  const modelById = new Map<string, TileModel>();
+  for (const model of sourceModels) modelById.set(model.id, model);
+  for (const model of preview.models) modelById.set(model.id, model);
+  const meshes: ImportedObj[] = [];
+  const models: TileModel[] = [];
+  for (const id of placementIds) {
+    const placement = preview.placements[id];
+    const sourceId = sourceIdOf(placement.meshId || id);
+    const sourceMesh = meshById.get(id) ?? meshById.get(sourceId);
+    const sourceModel = modelById.get(id) ?? modelById.get(sourceId);
+    if (!sourceMesh || !sourceModel) continue;
+    meshes.push({ ...sourceMesh, id });
+    models.push({ ...sourceModel, id, slotId: placement.slotId ?? sourceModel.slotId });
+  }
+  return meshes.length ? { meshes, models, placements: preview.placements } : preview;
+}
+
 type PackedMesh = Omit<ImportedObj, "positions" | "normals"> & {
   positions: number[];
   normals: number[];
@@ -183,7 +240,7 @@ export default function LatticeStudio() {
   const {
     hydrated: sourceHydrated,
     persistenceError: sourcePersistenceError,
-    saveStatus, restoredSession, updateProject, exportProject, openProject, validateProject,
+    saveStatus, restoredSession, getProject, updateProject, flushProject, exportProject, openProject, validateProject,
     restoreNotice,
     meshes,
     setMeshes,
@@ -249,6 +306,17 @@ export default function LatticeStudio() {
   const [lobbySlot, setLobbySlot] = useState("L1");
   const [fidelityMeshId, setFidelityMeshId] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ meshes: ImportedObj[]; models: TileModel[]; placements: Record<string, Placement> } | null>(null);
+  const [siteSourceMode, setSiteSourceMode] = useState<LatticeSourceMode>(() => readAssignmentState().sourceMode);
+  const siteFootprintMode = siteSourceMode === "site-diagram" || siteSourceMode === "site-polygons";
+  const [siteUnitsConfirmed, setSiteUnitsConfirmed] = useState(false);
+  const [siteValidation, setSiteValidation] = useState<SiteConstrainedArrangement | null>(null);
+  const [showSiteBoundaries, setShowSiteBoundaries] = useState(true);
+  const [showSelectedPolygons, setShowSelectedPolygons] = useState(true);
+  const [showExclusionPolygons, setShowExclusionPolygons] = useState(true);
+  const [showObjFootprints, setShowObjFootprints] = useState(true);
+  const [showBoundingEnvelopes, setShowBoundingEnvelopes] = useState(false);
+  const [showCollisionRegions, setShowCollisionRegions] = useState(true);
+  const [highlightZoneId, setHighlightZoneId] = useState<string | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [sessionPersistenceError,setSessionPersistenceError]=useState<string|null>(null);
   const skipRestorationSave=useRef(false);
@@ -268,6 +336,7 @@ export default function LatticeStudio() {
   const viewRef = useRef<LatticeViewportHandle>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const pendingAssembly = useRef<{ options: Assembly[]; active: "A" | "B" | "C" | "manual"; placements: Record<string, Placement> } | null>(null);
+  const pendingPreviewExpand = useRef<PreviewBoard | null>(null);
 
   const assigned = useMemo(() => LATTICE_SLOTS.flatMap((slot) => {
     const mesh = meshes.find((item) => item.id === assignments[slot.id]);
@@ -315,10 +384,11 @@ export default function LatticeStudio() {
   useEffect(() => {
     if (!sourceHydrated) return;
     applyingProject.current=true;
-    appliedProject.current=restoredSession;
+    // Prefer the live provider snapshot so Lattice ↔ Site tab switches keep the latest arrangement.
+    const saved = getProject() as LatticeSession | null;
+    appliedProject.current = saved;
     skipRestorationSave.current = hasRestoredProject.current;
     hasRestoredProject.current = true;
-    const saved = restoredSession as LatticeSession | null;
     if (saved?.version === 1 && Array.isArray(saved.meshes)) {
       if(typeof saved.sourceResponsiveExtensions==="boolean")setSourceResponsiveExtensions(saved.sourceResponsiveExtensions);
       setSearchOptions({...DEFAULT_ASSIGNMENT_SEARCH_OPTIONS,...saved.searchOptions});
@@ -327,7 +397,11 @@ export default function LatticeStudio() {
       setArchitecturalSelection(saved.architecturalSelection ?? null);
       setAssignmentResult(saved.assignmentResult ?? null);
       setGeneratedConnectors(saved.generatedConnectors ?? []);
-      setPreview(saved.preview ?? null);
+      const compactPreview = (saved.preview ?? null) as PreviewBoard | null;
+      setPreview(compactPreview);
+      if (compactPreview && Object.keys(compactPreview.placements).length > (compactPreview.meshes?.length ?? 0)) {
+        pendingPreviewExpand.current = compactPreview;
+      }
       if (saved.showOriginalTiles !== undefined) setShowOriginalTiles(saved.showOriginalTiles);
       if (saved.showGeneratedConnectors !== undefined) setShowGeneratedConnectors(saved.showGeneratedConnectors);
       if (saved.showConnectionPorts !== undefined) setShowConnectionPorts(saved.showConnectionPorts);
@@ -367,6 +441,7 @@ export default function LatticeStudio() {
         setShowGeneratedConnectors(false);
         setGeneratedConnectors([]);
         setPreview(null);
+        pendingPreviewExpand.current = null;
         setPresentation(false);
         if (saved.selectedId) setFidelityMeshId(saved.selectedId);
       } else {
@@ -388,10 +463,12 @@ export default function LatticeStudio() {
           placements: saved.placements ?? {},
         };
       }
-      setStatus(saved.status || `Restored Part 2 session · ${saved.meshes.length} OBJ${saved.meshes.length === 1 ? "" : "s"}.`);
+      const placementCount = saved.preview ? Object.keys(saved.preview.placements ?? {}).length : Object.keys(saved.placements ?? {}).length;
+      setStatus(saved.status || `Restored Part 2 session · ${saved.meshes.length} OBJ${saved.meshes.length === 1 ? "" : "s"}${placementCount ? ` · ${placementCount} placed form(s)` : ""}.`);
     }
     setSessionReady(true);
-  }, [sourceHydrated, restoredSession]);
+    // restoredSession updates when a project file is opened; getProject() supplies the live tab-switch snapshot.
+  }, [sourceHydrated, getProject, restoredSession]);
 
   useEffect(() => {
     const pending = pendingAssembly.current;
@@ -402,6 +479,19 @@ export default function LatticeStudio() {
     setPreview(boardFromTiles(option.tiles, models, meshes, { placements: pending.placements }));
     setActiveOption(option.id);
   }, [sessionReady, models, meshes]);
+
+  useEffect(() => {
+    if (!sessionReady || !pendingPreviewExpand.current || models.length < 1 || meshes.length < 1) return;
+    const expanded = expandPreviewFromSources(pendingPreviewExpand.current, meshes, models);
+    pendingPreviewExpand.current = null;
+    if (expanded) setPreview(expanded);
+  }, [sessionReady, models, meshes]);
+
+  useEffect(() => {
+    return () => {
+      void flushProject();
+    };
+  }, [flushProject]);
 
   useEffect(() => {
     if (!sessionReady || !sourceHydrated) return;
@@ -432,7 +522,8 @@ export default function LatticeStudio() {
       sourceResponsiveExtensions,
       searchOptions,
       architecturalPreferences, architecturalStudy, architecturalSelection,
-      assignmentResult, generatedConnectors, preview,
+      assignmentResult, generatedConnectors,
+      preview: compactPreviewForStorage(preview, meshes),
       showOriginalTiles, showGeneratedConnectors, showConnectionPorts, connectionStage,
       gatheringSlot, officeSlot, lobbySlot, descriptorRanks,
     };
@@ -450,10 +541,20 @@ export default function LatticeStudio() {
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      if(sourceResponsiveExtensions) {
-        try {await initializeExtensionReconstruction();}
-        catch(error){if(!cancelled){setModels([]);setStatus(`Measured extension initialization failed: ${error instanceof Error?error.message:String(error)}`);}return;}
-        if(cancelled)return;
+      let useMeasuredExtensions = sourceResponsiveExtensions;
+      if (sourceResponsiveExtensions) {
+        try {
+          await initializeExtensionReconstruction();
+        } catch (error) {
+          // Keep mapped OBJs analyzable so RUN ORIENTATION stays available.
+          // Measured Extensions can be re-enabled after the geometry runtime is present.
+          useMeasuredExtensions = false;
+          if (!cancelled) {
+            setSourceResponsiveExtensions(false);
+            setStatus(`Measured Extensions unavailable (${error instanceof Error ? error.message : String(error)}). Analyzing mapped OBJs without measured extensions so orientation/assembly can still run.`);
+          }
+        }
+        if (cancelled) return;
       }
       const scale = UNIT_TO_FEET[unit];
       const sources = meshes.map((mesh) => {
@@ -485,7 +586,7 @@ export default function LatticeStudio() {
         return { ...cached, slotId: source.slotId };
       });
       if (cancelled) return;
-      setModels(aligned.map(model=>({...model,sourceResponsiveExtensions})));
+      setModels(aligned.map((model) => ({ ...model, sourceResponsiveExtensions: useMeasuredExtensions })));
       setPlacements((current) => {
         const next = { ...current };
         for (const model of aligned) next[model.id] = { ...(next[model.id] ?? emptyPlacement(model.id, model.slotId)), slotId: model.slotId };
@@ -790,7 +891,64 @@ export default function LatticeStudio() {
     }
   }
 
+  async function runSiteConstrainedArrangement() {
+    const token = ++cancelRef.current;
+    setBusy(true);
+    setProgressPercent(10);
+    setStatus("Packing assigned OBJs into selected site polygon footprint(s) on 20′ bays…");
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      if (token !== cancelRef.current) return;
+      const siteSession = loadSiteSessionProject();
+      const projectUnitsConfirmed = siteSession?.project.coordinates.unitAssumption === "confirmed";
+      const result = generateSiteConstrainedArrangement({
+        models,
+        meshes,
+        unitsConfirmed: siteUnitsConfirmed || projectUnitsConfirmed,
+      });
+      setSiteValidation(result);
+      setProgressPercent(80);
+      if (result.unitsBlocked || !result.placedCount) {
+        setStatus(result.summary);
+        return;
+      }
+      setField(result.field);
+      setAssignmentResult(null);
+      setGeneratedConnectors([]);
+      setArchitecturalStudy(null);
+      setArchitecturalSelection(null);
+      setPlacements(result.placements);
+      setPreview({ meshes: result.meshes, models: result.models, placements: result.placements });
+      setOptions(null);
+      setActiveOption("manual");
+      setShowLattice(true);
+      setShowOriginalTiles(true);
+      setShowGeneratedConnectors(false);
+      setShowConnections(false);
+      setColorMode("typology");
+      setDiagnostic("assembly");
+      setCameraMode("iso");
+      setPresentation(false);
+      setProgressPercent(100);
+      setStatus(`${result.summary} ${result.notes.slice(0, 4).join(" ")}`);
+    } catch (error) {
+      if (token === cancelRef.current) {
+        setStatus(error instanceof Error ? error.message : "Site-constrained arrangement failed.");
+      }
+    } finally {
+      if (token === cancelRef.current) {
+        setBusy(false);
+        setProgressPercent(null);
+      }
+    }
+  }
+
   async function runAssemblyTest(mode: AssemblyTestMode = assemblyMode) {
+    const siteState = readAssignmentState();
+    if (siteState.sourceMode === "site-diagram" || siteState.sourceMode === "site-polygons") {
+      await runSiteConstrainedArrangement();
+      return;
+    }
     setAssemblyMode(mode);
     if (mode === "catalog") {
       await runCatalogue();
@@ -943,6 +1101,32 @@ export default function LatticeStudio() {
   }
 
   const shown = preview ?? { meshes: assigned.map((item) => item.mesh), models, placements };
+  const siteOverlays: SiteViewportOverlay[] = siteValidation?.overlays ?? [];
+  const footprintOverlays: SiteFootprintOverlay[] = useMemo(() => {
+    if (!siteValidation) return [];
+    const colliding = new Set<string>();
+    for (const pair of siteValidation.collisions) {
+      colliding.add(pair.aId);
+      colliding.add(pair.bId);
+    }
+    const breach = new Set(siteValidation.boundaryBreachIds);
+    const modelById = new Map(shown.models.map((model) => [model.id, model]));
+    return Object.entries(shown.placements).map(([id, placement]) => {
+      const model = modelById.get(id) ?? modelById.get(id.split("::")[0]);
+      const width = model ? Math.max(LATTICE_FEET, Math.abs(model.bboxMax[0] - model.bboxMin[0])) : LATTICE_FEET;
+      const depth = model ? Math.max(LATTICE_FEET, Math.abs(model.bboxMax[1] - model.bboxMin[1])) : LATTICE_FEET;
+      const cx = placement.ix * LATTICE_FEET + LATTICE_FEET / 2;
+      const cz = placement.iy * LATTICE_FEET + LATTICE_FEET / 2;
+      const ring = bayOutline(cx, cz, Math.max(width, depth), placement.rotation);
+      return {
+        id,
+        zoneId: id.includes("::site-") ? id.split("::site-")[1]?.split("-").slice(0, -1).join("-") ?? "" : "",
+        ringLattice: ring,
+        breached: breach.has(id),
+        colliding: colliding.has(id),
+      };
+    });
+  }, [siteValidation, shown.models, shown.placements]);
   const previewGeometryKey=preview?.models.map(m=>m.connectionSurface?geometryRevision(m.connectionSurface).id:"missing").join(",");
   // Keep endpoints and exported connectors attached to the currently displayed transforms.
   const liveAssignmentSynthesis = useMemo(() => {
@@ -1057,14 +1241,31 @@ export default function LatticeStudio() {
                 <option value="millimeters">Millimeters</option>
               </select>
             </label>
-            <label className="mt-3 block" style={{ color: "var(--muted)" }}>
-              Up axis
-              <select className="mt-1 w-full rounded border bg-transparent px-2 py-1" style={buttonStyle} value={upAxisMode} onChange={(event) => setUpAxisMode(event.target.value as UpAxisMode)}>
-                <option value="auto">Auto</option>
-                <option value="y">Y up</option>
-                <option value="z">Z up</option>
-              </select>
-            </label>
+            <div className="mt-3" style={{ color: "var(--muted)" }}>
+              Form vertical axis
+              <div className="mt-1 flex flex-wrap gap-1">
+                {([
+                  ["auto", "Auto"],
+                  ["y", "Y vertical"],
+                  ["z", "Z vertical"],
+                ] as const).map(([mode, label]) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    className={buttonClass}
+                    style={{
+                      ...buttonStyle,
+                      borderColor: upAxisMode === mode ? "var(--accent)" : "var(--line)",
+                      background: upAxisMode === mode ? "var(--accent-primary)" : "transparent",
+                      color: upAxisMode === mode ? "var(--app-background)" : "var(--muted)",
+                    }}
+                    onClick={() => setUpAxisMode(mode)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <button type="button" className={`${buttonClass} mt-4 w-full`} style={{ ...buttonStyle, borderColor: showLattice ? "var(--accent)" : "var(--line)" }} onClick={() => setShowLattice((value) => !value)}>
               {showLattice ? "20' Grid On (optional)" : "20' Grid Off (optional)"}
             </button>
@@ -1167,15 +1368,79 @@ export default function LatticeStudio() {
               <option value="millimeters">Millimeters</option>
             </select>
           </label>
-          <label className="mt-3 block text-[10px]" style={{ color: "var(--muted)" }}>
-            Up axis
-            <select className="mt-1 w-full rounded border bg-transparent px-2 py-1 text-[11px]" style={buttonStyle} value={upAxisMode} onChange={(event) => setUpAxisMode(event.target.value as UpAxisMode)}>
-              <option value="auto">Auto</option>
-              <option value="y">Y up</option>
-              <option value="z">Z up</option>
-            </select>
-          </label>
-          <p className="mt-1 text-[10px]" style={{ color: "var(--muted)" }}>Auto stands a standard OBJ upright. Choose Z up when the file was saved with Z vertical.</p>
+          <div className="mt-3 text-[10px]" style={{ color: "var(--muted)" }}>
+            Form vertical axis
+            <div className="mt-1 flex flex-wrap gap-1">
+              {([
+                ["auto", "Auto"],
+                ["y", "Y vertical"],
+                ["z", "Z vertical"],
+              ] as const).map(([mode, label]) => (
+                <button
+                  key={mode}
+                  type="button"
+                  className={buttonClass}
+                  style={{
+                    ...buttonStyle,
+                    borderColor: upAxisMode === mode ? "var(--accent)" : "var(--line)",
+                    background: upAxisMode === mode ? "var(--accent-primary)" : "transparent",
+                    color: upAxisMode === mode ? "var(--app-background)" : "var(--muted)",
+                  }}
+                  onClick={() => setUpAxisMode(mode)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p className="mt-1 text-[10px]" style={{ color: "var(--muted)" }}>
+            Rhino / OBJ files with Z up appear on their side under Y vertical. Choose <strong>Z vertical</strong> for those forms. Auto uses each file&apos;s embedded hint (defaults to Y if unmarked).
+          </p>
+          <LatticeSiteSourcePanel
+            meshes={meshes}
+            onStatus={setStatus}
+            onAssignmentChange={(next) => {
+              setSiteSourceMode(next.sourceMode);
+              setHighlightZoneId(next.selectedZoneIds[0] ?? null);
+            }}
+            unitsConfirmed={siteUnitsConfirmed}
+            onUnitsConfirmedChange={setSiteUnitsConfirmed}
+          />
+          {siteFootprintMode && (
+            <div className="mt-3 rounded border p-2 text-[10px]" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
+              <div className="font-semibold" style={{ color: "var(--text)" }}>Site overlay · Lattice viewport</div>
+              <div className="mt-1 grid grid-cols-2 gap-1">
+                <label><input type="checkbox" checked={showSiteBoundaries} onChange={(e) => setShowSiteBoundaries(e.target.checked)} /> Site boundaries</label>
+                <label><input type="checkbox" checked={showSelectedPolygons} onChange={(e) => setShowSelectedPolygons(e.target.checked)} /> Selected polygons</label>
+                <label><input type="checkbox" checked={showExclusionPolygons} onChange={(e) => setShowExclusionPolygons(e.target.checked)} /> Exclusions</label>
+                <label><input type="checkbox" checked={showLattice} onChange={(e) => setShowLattice(e.target.checked)} /> 20′ registration grid</label>
+                <label><input type="checkbox" checked={showObjFootprints} onChange={(e) => setShowObjFootprints(e.target.checked)} /> OBJ footprints</label>
+                <label><input type="checkbox" checked={showBoundingEnvelopes} onChange={(e) => setShowBoundingEnvelopes(e.target.checked)} /> Bounding envelopes</label>
+                <label><input type="checkbox" checked={showCollisionRegions} onChange={(e) => setShowCollisionRegions(e.target.checked)} /> Collision / breach</label>
+                <label><input type="checkbox" checked={showConnections} onChange={(e) => setShowConnections(e.target.checked)} /> Validated connections</label>
+              </div>
+              <p className="mt-1">Registration cells ≠ architectural envelopes. Footprint lines use authentic mesh plan extents at each placement.</p>
+            </div>
+          )}
+          {siteValidation && (
+            <div className="mt-3 rounded border p-2 text-[10px]" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
+              <div className="font-semibold" style={{ color: "var(--text)" }}>Placement validation</div>
+              <p className="mt-1">{siteValidation.summary}</p>
+              <p>Cluster status: {siteValidation.clusterStatus} · morphing={String(siteValidation.morphingApplied)} · connections validated={String(siteValidation.connectionsValidated)}</p>
+              <p>Overlaps: {siteValidation.collisions.length} · boundary breaches: {siteValidation.boundaryBreachIds.length} · unique sources: {new Set(siteValidation.zoneReports.flatMap((z) => z.uniqueSourceMeshIds)).size}</p>
+              <ul className="mt-1 space-y-1">
+                {siteValidation.zoneReports.map((report: SiteZonePlacementReport) => (
+                  <li key={report.zoneId}>
+                    <button type="button" className="underline" style={{ color: highlightZoneId === report.zoneId ? "var(--accent)" : "inherit" }} onClick={() => setHighlightZoneId(report.zoneId)}>
+                      {report.zoneName}
+                    </button>
+                    : requested {report.requestedCount}, placed {report.placedCount}, cells {report.registrationCells.length}, breaches {report.boundaryBreaches}, collisions {report.collisionPairs}
+                    {report.unplacedReason ? ` · ${report.unplacedReason}` : ""}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <label className="mt-3 block text-[10px]" style={{ color: "var(--muted)" }}>
             Assembly Test
             <select
@@ -1196,9 +1461,15 @@ export default function LatticeStudio() {
             disabled={busy || models.length < 1}
             onClick={() => void runAssemblyTest()}
           >
-            {assemblyMode === "global-field" ? "ASSEMBLE GLOBAL FIELD (EXPERIMENTAL)" : "RUN ORIENTATION + ASSEMBLY"}
+            {siteFootprintMode
+              ? "RUN SITE-FOOTPRINT ARRANGEMENT"
+              : assemblyMode === "global-field" ? "ASSEMBLE GLOBAL FIELD (EXPERIMENTAL)" : "RUN ORIENTATION + ASSEMBLY"}
           </button>
-          <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>Registration increment is always 20 ft. Choose a mode, adjust X/Y/Z if needed, then press RUN ORIENTATION + ASSEMBLY. Settings do not run the solver.</p>
+          <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>
+            {siteFootprintMode
+              ? "Site mode packs mapped OBJs across the selected polygon footprint on 20′ bays so the field reads the site outline. Continuous morphing into one habitable envelope is Stage 4+ and is not applied yet."
+              : "Registration increment is always 20 ft. Choose a mode, adjust X/Y/Z if needed, then press RUN ORIENTATION + ASSEMBLY. Settings do not run the solver."}
+          </p>
           {assemblyMode!=="global-field"&&assemblyMode!=="catalog"&&<div className="mt-2 text-[10px]" style={{color:"var(--muted)"}}>
             <p>Feature-guided two-form generation. Equivalent transforms are removed before evaluation. Untested placements are reported.</p>
             <fieldset disabled={busy} className="mt-2"><legend>Two-form connection regions</legend>
@@ -1339,6 +1610,34 @@ export default function LatticeStudio() {
                 <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("iso")}>Isometric</button>
                 <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("plan")}>Plan</button>
                 <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setCameraMode("section")}>Section</button>
+                <button
+                  type="button"
+                  className={buttonClass}
+                  style={{
+                    ...buttonStyle,
+                    borderColor: upAxisMode === "y" ? "var(--accent)" : "var(--line)",
+                    background: upAxisMode === "y" ? "var(--accent-primary)" : "transparent",
+                    color: upAxisMode === "y" ? "var(--app-background)" : undefined,
+                  }}
+                  onClick={() => setUpAxisMode("y")}
+                  title="Treat OBJ Y as vertical (forms stand in Three.js Y-up)"
+                >
+                  Y vertical
+                </button>
+                <button
+                  type="button"
+                  className={buttonClass}
+                  style={{
+                    ...buttonStyle,
+                    borderColor: upAxisMode === "z" ? "var(--accent)" : "var(--line)",
+                    background: upAxisMode === "z" ? "var(--accent-primary)" : "transparent",
+                    color: upAxisMode === "z" ? "var(--app-background)" : undefined,
+                  }}
+                  onClick={() => setUpAxisMode("z")}
+                  title="Treat OBJ Z as vertical — use when Rhino/Z-up forms appear on their side"
+                >
+                  Z vertical
+                </button>
                 <button type="button" className={buttonClass} style={buttonStyle} onClick={() => setPresentation((value) => !value)}>{presentation ? "Exit Presentation" : "Presentation Mode"}</button>
               </>
             )}
@@ -1370,6 +1669,15 @@ export default function LatticeStudio() {
             connections={fidelityActive ? [] : shownReport?.connections ?? []}
             onSelect={setSelectedId}
             fidelityMesh={fidelityActive ? fidelityMesh : null}
+            siteOverlays={siteOverlays}
+            footprintOverlays={footprintOverlays}
+            showSiteBoundaries={showSiteBoundaries}
+            showSelectedPolygons={showSelectedPolygons}
+            showExclusionPolygons={showExclusionPolygons}
+            showObjFootprints={showObjFootprints}
+            showBoundingEnvelopes={showBoundingEnvelopes}
+            showCollisionRegions={showCollisionRegions}
+            highlightZoneId={highlightZoneId}
           />
           <div className="absolute bottom-3 left-3 right-3 space-y-1">
             {busy && progressPercent !== null && (
@@ -1689,8 +1997,18 @@ export default function LatticeStudio() {
               <div>Mode: {ASSEMBLY_TEST_LABELS[assignmentResult.mode]}</div>
               <div>Copy count: {assignmentResult.copyCount}</div>
               {assignmentResult.execution&&<div>Background search: {(assignmentResult.milliseconds/1000).toFixed(2)} s · {assignmentResult.execution.reusedSourceGeometries} unchanged source geometries reused. Connector validation remains fresh.</div>}
+              {assignmentResult.assemblyOutcome&&<div>Assembly outcome: {
+                assignmentResult.assemblyOutcome==="validated-connected"?"Validated connected assembly"
+                :assignmentResult.assemblyOutcome==="partial"?"Partial assembly — some forms linked, others isolated"
+                :assignmentResult.assemblyOutcome==="incomplete-search"?"Incomplete search — budget ended before a full connected solution; not proof none exists"
+                :"Failed or finished without a validated connected arrangement"
+              }</div>}
               {assignmentResult.searchEvidence&&<div>Stop: {assignmentResult.searchEvidence.stopReason??"legacy result: stopping reason not recorded"} · {assignmentResult.searchEvidence.evaluated}/{assignmentResult.searchEvidence.generated} unique arrangements tested · {assignmentResult.searchEvidence.omitted} untested · {assignmentResult.searchEvidence.duplicates??0} equivalent transforms removed · {assignmentResult.searchEvidence.cheapRejections??0} port pairs screened out · {assignmentResult.searchEvidence.detailedRoutes??0} detailed route validation attempts.</div>}
               <div>Registration: {registrationLabel(assignmentResult.field.cellsZ)}</div>
+              {assignmentResult.placementNotes.length>0&&<div>Form extents vs 20&apos; bay: {assignmentResult.placementNotes.map(n=>{
+                const bounds=n.reason.match(/bounds ([^·]+)/)?.[1]?.trim()??"n/a";
+                return `${n.filename.split(" · ")[0]||n.tileId}: ${bounds} @ (${n.ix},${n.iy},z=${(n.iz*20+(n.zLift??0)).toFixed(1)})`;
+              }).join(" · ")}</div>}
               {liveAssignmentSynthesis?.connectionDiagnostics && <div>Port candidates: {liveAssignmentSynthesis.connectionDiagnostics.candidateCount} · Accepted: {liveAssignmentSynthesis.connectionDiagnostics.acceptedCount} · Rejected: {liveAssignmentSynthesis.connectionDiagnostics.rejectedCount}<br />Circulation components: {liveAssignmentSynthesis.connectionDiagnostics.componentsBefore} → {liveAssignmentSynthesis.connectionDiagnostics.componentsAfter}<br />{Object.entries(liveAssignmentSynthesis.connectionDiagnostics.rejectionCounts).map(([reason,count])=>`${reason}: ${count}`).join(" · ")}</div>}
               {liveAssignmentSynthesis?.constructionDiagnostics?.map((d,i)=><div key={`construction-${i}`}>Adjacent-side construction: {d.routes} routes tested · {Object.entries(d.counts).map(([reason,count])=>`${reason}: ${count}`).join(" · ")}{d.approachRejections.length>0&&<><br />Approach screening: {d.approachRejections.map(r=>{const a=r as {reason:string;count:number};return `${a.reason}: ${a.count}`;}).join(" · ")}</>}</div>)}
               {liveAssignmentSynthesis?.featureDiagnostics&&<div>Feature generation: {liveAssignmentSynthesis.featureDiagnostics.generated} unique pairs · {liveAssignmentSynthesis.featureDiagnostics.evaluated} evaluated · {liveAssignmentSynthesis.featureDiagnostics.omitted} untested · {liveAssignmentSynthesis.featureDiagnostics.adaptations} reconstruction attempts.<br />{liveAssignmentSynthesis.featureDiagnostics.inventory.map(i=>`${i.id}: ${Object.entries(i.counts).map(([kind,count])=>`${count} ${kind}`).join(", ")}; ${i.sourceQualified} qualified source approaches`).join(" · ")}<br />{liveAssignmentSynthesis.featureDiagnostics.stopReason}. Rejections: {Object.entries(liveAssignmentSynthesis.featureDiagnostics.attempts.reduce<Record<string,number>>((counts,a)=>{counts[a.reason]=(counts[a.reason]??0)+1;return counts;},{})).map(([reason,count])=>`${reason}: ${count}`).join(" · ")}</div>}

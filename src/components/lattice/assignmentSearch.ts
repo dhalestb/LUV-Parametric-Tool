@@ -57,6 +57,8 @@ export type AssignmentResult = {
   summary: string;
   formIds: string[];
   searchEvidence?:{guided:boolean;generated:number;evaluated:number;omitted:number;incomplete:boolean;stopReason?:string;candidateLimit:number;millisecondsLimit:number;duplicates?:number;stageStops?:string[];firstConnectionMs?:number;detailedRoutes?:number;cheapRejections?:number};
+  /** Distinguishes a validated network from a partial graph, an incomplete search, or a finished failure. */
+  assemblyOutcome?: "validated-connected" | "partial" | "incomplete-search" | "failed";
   execution?:{environment:"browser module worker";reusedSourceGeometries:number};
 };
 
@@ -93,7 +95,32 @@ export function mappingStatus(models: TileModel[]) {
 }
 
 export type AssignmentSearchOptions={guided:boolean;perStage:number;candidates:number;milliseconds:number;stopOnConnected?:boolean;featurePolicy?:ConnectionFeaturePolicy};
-export const DEFAULT_ASSIGNMENT_SEARCH_OPTIONS:AssignmentSearchOptions={guided:true,perStage:8,candidates:64,milliseconds:120000,stopOnConnected:true,featurePolicy:DEFAULT_CONNECTION_FEATURE_POLICY};
+export const DEFAULT_ASSIGNMENT_SEARCH_OPTIONS:AssignmentSearchOptions={guided:true,perStage:16,candidates:128,milliseconds:120000,stopOnConnected:true,featurePolicy:DEFAULT_CONNECTION_FEATURE_POLICY};
+
+/** Feature-guided generation budgets scale with form count; they remain bounded.
+ * Pair/adaptation ceilings match generateFeatureConnections hard limits (128/32).
+ * Prior Stage A runs generated thousands of feature pairs but evaluated only ~12,
+ * so the shortlist must be wide enough to reach viable branch/edge landings. */
+export function featureConnectionBudget(tileCount:number){
+  const forms=Math.max(2,tileCount);
+  return {
+    pairs:Math.min(128,Math.max(32,forms*20)),
+    adaptations:Math.min(32,Math.max(12,forms*6)),
+    milliseconds:Math.min(90000,Math.max(20000,forms*18000)),
+  };
+}
+
+/** Multi-form guided searches need a larger shortlist than the two-form defaults. */
+function effectiveSearchOptions(copyCount:number,options?:AssignmentSearchOptions):AssignmentSearchOptions|undefined {
+  if(!options)return options;
+  if(!options.guided||!options.featurePolicy||copyCount<=2)return options;
+  return {
+    ...options,
+    perStage:Math.min(256,Math.max(options.perStage,copyCount*6)),
+    candidates:Math.min(2048,Math.max(options.candidates,copyCount*48)),
+  };
+}
+
 type Hooks = { cancelled: () => boolean; onProgress: (message: string, percent?: number) => void;
   onEvaluation?:(tiles:PlacedTile[],synthesis:SynthesisResult)=>void };
 type SearchControl={options:AssignmentSearchOptions;started:number;generated:number;evaluated:number;stopReason?:string;duplicates:number;stageStops:string[];firstConnectionMs?:number;detailedRoutes:number;cheapRejections:number};
@@ -241,8 +268,12 @@ function evaluateAssignment(instances: TileModel[], tiles: PlacedTile[], collect
 function evaluateCandidate(instances:TileModel[],tiles:PlacedTile[]){
   const finish=beginGeometryValidation();
   try {
-    if(tiles.length===2&&instances.every(m=>m.sourceResponsiveExtensions&&m.connectionFeaturePolicy)){
-      const portMatches=generateFeatureConnections(instances,tiles,{policy:instances[0].connectionFeaturePolicy,pairs:8,adaptations:4,milliseconds:10000});
+    // Feature-guided generation is the architecture-first path for any N>=2
+    // assembly once a policy is attached. It already enumerates all adjacent
+    // form pairs; budgets scale with tile count instead of hard-coding two forms.
+    if(tiles.length>=2&&instances.every(m=>m.sourceResponsiveExtensions&&m.connectionFeaturePolicy)){
+      const budget=featureConnectionBudget(tiles.length);
+      const portMatches=generateFeatureConnections(instances,tiles,{policy:instances[0].connectionFeaturePolicy,pairs:budget.pairs,adaptations:budget.adaptations,milliseconds:budget.milliseconds});
       const workingModels=portMatches.workingModels,evaled=evaluateAssembly(workingModels,tiles);
       evaled.components=portMatches.componentsAfter;
       evaled.parts={...evaled.parts,connectivity:Math.max(0,tiles.length-evaled.components)};
@@ -388,14 +419,25 @@ function finalize(
   const hardFail =
     tiles.length < copyCount ||
     evaled.parts.collision > copyCount ||
-    (copyCount > 1 && !linked) ||
     (uniqueForms < Math.min(copyCount, forms.length) && copyCount > 1 && forms.length >= copyCount && uniqueForms === 1);
+  // Unlinked arrangements stay REVIEW until searchEvidence decides whether the
+  // search finished without a connection (failed) or stopped early (incomplete).
   const isolated = synthesis.organicDiagnostics?.isolated.length ?? 0;
-  const status: AssignmentResult["status"] = hardFail ? "FAIL" : graphCount > 1 || isolated > 0 || typologyRetention < 45 || synthesis.connectorCost > copyCount * 8 ? "REVIEW" : "PASS";
-  const summary = `${copyCount} forms (${formLabel(forms)}) · score ${score.toFixed(1)} · direct ${synthesis.directInterlocks} · interlocks ${synthesis.interlocks} · organic ${synthesis.organicConnectors} · bridges ${synthesis.bridges} · ramps ${synthesis.ramps} · stairs ${synthesis.stairs} · components ${graphCount} · isolated ${isolated}`;
+  const status: AssignmentResult["status"] = hardFail ? "FAIL" : graphCount > 1 || !linked || isolated > 0 || typologyRetention < 45 || synthesis.connectorCost > copyCount * 8 ? "REVIEW" : "PASS";
+  const assemblyOutcome: NonNullable<AssignmentResult["assemblyOutcome"]> =
+    graphCount === 1 && linked && !hardFail ? "validated-connected"
+    : graphCount < tiles.length ? "partial"
+    : "failed";
+  const outcomeLabel = assemblyOutcome === "validated-connected" ? "VALIDATED CONNECTED ASSEMBLY"
+    : assemblyOutcome === "partial" ? "PARTIAL ASSEMBLY"
+    : "FAILED OR INCOMPLETE ASSEMBLY";
+  const summary = `${outcomeLabel} · ${copyCount} forms (${formLabel(forms)}) · score ${score.toFixed(1)} · direct ${synthesis.directInterlocks} · interlocks ${synthesis.interlocks} · organic ${synthesis.organicConnectors} · bridges ${synthesis.bridges} · ramps ${synthesis.ramps} · stairs ${synthesis.stairs} · components ${graphCount} · isolated ${isolated}`;
   const placementNotes: PlacementNote[] = tiles.map((tile) => {
     const model = instances.find((item) => item.id === tile.id)!;
     const variant = model.variants[tile.variant];
+    const width = Math.max(0, model.bboxMax[0] - model.bboxMin[0]);
+    const depth = Math.max(0, model.bboxMax[1] - model.bboxMin[1]);
+    const height = tileHeight(model);
     return {
       tileId: tile.id,
       sourceId: sourceIdOf(model.id),
@@ -412,7 +454,7 @@ function finalize(
       circulation: evaled.parts.circulation,
       complementary: evaled.parts.interlock,
       collision: evaled.parts.collision,
-      reason: `assignment-mode · ${field.cellsZ === 1 ? "single lattice level" : "bay stack/gap aware"} · architectural ports`,
+      reason: `assignment-mode · ${field.cellsZ === 1 ? "single lattice level" : "bay stack/gap aware"} · feature-guided when enabled · bounds ${width.toFixed(1)}×${depth.toFixed(1)}×${height.toFixed(1)} ft vs ${LATTICE_FEET}' registration bay`,
       neighbors: [],
     };
   });
@@ -437,6 +479,7 @@ function finalize(
     status,
     summary,
     formIds: forms.map((model) => model.id),
+    assemblyOutcome,
   };
 }
 
@@ -513,7 +556,10 @@ async function searchMixedPair(forms: TileModel[], field: LatticeField, hooks: H
       iy: origin.iy + dy,
       sameBay: false,
     }));
-    if (aSource !== bSource) targets.push({ ix: origin.ix, iy: origin.iy, sameBay: true });
+    // Feature-guided generation only proposes side-adjacent bay pairs. Same-bay
+    // stacking burns the shortlist without producing feature candidates, so skip
+    // it when a feature policy is active rather than inventing arbitrary gaps.
+    if (aSource !== bSource && !a.connectionFeaturePolicy) targets.push({ ix: origin.ix, iy: origin.iy, sameBay: true });
 
     for (const target of targets) {
       if (target.ix < 0 || target.iy < 0 || target.ix >= field.cellsX || target.iy >= field.cellsY) continue;
@@ -615,7 +661,7 @@ async function growMixedAssembly(
           iy: host.iy + dy,
           sameBay: false,
         }));
-        targets.push({ ix: host.ix, iy: host.iy, sameBay: true });
+        if (!nextModel.connectionFeaturePolicy) targets.push({ ix: host.ix, iy: host.iy, sameBay: true });
 
         for (const target of targets) {
           if (target.ix < 0 || target.iy < 0 || target.ix >= field.cellsX || target.iy >= field.cellsY) continue;
@@ -697,8 +743,9 @@ export async function searchAssignmentCopies(
   options?:AssignmentSearchOptions,
 ): Promise<AssignmentResult> {
   const started = performance.now();
-  if(options&&(!Number.isInteger(options.perStage)||options.perStage<2||options.perStage>256||!Number.isInteger(options.candidates)||options.candidates<2||options.candidates>2048||!Number.isFinite(options.milliseconds)||options.milliseconds<1000||options.milliseconds>300000))throw new Error("Invalid bounded assignment search budget");
-  const control:SearchControl|undefined=options?{options,started,generated:0,evaluated:0,duplicates:0,stageStops:[],detailedRoutes:0,cheapRejections:0}:undefined;
+  const searchOptions=effectiveSearchOptions(copyCount,options);
+  if(searchOptions&&(!Number.isInteger(searchOptions.perStage)||searchOptions.perStage<2||searchOptions.perStage>256||!Number.isInteger(searchOptions.candidates)||searchOptions.candidates<2||searchOptions.candidates>2048||!Number.isFinite(searchOptions.milliseconds)||searchOptions.milliseconds<1000||searchOptions.milliseconds>300000))throw new Error("Invalid bounded assignment search budget");
+  const control:SearchControl|undefined=searchOptions?{options:searchOptions,started,generated:0,evaluated:0,duplicates:0,stageStops:[],detailedRoutes:0,cheapRejections:0}:undefined;
   const defaults = assignmentFieldForCopies(Math.max(2, copyCount));
   const field: LatticeField = fieldOverride
     ? {
@@ -714,7 +761,9 @@ export async function searchAssignmentCopies(
     hooks.onProgress("Need at least 2 distinct mapped forms", 100);
   }
 
-  const forms = selectDistinctForms(eligiblePool, copyCount, seeds).map(m=>({...m,connectionFeaturePolicy:copyCount===2?options?.featurePolicy:undefined}));
+  // Attach feature policy for every multi-form run so incremental 3-/4-/8-form
+  // growth uses the same architecture-first generator as two-form assemblies.
+  const forms = selectDistinctForms(eligiblePool, copyCount, seeds).map(m=>({...m,connectionFeaturePolicy:copyCount>=2?searchOptions?.featurePolicy:undefined}));
   hooks.onProgress(`Selecting ${copyCount} distinct forms · ${formLabel(forms)}`, 5);
   const grown = await growMixedAssembly(forms, field, hooks,control);
   assertEligibleAssignmentSources(grown.tiles, grown.instances, eligibleAssignedSourceIds);
@@ -725,9 +774,17 @@ export async function searchAssignmentCopies(
   if(control){const omitted=Math.max(0,control.generated-control.evaluated);
     if(!control.stopReason && omitted>0)stopped(control);
     const stopReason=control.stopReason??(control.stageStops.some(reason=>reason.endsWith("time share"))?"per-stage time share":control.stageStops.length?"per-stage shortlist limit":"candidate space exhausted");
-    result.searchEvidence={guided:options!.guided,generated:control.generated,evaluated:control.evaluated,omitted,incomplete:omitted>0||!!control.stopReason,stopReason,candidateLimit:options!.candidates,millisecondsLimit:options!.milliseconds,duplicates:control.duplicates,stageStops:control.stageStops,firstConnectionMs:control.firstConnectionMs,detailedRoutes:control.detailedRoutes,cheapRejections:control.cheapRejections};
+    const incomplete=omitted>0||!!control.stopReason;
+    result.searchEvidence={guided:searchOptions!.guided,generated:control.generated,evaluated:control.evaluated,omitted,incomplete,stopReason,candidateLimit:searchOptions!.candidates,millisecondsLimit:searchOptions!.milliseconds,duplicates:control.duplicates,stageStops:control.stageStops,firstConnectionMs:control.firstConnectionMs,detailedRoutes:control.detailedRoutes,cheapRejections:control.cheapRejections};
     result.summary+=` · bounded search ${control.evaluated}/${control.generated} unique · ${omitted} untested · ${stopReason}`;
-    if(!result.synthesis.connectors.length&&result.components>1&&result.searchEvidence.incomplete)result.summary+=" · No connection found within the search budget";
+    if(result.assemblyOutcome==="failed"&&incomplete){
+      result.assemblyOutcome="incomplete-search";
+      result.status=result.status==="FAIL"?result.status:"REVIEW";
+      result.summary=result.summary.replace("FAILED OR INCOMPLETE ASSEMBLY","INCOMPLETE SEARCH")
+        +" · No connection found within the search budget — not proof that no geometric solution exists";
+    }else if(result.assemblyOutcome==="failed"&&!incomplete&&!result.synthesis.connectors.length&&result.components>1){
+      result.summary+=" · Finished search without a validated connected arrangement";
+    }
   }
   return result;
 }

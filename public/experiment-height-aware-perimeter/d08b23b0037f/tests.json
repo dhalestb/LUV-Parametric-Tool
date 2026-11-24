@@ -1,0 +1,123 @@
+{
+  "passed": true,
+  "checks": [
+    "All 13 candidates resolve to exact native generating source-edge events; five accepted, eight rejected.",
+    "Independent original Rule B replay retains exact native letter, architecture and operation-trace hashes. Rule A arrangement is not regenerated.",
+    "Corrected native/world mesh hashes and all eligibility decisions reproduce exactly.",
+    "Single-wall demonstration reproduces exactly.",
+    "Stale source, altered base datum, full-site scope and rejected-wall forcing are blocked.",
+    "Finished assembly preserves every full native partial-return, open-lift, recess and terrace-passage air volume.",
+    "All positive added-wall intersections are the two native orthogonal corner-arm joins; no unrelated collision.",
+    "Each accepted wall is continuous to the base at all source/return/floor critical elevations, not merely in projection.",
+    "World-space transform, source footprint and assigned-territory containment are preserved.",
+    "All 92 saved letters and native 0/0.5/1/2-ft offsets unchanged.",
+    "Corrected replay passes the unchanged native strict OBJ/manifold/intersection validator."
+  ],
+  "protection": [
+    {
+      "kind": "return-open-lift",
+      "count": 35,
+      "unionAirVolumeFeet3": 88.89081653211589,
+      "baselineObstructionFeet3": -1.7208456881689926e-15,
+      "correctedObstructionFeet3": -1.7208456881689926e-15
+    },
+    {
+      "kind": "height-dependent-partial-return",
+      "count": 47,
+      "unionAirVolumeFeet3": 101.04045929077202,
+      "baselineObstructionFeet3": -1.2006996959190719e-15,
+      "correctedObstructionFeet3": -1.2018931653417532e-15
+    },
+    {
+      "kind": "native-recess-air",
+      "count": 154,
+      "unionAirVolumeFeet3": 1241.165301650908,
+      "baselineObstructionFeet3": 1.577327474904834e-14,
+      "correctedObstructionFeet3": 2.1716437377744882e-14
+    },
+    {
+      "kind": "terrace-passage",
+      "count": 2,
+      "unionAirVolumeFeet3": 293.93719482421875,
+      "baselineObstructionFeet3": -2.886579864025407e-15,
+      "correctedObstructionFeet3": -2.886579864025407e-15
+    }
+  ],
+  "pairs": [
+    {
+      "a": "base-wall-248",
+      "b": "base-wall-263",
+      "volumeFeet3": 2.821662724018099,
+      "meaning": "Authentic two-arm L corner intersection"
+    },
+    {
+      "a": "base-wall-360",
+      "b": "base-wall-376",
+      "volumeFeet3": 2.821662724018099,
+      "meaning": "Authentic two-arm L corner intersection"
+    }
+  ],
+  "continuous": [
+    {
+      "id": "base-wall-248",
+      "criticalSections": 52,
+      "maxMissingAreaFeet2": 0
+    },
+    {
+      "id": "base-wall-263",
+      "criticalSections": 52,
+      "maxMissingAreaFeet2": 0
+    },
+    {
+      "id": "base-wall-266",
+      "criticalSections": 52,
+      "maxMissingAreaFeet2": 0
+    },
+    {
+      "id": "base-wall-360",
+      "criticalSections": 52,
+      "maxMissingAreaFeet2": 0
+    },
+    {
+      "id": "base-wall-376",
+      "criticalSections": 52,
+      "maxMissingAreaFeet2": 0
+    }
+  ],
+  "measurements": {
+    "baselineVolumeFeet3": 2539.9704916373594,
+    "correctedVolumeFeet3": 2621.8521354979603,
+    "addedMaterialFeet3": 81.88164386060089,
+    "rawExtensionUnionFeet3": 86.47566348314285,
+    "baselineProjectionFeet2": 947.474623741582,
+    "correctedProjectionFeet2": 947.474623741582,
+    "oldGroundWallAreaFeet2": 76.2509765625,
+    "newGroundWallAreaFeet2": 84.89854291081429,
+    "newGroundWallAreaAddedFeet2": 8.647566348314285,
+    "extensionUnionFootprintFeet2": 8.647566348314285,
+    "heightFeet": 19.9140625,
+    "sourceLetterCount": 92,
+    "baselineComponents": 436,
+    "correctedComponents": 441
+  },
+  "export": {
+    "dir": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Site-Polygon-Morphogenesis\\reports\\height-aware-perimeter-implementation-20261121\\replay-export",
+    "passed": true,
+    "nonCoplanar": 0,
+    "coplanar": 0,
+    "exports": 442
+  },
+  "hashes": {
+    "source": "546108601c35fa48f0b30ef8409b5ef3d9ded9bc451a12b62d0b04fe4d8242fe",
+    "baselineArchitecture": "cd4d7ecce65317804e3c525c45d13feecbb4946145c1581a799e87958b9cb3df",
+    "correctedNative": "d6e064c431078c17c77cae0d07e4cad52dc7913fb92547c3d5ba47f99321201e",
+    "correctedWorld": "d08b23b0037fb8386f021baf05acea67d8c9136c4d4cbb9aa9287dab0bc92660"
+  },
+  "limitations": [
+    "Fixture only. No Miami or full-site generation.",
+    "Only complete native panel spans are accepted; six mixed-ownership panels are not split.",
+    "Two fully exterior panels collide with native sources/returns/recess air and remain unresolved.",
+    "The demonstrated new owners are L edges; no V edge is among the 13 baseline candidates.",
+    "Full enclosure completion is not claimed. Original partial-opening limitations remain."
+  ]
+}

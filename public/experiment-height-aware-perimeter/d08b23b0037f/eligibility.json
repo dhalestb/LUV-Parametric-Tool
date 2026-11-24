@@ -1,0 +1,1671 @@
+[
+  {
+    "id": "base-wall-241",
+    "source": {
+      "letterId": "L-47",
+      "curveIndex": 5,
+      "stationId": "L-47",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          9.796773214729718,
+          -10.257929829480446
+        ],
+        [
+          14.039413978812812,
+          -6.015289065397352
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          8.796773214729718,
+          -11.257929829480446
+        ],
+        [
+          13.039413978812812,
+          -7.015289065397352
+        ]
+      ],
+      "sourceBottomFeet": 10,
+      "sourceTopFeet": 10.91304348214813,
+      "setbackFeet": 0,
+      "exactTraceEdgeId": "L-47"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 10.9140625,
+      "meshHash": "660aef5d483c12ca07f26efe382c44cece937f5f38de221640d98abaa12d4843"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        1,
+        0
+      ],
+      "from": -0.0625,
+      "to": 3.671875,
+      "lengthFeet": 3.734375,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 0.6597314272075891,
+      "insideGroundFeet2": 1.3237314876168966,
+      "outwardOccupiedFeet2": 0.049072571098804474,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": false,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "connection-243",
+        "kind": "connection",
+        "sources": [
+          "L-47",
+          "L-63"
+        ],
+        "bottomFeet": 15.828125,
+        "topFeet": 16.359375
+      },
+      {
+        "id": "daylight-return-256",
+        "kind": "daylight-return",
+        "sources": [
+          "L-47",
+          "L-46"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 12.1640625
+      },
+      {
+        "id": "plank-return-257",
+        "kind": "plank-return",
+        "sources": [
+          "L-47",
+          "L-79"
+        ],
+        "bottomFeet": 16.359375,
+        "topFeet": 17.53125
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 1.9834629148244858,
+      "volumeFeet3": 19.83462914824486,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 1.9834629148244856
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 2.335592520831101,
+      "structuralCollisionFeet3": 9.528445761818146,
+      "protectedAirConflicts": [
+        {
+          "id": "native-air-8",
+          "kind": "return-open-lift",
+          "volumeFeet3": 1.836346912677982
+        },
+        {
+          "id": "native-air-15",
+          "kind": "height-dependent-partial-return",
+          "volumeFeet3": 0.11565023736596203
+        },
+        {
+          "id": "recess-base-wall-50",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.9001289214502322
+        },
+        {
+          "id": "recess-wall-51",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.8805281241657212
+        },
+        {
+          "id": "recess-base-wall-57",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.7452766969145164
+        },
+        {
+          "id": "recess-wall-58",
+          "kind": "native-recess-air",
+          "volumeFeet3": 2.1604324482541424
+        }
+      ]
+    },
+    "eligible": false,
+    "reasons": [
+      "Mixed lower/upper ownership: only part of this native panel is outside the lower enclosure; interval splitting is deferred.",
+      "Not a verified exterior source interface of the combined source-derived envelope.",
+      "Downward extrusion intersects preserved source letters.",
+      "Downward extrusion collides with an existing lower wall or return.",
+      "Downward extrusion would obstruct protected native opening/recess air: native-air-8, native-air-15, recess-base-wall-50, recess-wall-51, recess-base-wall-57, recess-wall-58"
+    ]
+  },
+  {
+    "id": "base-wall-245",
+    "source": {
+      "letterId": "L-47",
+      "curveIndex": 5,
+      "stationId": "L-47",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          9.796773214729718,
+          -10.257929829480446
+        ],
+        [
+          14.039413978812812,
+          -6.015289065397352
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          8.796773214729718,
+          -11.257929829480446
+        ],
+        [
+          13.039413978812812,
+          -7.015289065397352
+        ]
+      ],
+      "sourceBottomFeet": 10,
+      "sourceTopFeet": 10.91304348214813,
+      "setbackFeet": 0,
+      "exactTraceEdgeId": "L-47"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 10.9140625,
+      "meshHash": "21d9ab76c7f2fc29e9319e8fde888014fccd11f365963adc9aaf89d91b99923a"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        1,
+        0
+      ],
+      "from": 3.671875,
+      "to": 5.671875,
+      "lengthFeet": 2,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 1.0622730255126953,
+      "insideGroundFeet2": 0,
+      "outwardOccupiedFeet2": 0,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": true,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "connection-243",
+        "kind": "connection",
+        "sources": [
+          "L-47",
+          "L-63"
+        ],
+        "bottomFeet": 15.828125,
+        "topFeet": 16.359375
+      },
+      {
+        "id": "daylight-return-256",
+        "kind": "daylight-return",
+        "sources": [
+          "L-47",
+          "L-46"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 12.1640625
+      },
+      {
+        "id": "plank-return-257",
+        "kind": "plank-return",
+        "sources": [
+          "L-47",
+          "L-79"
+        ],
+        "bottomFeet": 16.359375,
+        "topFeet": 17.53125
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 1.0622730255126953,
+      "volumeFeet3": 10.622730255126948,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 1.0622730255126955
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0.0023996159261342838,
+      "structuralCollisionFeet3": 0.007254774463945068,
+      "protectedAirConflicts": [
+        {
+          "id": "recess-base-wall-57",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.008878462082066182
+        },
+        {
+          "id": "recess-wall-58",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.02573717607447194
+        }
+      ]
+    },
+    "eligible": false,
+    "reasons": [
+      "Downward extrusion intersects preserved source letters.",
+      "Downward extrusion collides with an existing lower wall or return.",
+      "Downward extrusion would obstruct protected native opening/recess air: recess-base-wall-57, recess-wall-58"
+    ]
+  },
+  {
+    "id": "base-wall-248",
+    "source": {
+      "letterId": "L-48",
+      "curveIndex": 5,
+      "stationId": "L-48-edge-5",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          14.039413978812817,
+          -6.015289065397354
+        ],
+        [
+          16.867841154868216,
+          -3.186861889341957
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          13.039413978812817,
+          -7.015289065397354
+        ],
+        [
+          15.867841154868216,
+          -4.186861889341957
+        ]
+      ],
+      "sourceBottomFeet": 11.25,
+      "sourceTopFeet": 11.85869565476542,
+      "setbackFeet": 0,
+      "exactTraceEdgeId": "L-48-edge-5"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 11.859375,
+      "meshHash": "1e3a8ff4c0b150e0caeb2d5a2d98be79ae65833dfb5c39528c8990613187c142"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        1,
+        0
+      ],
+      "from": 5.671875,
+      "to": 9.671875,
+      "lengthFeet": 4,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 2.1245460510253906,
+      "insideGroundFeet2": 0,
+      "outwardOccupiedFeet2": 0,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": true,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 2.1245460510253906,
+      "volumeFeet3": 21.245460510253892,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 2.124546051025391
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0,
+      "structuralCollisionFeet3": 0,
+      "protectedAirConflicts": []
+    },
+    "eligible": true,
+    "reasons": [
+      "Exact source ownership and every geometry/opening/containment check passed."
+    ]
+  },
+  {
+    "id": "base-wall-263",
+    "source": {
+      "letterId": "L-48",
+      "curveIndex": 0,
+      "stationId": "L-48-edge-0",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          16.867841154868216,
+          -3.186861889341957
+        ],
+        [
+          14.223876624713107,
+          -0.54289735918685
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          15.867841154868216,
+          -4.186861889341957
+        ],
+        [
+          13.223876624713107,
+          -1.54289735918685
+        ]
+      ],
+      "sourceBottomFeet": 11.25,
+      "sourceTopFeet": 11.85869565476542,
+      "setbackFeet": 0,
+      "exactTraceEdgeId": "L-48-edge-0"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 11.859375,
+      "meshHash": "aba5320f4484f04fe5f2875366635d81dd1dbe46206f759fc9e28cbf6f62ae8a"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        0,
+        1
+      ],
+      "from": -14.1796875,
+      "to": -10.4453125,
+      "lengthFeet": 3.734375,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 1.9834629148244858,
+      "insideGroundFeet2": 0,
+      "outwardOccupiedFeet2": 0,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": true,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 1.9834629148244858,
+      "volumeFeet3": 19.83462914824485,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 1.9834629148244862
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0,
+      "structuralCollisionFeet3": 0,
+      "protectedAirConflicts": []
+    },
+    "eligible": true,
+    "reasons": [
+      "Exact source ownership and every geometry/opening/containment check passed."
+    ]
+  },
+  {
+    "id": "base-wall-266",
+    "source": {
+      "letterId": "L-49",
+      "curveIndex": 5,
+      "stationId": "L-49",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          14.223876624713109,
+          -0.5428973591868491
+        ],
+        [
+          9.981235860630012,
+          3.6997434048962465
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          13.223876624713109,
+          -1.5428973591868491
+        ],
+        [
+          8.981235860630012,
+          2.6997434048962465
+        ]
+      ],
+      "sourceBottomFeet": 10,
+      "sourceTopFeet": 10.91304348214813,
+      "setbackFeet": 0,
+      "exactTraceEdgeId": "L-49"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 10.9140625,
+      "meshHash": "243fa7152490cb65b5c83f1081b9c0da887a01d85acad426789a39d634917f19"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        0,
+        1
+      ],
+      "from": -10.4453125,
+      "to": -8.5703125,
+      "lengthFeet": 1.875,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 0.9958809614181519,
+      "insideGroundFeet2": 0,
+      "outwardOccupiedFeet2": 0,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": true,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "connection-271",
+        "kind": "connection",
+        "sources": [
+          "L-49",
+          "V-65"
+        ],
+        "bottomFeet": 15.9765625,
+        "topFeet": 16.5078125
+      },
+      {
+        "id": "connection-275",
+        "kind": "connection",
+        "sources": [
+          "L-49",
+          "V-65"
+        ],
+        "bottomFeet": 15.9765625,
+        "topFeet": 16.5078125
+      },
+      {
+        "id": "daylight-return-321",
+        "kind": "daylight-return",
+        "sources": [
+          "L-49",
+          "L-50"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 12.1640625
+      },
+      {
+        "id": "plank-return-322",
+        "kind": "plank-return",
+        "sources": [
+          "L-49",
+          "L-82"
+        ],
+        "bottomFeet": 16.5078125,
+        "topFeet": 17.53125
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 0.9958809614181519,
+      "volumeFeet3": 9.958809614181522,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 0.9958809614181519
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0,
+      "structuralCollisionFeet3": 0,
+      "protectedAirConflicts": []
+    },
+    "eligible": true,
+    "reasons": [
+      "Exact source ownership and every geometry/opening/containment check passed."
+    ]
+  },
+  {
+    "id": "base-wall-269",
+    "source": {
+      "letterId": "L-49",
+      "curveIndex": 5,
+      "stationId": "L-49",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          14.223876624713109,
+          -0.5428973591868491
+        ],
+        [
+          9.981235860630012,
+          3.6997434048962465
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          13.223876624713109,
+          -1.5428973591868491
+        ],
+        [
+          8.981235860630012,
+          2.6997434048962465
+        ]
+      ],
+      "sourceBottomFeet": 10,
+      "sourceTopFeet": 10.91304348214813,
+      "setbackFeet": 0,
+      "exactTraceEdgeId": "L-49"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 10.9140625,
+      "meshHash": "eaefbc1e326a8d20f095ff506254cc93d2406c58888493d2c2811dd48b1fe215"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        0,
+        1
+      ],
+      "from": -8.5703125,
+      "to": -6.703125,
+      "lengthFeet": 1.8671875,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 0.9546575248241425,
+      "insideGroundFeet2": 0.03707393258810043,
+      "outwardOccupiedFeet2": 0,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": false,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "connection-271",
+        "kind": "connection",
+        "sources": [
+          "L-49",
+          "V-65"
+        ],
+        "bottomFeet": 15.9765625,
+        "topFeet": 16.5078125
+      },
+      {
+        "id": "connection-275",
+        "kind": "connection",
+        "sources": [
+          "L-49",
+          "V-65"
+        ],
+        "bottomFeet": 15.9765625,
+        "topFeet": 16.5078125
+      },
+      {
+        "id": "daylight-return-321",
+        "kind": "daylight-return",
+        "sources": [
+          "L-49",
+          "L-50"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 12.1640625
+      },
+      {
+        "id": "plank-return-322",
+        "kind": "plank-return",
+        "sources": [
+          "L-49",
+          "L-82"
+        ],
+        "bottomFeet": 16.5078125,
+        "topFeet": 17.53125
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 0.9917314574122429,
+      "volumeFeet3": 9.917314574122425,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 0.9917314574122433
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0.027287067745823613,
+      "structuralCollisionFeet3": 0.3525280376197769,
+      "protectedAirConflicts": [
+        {
+          "id": "recess-base-wall-73",
+          "kind": "native-recess-air",
+          "volumeFeet3": 3.059875527571421
+        },
+        {
+          "id": "recess-wall-74",
+          "kind": "native-recess-air",
+          "volumeFeet3": 2.5217064649332315
+        },
+        {
+          "id": "recess-roof-wall-76",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.6421543044853024
+        }
+      ]
+    },
+    "eligible": false,
+    "reasons": [
+      "Mixed lower/upper ownership: only part of this native panel is outside the lower enclosure; interval splitting is deferred.",
+      "Downward extrusion intersects preserved source letters.",
+      "Downward extrusion collides with an existing lower wall or return.",
+      "Downward extrusion would obstruct protected native opening/recess air: recess-base-wall-73, recess-wall-74, recess-roof-wall-76"
+    ]
+  },
+  {
+    "id": "base-wall-273",
+    "source": {
+      "letterId": "L-49",
+      "curveIndex": 5,
+      "stationId": "L-49",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          14.223876624713109,
+          -0.5428973591868491
+        ],
+        [
+          9.981235860630012,
+          3.6997434048962465
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          13.223876624713109,
+          -1.5428973591868491
+        ],
+        [
+          8.981235860630012,
+          2.6997434048962465
+        ]
+      ],
+      "sourceBottomFeet": 10,
+      "sourceTopFeet": 10.91304348214813,
+      "setbackFeet": 0,
+      "exactTraceEdgeId": "L-49"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 10.9140625,
+      "meshHash": "3303ddc0fee0044931b5ea9c3699cee6c7b6e784148e92875091f5377717bef3"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        0,
+        1
+      ],
+      "from": -6.703125,
+      "to": -4.4453125,
+      "lengthFeet": 2.2578125,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 0.0702974796295166,
+      "insideGroundFeet2": 1.1289091780781746,
+      "outwardOccupiedFeet2": 0.05736079066991806,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": false,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "connection-271",
+        "kind": "connection",
+        "sources": [
+          "L-49",
+          "V-65"
+        ],
+        "bottomFeet": 15.9765625,
+        "topFeet": 16.5078125
+      },
+      {
+        "id": "connection-275",
+        "kind": "connection",
+        "sources": [
+          "L-49",
+          "V-65"
+        ],
+        "bottomFeet": 15.9765625,
+        "topFeet": 16.5078125
+      },
+      {
+        "id": "daylight-return-321",
+        "kind": "daylight-return",
+        "sources": [
+          "L-49",
+          "L-50"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 12.1640625
+      },
+      {
+        "id": "plank-return-322",
+        "kind": "plank-return",
+        "sources": [
+          "L-49",
+          "L-82"
+        ],
+        "bottomFeet": 16.5078125,
+        "topFeet": 17.53125
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 1.1992066577076912,
+      "volumeFeet3": 11.99206657707691,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 1.1992066577076912
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 1.321719948534337,
+      "structuralCollisionFeet3": 3.8273140341698304,
+      "protectedAirConflicts": [
+        {
+          "id": "recess-base-wall-73",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.3278718385845423
+        },
+        {
+          "id": "recess-wall-74",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.2702059373259544
+        },
+        {
+          "id": "recess-roof-wall-76",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.7776999404886736
+        }
+      ]
+    },
+    "eligible": false,
+    "reasons": [
+      "Mixed lower/upper ownership: only part of this native panel is outside the lower enclosure; interval splitting is deferred.",
+      "Not a verified exterior source interface of the combined source-derived envelope.",
+      "Downward extrusion intersects preserved source letters.",
+      "Downward extrusion collides with an existing lower wall or return.",
+      "Downward extrusion would obstruct protected native opening/recess air: recess-base-wall-73, recess-wall-74, recess-roof-wall-76"
+    ]
+  },
+  {
+    "id": "base-wall-352",
+    "source": {
+      "letterId": "L-55",
+      "curveIndex": 0,
+      "stationId": "L-55",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          -8.65925362120706,
+          8.567022298256914
+        ],
+        [
+          -12.62520041643972,
+          4.601075503024257
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          -9.65925362120706,
+          7.567022298256914
+        ],
+        [
+          -13.62520041643972,
+          3.6010755030242567
+        ]
+      ],
+      "sourceBottomFeet": 10,
+      "sourceTopFeet": 10.91304348214813,
+      "setbackFeet": 2,
+      "exactTraceEdgeId": "L-55"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 10.9140625,
+      "meshHash": "dcc12b9eb0d06f258e1465e1e62fffa2ad6f761e6c86e84fe37e4a93c00988e8"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        -1,
+        0
+      ],
+      "from": 0.0625,
+      "to": 3.671875,
+      "lengthFeet": 3.609375,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 0.015862406231462955,
+      "insideGroundFeet2": 1.9012084444984794,
+      "outwardOccupiedFeet2": 0.11276887357234955,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": false,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "connection-354",
+        "kind": "connection",
+        "sources": [
+          "L-55",
+          "L-71"
+        ],
+        "bottomFeet": 14.578125,
+        "topFeet": 15.109375
+      },
+      {
+        "id": "connection-358",
+        "kind": "connection",
+        "sources": [
+          "L-55",
+          "L-72"
+        ],
+        "bottomFeet": 13.6328125,
+        "topFeet": 14.1640625
+      },
+      {
+        "id": "daylight-return-368",
+        "kind": "daylight-return",
+        "sources": [
+          "L-54",
+          "L-55"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 12.1640625
+      },
+      {
+        "id": "daylight-return-370",
+        "kind": "daylight-return",
+        "sources": [
+          "L-56",
+          "L-55"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 1.9170708507299423,
+      "volumeFeet3": 19.170708507299423,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 1.9170708507299443
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 1.1838822086360474,
+      "structuralCollisionFeet3": 3.369880050595385,
+      "protectedAirConflicts": [
+        {
+          "id": "native-air-28",
+          "kind": "return-open-lift",
+          "volumeFeet3": 0.6281670928001404
+        },
+        {
+          "id": "recess-roof-wall-170",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.20875027027796023
+        },
+        {
+          "id": "recess-base-wall-171",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.034327238485275226
+        },
+        {
+          "id": "recess-wall-172",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.09827256360586029
+        },
+        {
+          "id": "recess-roof-wall-173",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.017597356913029223
+        }
+      ]
+    },
+    "eligible": false,
+    "reasons": [
+      "Mixed lower/upper ownership: only part of this native panel is outside the lower enclosure; interval splitting is deferred.",
+      "Not a verified exterior source interface of the combined source-derived envelope.",
+      "Downward extrusion intersects preserved source letters.",
+      "Downward extrusion collides with an existing lower wall or return.",
+      "Downward extrusion would obstruct protected native opening/recess air: native-air-28, recess-roof-wall-170, recess-base-wall-171, recess-wall-172, recess-roof-wall-173"
+    ]
+  },
+  {
+    "id": "base-wall-356",
+    "source": {
+      "letterId": "L-55",
+      "curveIndex": 0,
+      "stationId": "L-55",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          -8.65925362120706,
+          8.567022298256914
+        ],
+        [
+          -12.62520041643972,
+          4.601075503024257
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          -9.65925362120706,
+          7.567022298256914
+        ],
+        [
+          -13.62520041643972,
+          3.6010755030242567
+        ]
+      ],
+      "sourceBottomFeet": 10,
+      "sourceTopFeet": 10.91304348214813,
+      "setbackFeet": 2,
+      "exactTraceEdgeId": "L-55"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 10.9140625,
+      "meshHash": "a7a7230febc3d806cc5ed82b4c402f4669144bc947eb160905a133bbab740803"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        -1,
+        0
+      ],
+      "from": 3.671875,
+      "to": 5.671875,
+      "lengthFeet": 2,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 1.0104118818417192,
+      "insideGroundFeet2": 0.05186114367097616,
+      "outwardOccupiedFeet2": 0.00317315012216568,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": false,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "connection-354",
+        "kind": "connection",
+        "sources": [
+          "L-55",
+          "L-71"
+        ],
+        "bottomFeet": 14.578125,
+        "topFeet": 15.109375
+      },
+      {
+        "id": "connection-358",
+        "kind": "connection",
+        "sources": [
+          "L-55",
+          "L-72"
+        ],
+        "bottomFeet": 13.6328125,
+        "topFeet": 14.1640625
+      },
+      {
+        "id": "daylight-return-368",
+        "kind": "daylight-return",
+        "sources": [
+          "L-54",
+          "L-55"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 12.1640625
+      },
+      {
+        "id": "daylight-return-370",
+        "kind": "daylight-return",
+        "sources": [
+          "L-56",
+          "L-55"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 1.0622730255126953,
+      "volumeFeet3": 10.622730255126946,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 1.0622730255126953
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0.030115659961039862,
+      "structuralCollisionFeet3": 0.518611436709762,
+      "protectedAirConflicts": [
+        {
+          "id": "recess-base-wall-167",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.045647548948182
+        },
+        {
+          "id": "recess-wall-168",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.041884489357471064
+        },
+        {
+          "id": "recess-roof-wall-170",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.0116164013452363
+        },
+        {
+          "id": "recess-base-wall-171",
+          "kind": "native-recess-air",
+          "volumeFeet3": 1.7837760368201998
+        },
+        {
+          "id": "recess-wall-172",
+          "kind": "native-recess-air",
+          "volumeFeet3": 5.106622372557466
+        },
+        {
+          "id": "recess-roof-wall-173",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.9144267047959148
+        },
+        {
+          "id": "recess-base-wall-174",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.17338086231757202
+        },
+        {
+          "id": "recess-wall-175",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.5852386507831396
+        }
+      ]
+    },
+    "eligible": false,
+    "reasons": [
+      "Mixed lower/upper ownership: only part of this native panel is outside the lower enclosure; interval splitting is deferred.",
+      "Not a verified exterior source interface of the combined source-derived envelope.",
+      "Downward extrusion intersects preserved source letters.",
+      "Downward extrusion collides with an existing lower wall or return.",
+      "Downward extrusion would obstruct protected native opening/recess air: recess-base-wall-167, recess-wall-168, recess-roof-wall-170, recess-base-wall-171, recess-wall-172, recess-roof-wall-173, recess-base-wall-174, recess-wall-175"
+    ]
+  },
+  {
+    "id": "base-wall-360",
+    "source": {
+      "letterId": "L-56",
+      "curveIndex": 5,
+      "stationId": "L-56-edge-5",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          -14.039413978812815,
+          6.0152890653973525
+        ],
+        [
+          -16.867841154868213,
+          3.186861889341957
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          -15.039413978812815,
+          5.0152890653973525
+        ],
+        [
+          -17.867841154868213,
+          2.186861889341957
+        ]
+      ],
+      "sourceBottomFeet": 11.25,
+      "sourceTopFeet": 11.85869565476542,
+      "setbackFeet": 0,
+      "exactTraceEdgeId": "L-56-edge-5"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 11.859375,
+      "meshHash": "7b147e2e94b2c1e8dcec57e47a5f41e021ac1febdb89500fece7ac75d379ba1f"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        -1,
+        0
+      ],
+      "from": 5.671875,
+      "to": 9.671875,
+      "lengthFeet": 4,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 2.1245460510253906,
+      "insideGroundFeet2": 0,
+      "outwardOccupiedFeet2": 0,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": true,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "daylight-return-370",
+        "kind": "daylight-return",
+        "sources": [
+          "L-56",
+          "L-55"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      },
+      {
+        "id": "daylight-return-422",
+        "kind": "daylight-return",
+        "sources": [
+          "L-56",
+          "L-57"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 2.1245460510253906,
+      "volumeFeet3": 21.2454605102539,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 2.124546051025391
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0,
+      "structuralCollisionFeet3": 5.065392549852277e-16,
+      "protectedAirConflicts": []
+    },
+    "eligible": true,
+    "reasons": [
+      "Exact source ownership and every geometry/opening/containment check passed."
+    ]
+  },
+  {
+    "id": "base-wall-376",
+    "source": {
+      "letterId": "L-56",
+      "curveIndex": 0,
+      "stationId": "L-56-edge-0",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          -16.867841154868213,
+          3.186861889341957
+        ],
+        [
+          -14.223876624713107,
+          0.5428973591868491
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          -17.867841154868213,
+          2.186861889341957
+        ],
+        [
+          -15.223876624713107,
+          -0.4571026408131509
+        ]
+      ],
+      "sourceBottomFeet": 11.25,
+      "sourceTopFeet": 11.85869565476542,
+      "setbackFeet": 0,
+      "exactTraceEdgeId": "L-56-edge-0"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 11.859375,
+      "meshHash": "f09853fb8c59087cfb10a1df2048ba5d3676cae7c929601e1fee1b8ec464ef4d"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        0,
+        -1
+      ],
+      "from": -14.1796875,
+      "to": -10.4453125,
+      "lengthFeet": 3.734375,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 1.9834629148244858,
+      "insideGroundFeet2": 0,
+      "outwardOccupiedFeet2": 0,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": true,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "daylight-return-370",
+        "kind": "daylight-return",
+        "sources": [
+          "L-56",
+          "L-55"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      },
+      {
+        "id": "daylight-return-422",
+        "kind": "daylight-return",
+        "sources": [
+          "L-56",
+          "L-57"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 1.9834629148244858,
+      "volumeFeet3": 19.83462914824485,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 1.9834629148244862
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0,
+      "structuralCollisionFeet3": 4.163336342344337e-17,
+      "protectedAirConflicts": []
+    },
+    "eligible": true,
+    "reasons": [
+      "Exact source ownership and every geometry/opening/containment check passed."
+    ]
+  },
+  {
+    "id": "base-wall-379",
+    "source": {
+      "letterId": "L-57",
+      "curveIndex": 0,
+      "stationId": "L-57",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          -12.809663062340011,
+          1.957110921559945
+        ],
+        [
+          -10.165698532184905,
+          -0.6868536085951611
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          -13.809663062340011,
+          0.9571109215599449
+        ],
+        [
+          -11.165698532184905,
+          -1.686853608595161
+        ]
+      ],
+      "sourceBottomFeet": 11.25,
+      "sourceTopFeet": 11.85869565476542,
+      "setbackFeet": 2,
+      "exactTraceEdgeId": "L-57"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 11.859375,
+      "meshHash": "46eebaa87d2a3c403a0ff49be72fd2fd6cb1d35d9e892ad5c68752428b0ebfa1"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        0,
+        -1
+      ],
+      "from": -10.4453125,
+      "to": -8.5703125,
+      "lengthFeet": 1.875,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 0.9958809614181519,
+      "insideGroundFeet2": 0,
+      "outwardOccupiedFeet2": 0,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": true,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "connection-381",
+        "kind": "connection",
+        "sources": [
+          "L-57",
+          "L-72"
+        ],
+        "bottomFeet": 13.6328125,
+        "topFeet": 14.1640625
+      },
+      {
+        "id": "connection-385",
+        "kind": "connection",
+        "sources": [
+          "L-57",
+          "L-73"
+        ],
+        "bottomFeet": 14.578125,
+        "topFeet": 15.109375
+      },
+      {
+        "id": "daylight-return-422",
+        "kind": "daylight-return",
+        "sources": [
+          "L-56",
+          "L-57"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      },
+      {
+        "id": "daylight-return-423",
+        "kind": "daylight-return",
+        "sources": [
+          "V-58",
+          "L-57"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 0.9958809614181519,
+      "volumeFeet3": 9.958809614181522,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 0.9958809614181519
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0.23272351748554784,
+      "structuralCollisionFeet3": 0.17449832623242392,
+      "protectedAirConflicts": [
+        {
+          "id": "native-air-36",
+          "kind": "height-dependent-partial-return",
+          "volumeFeet3": 0.22822434920531753
+        },
+        {
+          "id": "recess-base-wall-174",
+          "kind": "native-recess-air",
+          "volumeFeet3": 1.5654461547019312
+        },
+        {
+          "id": "recess-wall-175",
+          "kind": "native-recess-air",
+          "volumeFeet3": 5.1482384863993484
+        },
+        {
+          "id": "recess-base-wall-178",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.08718175619287634
+        },
+        {
+          "id": "recess-wall-179",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.22818329689471348
+        }
+      ]
+    },
+    "eligible": false,
+    "reasons": [
+      "Downward extrusion intersects preserved source letters.",
+      "Downward extrusion collides with an existing lower wall or return.",
+      "Downward extrusion would obstruct protected native opening/recess air: native-air-36, recess-base-wall-174, recess-wall-175, recess-base-wall-178, recess-wall-179"
+    ]
+  },
+  {
+    "id": "base-wall-383",
+    "source": {
+      "letterId": "L-57",
+      "curveIndex": 0,
+      "stationId": "L-57",
+      "level": 2,
+      "zone": "upper",
+      "nativeEdgeXY": [
+        [
+          -12.809663062340011,
+          1.957110921559945
+        ],
+        [
+          -10.165698532184905,
+          -0.6868536085951611
+        ]
+      ],
+      "worldEdgeXY": [
+        [
+          -13.809663062340011,
+          0.9571109215599449
+        ],
+        [
+          -11.165698532184905,
+          -1.686853608595161
+        ]
+      ],
+      "sourceBottomFeet": 11.25,
+      "sourceTopFeet": 11.85869565476542,
+      "setbackFeet": 2,
+      "exactTraceEdgeId": "L-57"
+    },
+    "originalWall": {
+      "bottom": 10,
+      "top": 11.859375,
+      "meshHash": "475fb65d1c70491d8da3655ae812a95f52c203d2340566fa1ea328c262e952b3"
+    },
+    "attribution": {
+      "method": "Original unchanged Rule B add() event p/curveIndex, native replay geometry hash verified",
+      "unambiguous": true
+    },
+    "interval": {
+      "nativeTangent": [
+        0,
+        -1
+      ],
+      "from": -8.5703125,
+      "to": -6.703125,
+      "lengthFeet": 1.8671875,
+      "thicknessFeet": 0.53125
+    },
+    "ownership": {
+      "outsideGroundFeet2": 0.6932801306247711,
+      "insideGroundFeet2": 0.29845132678747177,
+      "outwardOccupiedFeet2": 0.021374598145484924,
+      "inwardMissingFeet2": 0,
+      "exteriorOwner": false,
+      "method": "Exact upper source panel; inward collar in its source-derived envelope, outward collar outside combined lower/upper source-derived envelope, full panel outside ground enclosure."
+    },
+    "relations": [
+      {
+        "id": "connection-381",
+        "kind": "connection",
+        "sources": [
+          "L-57",
+          "L-72"
+        ],
+        "bottomFeet": 13.6328125,
+        "topFeet": 14.1640625
+      },
+      {
+        "id": "connection-385",
+        "kind": "connection",
+        "sources": [
+          "L-57",
+          "L-73"
+        ],
+        "bottomFeet": 14.578125,
+        "topFeet": 15.109375
+      },
+      {
+        "id": "daylight-return-422",
+        "kind": "daylight-return",
+        "sources": [
+          "L-56",
+          "L-57"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      },
+      {
+        "id": "daylight-return-423",
+        "kind": "daylight-return",
+        "sources": [
+          "V-58",
+          "L-57"
+        ],
+        "bottomFeet": 10,
+        "topFeet": 11.859375
+      }
+    ],
+    "extension": {
+      "bottomFeet": 0,
+      "topFeet": 10,
+      "heightFeet": 10,
+      "planAreaFeet2": 0.9917314574122429,
+      "volumeFeet3": 9.917314574122432,
+      "nativePanelDifferenceFeet2": 0,
+      "upperContactAreaFeet2": 0.9917314574122429
+    },
+    "checks": {
+      "outsideTerritoryFeet2": 0,
+      "sourceCollisionFeet3": 0.828681256867981,
+      "structuralCollisionFeet3": 1.8629674329713448,
+      "protectedAirConflicts": [
+        {
+          "id": "native-air-29",
+          "kind": "return-open-lift",
+          "volumeFeet3": 1.0063838321172573
+        },
+        {
+          "id": "native-air-36",
+          "kind": "height-dependent-partial-return",
+          "volumeFeet3": 0.23225846666527986
+        },
+        {
+          "id": "recess-base-wall-174",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.06619584744476016
+        },
+        {
+          "id": "recess-wall-175",
+          "kind": "native-recess-air",
+          "volumeFeet3": 0.21149214797333094
+        },
+        {
+          "id": "recess-base-wall-178",
+          "kind": "native-recess-air",
+          "volumeFeet3": 1.4341056852354084
+        },
+        {
+          "id": "recess-wall-179",
+          "kind": "native-recess-air",
+          "volumeFeet3": 3.7535257104536868
+        }
+      ]
+    },
+    "eligible": false,
+    "reasons": [
+      "Mixed lower/upper ownership: only part of this native panel is outside the lower enclosure; interval splitting is deferred.",
+      "Not a verified exterior source interface of the combined source-derived envelope.",
+      "Downward extrusion intersects preserved source letters.",
+      "Downward extrusion collides with an existing lower wall or return.",
+      "Downward extrusion would obstruct protected native opening/recess air: native-air-29, native-air-36, recess-base-wall-174, recess-wall-175, recess-base-wall-178, recess-wall-179"
+    ]
+  }
+]

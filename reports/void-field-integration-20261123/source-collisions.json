@@ -1,0 +1,82 @@
+[
+  {
+    "a": "U-2",
+    "b": "V-3",
+    "roles": [
+      "terrace",
+      "perimeter"
+    ],
+    "volumeFeet3": 37.26598954207048,
+    "classification": "unresolved native source intersection; not automatically authorized by source roles"
+  },
+  {
+    "a": "L-4",
+    "b": "V-5",
+    "roles": [
+      "interior",
+      "interior"
+    ],
+    "volumeFeet3": 33.27568471017532,
+    "classification": "unresolved native source intersection; not automatically authorized by source roles"
+  },
+  {
+    "a": "L-4",
+    "b": "U-8",
+    "roles": [
+      "interior",
+      "terrace"
+    ],
+    "volumeFeet3": 16.503792458595818,
+    "classification": "unresolved native source intersection; not automatically authorized by source roles"
+  },
+  {
+    "a": "L-4",
+    "b": "V-9",
+    "roles": [
+      "interior",
+      "perimeter"
+    ],
+    "volumeFeet3": 8.132222671872265,
+    "classification": "unresolved native source intersection; not automatically authorized by source roles"
+  },
+  {
+    "a": "V-5",
+    "b": "L-6",
+    "roles": [
+      "interior",
+      "perimeter"
+    ],
+    "volumeFeet3": 5.995204022581787,
+    "classification": "unresolved native source intersection; not automatically authorized by source roles"
+  },
+  {
+    "a": "V-5",
+    "b": "V-9",
+    "roles": [
+      "interior",
+      "perimeter"
+    ],
+    "volumeFeet3": 4.993940473308157,
+    "classification": "unresolved native source intersection; not automatically authorized by source roles"
+  },
+  {
+    "a": "L-6",
+    "b": "U-7",
+    "roles": [
+      "perimeter",
+      "interior"
+    ],
+    "volumeFeet3": 5.461054595048877,
+    "classification": "unresolved native source intersection; not automatically authorized by source roles"
+  },
+  {
+    "a": "U-8",
+    "b": "V-9",
+    "roles": [
+      "terrace",
+      "perimeter"
+    ],
+    "volumeFeet3": 2.326831516822715,
+    "classification": "unresolved native source intersection; not automatically authorized by source roles"
+  }
+]

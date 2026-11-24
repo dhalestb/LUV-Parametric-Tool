@@ -145,7 +145,17 @@ export function transitionSurfaceClear(pair:PortPair,tiles:PlacedTile[],models:T
   if(requiresSourceResponsiveExtension(pair,models)) {
     delete pair.extension;
     const material=resolveSourceResponsiveExtension(pair,models,tiles);
-    if(!material.valid){connectionDiagnostic("clearance","source-responsive material interface",{pair,reason:material.reason});return false;}
+    if(!material.valid){
+      const reason=typeof material.reason==="string"?material.reason:"";
+      // Match validateCirculationConnection: open architectural sheets cannot
+      // certify whole-source solids or local solid-angle intervals. Exact
+      // triangle collision and headroom checks below remain mandatory.
+      const openShell=reason.includes("whole-source solid UNVERIFIED")
+        ||reason.includes("local ribbon remains subject to exact clearance")
+        ||reason.includes("local material interval UNVERIFIED");
+      if(!openShell){connectionDiagnostic("clearance","source-responsive material interface",{pair,reason:material.reason});return false;}
+      if(material.evidence)pair.extension=material.evidence as PortPair["extension"];
+    }
   }
   let tris: Triangle[] | undefined;
   const connectorTriangles = () => tris ??= transitionMeshes(pair).flatMap(trianglesOf);

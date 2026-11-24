@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "checks": [
+    "deterministic A/B replay 0",
+    "deterministic A/B replay 1",
+    "two independent arrangements / unchanged territory",
+    "changing only organizing boundary does not change A or B mesh hashes",
+    "negative fields: no implicit placement, curved/oblique unsupported, stale source, missing height, source too large",
+    "40/30/30 area and geometry subdivision; exact allocation precision; stale shares/seed/revision/area errors rejected",
+    "all six generated territory records accepted by unchanged site height/containment contract",
+    "native glyph identity / indices / rigid transform 0 max normalized error 1.4054300946555646e-15",
+    "native glyph identity / indices / rigid transform 1 max normalized error 1.4054300946555646e-15"
+  ],
+  "replays": [
+    "C:\\Users\\DHale\\Documents\\Codex\\LUV-Site-Polygon-Morphogenesis\\reports\\minimum-polygon-corrections-20261121\\tests-1795304878571\\replay-0",
+    "C:\\Users\\DHale\\Documents\\Codex\\LUV-Site-Polygon-Morphogenesis\\reports\\minimum-polygon-corrections-20261121\\tests-1795304878571\\replay-1"
+  ],
+  "boundaryOnlyReplay": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Site-Polygon-Morphogenesis\\reports\\minimum-polygon-corrections-20261121\\tests-1795304878571\\boundary-only",
+  "previousOpenings": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Site-Polygon-Morphogenesis\\reports\\minimum-polygon-corrections-20261121\\tests-1795304878571\\previous-proof-openings.json",
+  "territories": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Site-Polygon-Morphogenesis\\reports\\minimum-polygon-corrections-20261121\\tests-1795304878571\\territory-results.json",
+  "proofResults": [
+    "C:\\Users\\DHale\\Documents\\Codex\\LUV-Site-Polygon-Morphogenesis\\reports\\minimum-polygon-corrections-20261121\\runs\\field-fit-rectangular-field\\result.json",
+    "C:\\Users\\DHale\\Documents\\Codex\\LUV-Site-Polygon-Morphogenesis\\reports\\minimum-polygon-corrections-20261121\\runs\\initial-angular-field\\result.json"
+  ]
+}

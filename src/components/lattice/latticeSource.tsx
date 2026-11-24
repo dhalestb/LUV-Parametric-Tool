@@ -24,7 +24,11 @@ type LatticeSourceValue = {
   restoreNotice: string | null;
   saveStatus: "saved" | "saving" | "unsaved" | "failed";
   restoredSession: ProjectState | null;
+  /** Live in-memory project (survives Lattice ↔ Site route remounts). */
+  getProject: () => ProjectState;
   updateProject: (slice: Record<string, unknown>) => void;
+  /** Flush debounced autosave immediately (tab switches / unmount). */
+  flushProject: () => Promise<void>;
   exportProject: () => Promise<string>;
   openProject: (text: string) => Promise<void>;
   validateProject: (text: string) => Promise<void>;
@@ -107,6 +111,27 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
     return () => { cancelled = true; if (timer.current) clearTimeout(timer.current); storageClient.current?.dispose(); storageClient.current=null; };
   }, []);
 
+  const persistRevision = useCallback((revision: number) => {
+    saving.current = saving.current.catch(() => {}).then(async () => {
+      if (revision !== generation.current) return;
+      setSaveStatus("saving");
+      try {
+        if (!storageClient.current) throw new Error("Project storage is not initialized.");
+        checksum.current = await storageClient.current.request<string>("save", { state: project.current, expected: checksum.current });
+        if (revision === generation.current) {
+          setSaveStatus("saved");
+          try { window.sessionStorage.removeItem("luv-project-unsaved"); } catch { /* stale marker is conservative */ }
+          try { if (window.localStorage.getItem("luv-project-unsaved-revision") === writer.current) window.localStorage.removeItem("luv-project-unsaved-revision"); } catch { /* stale marker is conservative */ }
+          setPersistenceError(null);
+        }
+      } catch (error) {
+        setSaveStatus("failed");
+        setPersistenceError(`Project save failed (${error instanceof Error ? `${error.name}: ${error.message}` : String(error)}). Last complete project retained; Save Project before closing.`);
+      }
+    });
+    return saving.current;
+  }, []);
+
   const updateProject = useCallback((slice: Record<string, unknown>) => {
     project.current = { ...project.current, ...slice };
     const revision = ++generation.current;
@@ -116,25 +141,22 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
     try { window.localStorage.setItem("luv-project-unsaved-revision", writer.current); } catch { /* IDB still governs verified saving */ }
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      saving.current = saving.current.catch(() => {}).then(async () => {
-        if (revision !== generation.current) return;
-        setSaveStatus("saving");
-        try {
-          if (!storageClient.current) throw new Error("Project storage is not initialized.");
-          checksum.current = await storageClient.current.request<string>("save", { state: project.current, expected: checksum.current });
-          if (revision === generation.current) {
-            setSaveStatus("saved");
-            try { window.sessionStorage.removeItem("luv-project-unsaved"); } catch { /* stale marker is conservative */ }
-            try { if (window.localStorage.getItem("luv-project-unsaved-revision") === writer.current) window.localStorage.removeItem("luv-project-unsaved-revision"); } catch { /* stale marker is conservative */ }
-            setPersistenceError(null);
-          }
-        } catch (error) {
-          setSaveStatus("failed");
-          setPersistenceError(`Project save failed (${error instanceof Error ? `${error.name}: ${error.message}` : String(error)}). Last complete project retained; Save Project before closing.`);
-        }
-      });
+      timer.current = null;
+      void persistRevision(revision);
     }, 500);
-  }, []);
+  }, [persistRevision]);
+
+  const getProject = useCallback(() => project.current, []);
+
+  const flushProject = useCallback(async () => {
+    if (!writable.current) return;
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
+    const revision = generation.current;
+    await persistRevision(revision);
+  }, [persistRevision]);
 
   useEffect(() => {
     if (hydrated) updateProject({ meshes: meshes.map(packMesh), assignments, unit, upAxisMode });
@@ -142,9 +164,17 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => { if (saveStatus !== "saved") { event.preventDefault(); event.returnValue = ""; } };
+    const flush = () => { void flushProject(); };
+    const onVisibility = () => { if (document.visibilityState === "hidden") flush(); };
     window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, [saveStatus]);
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("beforeunload", warn);
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [saveStatus, flushProject]);
 
   const exportProject = useCallback(async () => {
     if(!storageClient.current)throw new Error("Project storage is not initialized.");
@@ -236,7 +266,7 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
     origin,
     persistenceError,
     restoreNotice,
-    saveStatus, restoredSession, updateProject, exportProject, openProject, validateProject,
+    saveStatus, restoredSession, getProject, updateProject, flushProject, exportProject, openProject, validateProject,
     meshes,
     assignments,
     unit,
@@ -247,7 +277,7 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
     setUpAxisMode,
     importObjFiles,
     loadSampleObjs,
-  }), [hydrated, origin, persistenceError, restoreNotice, saveStatus, restoredSession, updateProject, exportProject, openProject, validateProject, meshes, assignments, unit, upAxisMode, importObjFiles, loadSampleObjs]);
+  }), [hydrated, origin, persistenceError, restoreNotice, saveStatus, restoredSession, getProject, updateProject, flushProject, exportProject, openProject, validateProject, meshes, assignments, unit, upAxisMode, importObjFiles, loadSampleObjs]);
 
   return <LatticeSourceContext.Provider value={value}>{children}</LatticeSourceContext.Provider>;
 }

@@ -1,0 +1,974 @@
+[
+  {
+    "id": "IP-002-C1-seated",
+    "sourceCount": 7,
+    "counts": {
+      "L": 3,
+      "U": 2,
+      "V": 2
+    },
+    "sourceLetterDimensions": [
+      {
+        "id": "L-1",
+        "preferredSizeFeet": 10,
+        "min": [
+          371.98303481610117,
+          0.5805514788406985,
+          -700.8962538424211
+        ],
+        "max": [
+          377.6536679220022,
+          10.635111296769109,
+          -691.7507388493192
+        ],
+        "dimensions": [
+          5.670633105901061,
+          10.05455981792841,
+          9.14551499310187
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 3.9067920566256973,
+          "y": 4.871153763987225,
+          "z": -14.591304347826085,
+          "rx": 87,
+          "ry": 0,
+          "rz": 837.2694797865115,
+          "rotationOrder": "ZYX",
+          "scale": 10.869565217391305,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 0,
+          "lift": "lower",
+          "architecturalRole": "terrace"
+        }
+      },
+      {
+        "id": "U-2",
+        "preferredSizeFeet": 10,
+        "min": [
+          363.74738542532486,
+          0.894863216579199,
+          -705.3478348124477
+        ],
+        "max": [
+          370.8611898367223,
+          10.320799559030608,
+          -695.7275580372831
+        ],
+        "dimensions": [
+          7.113804411397439,
+          9.425936342451408,
+          9.620276775164598
+        ],
+        "pose": {
+          "letter": "U",
+          "x": -3.5962667529571695,
+          "y": 0.5522668127367827,
+          "z": -14.591304347826085,
+          "rx": 0,
+          "ry": 85,
+          "rz": 687.2694797865115,
+          "rotationOrder": "ZYX",
+          "scale": 10.869565217391305,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 0,
+          "lift": "lower",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "V-3",
+        "preferredSizeFeet": 10,
+        "min": [
+          367.89182065403804,
+          2.8034834710152268,
+          -708.0754950492047
+        ],
+        "max": [
+          378.1926189675871,
+          12.803483652420667,
+          -706.0790983156228
+        ],
+        "dimensions": [
+          10.30079831354908,
+          10.00000018140544,
+          1.9963967335819461
+        ],
+        "pose": {
+          "letter": "V",
+          "x": 2.2899389198709486,
+          "y": -5.882646572556406,
+          "z": -12.395652173913042,
+          "rx": 90,
+          "ry": 0,
+          "rz": 717.2694797865115,
+          "rotationOrder": "ZYX",
+          "scale": 10.869565217391305,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 0,
+          "lift": "lower",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "L-4",
+        "preferredSizeFeet": 10,
+        "min": [
+          371.57629626987494,
+          15.580551478840697,
+          -700.3391726057537
+        ],
+        "max": [
+          377.71016175683064,
+          25.63511129676911,
+          -691.3847469060079
+        ],
+        "dimensions": [
+          6.133865486955699,
+          10.054559817928414,
+          8.954425699745798
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 3.737310552140417,
+          "y": 5.3326903539765524,
+          "z": 0.4086956521739138,
+          "rx": 87,
+          "ry": 0,
+          "rz": 840.9760673642159,
+          "rotationOrder": "ZYX",
+          "scale": 10.869565217391305,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "terrace"
+        }
+      },
+      {
+        "id": "U-5",
+        "preferredSizeFeet": 10,
+        "min": [
+          363.80975920679305,
+          15.8948632165792,
+          -705.6999848004766
+        ],
+        "max": [
+          370.4318500512353,
+          25.320799559030608,
+          -695.834525396837
+        ],
+        "dimensions": [
+          6.622090844442255,
+          9.425936342451408,
+          9.865459403639647
+        ],
+        "pose": {
+          "letter": "U",
+          "x": -3.783388097361775,
+          "y": 0.33259605648910817,
+          "z": 0.4086956521739138,
+          "rx": 0,
+          "ry": 85,
+          "rz": 690.9760673642159,
+          "rotationOrder": "ZYX",
+          "scale": 10.869565217391305,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "V-6",
+        "preferredSizeFeet": 10,
+        "min": [
+          366.7896904755604,
+          17.803483471015227,
+          -704.5586743992976
+        ],
+        "max": [
+          377.0607212670146,
+          27.803483652420667,
+          -702.8668084143802
+        ],
+        "dimensions": [
+          10.271030791454223,
+          10.00000018140544,
+          1.6918659849173991
+        ],
+        "pose": {
+          "letter": "V",
+          "x": 1.1729249803458763,
+          "y": -2.518091296981551,
+          "z": 2.6043478260869573,
+          "rx": 90,
+          "ry": 0,
+          "rz": 720.9760673642159,
+          "rotationOrder": "ZYX",
+          "scale": 10.869565217391305,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "L-7",
+        "preferredSizeFeet": 10,
+        "min": [
+          365.28545479514617,
+          26.76226862391809,
+          -715.2255656687638
+        ],
+        "max": [
+          378.5649569474288,
+          28.284007760831635,
+          -705.522310600182
+        ],
+        "dimensions": [
+          13.279502152282646,
+          1.5217391369135456,
+          9.703255068581825
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 1.1729249803458754,
+          "y": -7.5180912969815505,
+          "z": 7.324002456743873,
+          "rx": 0,
+          "ry": 0,
+          "rz": 780.9760673642159,
+          "rotationOrder": "ZYX",
+          "scale": 10.869565217391305,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "terrace"
+        }
+      }
+    ],
+    "sourceMeshHash": "449fa91aaa7faf57d67e1429319d64604401b40ee2a20a05b9a30707cfb14c45",
+    "architecturalHash": "6ed01c60e06ca907fde3e68b4be74da99a0029895ea53683f4c058233c5b0324",
+    "components": 9,
+    "architecturalFootprintFeet2": 169.69473420440747,
+    "territoryCoveragePercent": 14.752928743868017,
+    "architectureHeightFeet": 27.612892150878906,
+    "totalHeightIncludingSourcesFeet": 28.084872025200646,
+    "worldBaseFeet": 0.19913573563098907,
+    "ceilingFeet": 40.19913573563099,
+    "sourceCollisions": 0,
+    "classifiedArchitecturalContacts": 14,
+    "unclassifiedContacts": 0,
+    "selfIntersections": 0,
+    "localEnvelope": true,
+    "seating": {
+      "method": "Native horizontal source translated to measured fullCornerPier top; unchanged original fullCornerPier executes again",
+      "deltaZFeet": 0.21965463065691537,
+      "oldBottomFeet": 26.343478257630185,
+      "targetBottomFeet": 26.5631328882871,
+      "noPierOverride": true,
+      "otherLetterMeshesByteIdentical": true
+    },
+    "seatingErrorFeet": -3.514589934638934e-7,
+    "bearingFraction": 0.9999999407134021,
+    "deterministic": true
+  },
+  {
+    "id": "IP-003-C2-seated",
+    "sourceCount": 7,
+    "counts": {
+      "L": 3,
+      "U": 2,
+      "V": 2
+    },
+    "sourceLetterDimensions": [
+      {
+        "id": "L-1",
+        "preferredSizeFeet": 8,
+        "min": [
+          372.96743168855966,
+          0.5042683301987578,
+          -699.4216341706855
+        ],
+        "max": [
+          377.50393817328046,
+          8.547916184541485,
+          -692.1052221762039
+        ],
+        "dimensions": [
+          4.536506484720803,
+          8.043647854342726,
+          7.316411994481541
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 4.35598130279093,
+          "y": 5.431221936412609,
+          "z": -15.673043478260867,
+          "rx": 87,
+          "ry": 0,
+          "rz": 837.2694797865115,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 0,
+          "lift": "lower",
+          "architecturalRole": "terrace"
+        }
+      },
+      {
+        "id": "U-2",
+        "preferredSizeFeet": 8,
+        "min": [
+          363.9178168609578,
+          0.7557177203895589,
+          -704.3282267306304
+        ],
+        "max": [
+          369.6088603900758,
+          8.296466794350685,
+          -696.6320053104987
+        ],
+        "dimensions": [
+          5.691043529117962,
+          7.540749073961127,
+          7.696221420131678
+        ],
+        "pose": {
+          "letter": "U",
+          "x": -4.107561059856109,
+          "y": 0.6307845914886925,
+          "z": -15.673043478260867,
+          "rx": 0,
+          "ry": 85,
+          "rz": 687.2694797865115,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 0,
+          "lift": "lower",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "V-3",
+        "preferredSizeFeet": 8,
+        "min": [
+          369.6944603589091,
+          2.2826139239383814,
+          -709.8604920194696
+        ],
+        "max": [
+          377.9350990097484,
+          10.282614069062731,
+          -708.263374632604
+        ],
+        "dimensions": [
+          8.240638650839287,
+          8.00000014512435,
+          1.5971173868655342
+        ],
+        "pose": {
+          "letter": "V",
+          "x": 3.062498793387132,
+          "y": -7.867283216179507,
+          "z": -13.916521739130433,
+          "rx": 90,
+          "ry": 0,
+          "rz": 717.2694797865115,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 0,
+          "lift": "lower",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "L-4",
+        "preferredSizeFeet": 8,
+        "min": [
+          372.64204085157866,
+          15.504268330198755,
+          -698.7544253603918
+        ],
+        "max": [
+          377.5491332411432,
+          23.547916184541485,
+          -691.5908848005952
+        ],
+        "dimensions": [
+          4.907092389564525,
+          8.04364785434273,
+          7.1635405597966155
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 4.220396099202707,
+          "y": 6.0219950293638185,
+          "z": -0.6730434782608676,
+          "rx": 87,
+          "ry": 0,
+          "rz": 840.9760673642159,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "terrace"
+        }
+      },
+      {
+        "id": "U-5",
+        "preferredSizeFeet": 8,
+        "min": [
+          363.9677158861324,
+          15.755717720389557,
+          -704.6907409353046
+        ],
+        "max": [
+          369.2653885616862,
+          23.296466794350682,
+          -696.7983734123928
+        ],
+        "dimensions": [
+          5.297672675553827,
+          7.540749073961125,
+          7.892367522911741
+        ],
+        "pose": {
+          "letter": "U",
+          "x": -4.257258135379793,
+          "y": 0.3742537722394535,
+          "z": -0.6730434782608676,
+          "rx": 0,
+          "ry": 85,
+          "rz": 690.9760673642159,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "V-6",
+        "preferredSizeFeet": 8,
+        "min": [
+          368.812756216127,
+          17.282613923938378,
+          -706.5276679503187
+        ],
+        "max": [
+          377.02958084929037,
+          25.28261406906273,
+          -705.1741751623847
+        ],
+        "dimensions": [
+          8.216824633163355,
+          8.000000145124353,
+          1.3534927879339875
+        ],
+        "pose": {
+          "letter": "V",
+          "x": 2.1688876417670744,
+          "y": -4.656271446494399,
+          "z": 1.083478260869567,
+          "rx": 90,
+          "ry": 0,
+          "rz": 720.9760673642159,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "L-7",
+        "preferredSizeFeet": 8,
+        "min": [
+          367.60936767179567,
+          24.37664244600704,
+          -715.0611809658917
+        ],
+        "max": [
+          378.2329693936218,
+          25.59403375553788,
+          -707.2985769110262
+        ],
+        "dimensions": [
+          10.623601721826105,
+          1.2173913095308393,
+          7.7626040548655055
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 2.1688876417670735,
+          "y": -8.656271446494399,
+          "z": 4.78620236514147,
+          "rx": 0,
+          "ry": 0,
+          "rz": 780.9760673642159,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "terrace"
+        }
+      }
+    ],
+    "sourceMeshHash": "930e8f6b5e8b4c15c970647625acb5df3790f0550007c15755b25e487b084e19",
+    "architecturalHash": "120cabcf7f2be274a1900eb88022692e8fc02eafe080c6e5ff6516035069ab29",
+    "components": 9,
+    "architecturalFootprintFeet2": 145.72044020504887,
+    "territoryCoveragePercent": 12.668650450170123,
+    "architectureHeightFeet": 25.11376190185547,
+    "totalHeightIncludingSourcesFeet": 25.39489801990689,
+    "worldBaseFeet": 0.19913573563098907,
+    "ceilingFeet": 40.19913573563099,
+    "sourceCollisions": 0,
+    "classifiedArchitecturalContacts": 14,
+    "unclassifiedContacts": 0,
+    "selfIntersections": 0,
+    "localEnvelope": true,
+    "seating": {
+      "method": "Native horizontal source translated to measured fullCornerPier top; unchanged original fullCornerPier executes again",
+      "deltaZFeet": 0.10272410427190337,
+      "oldBottomFeet": 24.074782606104147,
+      "targetBottomFeet": 24.17750671037605,
+      "noPierOverride": true,
+      "otherLetterMeshesByteIdentical": true
+    },
+    "seatingErrorFeet": -6.901366447209512e-7,
+    "bearingFraction": 1.0000000486957235,
+    "deterministic": true
+  },
+  {
+    "id": "IP-043-C2-seated",
+    "sourceCount": 10,
+    "counts": {
+      "L": 4,
+      "U": 3,
+      "V": 3
+    },
+    "sourceLetterDimensions": [
+      {
+        "id": "L-1",
+        "preferredSizeFeet": 8,
+        "min": [
+          372.96727616625776,
+          0.5042683301987578,
+          -699.4213477385732
+        ],
+        "max": [
+          377.5039598251976,
+          8.547916184541485,
+          -692.1049998757218
+        ],
+        "dimensions": [
+          4.5366836589398645,
+          8.043647854342726,
+          7.316347862851444
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 4.355916347039374,
+          "y": 5.43147630270979,
+          "z": -15.673043478260867,
+          "rx": 87,
+          "ry": 0,
+          "rz": 837.2712064476218,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 0,
+          "lift": "lower",
+          "architecturalRole": "terrace"
+        }
+      },
+      {
+        "id": "U-2",
+        "preferredSizeFeet": 8,
+        "min": [
+          363.91783945747636,
+          0.7557177203895584,
+          -704.328396100543
+        ],
+        "max": [
+          369.6087051593579,
+          8.296466794350685,
+          -696.6320757435378
+        ],
+        "dimensions": [
+          5.690865701881535,
+          7.540749073961127,
+          7.69632035700522
+        ],
+        "pose": {
+          "letter": "U",
+          "x": -4.107628849411649,
+          "y": 0.6306682958732027,
+          "z": -15.673043478260867,
+          "rx": 0,
+          "ry": 85,
+          "rz": 687.2712064476218,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 0,
+          "lift": "lower",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "V-3",
+        "preferredSizeFeet": 8,
+        "min": [
+          369.6944775453964,
+          2.2826139239383805,
+          -709.8596901119305
+        ],
+        "max": [
+          377.9350965545359,
+          10.282614069062731,
+          -708.2628117917205
+        ],
+        "dimensions": [
+          8.240619009139493,
+          8.00000014512435,
+          1.596878320209953
+        ],
+        "pose": {
+          "letter": "V",
+          "x": 3.0625061590245535,
+          "y": -7.8666008419681805,
+          "z": -13.916521739130433,
+          "rx": 90,
+          "ry": 0,
+          "rz": 717.2712064476218,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 0,
+          "lift": "lower",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "L-4",
+        "preferredSizeFeet": 8,
+        "min": [
+          372.4752050508616,
+          15.504268330198755,
+          -698.3471560181999
+        ],
+        "max": [
+          377.57221647881823,
+          23.547916184541485,
+          -691.2777480183187
+        ],
+        "dimensions": [
+          5.097011427956659,
+          8.04364785434273,
+          7.069407999881264
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 4.151146386177678,
+          "y": 6.382198091598026,
+          "z": -0.6730434782608676,
+          "rx": 87,
+          "ry": 0,
+          "rz": 842.9589847645257,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "terrace"
+        }
+      },
+      {
+        "id": "U-5",
+        "preferredSizeFeet": 8,
+        "min": [
+          363.99529360437356,
+          15.755717720389557,
+          -704.8845053566127
+        ],
+        "max": [
+          369.0741792004075,
+          23.296466794350682,
+          -696.9007155147874
+        ],
+        "dimensions": [
+          5.078885596033956,
+          7.540749073961125,
+          7.983789841825342
+        ],
+        "pose": {
+          "letter": "U",
+          "x": -4.339991290103249,
+          "y": 0.2305647427389967,
+          "z": -0.6730434782608676,
+          "rx": 0,
+          "ry": 85,
+          "rz": 692.9589847645257,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "V-6",
+        "preferredSizeFeet": 8,
+        "min": [
+          369.6922440775386,
+          17.282613923938378,
+          -708.0282949778884
+        ],
+        "max": [
+          377.9354156213727,
+          25.28261406906273,
+          -706.3995581712676
+        ],
+        "dimensions": [
+          8.243171543834137,
+          8.000000145124353,
+          1.62873680662085
+        ],
+        "pose": {
+          "letter": "V",
+          "x": 3.0615489585140523,
+          "y": -6.019276464720653,
+          "z": 1.083478260869567,
+          "rx": 90,
+          "ry": 0,
+          "rz": 722.9589847645257,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 1,
+          "lift": "middle",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "L-7",
+        "preferredSizeFeet": 8,
+        "min": [
+          373.25298835011694,
+          30.50426833019876,
+          -699.9063022850721
+        ],
+        "max": [
+          377.4641081555203,
+          38.547916184541485,
+          -692.4852907595305
+        ],
+        "dimensions": [
+          4.211119805403371,
+          8.043647854342726,
+          7.421011525541644
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 4.4754713560713135,
+          "y": 4.998853587556056,
+          "z": 14.326956521739133,
+          "rx": 87,
+          "ry": 0,
+          "rz": 834.161929161055,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 2,
+          "lift": "top",
+          "architecturalRole": "terrace"
+        }
+      },
+      {
+        "id": "U-8",
+        "preferredSizeFeet": 8,
+        "min": [
+          363.87817182392126,
+          30.75571772038956,
+          -704.0219657649668
+        ],
+        "max": [
+          369.8807291124334,
+          38.296466794350685,
+          -696.5150415662357
+        ],
+        "dimensions": [
+          6.0025572885121505,
+          7.540749073961127,
+          7.506924198731099
+        ],
+        "pose": {
+          "letter": "U",
+          "x": -3.9886259487463054,
+          "y": 0.8360337155592613,
+          "z": 14.326956521739133,
+          "rx": 0,
+          "ry": 85,
+          "rz": 684.161929161055,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 2,
+          "lift": "top",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "V-9",
+        "preferredSizeFeet": 8,
+        "min": [
+          368.69913494890096,
+          31.23913566306882,
+          -708.5438838116219
+        ],
+        "max": [
+          376.96298203032495,
+          39.23913580819317,
+          -706.5190680027488
+        ],
+        "dimensions": [
+          8.26384708142399,
+          8.00000014512435,
+          2.024815808873086
+        ],
+        "pose": {
+          "letter": "V",
+          "x": 2.0787775986713393,
+          "y": -6.336825797328021,
+          "z": 15.040000000000003,
+          "rx": 90,
+          "ry": 0,
+          "rz": 714.161929161055,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 2,
+          "lift": "top",
+          "architecturalRole": "perimeter"
+        }
+      },
+      {
+        "id": "L-10",
+        "preferredSizeFeet": 8,
+        "min": [
+          367.39911090457224,
+          38.70263039033565,
+          -716.9046812746824
+        ],
+        "max": [
+          378.2630060746537,
+          39.92002169986649,
+          -709.3657729729072
+        ],
+        "dimensions": [
+          10.863895170081435,
+          1.2173913095308393,
+          7.538908301775223
+        ],
+        "pose": {
+          "letter": "L",
+          "x": 2.0787775986713384,
+          "y": -10.336825797328022,
+          "z": 19.112190309470076,
+          "rx": 0,
+          "ry": 0,
+          "rz": 774.161929161055,
+          "rotationOrder": "ZYX",
+          "scale": 8.695652173913043,
+          "scaleX": 1,
+          "scaleY": 1,
+          "scaleZ": 1,
+          "levelIndex": 2,
+          "lift": "top",
+          "architecturalRole": "terrace"
+        }
+      }
+    ],
+    "sourceMeshHash": "7fca8680f5eada37a21d2ea420ce1e2e769b7b18488334dc231e493fd469dca4",
+    "architecturalHash": "dd69c605429d7abfa4043c72d45632d3485d3a955a3d3acafc4a64d9ad9663be",
+    "components": 13,
+    "architecturalFootprintFeet2": 158.02211873408913,
+    "territoryCoveragePercent": 13.738134353838527,
+    "architectureHeightFeet": 39.070281982421875,
+    "totalHeightIncludingSourcesFeet": 39.7208859642355,
+    "worldBaseFeet": 0.19913573563098907,
+    "ceilingFeet": 40.19913573563099,
+    "sourceCollisions": 0,
+    "classifiedArchitecturalContacts": 21,
+    "unclassifiedContacts": 0,
+    "selfIntersections": 0,
+    "localEnvelope": true,
+    "seating": {
+      "method": "Native horizontal source translated to measured fullCornerPier top; unchanged original fullCornerPier executes again",
+      "deltaZFeet": 0.4721903094700721,
+      "oldBottomFeet": 38.03130434523458,
+      "targetBottomFeet": 38.50349465470465,
+      "noPierOverride": true,
+      "otherLetterMeshesByteIdentical": true
+    },
+    "seatingErrorFeet": 3.9200934764949125e-7,
+    "bearingFraction": 1.0000000674831795,
+    "deterministic": true
+  }
+]

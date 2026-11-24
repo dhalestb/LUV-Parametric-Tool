@@ -1,0 +1,16 @@
+{
+  "package": "manifold-3d",
+  "version": "3.5.3",
+  "assets": [
+    {
+      "name": "manifold.js",
+      "sha256": "860b5c9702a807d1f93b9eb5b4fce15dd1de1af35c508301791986bc4e70c552",
+      "bytes": 74762
+    },
+    {
+      "name": "manifold.wasm",
+      "sha256": "73e3b419ad31294f6b1cc478173944e50efc4a34bfdeeff0107bdfc12975f11c",
+      "bytes": 541470
+    }
+  ]
+}

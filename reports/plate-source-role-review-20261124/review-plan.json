@@ -1,0 +1,16 @@
+{
+  "version": "inserted-plate/source-role-visual-review-v1",
+  "chosen": [
+    "IP-002",
+    "IP-003",
+    "IP-004",
+    "IP-005",
+    "IP-043",
+    "IP-045"
+  ],
+  "maxRuleBCalls": 18,
+  "cornerOffsets": "8 directions; radii 0.5, 1, 1.5 times preferred size; no rotations, sizing, elevation or other-source changes. At most two source-valid C candidates per configuration.",
+  "planningScreen": "Disabled only in inherited review inputs; saved 20-ft preference unchanged",
+  "policyChanged": false,
+  "productionAlternatives": 0
+}

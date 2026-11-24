@@ -1,0 +1,42 @@
+[
+  {
+    "file": "baseline.json",
+    "sha256": "b40355d81ba25e5687c610c4073a3469e1ab73dea5c0edd99325c0b903ae1c86"
+  },
+  {
+    "file": "demo.json",
+    "sha256": "214e7658cc626522893b9b394cac477da49a13873614e4ac4b20fdc0b00c4f94"
+  },
+  {
+    "file": "eligibility.json",
+    "sha256": "e3d5e6adf3d957c112b3dc4494e9127cfb6be81d47c53445ef0a6d9f4906aad6"
+  },
+  {
+    "file": "full.json",
+    "sha256": "742872963b34c8e8d7c6cafa3575c70a256f645eb73b3a620d338e613f8d786a"
+  },
+  {
+    "file": "index.html",
+    "sha256": "4443eaf4b6d3292f26295b849c237b52da8acc2ceb02aa04519ac7f85b697cef"
+  },
+  {
+    "file": "plan-section-comparison.png",
+    "sha256": "f224b418ba9c731d4e93c2159fe429ae7bd5efc08116f2ed37f9e6c2d8d3ea48"
+  },
+  {
+    "file": "plan-section-comparison.svg",
+    "sha256": "343109408186066800f52714c6a1f44938ec8beb63cd05548e66f406a88fe3f0"
+  },
+  {
+    "file": "sections.html",
+    "sha256": "031e476dac431ae7b94b345f426db5b6bd6c5a858e5754eda4444fe715fc61f1"
+  },
+  {
+    "file": "tests.json",
+    "sha256": "47aa4bef275df98de19dc60d4318eb21e8adaf53bed73f917bb4e6b07ed28ba7"
+  },
+  {
+    "file": "viewer.js",
+    "sha256": "654bf76e91497f0ad3545fd0e3ea01956ad380d6884ba7e320e4dc6b625096ba"
+  }
+]

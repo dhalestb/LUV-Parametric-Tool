@@ -1,0 +1,933 @@
+[
+  {
+    "id": "IP-002-B-diagnostic",
+    "rows": [
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-U-2",
+        "volumeFeet3": 2.8838310857793963,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-V-3",
+        "volumeFeet3": 4.841128427283472,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.8140084353417109,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "boundary-V-3",
+        "volumeFeet3": 3.160069933975715,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.065945748072188,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-U-5",
+        "volumeFeet3": 2.883885472119339,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-V-6",
+        "volumeFeet3": 4.778770849339927,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.8065613135677873,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "boundary-V-6",
+        "volumeFeet3": 3.160074473825103,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.06595809260923868,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      }
+    ],
+    "unclassified": []
+  },
+  {
+    "id": "IP-003-B-diagnostic",
+    "rows": [
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-U-2",
+        "volumeFeet3": 2.3070612345998507,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-V-3",
+        "volumeFeet3": 3.8816955871212175,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.7112555965372764,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "boundary-V-3",
+        "volumeFeet3": 2.5280461960671414,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.06412412480516277,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-U-5",
+        "volumeFeet3": 2.307047758539397,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-V-6",
+        "volumeFeet3": 3.8202018746202078,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.7132622169489179,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "boundary-V-6",
+        "volumeFeet3": 2.528048329576761,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.06411933022501637,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      }
+    ],
+    "unclassified": []
+  },
+  {
+    "id": "IP-004-B-diagnostic",
+    "rows": [
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-U-2",
+        "volumeFeet3": 1.7303170092217488,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-V-3",
+        "volumeFeet3": 2.922280699332814,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.5073782756951667,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "boundary-V-3",
+        "volumeFeet3": 1.8960270391943248,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.05068764883957905,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-U-5",
+        "volumeFeet3": 1.730361136682005,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-V-6",
+        "volumeFeet3": 2.8613822766933623,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.5119051695682525,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "boundary-V-6",
+        "volumeFeet3": 1.8960416432687006,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.050681388142686766,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      }
+    ],
+    "unclassified": []
+  },
+  {
+    "id": "IP-005-B-diagnostic",
+    "rows": [
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-U-2",
+        "volumeFeet3": 1.1535589734718674,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-V-3",
+        "volumeFeet3": 1.96273204766982,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.2743633417196717,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "boundary-V-3",
+        "volumeFeet3": 1.264046840700491,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.0002692335172736267,
+        "basis": "UNCLASSIFIED",
+        "intersectionValidated": false
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.03382558353480318,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-U-5",
+        "volumeFeet3": 1.153490332363397,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-V-6",
+        "volumeFeet3": 1.9028175564387089,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.31197297450632916,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "boundary-V-6",
+        "volumeFeet3": 1.264054814066797,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.025080391658907186,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      }
+    ],
+    "unclassified": [
+      {
+        "a": "boundary-U-2",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.0002692335172736267,
+        "basis": "UNCLASSIFIED",
+        "intersectionValidated": false
+      }
+    ]
+  },
+  {
+    "id": "IP-043-B-diagnostic",
+    "rows": [
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-U-2",
+        "volumeFeet3": 2.3070806911055124,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-V-3",
+        "volumeFeet3": 3.881952525928942,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.7113165950258921,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "boundary-V-3",
+        "volumeFeet3": 2.528059354571517,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.06413891530514834,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-U-5",
+        "volumeFeet3": 2.307109571781474,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-V-6",
+        "volumeFeet3": 3.8400096087303135,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.7113865813018272,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "boundary-V-6",
+        "volumeFeet3": 2.5280811925713143,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.06412388349115408,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-7",
+        "b": "boundary-U-8",
+        "volumeFeet3": 2.3070960092614183,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-7",
+        "b": "boundary-V-9",
+        "volumeFeet3": 4.534035817851211,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-7",
+        "b": "plate-L-7",
+        "volumeFeet3": 0.7129388776640069,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-8",
+        "b": "boundary-V-9",
+        "volumeFeet3": 2.528077643835753,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-9",
+        "b": "plate-L-7",
+        "volumeFeet3": 0.0659533138062236,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      }
+    ],
+    "unclassified": []
+  },
+  {
+    "id": "IP-045-B-diagnostic",
+    "rows": [
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-U-2",
+        "volumeFeet3": 1.1535386878531664,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-V-3",
+        "volumeFeet3": 1.962756973362851,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.14212955197331345,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "boundary-V-3",
+        "volumeFeet3": 1.2640209286039,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.0002687561570488204,
+        "basis": "UNCLASSIFIED",
+        "intersectionValidated": false
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.0019695567071916385,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-U-5",
+        "volumeFeet3": 1.153535367464787,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-V-6",
+        "volumeFeet3": 1.8982029578867756,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.30730025789133214,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "boundary-V-6",
+        "volumeFeet3": 1.264032482438484,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.020294955662361506,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-7",
+        "b": "boundary-U-8",
+        "volumeFeet3": 1.1535640571764323,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-7",
+        "b": "boundary-V-9",
+        "volumeFeet3": 1.9806723289030275,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-7",
+        "b": "plate-L-7",
+        "volumeFeet3": 0.31300844655191845,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-8",
+        "b": "boundary-V-9",
+        "volumeFeet3": 1.2640434888847842,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-8",
+        "b": "plate-L-7",
+        "volumeFeet3": 0.000751899627696534,
+        "basis": "UNCLASSIFIED",
+        "intersectionValidated": false
+      },
+      {
+        "a": "boundary-V-9",
+        "b": "plate-L-7",
+        "volumeFeet3": 0.033964427711883766,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      }
+    ],
+    "unclassified": [
+      {
+        "a": "boundary-U-2",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.0002687561570488204,
+        "basis": "UNCLASSIFIED",
+        "intersectionValidated": false
+      },
+      {
+        "a": "boundary-U-8",
+        "b": "plate-L-7",
+        "volumeFeet3": 0.000751899627696534,
+        "basis": "UNCLASSIFIED",
+        "intersectionValidated": false
+      }
+    ]
+  },
+  {
+    "id": "IP-002-C1-seated",
+    "rows": [
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-U-2",
+        "volumeFeet3": 2.8838310857793963,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-V-3",
+        "volumeFeet3": 4.841128427283472,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.8140084353417109,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "boundary-V-3",
+        "volumeFeet3": 3.160069933975715,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "corner-pier-L-7",
+        "volumeFeet3": 9.979897618686854,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.065945748072188,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "corner-pier-L-7",
+        "volumeFeet3": 28.882092347698507,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-U-5",
+        "volumeFeet3": 2.883885472119339,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-V-6",
+        "volumeFeet3": 4.778770849339927,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.8065613135677873,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "boundary-V-6",
+        "volumeFeet3": 3.160074473825103,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "corner-pier-L-7",
+        "volumeFeet3": 7.702725228872561,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.06595809260923868,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "corner-pier-L-7",
+        "volumeFeet3": 21.023822086381063,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      }
+    ],
+    "unclassified": []
+  },
+  {
+    "id": "IP-003-C2-seated",
+    "rows": [
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-U-2",
+        "volumeFeet3": 2.3070612345998507,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-V-3",
+        "volumeFeet3": 3.8816955871212175,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.7112555965372764,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "boundary-V-3",
+        "volumeFeet3": 2.5280461960671414,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "corner-pier-L-7",
+        "volumeFeet3": 6.118449798910274,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.06412412480516277,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "corner-pier-L-7",
+        "volumeFeet3": 16.079082698256283,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-U-5",
+        "volumeFeet3": 2.307055901718388,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-V-6",
+        "volumeFeet3": 3.8202018746202078,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.7132622169489179,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "boundary-V-6",
+        "volumeFeet3": 2.528051083420862,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "corner-pier-L-7",
+        "volumeFeet3": 3.558178267763167,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.06411933022501637,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "corner-pier-L-7",
+        "volumeFeet3": 8.53378837300216,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      }
+    ],
+    "unclassified": []
+  },
+  {
+    "id": "IP-043-C2-seated",
+    "rows": [
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-U-2",
+        "volumeFeet3": 2.30707845382968,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "boundary-V-3",
+        "volumeFeet3": 3.881952525928942,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-1",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.7113165950258921,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "boundary-V-3",
+        "volumeFeet3": 2.5280626905285097,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-2",
+        "b": "corner-pier-L-10",
+        "volumeFeet3": 4.18770596649913,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "plate-L-1",
+        "volumeFeet3": 0.06413891530514834,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-3",
+        "b": "corner-pier-L-10",
+        "volumeFeet3": 7.1547324623973525,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-U-5",
+        "volumeFeet3": 2.3071005550689168,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "boundary-V-6",
+        "volumeFeet3": 3.8400096087303135,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-4",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.7113865813018272,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "boundary-V-6",
+        "volumeFeet3": 2.5280864709953628,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-5",
+        "b": "corner-pier-L-10",
+        "volumeFeet3": 3.3881234614715114,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "plate-L-4",
+        "volumeFeet3": 0.06412388349115408,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-6",
+        "b": "corner-pier-L-10",
+        "volumeFeet3": 3.5180963251979986,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-7",
+        "b": "boundary-U-8",
+        "volumeFeet3": 2.307100619716092,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-7",
+        "b": "boundary-V-9",
+        "volumeFeet3": 4.534035817851211,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-L-7",
+        "b": "plate-L-7",
+        "volumeFeet3": 0.7129388776640069,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-8",
+        "b": "boundary-V-9",
+        "volumeFeet3": 2.528080019767842,
+        "basis": "Native wall junction ledger",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-U-8",
+        "b": "corner-pier-L-10",
+        "volumeFeet3": 2.138028556059642,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-9",
+        "b": "plate-L-7",
+        "volumeFeet3": 0.0659533138062236,
+        "basis": "Native finished plate receiver",
+        "intersectionValidated": true
+      },
+      {
+        "a": "boundary-V-9",
+        "b": "corner-pier-L-10",
+        "volumeFeet3": 4.32355838035953,
+        "basis": "Native pier receiver contact",
+        "intersectionValidated": true
+      }
+    ],
+    "unclassified": []
+  }
+]

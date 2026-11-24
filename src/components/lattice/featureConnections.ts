@@ -1,5 +1,5 @@
 import { placedConnectionFeatures, connectionFeatures, DEFAULT_CONNECTION_FEATURE_POLICY, type ConnectionFeaturePolicy } from "./connectionFeatures";
-import { adaptFeatureLanding } from "./featureAdaptation";
+import { adaptFeatureLanding, adaptOpenShellFeatureLanding } from "./featureAdaptation";
 import { localPoint, worldFromLocal } from "./surfaceAttachment";
 import { validateCirculationConnection, acceptCirculationClass } from "./portConnectionValidation";
 import { transitionPath, transitionMeshes, planRun } from "./transitionGeometry";
@@ -12,14 +12,27 @@ import { landingHeadroomCheck, type ConnectorSurface } from "./connectionClearan
 import type { PlacedTile, PortPair, PortCandidate, TileModel, Vec3 } from "./types";
 
 export type FeatureConnectionOptions={policy?:ConnectionFeaturePolicy;pairs?:number;adaptations?:number;milliseconds?:number;
+  /** Prefer candidates whose feature ids contain these substrings (deterministic force-scheduling). */
+  preferFeatureIds?:string[];
   onEvaluation?:(e:{pair:PortPair;models:TileModel[];tiles:PlacedTile[];validation:ReturnType<typeof validateCirculationConnection>})=>void};
 export type FeatureAttempt={source:string;target:string;featureA:string;featureB:string;categoryA:string;categoryB:string;
   operation:string;reason:string;details?:unknown;geometry?:{from:Vec3;to:Vec3;width:number;rise:number;run:number;bend:number};adaptationMs?:number;validationMs?:number};
-const adaptations=new WeakMap<object,Map<string,ReturnType<typeof adaptFeatureLanding>>>();
-function workingLanding(model:TileModel,feature:ReturnType<typeof connectionFeatures>["features"][number],width:number,setback:number){
-  const revision=geometryRevision(model.connectionSurface!),key=JSON.stringify([model.id,model.anchor,model.cellFeet,feature,width,setback]);let entries=adaptations.get(revision);
-  if(!entries){entries=new Map();adaptations.set(revision,entries);}const old=entries.get(key);if(old)return old;
-  const end=startConnectionTiming("local feature adaptation");let result:ReturnType<typeof adaptFeatureLanding>;
+type LandingResult=ReturnType<typeof adaptFeatureLanding>&{sceneModels?:TileModel[]};
+const adaptations=new WeakMap<object,Map<string,LandingResult>>();
+function workingLanding(
+  model:TileModel,
+  tile:PlacedTile,
+  models:TileModel[],
+  tiles:PlacedTile[],
+  placed:{id:string;kind:ReturnType<typeof connectionFeatures>["features"][number]["kind"];point:Vec3;outward:Vec3;width:number;sourceFeatureId?:string},
+  feature:ReturnType<typeof connectionFeatures>["features"][number],
+  width:number,
+  setback:number,
+):LandingResult{
+  const revision=geometryRevision(model.connectionSurface!),key=JSON.stringify([model.id,model.anchor,model.cellFeet,tile,placed.id,placed.point,placed.outward,width,setback]);
+  let entries=adaptations.get(revision);if(!entries){entries=new Map();adaptations.set(revision,entries);}
+  const old=entries.get(key);if(old)return old;
+  const end=startConnectionTiming("local feature adaptation");let result:LandingResult;
   try{
     const plan={feature,width,depth:feature.width<width?4:3,setback,elevation:0};
     result=adaptFeatureLanding(model,plan);
@@ -27,6 +40,12 @@ function workingLanding(model:TileModel,feature:ReturnType<typeof connectionFeat
     // its depth. Try the independently measured boundary datum, then require
     // full reconstructed-to-original walking continuity below as usual.
     if(!result.valid&&result.reason==="no physical interior surface behind feature")result=adaptFeatureLanding(model,{...plan,datum:"boundary"});
+    // Real architectural OBJs are open sheets. Closed-solid column adaptation
+    // cannot certify them; complete a local derived floor patch instead.
+    if(!result.valid&&result.reason.includes("open-shell")){
+      const open=adaptOpenShellFeatureLanding(model,tile,models,tiles,{id:placed.id,kind:placed.kind,point:placed.point,outward:placed.outward,width:placed.width},width,setback);
+      result=open;
+    }
   }finally{end();}
   if(entries.size>=32)entries.delete(entries.keys().next().value!);entries.set(key,result);return result;
 }
@@ -100,7 +119,9 @@ export function generateFeatureConnections(models:TileModel[],tiles:PlacedTile[]
         // A slope failure can hide an independent low ceiling. Keep blocked
         // interfaces eligible for reconstruction, but try physically open
         // approaches first instead of exhausting the budget beneath slabs.
-        candidates.push({a,b,fa,fb,rank:(2-branches)*10000+(tier(fa.kind)+tier(fb.kind))*1000+Number(!fa.sourceClearance.clear)*1000+Number(!fb.sourceClearance.clear)*1000+approachCost(fa)+approachCost(fb)+flightDeficit*100+rise*12+span});
+        // Prefer near-level bridges that can use ADAPTIVE plates over tall stair
+        // runs while reconstruction is still being proven on real OBJ sheets.
+        candidates.push({a,b,fa,fb,rank:(2-branches)*10000+(tier(fa.kind)+tier(fb.kind))*1000+Number(!fa.sourceClearance.clear)*1000+Number(!fb.sourceClearance.clear)*1000+approachCost(fa)+approachCost(fb)+flightDeficit*100+rise*40+span});
       }
     }
     candidates.sort((a,b)=>a.rank-b.rank||a.fa.id.localeCompare(b.fa.id)||a.fb.id.localeCompare(b.fb.id));
@@ -121,6 +142,15 @@ export function generateFeatureConnections(models:TileModel[],tiles:PlacedTile[]
       return chosen;
     });
     for(const c of candidates)if(selected.length<pairLimit&&!selected.includes(c))selected.push(c);
+    // Inject preferred pairs from the full candidate pool before shortlist limits
+    // can drop them (deterministic isolated force-scheduling).
+    if(options.preferFeatureIds?.length){
+      const match=candidates.filter(c=>{
+        const ids=[c.fa.id,c.fb.id];
+        return options.preferFeatureIds!.every(token=>ids.some(id=>id.includes(token)));
+      });
+      for(const c of match)if(!selected.includes(c))selected.unshift(c);
+    }
     const attempts:FeatureAttempt[]=[],pairs:PortPair[]=[],surfaces:ConnectorSurface[]=[],used=new Set<string>(),parent=tiles.map((_,i)=>i);
     const find=(i:number):number=>parent[i]===i?i:find(parent[i]);
     let workingModels=models.slice(),tested=0,adapted=0,stopReason="feature candidates exhausted";
@@ -129,10 +159,19 @@ export function generateFeatureConnections(models:TileModel[],tiles:PlacedTile[]
     // when it expires. No already-valid source prefix suppresses a retraction.
     const adaptationOrder:typeof selected=[];
     for(let row=0;row<selected.length;row++)for(const group of groups){const c=group.filter(c=>selected.includes(c))[row];if(c)adaptationOrder.push(c);}
+    // Deterministic force-scheduling: every prefer token must appear on the pair.
+    const preferredPairs=options.preferFeatureIds?.length
+      ?[...adaptationOrder,...selected].filter((c,i,arr)=>{
+        if(arr.indexOf(c)!==i)return false;
+        const ids=[c.fa.id,c.fb.id];
+        return options.preferFeatureIds!.every(token=>ids.some(id=>id.includes(token)));
+      })
+      :[];
     const initial=adaptationOrder.slice(0,Math.max(1,Math.ceil(adaptationLimit*2/3)));
+    const prioritized=[...preferredPairs,...initial.filter(c=>!preferredPairs.includes(c))];
     // Give the highest-priority branch reconstructions a turn before expensive
     // unchanged floor-edge routes consume the entire shared time budget.
-    const schedule:Array<typeof selected[number]&{setbacks:number[];flatStairLanding?:boolean}>=[...initial.flatMap(c=>[{...c,setbacks:[-1]},{...c,setbacks:[0],flatStairLanding:true},{...c,setbacks:[0]}]),...selected.filter(c=>!initial.includes(c)).map(c=>({...c,setbacks:[-1]})),...[.5,1].flatMap(setback=>initial.map(c=>({...c,setbacks:[setback]})))];
+    const schedule:Array<typeof selected[number]&{setbacks:number[];flatStairLanding?:boolean}>=[...prioritized.flatMap(c=>[{...c,setbacks:[-1]},{...c,setbacks:[0],flatStairLanding:true},{...c,setbacks:[0]}]),...selected.filter(c=>!prioritized.includes(c)).map(c=>({...c,setbacks:[-1]})),...[.5,1].flatMap(setback=>prioritized.map(c=>({...c,setbacks:[setback]})))];
     const packingCache=new Map<string,ReturnType<typeof originalPlacementMaterial>>();
     for(const candidate of schedule){
       if(performance.now()-started>=milliseconds){stopReason="feature wall-time budget";break;}
@@ -149,29 +188,49 @@ export function generateFeatureConnections(models:TileModel[],tiles:PlacedTile[]
         // construction must remain eligible to reconstruct BOTH local rims.
         // Its actual material and original-continuation checks still follow.
         let endpointSetbacks=[setback,setback],landingChecks:Array<ReturnType<typeof validateWalkingApproach>>|undefined;
+        const deficient=new Set(["incomplete or overlapping floor coverage","no physical floor at entrance","disconnected interior footprint","local approach slope"]);
         if(candidate.flatStairLanding){
           const rise=Math.abs(fb.point[2]-fa.point[2]),span=Math.hypot(fb.point[0]-fa.point[0],fb.point[1]-fa.point[1]);
           if(rise<=.2||rise*12<=span)continue;
           landingChecks=[a,b].map((index,k)=>{const f=k===0?fa:fb;return validateWalkingApproach(workingModels[index],tiles[index],f.point,f.outward,width,3,workingModels,tiles,surfaces,true);});
           if(landingChecks.every(c=>c.valid))continue;
-          // Extend only a deficient footprint; flatten an adequately supported
-          // but sloping landing. A qualified opposite endpoint stays unchanged.
-          // These are construction proposals, never circulation certificates.
-          endpointSetbacks=landingChecks.map(c=>!c.valid&&["incomplete or overlapping floor coverage","no physical floor at entrance","disconnected interior footprint"].includes(c.reason)?-.75:0);
+          // Stair landings are checked INWARD from the rim. A negative setback
+          // only grows an outward pad; use positive retraction/rebuild so the
+          // 3 ft landing depth is reconstructed into the source form.
+          endpointSetbacks=landingChecks.map(c=>!c.valid&&deficient.has(c.reason)?0.75:0);
+        }else if(setback===0){
+          // Near-level pairs skip the stair-landing branch, but open-shell rims
+          // still need outward extension when the entrance lacks floor coverage.
+          landingChecks=[a,b].map((index,k)=>{const f=k===0?fa:fb;return validateWalkingApproach(workingModels[index],tiles[index],f.point,f.outward,width,2,workingModels,tiles,surfaces);});
+          if(landingChecks.some(c=>!c.valid&&deficient.has(c.reason))){
+            endpointSetbacks=landingChecks.map(c=>!c.valid&&deficient.has(c.reason)?-1:0);
+          }
         }
         let scene=workingModels,from=fa.point,to=fb.point;
         if(setback>=0){
           if(adapted>=adaptationLimit)break;adapted++;
-          const results=[a,b].map((index,k)=>{const placed=k===0?fa:fb,source=workingModels[index],feature=connectionFeatures(source).features.find(f=>f.id===(placed.sourceFeatureId??placed.id));
-            if(endpointSetbacks[k]===0&&candidate.flatStairLanding&&landingChecks![k].valid)return {valid:true as const,model:source,point:localPoint(placed.point,tiles[index],source),provenance:undefined};
-            return feature?workingLanding(source,{...feature,point:localPoint(placed.point,tiles[index],source)},width,endpointSetbacks[k]):undefined;});
+          const results=[a,b].map((index,k):LandingResult | {valid:true;model:TileModel;point:Vec3;provenance?:undefined} | undefined=>{const placed=k===0?fa:fb,source=workingModels[index],feature=connectionFeatures(source).features.find(f=>f.id===(placed.sourceFeatureId??placed.id));
+            if(endpointSetbacks[k]===0&&landingChecks?.[k]?.valid)return {valid:true as const,model:source,point:localPoint(placed.point,tiles[index],source),provenance:undefined};
+            if(!feature)return undefined;
+            return workingLanding(source,tiles[index],workingModels,tiles,placed,{...feature,point:localPoint(placed.point,tiles[index],source)},width,endpointSetbacks[k]);
+          });
           if(results.some(r=>!r?.valid)){attempts.push({...base,operation:`local landing / setbacks ${endpointSetbacks.join(",")}`,reason:"adaptation rejected",details:results.map(r=>r?.valid?{valid:true,provenance:r.provenance}:r)});continue;}
           scene=workingModels.slice();scene[a]=results[0]!.valid?results[0]!.model:scene[a];scene[b]=results[1]!.valid?results[1]!.model:scene[b];
-          from=worldFromLocal(results[0]!.valid?results[0]!.point:localPoint(fa.point,tiles[a],scene[a]),tiles[a],scene[a]);
-          to=worldFromLocal(results[1]!.valid?results[1]!.point:localPoint(fb.point,tiles[b],scene[b]),tiles[b],scene[b]);
-          // Check the entire reconstructed approach back to unchanged walking
-          // geometry, not just the flat two-foot endpoint plateau.
-          const continuity=[a,b].map((index,k)=>results[k]?.valid&&results[k].provenance?reconstructionContinuity(workingModels[index],scene[index],tiles[index],k===0?from:to,k===0?fa.outward:fb.outward,width,scene,tiles,surfaces,k===0?fa.approachDirections:fb.approachDirections):{valid:true,reason:"unchanged source approach; final scene validation still required"});
+          // Open-shell completion returns world points; closed-solid adaptation
+          // returns local points.
+          const endpoint=(result:NonNullable<(typeof results)[number]>,placed:typeof fa,index:number)=>{
+            if(!result.valid)return placed.point;
+            if(result.provenance?.operation==="open-shell local floor completion")return result.point;
+            return worldFromLocal(result.point,tiles[index],scene[index]);
+          };
+          from=endpoint(results[0]!,fa,a);to=endpoint(results[1]!,fb,b);
+          // Additive open-shell patches are certified by the final circulation gate.
+          const continuity=[a,b].map((index,k)=>{
+            const result=results[k];
+            if(!result?.valid||!result.provenance)return {valid:true,reason:"unchanged source approach; final scene validation still required"};
+            if(result.provenance.operation==="open-shell local floor completion")return {valid:true,reason:"open-shell additive patch; final circulation gate required"};
+            return reconstructionContinuity(workingModels[index],scene[index],tiles[index],k===0?from:to,k===0?fa.outward:fb.outward,width,scene,tiles,surfaces,k===0?fa.approachDirections:fb.approachDirections);
+          });
           if(continuity.some(c=>!c.valid)){attempts.push({...base,operation:`reconstructed approach / setbacks ${endpointSetbacks.join(",")}`,reason:"reconstruction-to-original walking continuity",details:continuity});continue;}
         }
         const packingKey=scene.map(m=>geometryRevision(m.connectionSurface!).id).join(":"),knownPacking=packingCache.get(packingKey)??originalPlacementMaterial(scene,tiles);
@@ -179,13 +238,24 @@ export function generateFeatureConnections(models:TileModel[],tiles:PlacedTile[]
         if(knownPacking.status==="REJECTED"){
           attempts.push({...base,operation:setback<0?"original placement packing":`reconstructed placement packing / setback ${setback}`,reason:"working forms penetrate",details:knownPacking});continue;
         }
-        const gap=Math.hypot(to[0]-from[0],to[1]-from[1]),stairRun=Math.ceil(Math.abs(to[2]-from[2])/.6)*1;
-        const offset=Math.min(6,Math.max(2,Math.sqrt(Math.max(0,stairRun*stairRun-gap*gap))/2));
-        const bends=stairRun>gap?[0,2,-2,offset,-offset]:[0,2,-2];
+        const gap=Math.hypot(to[0]-from[0],to[1]-from[1]);
+        const riseAbs=Math.abs(to[2]-from[2]);
+        const stairSteps=Math.max(1,Math.ceil(riseAbs/.6));
+        // Minimum walking-edge tread run; inside bends compress, so request margin.
+        const requiredTreadRun=stairSteps*.75*1.08;
+        const treadDeficit=Math.max(0,requiredTreadRun-gap);
+        const offset=Math.min(6,Math.max(2,treadDeficit>0?treadDeficit/2+1:2));
+        const bends=treadDeficit>0||riseAbs>.5
+          ?[0,2,-2,offset,-offset,Math.min(6,offset*1.5),-Math.min(6,offset*1.5),4,-4,6,-6]
+          :[0,2,-2];
         for(const bend of [...new Set(bends)]){
           if(performance.now()-started>=milliseconds){stopReason="feature wall-time budget";break;}
           const plan=Math.hypot(to[0]-from[0],to[1]-from[1]),rise=to[2]-from[2];
-          const pair:PortPair={tileA:tiles[a].id,tileB:tiles[b].id,portA:fa.id,portB:fb.id,from:[...from],to:[...to],plan,rise,distance:Math.hypot(plan,rise),usableWidth:width,startWidth:width,endWidth:width,startDirection:fa.outward,endDirection:fb.outward,connectionClass:Math.abs(rise)>.1?"VERTICAL":"ADAPTIVE",confidence:1,facing:1,widthCompatibility:1,score:0};
+          // VERTICAL with adequate plan run emits a ramp; only a short run becomes stairs.
+          // Near-level gaps stay ADAPTIVE bridges.
+          // Near-level gaps are ADAPTIVE bridges; acceptCirculationClass upgrades
+          // to VERTICAL only when measured slope exceeds the level threshold.
+          const pair:PortPair={tileA:tiles[a].id,tileB:tiles[b].id,portA:fa.id,portB:fb.id,from:[...from],to:[...to],plan,rise,distance:Math.hypot(plan,rise),usableWidth:width,startWidth:width,endWidth:width,startDirection:fa.outward,endDirection:fb.outward,connectionClass:Math.abs(rise)>.5?"VERTICAL":"ADAPTIVE",confidence:1,facing:1,widthCompatibility:1,score:0};
           pair.featureConnection={source:fa.kind,target:fb.kind,sourceFeature:fa.id,targetFeature:fb.id};
           pair.path=transitionPath(pair,bend);
           if(!acceptCirculationClass(pair)){attempts.push({...base,operation:`${setback<0?"original":"reconstructed"} bend ${bend}`,reason:"route slope/run"});continue;}
@@ -193,9 +263,10 @@ export function generateFeatureConnections(models:TileModel[],tiles:PlacedTile[]
           options.onEvaluation?.({pair,models:scene,tiles,validation});
           attempts.push({...base,operation:`${setback<0?"original":"reconstructed setbacks "+endpointSetbacks.join(",")} bend ${bend}`,geometry:{from:[...pair.from],to:[...pair.to],width,rise,run:planRun(pair.path!),bend},reason:validation.reason,details:validation.details,validationMs:performance.now()-before});
           if(validation.reason!=="accepted")continue;
-          // Fresh material packing after deformation; original source touch or
-          // a validator pass cannot excuse working forms penetrating each other.
-          const packing=originalPlacementMaterial(scene,tiles);if(packing.status!=="VERIFIED"){attempts.push({...base,operation:"working-scene packing",reason:packing.status,details:packing});continue;}
+          // Reject only measured solid penetration. Open architectural sheets
+          // cannot certify whole-source solids; UNVERIFIED packing is not a fail.
+          const packing=originalPlacementMaterial(scene,tiles);
+          if(packing.status==="REJECTED"){attempts.push({...base,operation:"working-scene packing",reason:packing.status,details:packing});continue;}
           pair.featureConnection={source:fa.kind,target:fb.kind,sourceFeature:fa.id,targetFeature:fb.id};
           pairs.push(pair);workingModels=scene;surfaces.push(...transitionMeshes(pair).map(m=>({...m,portPair:pair})));parent[find(a)]=find(b);accepted=true;break;
         }

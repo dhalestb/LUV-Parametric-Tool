@@ -57,10 +57,18 @@ export function initializeExtensionReconstruction() {
   // runtime. Node regression runners retain the installed ESM package entry.
   const browserRuntime=typeof window!=="undefined"||(typeof self!=="undefined"&&/^https?:$/.test(self.location?.protocol??""));
   const entry=browserRuntime?"/geometry-runtime/manifold-3.5.3/manifold.js":"manifold-3d";
-  return initialization??=import(/* webpackIgnore: true */ entry).then(async module=>{
-    const factory=module.default as ()=>Promise<ManifoldToplevel>;
-    api=await factory();api.setup();
-  });
+  if (!initialization) {
+    initialization = import(/* webpackIgnore: true */ entry).then(async (module) => {
+      const factory = module.default as () => Promise<ManifoldToplevel>;
+      api = await factory();
+      api.setup();
+    }).catch((error) => {
+      // Allow a later retry after the public geometry-runtime assets are restored.
+      initialization = undefined;
+      throw error;
+    });
+  }
+  return initialization;
 }
 /** Shared initialized kernel for bounded derived-geometry operations. */
 export function extensionGeometryKernel(){if(!api)throw new Error("Geometry runtime not initialized");return api;}
