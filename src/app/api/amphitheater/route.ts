@@ -119,7 +119,7 @@ export async function POST(req:NextRequest){
    letterArrangementReport:dual.letterArrangement,
    architecturalGenerationReport:dual.architecturalGeneration,
    source:arranged.placements,
-   ...(useRuleGuides?{
+   ...(useRuleGuides||r.workspaceTypology==='flat-deep-plan-plate'?{
     population:arranged.placements.length,
     sourceName:`${workspaceTypologyName(r.workspaceTypology!)} · ${arranged.placements.length} letters`,
     ...(openHallGeometry

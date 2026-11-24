@@ -243,6 +243,11 @@ export default function AmphitheaterStudio(){
   showWalls: flatShowWalls, joinWalls: flatJoinWalls,
  }), [flatColumnSize, flatFloorGuide, flatWallGuide, flatColumnSpacing, flatWallThickness, flatSlabThickness, flatShowWalls, flatJoinWalls]);
  const flatPlateMode = workspaceTypology === 'flat-deep-plan-plate';
+ const selectedRulesTypology = workspaceTypology === 'open-hall-workspace' || flatPlateMode
+  ? workspaceTypology : undefined;
+ const savedRulesTypology = result?.request.workspaceTypology
+  ?? result?.letterArrangementReport?.typology ?? result?.architecturalGenerationReport?.typology;
+ const savedRulesMatchSelection = !selectedRulesTypology || savedRulesTypology === selectedRulesTypology;
  const flatClearHeight = flatPlateClearHeightCheck(field.height, flatSlabThickness);
  const flatPlateError = flatPlateMode
   ? flatPlateSettingsError(flatPlate) ?? (flatClearHeight.ok ? flatPlateFloorGuideError({...field, flatPlate}) : flatClearHeight.detail)
@@ -353,6 +358,15 @@ export default function AmphitheaterStudio(){
  <aside className="space-y-4"><section style={panel} className="space-y-3"><h2>Generation controls</h2>
  <label className="block">Typology<select aria-label="Typology" className="block w-full" value={workspaceTypology||(envelopeVersion==='room-within-volume'?'room-within-volume':envelopeVersion==='inserted-plate'?'inserted-plate':envelopeVersion==='void-field'?'void-field':'stepped')} disabled={busy} onChange={e=>{const value=e.target.value;if(WORKSPACE_TYPOLOGIES.some(([id])=>id===value)){const id=value as WorkspaceTypology;setWorkspaceTypology(id);setEnvelopeVersion('workspace-ten-rule');setGenerator('workspace-ten-rule');setField(WORKSPACE_DEFAULT_FIELDS[id]);setError('');return;}setWorkspaceTypology('');if(value==='room-within-volume'){setRoomVersion('perimeter-room');chooseOrder('platforms');setError('');}setEnvelopeVersion(value==='room-within-volume'?'room-within-volume':value==='inserted-plate'?'inserted-plate':value==='void-field'?'void-field':'vertical-walls');setGenerator('source-preserving');if(value==='stepped'||value==='void-field'||value==='inserted-plate'){setField({width:40,depth:40,height:60});setPreferred(LETTER_SIZE_PRESETS[60].preferredFeet);}else if(value==='room-within-volume'){setField({width:40,depth:40,height:60});setPreferred(LETTER_SIZE_PRESETS[60].preferredFeet);}}}>
  <optgroup label="Gathering proofs"><option value="stepped">Stepped Amphitheater</option><option value="inserted-plate">Inserted Horizontal Plate</option><option value="void-field">Void-Field</option><option value="room-within-volume">Room Within Volume</option></optgroup><optgroup label="Workspace typologies · dual rulesets">{WORKSPACE_TYPOLOGIES.map(([id,name])=><option key={id} value={id}>{name}</option>)}</optgroup></select></label>
+ {selectedRulesTypology&&<section aria-label="Current typology rules">
+  <h3>Current rules · {workspaceTypologyName(selectedRulesTypology)}</h3>
+  {sectionsForTypology(selectedRulesTypology).map(section=><details key={section.id}>
+   <summary>{section.stage==='letter-arrangement'?'Letter Arrangement':'Architectural Generation'} · {section.requirements.length} rules</summary>
+   <ol className="list-decimal space-y-2 pl-5 text-xs">
+    {section.requirements.map(requirement=><li key={requirement}>{requirement}</li>)}
+   </ol>
+  </details>)}
+ </section>}
  {flatPlateMode&&<fieldset className="space-y-2">
   <legend>Flat Deep Plan Plate</legend>
   {([['Column L size',flatColumnSize,setFlatColumnSize,FLAT_PLATE_PRESETS.columnSize],['Floor and mezzanine L size',flatFloorGuide,setFlatFloorGuide,FLAT_PLATE_PRESETS.floorMezzGuideSize],['Wall L size',flatWallGuide,setFlatWallGuide,FLAT_PLATE_PRESETS.wallGuideSize]] as const)
@@ -413,15 +427,6 @@ export default function AmphitheaterStudio(){
 <div className="grid grid-cols-2 gap-2"><label className="text-xs">Wall thickness (ft)<input aria-label="Wall thickness" type="number" min="0.1" step="0.25" className="block border w-full p-1" disabled={busy} value={wallThickness} onChange={e=>setWallThickness(normalizeOpenHallGuideSize(+e.target.value,OPEN_HALL_WALL_THICKNESS))}/></label><label className="text-xs">Slab thickness (ft)<input aria-label="Slab thickness" type="number" min="0.1" step="0.25" className="block border w-full p-1" disabled={busy} value={slabThickness} onChange={e=>setSlabThickness(normalizeOpenHallGuideSize(+e.target.value,OPEN_HALL_DEFAULT_SLAB_THICKNESS))}/></label></div><p className="text-xs">Thicker walls can reduce the floor footprint. Thicker slabs reduce clearance around the mezzanine.</p><label className="block"><input type="checkbox" checked={perimeterWalls} onChange={e=>setPerimeterWalls(e.target.checked)}/> Show perimeter walls</label><label className="block"><input type="checkbox" checked={joinWalls} onChange={e=>setJoinWalls(e.target.checked)}/> Join walls into the main massing</label><p className="text-xs">Letter-driven Open Hall: floor plate from outer edges of 4 corner Ls; mezzanine 2/3/4-channel from outer + pocket Ls (pockets from inner edges). Floor/mezz presets 9 / 11 / 13′; wall size independent.</p></div>}
 {(['width','depth','height'] as const).map((axis,i)=><label className="block" key={axis}>{['Width X','Depth Y','Height Z'][i]} (ft)<select aria-label={axis} className="block w-full" value={field[axis]} disabled={busy||fixedPattern} onChange={e=>setField(f=>({...f,[axis]:+e.target.value}))}>{WORKSPACE_FIELD_PRESETS.map(n=><option key={n}>{n}</option>)}</select></label>)}
  {generationBlocked&&<p role="alert" style={{color:'#ed8989'}}>{openHallError??flatPlateError}</p>}
- {(workspaceTypology==='open-hall-workspace'||flatPlateMode)&&<details>
-  <summary>Current rules and defaults</summary>
-  {sectionsForTypology(workspaceTypology).map(section=><details key={section.id}>
-   <summary>{section.stage==='letter-arrangement'?'Letter Arrangement':'Architectural Generation'} · {section.requirements.length} rules</summary>
-   <ol className="list-decimal space-y-2 pl-5 text-xs">
-    {section.requirements.map(requirement=><li key={requirement}>{requirement}</li>)}
-   </ol>
-  </details>)}
- </details>}
  {workspaceTypology!=='open-hall-workspace'&&workspaceTypology!=='flat-deep-plan-plate'&&<>
  <label className="block">Preferred letter size (ft)<input aria-label="Preferred letter size" className="block w-full" type="number" min="0" step="any" value={preferred} disabled={busy||fixedPattern} onChange={e=>setPreferred(+e.target.value)}/></label>
  <div className="flex gap-2">{([20,40,60] as const).map(h=><button key={h} disabled={busy||fixedPattern} onClick={()=>setPreferred(LETTER_SIZE_PRESETS[h].preferredFeet)} className="border p-1">{LETTER_SIZE_PRESETS[h].preferredFeet}′ preset</button>)}</div><p className="text-xs">Letter presets and field dimensions are independent.</p>
@@ -469,10 +474,12 @@ export default function AmphitheaterStudio(){
   {envelopeVersion==='room-within-volume'&&<p>Independent Enclosed Room pilot: generate from the selected letters or edit them, then regenerate. Source transforms and quantity are preserved.</p>}
  {result?.roomReport&&<section>{result.roomReport.perimeter&&<p>Perimeter letters: {result.roomReport.perimeter.lower} lower and {result.roomReport.perimeter.upper} upper · {result.roomReport.perimeter.interior} room letters · {(result.roomReport.perimeter.baseCoverage*100).toFixed(1)}% angular coverage · largest base gap at most {result.roomReport.perimeter.maxGapFeet.toFixed(1)} ft.</p>}<h3>Independent Enclosed Room — measured geometry</h3><p>{result.roomReport.clearRoomArea.toFixed(1)} ft² clear room · {result.roomReport.headroom.toFixed(2)} ft headroom · {result.roomReport.interstitialArea.toFixed(1)} ft² surrounding space.</p><p>Room sources: {result.roomReport.roomSources.join(', ')}. {result.roomReport.windows.length} further source-derived outer openings. Access check: {result.roomReport.access.clearWidth} ft wide × {result.roomReport.access.clearHeight} ft high.</p>{result.roomReport.contours&&<><p>{result.roomReport.contours.method}. Room boundary offset: {result.roomReport.contours.roomOffset} ft; outer boundary offset: {result.roomReport.contours.envelopeOffset} ft.</p><details><summary>Each letter’s measured influence</summary>{result.contributions?.map(c=><p key={c.letter}>{c.letter}: {c.relationships.join(', ')} · {c.exposedArea.toFixed(1)} ft² exposed surface</p>)}</details></>}<p>Geometric pilot; architectural access and structural performance are not certified.</p></section>}
  <p>{result?`Displayed study: ${displayField.width} × ${displayField.depth} × ${displayField.height} ft · ${result.request.preferredFeet} ft letters · ${result.sourceCount} actual instances · ${result.volume.toFixed(3)} ft³${result.request.workspaceTypology?' · '+workspaceTypologyName(result.request.workspaceTypology):''}`:'No saved geometry is preloaded. Generate a new study.'}</p>
- {(result?.letterArrangementReport||result?.architecturalGenerationReport)&&<section style={{marginTop:16}}><h2>Workspace dual rulesets</h2><p className="text-xs">Geometric proof only — not certified for occupancy, circulation, accessibility, or structure. All measured rules stay listed below (pass and fail).</p>
+ {(result?.letterArrangementReport||result?.architecturalGenerationReport)&&<details key={result.id} open={savedRulesMatchSelection} style={{marginTop:16}}>
+ <summary>Saved study rules{savedRulesTypology&&` · ${workspaceTypologyName(savedRulesTypology)}`}</summary>
+ <p className="text-xs">Geometric proof only — not certified for occupancy, circulation, accessibility, or structure. All measured rules stay listed below (pass and fail).</p>
  {result.letterArrangementReport&&<WorkspaceRuleGroup report={result.letterArrangementReport}/>}
  {result.architecturalGenerationReport&&<WorkspaceRuleGroup report={result.architecturalGenerationReport}/>}
- </section>}
+ </details>}
  {result?.plateReport?.version==='edge-connected'?<p>The two horizontal plates share a footprint. The upper plate meets an L wall along its edge.</p>:result?.plateReport?.version==='merged-walls'?<p>Exterior letter edges form overlapping walls. The two middle U interiors form plates that meet adjacent walls directly.</p>:result?.plateReport?.version==='two-u'?<p>Middle U bends form the inserted plates. Partial L corners form walls and upright V arms form frames.</p>:envelopeVersion==='inserted-plate'&&<p>Inserted Plate: horizontal plate sources span compatible letter-derived edge and frame boundaries. Letter concavities protect openings between levels. New sources use horizontal L/U and upright V roles; regeneration preserves all saved poses. Legacy ledges remain in Advanced Settings for comparison.</p>}
  {result?.plateReport&&<details open><summary>Inserted Plate source influence and geometry</summary>{result.plateReport.floors.map(f=><p key={f.id}>{f.source} · horizontal plate at {f.topZ.toFixed(2)} ft {f.netArea!==undefined?' · '+f.netArea.toFixed(1)+' ft² net floor':''} · {f.links.map(l=>l.source).join(', ')} boundary links</p>)}{result.plateReport.pockets.map(p=><p key={p.source}>{p.source} · open curved edge recess above {p.floor}</p>)}{result.plateReport.walls.map(w=><p key={w.source}>{w.source} · upright boundary · support {w.supportZ.toFixed(2)} ft · {w.contacts.filter(c=>c.volume>1e-6).length} plate contacts</p>)}<p>{result.plateReport.limitations.join(' ')}</p></details>}
  {result?.voidFieldReport&&<p>Displayed façade mode: {result.voidFieldReport.facadeMode==='face-normal'?'Face-Normal · source-perpendicular':'Global Z · vertical comparison'}.</p>}
