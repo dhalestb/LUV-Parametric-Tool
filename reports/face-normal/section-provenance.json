@@ -1,0 +1,24 @@
+{
+  "source": "U-6",
+  "frame": [
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    4.878194205921213,
+    0,
+    16.865680588781835,
+    1
+  ],
+  "before": "vertical-15",
+  "after": "native-15",
+  "method": "Exact Manifold sections of generated exported meshes; original source triangle-plane intersections."
+}

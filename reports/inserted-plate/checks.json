@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checkpoint": "9c01558f11ff8ea7824f640f108fb588d9198b6a",
+  "tenRegressionSuites": true,
+  "typescript": true,
+  "targetedLint": true,
+  "productionBuild": true,
+  "browserGenerationAndSavedReload": true,
+  "browserABCSect": true,
+  "actualApiSourceAndMeshMatchesWorker": true,
+  "portableSeed": true,
+  "originalGeometryThresholdsUnchanged": true,
+  "noPushMergeDeploy": true
+}

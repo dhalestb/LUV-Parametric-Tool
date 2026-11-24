@@ -1,0 +1,93 @@
+{
+  "passed": true,
+  "broadPhaseFlags": 0,
+  "preciseMethod": "all nonadjacent BVH pairs tested with independent segment/triangle crossings and coplanar polygon clipping; original preflight retained separately",
+  "exports": [
+    {
+      "file": "combined-envelope.obj",
+      "status": "NoError",
+      "volume": 32518.609225165874,
+      "vertices": 7099,
+      "triangles": 14198
+    },
+    {
+      "file": "bank-1.obj",
+      "status": "NoError",
+      "volume": 15162.413991445621,
+      "vertices": 2805,
+      "triangles": 5610
+    },
+    {
+      "file": "bank-2.obj",
+      "status": "NoError",
+      "volume": 11174.2319467238,
+      "vertices": 1975,
+      "triangles": 3950
+    },
+    {
+      "file": "bank-3.obj",
+      "status": "NoError",
+      "volume": 11252.802600551982,
+      "vertices": 2264,
+      "triangles": 4528
+    },
+    {
+      "file": "bank-4.obj",
+      "status": "NoError",
+      "volume": 13811.253262688811,
+      "vertices": 2267,
+      "triangles": 4534
+    },
+    {
+      "file": "bank-5.obj",
+      "status": "NoError",
+      "volume": 9329.86997732944,
+      "vertices": 1950,
+      "triangles": 3900
+    },
+    {
+      "file": "bank-6.obj",
+      "status": "NoError",
+      "volume": 12320.304401540585,
+      "vertices": 2397,
+      "triangles": 4794
+    },
+    {
+      "file": "bank-7.obj",
+      "status": "NoError",
+      "volume": 16378.356388773725,
+      "vertices": 2239,
+      "triangles": 4478
+    },
+    {
+      "file": "bay-1.obj",
+      "status": "NoError",
+      "volume": 1286.9132982463152,
+      "vertices": 10,
+      "triangles": 16
+    },
+    {
+      "file": "bay-2.obj",
+      "status": "NoError",
+      "volume": 244.52596018172883,
+      "vertices": 10,
+      "triangles": 16
+    },
+    {
+      "file": "bay-3.obj",
+      "status": "NoError",
+      "volume": 401.276765290339,
+      "vertices": 22,
+      "triangles": 40
+    }
+  ],
+  "coplanarAreas": [],
+  "nonAdjacentTriangleChecks": 486723,
+  "selfIntersectionPairs": 0,
+  "coplanar": 0,
+  "nonCoplanar": 0,
+  "examples": [],
+  "shellVolumes": [
+    32518.609137618747
+  ]
+}

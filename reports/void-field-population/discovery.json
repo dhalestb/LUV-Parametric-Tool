@@ -1,0 +1,172 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "count": 10,
+      "seed": 211,
+      "volume": 4489.5826891166835,
+      "triangles": 11210,
+      "elapsedMs": 7424,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 480293,
+        "legacyFlags": 154
+      },
+      "rejected": [
+        {
+          "seed": 19,
+          "reason": "(node:10556) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [4195.610378304298,0.12299370970358159,0.09036181172834926,0.15886415075402333,0.04070764686475509]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        },
+        {
+          "seed": 37,
+          "reason": "(node:63740) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Open atrium sightlines failed: {\"floors\":[2,2,2],\"crossLevel\":[2,0,2],\"sky\":3}\n    at Object.validateAtriumViews (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-atrium-openings.cjs:77:29)\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:146:66)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        },
+        {
+          "seed": 73,
+          "reason": "(node:67892) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nManifoldError: Not manifold\n    at new ManifoldError (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:10882)\n    at new Module.Manifold (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:13334)\n    at floatSafe (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:12:131)\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:141:8)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13 {\n  code: 'NotManifold'\n}\n"
+        },
+        {
+          "seed": 101,
+          "reason": "(node:56168) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nManifoldError: Not manifold\n    at new ManifoldError (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:10882)\n    at new Module.Manifold (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:13334)\n    at floatSafe (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:12:131)\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:141:8)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13 {\n  code: 'NotManifold'\n}\n"
+        },
+        {
+          "seed": 149,
+          "reason": "(node:9680) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [4408.769431273223,-9.31371848799755]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        }
+      ]
+    },
+    {
+      "count": 11,
+      "seed": 149,
+      "volume": 4831.368705179462,
+      "triangles": 11996,
+      "elapsedMs": 7499,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 541774,
+        "legacyFlags": 184
+      },
+      "rejected": [
+        {
+          "seed": 19,
+          "reason": "(node:73944) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [4814.432945466249,0.12122446128495912,0.09020770003864906,0.1596649285189385,0.04037345529193852]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        },
+        {
+          "seed": 37,
+          "reason": "(node:49056) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [5076.452896560464,-0.6702862227066226]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        },
+        {
+          "seed": 73,
+          "reason": "(node:61804) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nManifoldError: Not manifold\n    at new ManifoldError (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:10882)\n    at new Module.Manifold (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:13334)\n    at floatSafe (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:12:131)\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:141:8)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13 {\n  code: 'NotManifold'\n}\n"
+        },
+        {
+          "seed": 101,
+          "reason": "(node:73480) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [6061.361701515201,-238.05568675077257,-289.36843260613045,-2.439391073734366,0.17880783260163313,0.005575212098118943]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        }
+      ]
+    },
+    {
+      "count": 12,
+      "seed": 149,
+      "volume": 4827.395708446812,
+      "triangles": 12658,
+      "elapsedMs": 8229,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 588759,
+        "legacyFlags": 191
+      },
+      "rejected": [
+        {
+          "seed": 19,
+          "reason": "(node:70808) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [6002.087043945663,0.12264224880330943,0.09033129528350933,0.15902259261845247,0.04064103615144485,-288.1169193091784,-269.3242637051617]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        },
+        {
+          "seed": 37,
+          "reason": "(node:9152) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [5319.8298331659025,-1.387804373157807,-1.3054276341755033,-1.2694580047997595]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        },
+        {
+          "seed": 73,
+          "reason": "(node:61452) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Open atrium sightlines failed: {\"floors\":[2,2,2],\"crossLevel\":[2,0,2],\"sky\":3}\n    at Object.validateAtriumViews (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-atrium-openings.cjs:77:29)\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:146:66)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        },
+        {
+          "seed": 101,
+          "reason": "(node:72884) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [5665.686033954839,-16.137763263149328,-5.582158702923121,-0.11801944653760091]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        }
+      ]
+    },
+    {
+      "count": 13,
+      "seed": 37,
+      "volume": 5549.1764959240945,
+      "triangles": 12298,
+      "elapsedMs": 8564,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 589152,
+        "legacyFlags": 173
+      },
+      "rejected": [
+        {
+          "seed": 19,
+          "reason": "(node:29048) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [5305.272056098356,-2.4697754011447235,0.12337384683281516,-0.0006854206111250344,0.09039475057297339,0.15869316017260549,0.04077929078546816]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        }
+      ]
+    },
+    {
+      "count": 14,
+      "seed": 149,
+      "volume": 5152.623273147893,
+      "triangles": 12518,
+      "elapsedMs": 8061,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 507400,
+        "legacyFlags": 145
+      },
+      "rejected": [
+        {
+          "seed": 19,
+          "reason": "(node:57472) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nManifoldError: Not manifold\n    at new ManifoldError (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:10882)\n    at new Module.Manifold (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:13334)\n    at floatSafe (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:12:131)\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:141:8)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13 {\n  code: 'NotManifold'\n}\n"
+        },
+        {
+          "seed": 37,
+          "reason": "(node:77596) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [6332.976786883569,-0.02615095260531557,-0.06369718547063641]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        },
+        {
+          "seed": 73,
+          "reason": "(node:59736) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nManifoldError: Not manifold\n    at new ManifoldError (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:10882)\n    at new Module.Manifold (file:///C:/Users/DHale/Documents/Codex/LUV-Gathering-Envelope-Experiment/node_modules/manifold-3d/manifold.js:1:13334)\n    at floatSafe (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:12:131)\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:141:8)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13 {\n  code: 'NotManifold'\n}\n"
+        },
+        {
+          "seed": 101,
+          "reason": "(node:60628) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [5530.063649498274,-3.1187084483346017,-2.2172560613595635]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        }
+      ]
+    },
+    {
+      "count": 15,
+      "seed": 37,
+      "volume": 6126.545943137796,
+      "triangles": 14474,
+      "elapsedMs": 9176,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 651809,
+        "legacyFlags": 209
+      },
+      "rejected": [
+        {
+          "seed": 19,
+          "reason": "(node:32492) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Void field envelope is disconnected: [5760.111437007945,-3.729969261380464,-0.27857899583436874]\n    at Object.voidFieldEnvelope (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs:144:40)\n    at Object.buildSource (C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs:35:214)\n    at async C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\amphitheater-interactive-worker.cjs:23:13\n"
+        }
+      ]
+    }
+  ],
+  "unchangedMeshThresholds": true
+}

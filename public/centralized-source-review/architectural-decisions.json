@@ -1,0 +1,48 @@
+[
+  {
+    "filename": "Void_Field.obj",
+    "geometryHash": "1587dc0976dd73792a368aa1bf94a4a490b91d1f221ac7ca015daa2a4fea819b",
+    "sourceSha256": "129f4ec8d491855ce0fd2f8acda3502620d6694ff5fc1be836561b46f6cc8030",
+    "region": 34,
+    "classification": "provisional gathering-space candidate",
+    "access": "unresolved",
+    "continuousClearAreaFt2": 372.2468,
+    "minimumHeadroomForThisAreaFt": 7,
+    "clearPatchDiameterFt": 11.73,
+    "crossings": [
+      {
+        "to": 56,
+        "state": "potential",
+        "verifiedApproach": false,
+        "countsForConvergence": false,
+        "countsForAccessibility": false,
+        "testedSegments": 15,
+        "passingLocalStrips": 0
+      },
+      {
+        "to": 95,
+        "state": "potential",
+        "verifiedApproach": false,
+        "countsForConvergence": false,
+        "countsForAccessibility": false,
+        "testedSegments": 8,
+        "passingLocalStrips": 0
+      }
+    ],
+    "destinationApproved": false,
+    "score": null
+  },
+  {
+    "filename": "Linear.obj",
+    "geometryHash": "a1bd4c04a308353748ec239b7aaaa24b767d8e8e0e1172e3934337f27e891af9",
+    "sourceSha256": "17c938d3b4e09893f652412d7b9d966562e60a14ddf013aef0cf3c7682bff258",
+    "subject": "second-floor loft",
+    "cover": "open to sky",
+    "evidence": "designer confirmation",
+    "relatedReviewRegion": 3,
+    "loftBoundaryConfirmed": false,
+    "connectionFromR10": "unresolved",
+    "destinationApproved": false,
+    "score": null
+  }
+]

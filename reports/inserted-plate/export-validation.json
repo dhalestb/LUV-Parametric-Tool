@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "coordinateConvention": "feet, Z up, same saved source/architecture coordinates",
+  "rows": [
+    {
+      "kind": "letters",
+      "vertices": 5868,
+      "faces": 1956
+    },
+    {
+      "kind": "form",
+      "vertices": 1859,
+      "faces": 3734
+    }
+  ]
+}

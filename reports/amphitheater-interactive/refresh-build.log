@@ -1,0 +1,87 @@
+
+> d7-letter-grid@0.1.0 build
+> node scripts/patch-next-eisdir.js && next build
+
+[patch-next-eisdir] next-trace-entrypoints-plugin.js already patched
+[patch-next-eisdir] collect-build-traces.js already patched
+[patch-next-eisdir] no changes needed
+   ▲ Next.js 15.5.27
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 7.6s
+   Linting and checking validity of types ...
+
+./src/app/composition-presentation/page.tsx
+76:6  Warning: React Hook useEffect has a missing dependency: 'isPdfBoard'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/amphitheaterPrototype.ts
+626:27  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+1125:11  Warning: 'nearestPair' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/lattice/distribution.ts
+297:5  Warning: 'neighborCount' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/lattice/LatticeViewport.tsx
+188:9  Warning: The 'visibleMeshes' conditional could make the dependencies of useMemo Hook (at line 200) change on every render. To fix this, wrap the initialization of 'visibleMeshes' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+246:6  Warning: React Hook useMemo has a missing dependency: 'field'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+484:104  Warning: React Hook useImperativeHandle has an unnecessary dependency: 'canvasKey'. Either exclude it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/lattice/search.ts
+444:16  Warning: 'rankAttachments' is defined but never used.  @typescript-eslint/no-unused-vars
+573:16  Warning: 'beamSearch' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/officeLetterIntersections.ts
+106:11  Warning: 'quarterMirror' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/officeWorkspaceRules.ts
+560:9  Warning: 'obstacles' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/openHallLetterLayout.ts
+12:9  Warning: 'pairCount' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/PrototypeDemonstration.tsx
+203:26  Warning: React Hook useLayoutEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked.  react-hooks/exhaustive-deps
+203:39  Warning: React Hook useLayoutEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked.  react-hooks/exhaustive-deps
+203:52  Warning: React Hook useLayoutEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked.  react-hooks/exhaustive-deps
+
+./src/components/UnifiedPrototype.tsx
+121:88  Warning: 'frame' is defined but never used.  @typescript-eslint/no-unused-vars
+121:113  Warning: 'cube' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+121:135  Warning: 'cubeBounds' is defined but never used.  @typescript-eslint/no-unused-vars
+182:198  Warning: React Hook useEffect has a missing dependency: 'snapshot?.data.arrangement?.placements'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+183:351  Warning: React Hook useEffect has a missing dependency: 'snapshot?.data.enclosure'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/15) ...
+   Generating static pages (3/15) 
+   Generating static pages (7/15) 
+   Generating static pages (11/15) 
+ ✓ Generating static pages (15/15)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    8.35 kB         120 kB
+├ ○ /_not-found                            992 B         104 kB
+├ ○ /amphitheater                        11.8 kB         377 kB
+├ ƒ /api/amphitheater                      131 B         103 kB
+├ ƒ /api/export-volume                     131 B         103 kB
+├ ƒ /api/letter-intersections              131 B         103 kB
+├ ○ /composition                           73 kB         443 kB
+├ ○ /composition-presentation            5.71 kB         112 kB
+├ ○ /crops                               5.01 kB         116 kB
+├ ○ /evaluations                         15.7 kB         380 kB
+├ ○ /lattice                             39.1 kB         258 kB
+├ ○ /part3                               6.89 kB         113 kB
+├ ○ /shapes                               2.3 kB         218 kB
+└ ○ /voids                               2.93 kB         219 kB
++ First Load JS shared by all             103 kB
+  ├ chunks/255-ce8c7c75002f810b.js       46.5 kB
+  ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+  └ other shared chunks (total)           2.3 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -1,0 +1,107 @@
+{
+  "study": {
+    "requestedPopulation": "auto",
+    "actualPopulation": 19,
+    "preferredSize": 13,
+    "counts": {
+      "L": 8,
+      "U": 4,
+      "V": 7
+    },
+    "capacity": {
+      "terracesByPlan": 8,
+      "terracesByHeight": 23
+    },
+    "desired": {
+      "L": 8,
+      "U": 4,
+      "V": 7
+    },
+    "enclosureSupportLength": 72.39297155006146,
+    "measuredUArcLength": 22.736655570920394,
+    "uprightVHeight": 13.000000235827072,
+    "sourceRegistration": [
+      20,
+      20,
+      20
+    ],
+    "minorRise": 1.978260869565217,
+    "run": 2.2980970388562794,
+    "displacement": 3.25,
+    "majorLevelSpacing": 12,
+    "runtimeMs": 1695.7795
+  },
+  "validation": {
+    "sealedConstructionSeams": [],
+    "status": "NoError",
+    "volume": 2161.400049777864,
+    "bounds": {
+      "min": [
+        -15.530529975891113,
+        -19.30760955810547,
+        0.9590299725532532
+      ],
+      "max": [
+        15.573419570922852,
+        15.301569938659668,
+        58.7846794128418
+      ]
+    },
+    "shellVolumes": [
+      2161.400049777864
+    ],
+    "outside": 0,
+    "sourceOutside": 0,
+    "sourceCount": 19,
+    "beforeSerializationShellVolumes": [
+      2161.400484133832
+    ],
+    "serializationVolumeDelta": -0.0004343559680819453,
+    "numericalCutClearance": 0.0001,
+    "exportGrid": 0.00001,
+    "sourceFocusOverlap": 1113.3885264616504,
+    "clipped": 0
+  },
+  "tools": [
+    {
+      "id": "primary-gathering-void",
+      "finalObstruction": 0,
+      "removed": 6302.454214691309
+    },
+    {
+      "id": "recess-enclosure-left-U-0",
+      "finalObstruction": 0,
+      "removed": 17.511340180395592
+    },
+    {
+      "id": "recess-enclosure-left-U-1",
+      "finalObstruction": 0,
+      "removed": 33.68715647769558
+    },
+    {
+      "id": "recess-enclosure-left-U-2",
+      "finalObstruction": 0,
+      "removed": 42.004401894539505
+    },
+    {
+      "id": "recess-enclosure-right-U-0",
+      "finalObstruction": 0,
+      "removed": 35.38677730631121
+    },
+    {
+      "id": "recess-enclosure-right-U-1",
+      "finalObstruction": 0,
+      "removed": 44.85305592824082
+    },
+    {
+      "id": "recess-enclosure-right-U-2",
+      "finalObstruction": 0,
+      "removed": 38.27584663662476
+    },
+    {
+      "id": "recess-rear-enclosure",
+      "finalObstruction": 0,
+      "removed": 24.22170006473174
+    }
+  ]
+}

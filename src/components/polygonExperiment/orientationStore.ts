@@ -1,0 +1,16 @@
+import type {SiteInput} from './model';
+export type OrientationResult={version:1;id:string;kind:'orientation-only';typologyId?:string;typologyName?:string;site:SiteInput;zoneId:string;geometryHash:string;counts:{L:number;U:number;V:number};parameters:{recipe:string;seed:number;spacing:number;heading:number;datum:number;field:{width:number;depth:number;height:number}};frame:{center:[number,number];angle:number;corners:[number,number][]};components:{id:string;letter:'L'|'U'|'V';nominalSizeFeet:number;mesh:{positions:number[];indices:number[]}}[];layers:{level:number;world:[number,number,number][]}[];organizingEdges:{id:string;points:[number,number,number][]}[];validation:{outsideArea:number;maxElevationError:number;triangles:number;attempts:number;grossArea:number;permittedArea:number;protectedArea:number;milliseconds:number};limitations:string[];provenance:{entry:string;B:{executed:false}}};
+export const ORIENTATION_KEY='luv-experiment-orientation-selection-v1';
+export type OrientationSelection={id:string|null;letters:boolean;organizing:boolean;boundaries:boolean;siteVisible:boolean};
+export const selectionDefault:OrientationSelection={id:null,letters:true,organizing:true,boundaries:true,siteVisible:false};
+function db():Promise<IDBDatabase>{return new Promise((resolve,reject)=>{const r=indexedDB.open('luv-experiment-orientations-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('results',{keyPath:'id'});r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+export async function saveOrientation(result:OrientationResult){const d=await db();try{await new Promise<void>((resolve,reject)=>{const t=d.transaction('results','readwrite');t.objectStore('results').put(result);t.oncomplete=()=>resolve();t.onerror=()=>reject(t.error);t.onabort=()=>reject(t.error);});}finally{d.close();}}
+export async function readOrientation(id:string):Promise<OrientationResult|undefined>{const d=await db();try{return await new Promise((resolve,reject)=>{const r=d.transaction('results').objectStore('results').get(id);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}finally{d.close();}}
+export async function listOrientations():Promise<OrientationResult[]>{const d=await db();try{return await new Promise((resolve,reject)=>{const r=d.transaction('results').objectStore('results').getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}finally{d.close();}}
+export function readSelection():OrientationSelection{const s=localStorage.getItem(ORIENTATION_KEY);return s?{...selectionDefault,...JSON.parse(s)}:selectionDefault;}
+export function writeSelection(s:OrientationSelection){localStorage.setItem(ORIENTATION_KEY,JSON.stringify(s));window.dispatchEvent(new Event('luv-orientation-change'));}
+
+export const SITE_ORIENTATION_KEY='luv-experiment-site-orientation-selection-v1';
+export function readSiteSelection():OrientationSelection{const raw=localStorage.getItem(SITE_ORIENTATION_KEY);return raw?{...selectionDefault,...JSON.parse(raw)}:readSelection();}
+export function writeSiteSelection(value:OrientationSelection){localStorage.setItem(SITE_ORIENTATION_KEY,JSON.stringify(value));window.dispatchEvent(new Event('luv-orientation-change'));}
+export function ensureSiteSelection(){if(!localStorage.getItem(SITE_ORIENTATION_KEY))writeSiteSelection(readSelection());}

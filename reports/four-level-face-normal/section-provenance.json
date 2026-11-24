@@ -1,0 +1,24 @@
+{
+  "source": "U-11",
+  "frame": [
+    0.5000000000000001,
+    0,
+    0.8660254037844386,
+    0,
+    0.8660254037844386,
+    0,
+    -0.5000000000000001,
+    0,
+    0,
+    1,
+    0,
+    0,
+    8.804539759845436,
+    0,
+    10.1892723088994,
+    1
+  ],
+  "before": "four-level-face-vertical",
+  "after": "four-level-face-normal",
+  "method": "Exact Manifold sections of generated exported meshes; original source triangle-plane intersections."
+}

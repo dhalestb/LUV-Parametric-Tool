@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "broadPhaseFlags": 27,
+  "preciseMethod": "all nonadjacent BVH pairs tested with independent segment/triangle crossings and coplanar polygon clipping; original preflight retained separately",
+  "exports": [
+    {
+      "file": "combined-envelope.obj",
+      "status": "NoError",
+      "volume": 2708.5356418585743,
+      "vertices": 1364,
+      "triangles": 2728
+    },
+    {
+      "file": "contour-U-1.obj",
+      "status": "NoError",
+      "volume": 873.37136662934,
+      "vertices": 781,
+      "triangles": 1550
+    },
+    {
+      "file": "contour-L-2.obj",
+      "status": "NoError",
+      "volume": 774.0812714880948,
+      "vertices": 260,
+      "triangles": 516
+    },
+    {
+      "file": "contour-U-3.obj",
+      "status": "NoError",
+      "volume": 98.79696243530105,
+      "vertices": 164,
+      "triangles": 320
+    },
+    {
+      "file": "transition-4.obj",
+      "status": "NoError",
+      "volume": 633.8415173384955,
+      "vertices": 106,
+      "triangles": 208
+    },
+    {
+      "file": "transition-5.obj",
+      "status": "NoError",
+      "volume": 390.2839015346404,
+      "vertices": 55,
+      "triangles": 106
+    },
+    {
+      "file": "directional-U-3.obj",
+      "status": "NoError",
+      "volume": 4382.518141855848,
+      "vertices": 70,
+      "triangles": 136
+    }
+  ],
+  "coplanarAreas": [],
+  "nonAdjacentTriangleChecks": 90048,
+  "selfIntersectionPairs": 0,
+  "coplanar": 0,
+  "nonCoplanar": 0,
+  "examples": [],
+  "shellVolumes": [
+    2708.5356418585743
+  ]
+}

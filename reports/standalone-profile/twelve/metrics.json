@@ -1,0 +1,16 @@
+{
+  "id": "6d15599f-37db-44c7-ad39-caa4aac902b0",
+  "milliseconds": 4466.5957,
+  "beforeTriangles": 65608,
+  "afterTriangles": 10538,
+  "beforeVolume": 16268.616037021653,
+  "afterVolume": 26613.544872253548,
+  "beforeOperations": 9,
+  "afterOperations": 8,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 320025,
+    "legacyFlags": 141
+  }
+}

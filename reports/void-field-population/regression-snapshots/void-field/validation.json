@@ -1,0 +1,869 @@
+{
+  "passed": true,
+  "rejectedCases": [
+    {
+      "seed": 21,
+      "reason": "Unintended enclosed cavity; rejected without publishing a study."
+    }
+  ],
+  "rows": [
+    {
+      "height": 20,
+      "seed": 19,
+      "mode": "neighbor-taper",
+      "elapsedMs": 5238,
+      "volume": 4048.681938854127,
+      "removed": 1946.5922176054146,
+      "triangles": 10726,
+      "actualHeight": 19.9820613861084,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 407638,
+        "legacyFlags": 197
+      },
+      "voids": [
+        {
+          "source": "L-8",
+          "hierarchy": "primary",
+          "area": 67.92745740377718,
+          "removed": 1358.0697626438496,
+          "taper": -0.021423847207107768
+        },
+        {
+          "source": "U-3",
+          "hierarchy": "secondary",
+          "area": 38.73635482613603,
+          "removed": 266.82425151546886,
+          "taper": 0.028370093466210066
+        },
+        {
+          "source": "V-5",
+          "hierarchy": "secondary",
+          "area": 18.269730629675216,
+          "removed": 306.8853671265788,
+          "taper": 0.039909366428988916
+        }
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -6.359999999999999,
+          "exposedArea": 351.17613154319497,
+          "component": "source-envelope-L-1",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-1",
+            "void-rim-L-8"
+          ]
+        },
+        {
+          "letter": "U-2",
+          "sourceCenterZ": -6.359999999999999,
+          "exposedArea": 412.63418212617347,
+          "component": "source-envelope-U-2",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-2",
+            "void-rim-U-3"
+          ]
+        },
+        {
+          "letter": "U-3",
+          "sourceCenterZ": 0,
+          "exposedArea": 414.2034698298557,
+          "component": "void-rim-U-3",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-2",
+            "void-rim-L-8",
+            "void-rim-U-3",
+            "void-rim-V-5",
+            "void-U-3",
+            "connection-U-3-V-5-0",
+            "connection-U-3-V-5-1"
+          ]
+        },
+        {
+          "letter": "V-4",
+          "sourceCenterZ": 1.1799999999999997,
+          "exposedArea": 652.8812097405087,
+          "component": "source-envelope-V-4",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-V-4",
+            "source-envelope-L-6"
+          ]
+        },
+        {
+          "letter": "V-5",
+          "sourceCenterZ": 0,
+          "exposedArea": 409.46355871256395,
+          "component": "void-rim-V-5",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "void-rim-U-3",
+            "void-rim-V-5",
+            "void-V-5"
+          ]
+        },
+        {
+          "letter": "L-6",
+          "sourceCenterZ": 1.1799999999999997,
+          "exposedArea": 146.41098199606938,
+          "component": "source-envelope-L-6",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-V-4",
+            "source-envelope-L-6",
+            "source-envelope-U-7",
+            "void-rim-L-8"
+          ]
+        },
+        {
+          "letter": "U-7",
+          "sourceCenterZ": 6.100000000000001,
+          "exposedArea": 1118.259460259526,
+          "component": "source-envelope-U-7",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-6",
+            "source-envelope-U-7",
+            "source-envelope-V-9"
+          ]
+        },
+        {
+          "letter": "L-8",
+          "sourceCenterZ": 0,
+          "exposedArea": 710.3700415300432,
+          "component": "void-rim-L-8",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-1",
+            "source-envelope-L-6",
+            "void-rim-L-8",
+            "void-rim-U-3",
+            "void-L-8"
+          ]
+        },
+        {
+          "letter": "V-9",
+          "sourceCenterZ": 6.100000000000001,
+          "exposedArea": 1018.3469894708257,
+          "component": "source-envelope-V-9",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "source-envelope-V-9"
+          ]
+        }
+      ]
+    },
+    {
+      "height": 40,
+      "seed": 19,
+      "mode": "neighbor-taper",
+      "elapsedMs": 5203,
+      "volume": 4258.740343666342,
+      "removed": 2204.104053771982,
+      "triangles": 10718,
+      "actualHeight": 22.602060317993164,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 429749,
+        "legacyFlags": 189
+      },
+      "voids": [
+        {
+          "source": "L-8",
+          "hierarchy": "primary",
+          "area": 67.92745740377718,
+          "removed": 1539.1698125486391,
+          "taper": -0.021423847207107768
+        },
+        {
+          "source": "U-3",
+          "hierarchy": "secondary",
+          "area": 38.73635482613603,
+          "removed": 300.2869775578456,
+          "taper": 0.028370093466210066
+        },
+        {
+          "source": "V-5",
+          "hierarchy": "secondary",
+          "area": 18.269730629675216,
+          "removed": 345.94843082065654,
+          "taper": 0.039909366428988916
+        }
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -16.36,
+          "exposedArea": 351.147653836547,
+          "component": "source-envelope-L-1",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-1",
+            "source-envelope-L-6"
+          ]
+        },
+        {
+          "letter": "U-2",
+          "sourceCenterZ": -16.36,
+          "exposedArea": 412.8329683685954,
+          "component": "source-envelope-U-2",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-2",
+            "void-rim-U-3"
+          ]
+        },
+        {
+          "letter": "U-3",
+          "sourceCenterZ": -7.65,
+          "exposedArea": 471.5505490491998,
+          "component": "void-rim-U-3",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-2",
+            "void-rim-L-8",
+            "void-rim-U-3",
+            "void-rim-V-5",
+            "void-U-3",
+            "connection-U-3-V-5-0",
+            "connection-U-3-V-5-1"
+          ]
+        },
+        {
+          "letter": "V-4",
+          "sourceCenterZ": -8.82,
+          "exposedArea": 652.7980615039542,
+          "component": "source-envelope-V-4",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-V-4",
+            "source-envelope-L-6"
+          ]
+        },
+        {
+          "letter": "V-5",
+          "sourceCenterZ": -7.65,
+          "exposedArea": 477.9990308422558,
+          "component": "void-rim-V-5",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "void-rim-U-3",
+            "void-rim-V-5",
+            "void-V-5"
+          ]
+        },
+        {
+          "letter": "L-6",
+          "sourceCenterZ": -8.82,
+          "exposedArea": 146.30827698300465,
+          "component": "source-envelope-L-6",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-1",
+            "source-envelope-V-4",
+            "source-envelope-L-6",
+            "void-rim-L-8"
+          ]
+        },
+        {
+          "letter": "U-7",
+          "sourceCenterZ": -1.2800000000000011,
+          "exposedArea": 1252.6775794342782,
+          "component": "source-envelope-U-7",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "source-envelope-V-9",
+            "void-rim-V-5"
+          ]
+        },
+        {
+          "letter": "L-8",
+          "sourceCenterZ": -7.65,
+          "exposedArea": 749.4197968157262,
+          "component": "void-rim-L-8",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-6",
+            "void-rim-L-8",
+            "void-rim-U-3",
+            "void-L-8"
+          ]
+        },
+        {
+          "letter": "V-9",
+          "sourceCenterZ": -1.2800000000000011,
+          "exposedArea": 1198.483383070662,
+          "component": "source-envelope-V-9",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "source-envelope-V-9"
+          ]
+        }
+      ]
+    },
+    {
+      "height": 60,
+      "seed": 19,
+      "mode": "neighbor-taper",
+      "elapsedMs": 5191,
+      "volume": 4258.740343666342,
+      "removed": 2204.10405377198,
+      "triangles": 10716,
+      "actualHeight": 22.602060317993164,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 429714,
+        "legacyFlags": 189
+      },
+      "voids": [
+        {
+          "source": "L-8",
+          "hierarchy": "primary",
+          "area": 67.92745740377718,
+          "removed": 1539.1698125486391,
+          "taper": -0.021423847207107768
+        },
+        {
+          "source": "U-3",
+          "hierarchy": "secondary",
+          "area": 38.73635482613603,
+          "removed": 300.2869775578456,
+          "taper": 0.028370093466210066
+        },
+        {
+          "source": "V-5",
+          "hierarchy": "secondary",
+          "area": 18.269730629675216,
+          "removed": 345.94843082065654,
+          "taper": 0.039909366428988916
+        }
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 351.147653836547,
+          "component": "source-envelope-L-1",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-1",
+            "source-envelope-L-6"
+          ]
+        },
+        {
+          "letter": "U-2",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 412.8329683685954,
+          "component": "source-envelope-U-2",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-2",
+            "void-rim-U-3"
+          ]
+        },
+        {
+          "letter": "U-3",
+          "sourceCenterZ": -17.65,
+          "exposedArea": 471.5505490491998,
+          "component": "void-rim-U-3",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-2",
+            "void-rim-L-8",
+            "void-rim-U-3",
+            "void-rim-V-5",
+            "void-U-3",
+            "connection-U-3-V-5-0",
+            "connection-U-3-V-5-1"
+          ]
+        },
+        {
+          "letter": "V-4",
+          "sourceCenterZ": -18.82,
+          "exposedArea": 652.7980615039542,
+          "component": "source-envelope-V-4",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-V-4",
+            "source-envelope-L-6"
+          ]
+        },
+        {
+          "letter": "V-5",
+          "sourceCenterZ": -17.65,
+          "exposedArea": 477.9990308422558,
+          "component": "void-rim-V-5",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "void-rim-U-3",
+            "void-rim-V-5",
+            "void-V-5"
+          ]
+        },
+        {
+          "letter": "L-6",
+          "sourceCenterZ": -18.82,
+          "exposedArea": 146.30827698300465,
+          "component": "source-envelope-L-6",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-1",
+            "source-envelope-V-4",
+            "source-envelope-L-6",
+            "void-rim-L-8"
+          ]
+        },
+        {
+          "letter": "U-7",
+          "sourceCenterZ": -11.280000000000001,
+          "exposedArea": 1252.6775794342782,
+          "component": "source-envelope-U-7",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "source-envelope-V-9",
+            "void-rim-V-5"
+          ]
+        },
+        {
+          "letter": "L-8",
+          "sourceCenterZ": -17.65,
+          "exposedArea": 749.4197968157262,
+          "component": "void-rim-L-8",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-6",
+            "void-rim-L-8",
+            "void-rim-U-3",
+            "void-L-8"
+          ]
+        },
+        {
+          "letter": "V-9",
+          "sourceCenterZ": -11.280000000000001,
+          "exposedArea": 1198.497794231288,
+          "component": "source-envelope-V-9",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "source-envelope-V-9"
+          ]
+        }
+      ]
+    },
+    {
+      "height": 60,
+      "seed": 19,
+      "mode": "straight",
+      "elapsedMs": 5347,
+      "volume": 4258.727970142167,
+      "removed": 2203.1798349507353,
+      "triangles": 10674,
+      "actualHeight": 22.602060317993164,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 423890,
+        "legacyFlags": 260
+      },
+      "voids": [
+        {
+          "source": "L-8",
+          "hierarchy": "primary",
+          "area": 67.92745740377718,
+          "removed": 1536.0479541823652,
+          "taper": 0
+        },
+        {
+          "source": "U-3",
+          "hierarchy": "secondary",
+          "area": 38.73635482613603,
+          "removed": 301.729393295881,
+          "taper": 0
+        },
+        {
+          "source": "V-5",
+          "hierarchy": "secondary",
+          "area": 18.269730629675216,
+          "removed": 347.09739444005936,
+          "taper": 0
+        }
+      ],
+      "contributions": [
+        {
+          "letter": "L-1",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 351.39438486629365,
+          "component": "source-envelope-L-1",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-1",
+            "source-envelope-L-6"
+          ]
+        },
+        {
+          "letter": "U-2",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 411.091549038345,
+          "component": "source-envelope-U-2",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-2",
+            "void-rim-U-3"
+          ]
+        },
+        {
+          "letter": "U-3",
+          "sourceCenterZ": -17.65,
+          "exposedArea": 475.827220077449,
+          "component": "void-rim-U-3",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-2",
+            "void-rim-L-8",
+            "void-rim-U-3",
+            "void-rim-V-5",
+            "void-U-3",
+            "connection-U-3-V-5-0",
+            "connection-U-3-V-5-1"
+          ]
+        },
+        {
+          "letter": "V-4",
+          "sourceCenterZ": -18.82,
+          "exposedArea": 652.9141903144046,
+          "component": "source-envelope-V-4",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-V-4",
+            "source-envelope-L-6"
+          ]
+        },
+        {
+          "letter": "V-5",
+          "sourceCenterZ": -17.65,
+          "exposedArea": 486.3489926269812,
+          "component": "void-rim-V-5",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "void-rim-U-3",
+            "void-rim-V-5",
+            "void-V-5"
+          ]
+        },
+        {
+          "letter": "L-6",
+          "sourceCenterZ": -18.82,
+          "exposedArea": 146.4317084798239,
+          "component": "source-envelope-L-6",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-1",
+            "source-envelope-V-4",
+            "source-envelope-L-6",
+            "void-rim-L-8"
+          ]
+        },
+        {
+          "letter": "U-7",
+          "sourceCenterZ": -11.280000000000001,
+          "exposedArea": 1252.7222600418418,
+          "component": "source-envelope-U-7",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "source-envelope-V-9",
+            "void-rim-V-5"
+          ]
+        },
+        {
+          "letter": "L-8",
+          "sourceCenterZ": -17.65,
+          "exposedArea": 741.0469577225565,
+          "component": "void-rim-L-8",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-6",
+            "void-rim-L-8",
+            "void-rim-U-3",
+            "void-L-8"
+          ]
+        },
+        {
+          "letter": "V-9",
+          "sourceCenterZ": -11.280000000000001,
+          "exposedArea": 1198.3473020266156,
+          "component": "source-envelope-V-9",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-7",
+            "source-envelope-V-9"
+          ]
+        }
+      ]
+    },
+    {
+      "height": 60,
+      "seed": 37,
+      "mode": "neighbor-taper",
+      "elapsedMs": 5211,
+      "volume": 3850.5483215104055,
+      "removed": 2430.343624898844,
+      "triangles": 8600,
+      "actualHeight": 22.333213806152344,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 342591,
+        "legacyFlags": 116
+      },
+      "voids": [
+        {
+          "source": "L-6",
+          "hierarchy": "primary",
+          "area": 67.92745746784352,
+          "removed": 1521.2909383325805,
+          "taper": -0.021423847236605342
+        },
+        {
+          "source": "U-5",
+          "hierarchy": "secondary",
+          "area": 38.736354828085354,
+          "removed": 583.7031575949522,
+          "taper": 0.028370093517936526
+        },
+        {
+          "source": "V-1",
+          "hierarchy": "secondary",
+          "area": 18.269730629675216,
+          "removed": 320.71022597525325,
+          "taper": 0.06999999999999999
+        }
+      ],
+      "contributions": [
+        {
+          "letter": "V-1",
+          "sourceCenterZ": -17.65,
+          "exposedArea": 429.38633395413575,
+          "component": "void-rim-V-1",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-7",
+            "void-rim-U-5",
+            "void-rim-V-1",
+            "void-V-1"
+          ]
+        },
+        {
+          "letter": "L-2",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 322.24025894176305,
+          "component": "source-envelope-L-2",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-2",
+            "source-envelope-U-3"
+          ]
+        },
+        {
+          "letter": "U-3",
+          "sourceCenterZ": -26.36,
+          "exposedArea": 353.797900159458,
+          "component": "source-envelope-U-3",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-2",
+            "source-envelope-U-3",
+            "source-envelope-V-4"
+          ]
+        },
+        {
+          "letter": "V-4",
+          "sourceCenterZ": -18.82,
+          "exposedArea": 562.5137554843694,
+          "component": "source-envelope-V-4",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-3",
+            "source-envelope-V-4",
+            "void-rim-L-6"
+          ]
+        },
+        {
+          "letter": "U-5",
+          "sourceCenterZ": -17.65,
+          "exposedArea": 424.90379331090867,
+          "component": "void-rim-U-5",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "void-rim-L-6",
+            "void-rim-U-5",
+            "void-rim-V-1",
+            "void-U-5"
+          ]
+        },
+        {
+          "letter": "L-6",
+          "sourceCenterZ": -17.65,
+          "exposedArea": 607.1559957271331,
+          "component": "void-rim-L-6",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-V-4",
+            "source-envelope-V-9",
+            "void-rim-L-6",
+            "void-rim-U-5",
+            "void-rim-V-1",
+            "void-L-6",
+            "connection-L-6-V-1-0",
+            "connection-L-6-V-1-1"
+          ]
+        },
+        {
+          "letter": "L-7",
+          "sourceCenterZ": -18.82,
+          "exposedArea": 412.8467579008995,
+          "component": "source-envelope-L-7",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-L-7",
+            "void-rim-V-1"
+          ]
+        },
+        {
+          "letter": "U-8",
+          "sourceCenterZ": -11.280000000000001,
+          "exposedArea": 1036.014940989486,
+          "component": "source-envelope-U-8",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-8",
+            "source-envelope-V-9"
+          ]
+        },
+        {
+          "letter": "V-9",
+          "sourceCenterZ": -11.280000000000001,
+          "exposedArea": 1000.4209023758361,
+          "component": "source-envelope-V-9",
+          "relationships": [
+            "occupied-level-1",
+            "occupied-level-2",
+            "occupied-level-3",
+            "source-envelope-U-8",
+            "source-envelope-V-9",
+            "void-rim-L-6"
+          ]
+        }
+      ]
+    }
+  ],
+  "editing": {
+    "changedLetter": 3,
+    "manualYaw": 95,
+    "posesPreserved": true,
+    "architectureChanged": true
+  },
+  "outOfRangePopulationGate": true
+}

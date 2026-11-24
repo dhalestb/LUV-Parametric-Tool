@@ -1,0 +1,24 @@
+const fs=require('fs'),path=require('path');
+const dir='reports/amphitheater-interactive',rows=JSON.parse(fs.readFileSync(dir+'/population-results.json'));
+let report='# Population comparison\n\nProtected baseline checkpoint dbf02bf0d304a6581b9f5449a9c6c3865c09beff. Original five-letter export, manifest and validation were reproduced byte for byte before further changes.\n\nAll studies use 40 × 40 × 60 ft, preferred size 13 ft, articulation 75%. Original five placements are exact prefixes of all larger inputs. Additional letters are placed explicitly in the composition stage, using sampled parent contour points and directions with deterministic seeded exploration, containment and separation scoring. Automatic population uses round(field volume / (3.5 × preferred size³)), yielding 12. This density is an experimental choice. Seed 37 supplies nested 8/12/16 studies. Auto uses seed 107.\n\nThe preserved baseline uses its original low-elevation articulation. A five-letter control and all larger studies use feature-derived elevations. The control distinguishes that algorithm change from population effects.\n\n';
+report+='|Count|Envelope height / use|Source mesh Z range|Pockets / through openings|Largest connected planar wall|Recess/opening floor elevations|\n|---|---|---|---|---|---|\n';
+for(const [i,row] of rows.entries()){
+ const folder=path.join('.amphitheater-runs',row.id),r=JSON.parse(fs.readFileSync(path.join(folder,'result.json'))),a=r.articulationReport;
+ const label=i===0?'5 preserved':i===1?'5 elevation control':i===5?'Auto (12)':String(row.count);
+ const copy=path.join(dir,'population-evidence',label.replaceAll(' ','-'));fs.mkdirSync(copy,{recursive:true});
+ for(const file of ['request.json','result.json','manifest.json','validation.json','intersection-diagnostics.json'])fs.copyFileSync(path.join(folder,file),path.join(copy,file));
+ const low=Math.min(...row.heights.map(h=>h[0])),high=Math.max(...row.heights.map(h=>h[1]));
+ report+='|'+[label,row.height+' ft / '+(row.height/60*100).toFixed(1)+'%',low.toFixed(2)+'–'+high.toFixed(2)+' ft',(row.ops.length-row.openings)+' / '+row.openings,row.walls[0].area.toFixed(1)+' ft²',row.ops.map(o=>o.base.toFixed(1)).join(', ')+' ft'].join('|')+'|\n';
+ report+='\n';
+}
+report+='\nEach source mesh vertical interval and source-center elevation, each operation source pair, bay/depth dimensions and elevations, projections and the three largest planar patches appear in population-results.json and the saved result snapshots. Heights use the viewer floor convention (Composition centered Z plus 30 ft).\n\n';
+for(const [i,row] of rows.entries()){
+ const name=i===0?'Five preserved':i===1?'Five control':i===5?'Automatic':row.count+' letters';
+ const url='http://127.0.0.1:4184/amphitheater?study='+row.id;
+ report+='- '+name+' [Architecture]('+url+') · [Original letters]('+url+'&view=A). Independent nonadjacent triangle checks '+row.pairs+'; zero intersections.\n';
+}
+report+='\nFacade measure sums edge-connected coplanar near-vertical mesh triangles, grouping plane normals rounded to 1e-4 and plane offsets to .001 ft. It includes cavity walls and exposes the major X=-20 boundary wall. Larger populations raise massing and create more operations but do not consistently reduce the largest flat patch. Field clipping and ground-to-trajectory solid columns produce these planar boundary walls. Feature connectivity is a minimum spanning network, so additional adjacency opportunities remain unused.\n\n';
+report+='Recesses are accepted at 15–35% of actual local ray-measured bay chords. Backing and mouth probes and final cutter obstruction checks remain active. All runs passed exported-solid manifold, positive volumes, single shell, source transform correspondence, field containment and unchanged independent intersections. Alcove clearance flags remain geometric candidates. Circulation, occupancy, accessibility and principal gathering-void continuity require review. Current 0.5 ft plan sampling, dominant-axis bay projection and type-based soffit profiles limit smooth feature correspondence. Increased population does not fill the full height or guarantee more accepted cuts.\n\n';
+report+='Browser verification extended 8 to 9, saved, removed, restored, and generated study e1f5d69b-aa17-4fd1-9d7f-e63f6c3114b3. Result 9 instances, 31733.498 ft³, zero crossings in 595828 pairs. Production build, TypeScript, build lint, 29 selection-height regressions and 5 Composition refresh tests passed. Existing unrelated build warnings remain.\n\nStart with npm run start -- --hostname 127.0.0.1 --port 4184 from the isolated worktree. Runtime study links require .amphitheater-runs; committed evidence contains exact requests and meshes. To restore a study copy its evidence directory under .amphitheater-runs/<result.id>.\n';
+fs.writeFileSync(dir+'/POPULATION-REVIEW.md',report);
+

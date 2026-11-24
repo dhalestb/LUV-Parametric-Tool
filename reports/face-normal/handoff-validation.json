@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-12",
+  "portableStudies": [
+    "void-field-open-vertical-15",
+    "void-field-open-face-normal-15",
+    "void-field-enclosed-15",
+    "stepped-amphitheater-latest"
+  ],
+  "portableSeedFreshDirectoryPassed": true,
+  "repeatedSeedPreservesExisting": true,
+  "regressions": {
+    "passed": true,
+    "rows": [
+      {
+        "name": "void-field-tests",
+        "passed": true,
+        "elapsedMs": 28967
+      },
+      {
+        "name": "void-field-spacing-tests",
+        "passed": true,
+        "elapsedMs": 9946
+      },
+      {
+        "name": "three-lift-tests",
+        "passed": true,
+        "elapsedMs": 15198
+      },
+      {
+        "name": "upright-opening-tests",
+        "passed": true,
+        "elapsedMs": 10690
+      },
+      {
+        "name": "recessed-study-tests",
+        "passed": true,
+        "elapsedMs": 7514
+      },
+      {
+        "name": "vertical-envelope-constraints-tests",
+        "passed": true,
+        "elapsedMs": 5240
+      },
+      {
+        "name": "amphitheater-presentation-export-tests",
+        "passed": true,
+        "elapsedMs": 3894
+      },
+      {
+        "name": "open-atrium-tests",
+        "passed": true,
+        "elapsedMs": 30434
+      },
+      {
+        "name": "face-normal-tests",
+        "passed": true,
+        "elapsedMs": 50430
+      }
+    ]
+  },
+  "typescriptPassed": true,
+  "targetedLintPassed": true,
+  "noCredentialPatternHits": true,
+  "notes": "Production build recorded in local handoff log; historical reports describe the earlier uncommitted experiment. Portable inputs replace local-only test dependencies; geometry validation unchanged.",
+  "productionBuildPassed": true,
+  "portableSectionScriptsPassed": true
+}

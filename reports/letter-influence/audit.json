@@ -1,0 +1,234 @@
+{
+  "before": "e1f5d69b-aa17-4fd1-9d7f-e63f6c3114b3",
+  "after": "91661973-7d1a-44e6-8647-dcaddd8b6069",
+  "rows": [
+    {
+      "stage": "before",
+      "letter": "L-1",
+      "sourceCenterZ": 17,
+      "changedVolume": 1640.6003827814745,
+      "percent": 5.169932420298738,
+      "components": [
+        "bank-5"
+      ]
+    },
+    {
+      "stage": "before",
+      "letter": "U-2",
+      "sourceCenterZ": 22,
+      "changedVolume": 1199.8779279397584,
+      "percent": 3.7811083461650625,
+      "components": [
+        "bank-3",
+        "bank-5",
+        "bank-8"
+      ]
+    },
+    {
+      "stage": "before",
+      "letter": "V-3",
+      "sourceCenterZ": 30,
+      "changedVolume": 3403.9747454920634,
+      "percent": 10.726755631228956,
+      "components": [
+        "bank-2",
+        "bank-4"
+      ]
+    },
+    {
+      "stage": "before",
+      "letter": "V-4",
+      "sourceCenterZ": 26,
+      "changedVolume": 5766.228479359749,
+      "percent": 18.17079397954928,
+      "components": [
+        "bank-2",
+        "bank-3",
+        "bank-6"
+      ]
+    },
+    {
+      "stage": "before",
+      "letter": "L-5",
+      "sourceCenterZ": 28,
+      "changedVolume": 3980.6768848448687,
+      "percent": 12.544084895800292,
+      "components": [
+        "bank-6"
+      ]
+    },
+    {
+      "stage": "before",
+      "letter": "L-6",
+      "sourceCenterZ": 35.39071836128183,
+      "changedVolume": 1603.53602519595,
+      "percent": 5.05313357889284,
+      "components": [
+        "bank-1"
+      ]
+    },
+    {
+      "stage": "before",
+      "letter": "V-7",
+      "sourceCenterZ": 38.08693049880473,
+      "changedVolume": 5293.125704009132,
+      "percent": 16.67993160862159,
+      "components": [
+        "bank-1",
+        "bank-4",
+        "bank-7"
+      ]
+    },
+    {
+      "stage": "before",
+      "letter": "L-8",
+      "sourceCenterZ": 47.67783024217097,
+      "changedVolume": 2776.125002390217,
+      "percent": 8.748247777637395,
+      "components": [
+        "bank-7"
+      ]
+    },
+    {
+      "stage": "before",
+      "letter": "V-9",
+      "sourceCenterZ": 11.163837845477723,
+      "changedVolume": 785.1114992890124,
+      "percent": 2.4740780486970446,
+      "components": [
+        "bank-8"
+      ]
+    },
+    {
+      "stage": "after",
+      "letter": "L-1",
+      "sourceCenterZ": 17,
+      "changedVolume": 1338.3114661027753,
+      "percent": 11.03871753858743,
+      "components": [
+        "contour-L-1",
+        "contour-U-2",
+        "transition-14"
+      ],
+      "exposedArea": 1078.0169959040256
+    },
+    {
+      "stage": "after",
+      "letter": "U-2",
+      "sourceCenterZ": 22,
+      "changedVolume": 2279.421019761224,
+      "percent": 18.80121737426015,
+      "components": [
+        "contour-L-1",
+        "contour-U-2",
+        "contour-V-4",
+        "contour-V-9",
+        "transition-12",
+        "transition-14",
+        "transition-17"
+      ],
+      "exposedArea": 1223.4824633878695
+    },
+    {
+      "stage": "after",
+      "letter": "V-3",
+      "sourceCenterZ": 30,
+      "changedVolume": 1855.735277180906,
+      "percent": 15.306554617547556,
+      "components": [
+        "contour-V-3",
+        "contour-V-4",
+        "contour-V-7",
+        "transition-11",
+        "transition-13"
+      ],
+      "exposedArea": 1245.2170060285534
+    },
+    {
+      "stage": "after",
+      "letter": "V-4",
+      "sourceCenterZ": 26,
+      "changedVolume": 1948.2489391965883,
+      "percent": 16.069629738188446,
+      "components": [
+        "contour-U-2",
+        "contour-V-3",
+        "contour-V-4",
+        "contour-L-5",
+        "transition-11",
+        "transition-12",
+        "transition-15"
+      ],
+      "exposedArea": 1166.4865696504535
+    },
+    {
+      "stage": "after",
+      "letter": "L-5",
+      "sourceCenterZ": 28,
+      "changedVolume": 1160.7085771628292,
+      "percent": 9.573805838507427,
+      "components": [
+        "contour-V-4",
+        "contour-L-5",
+        "transition-15"
+      ],
+      "exposedArea": 1267.1562966145054
+    },
+    {
+      "stage": "after",
+      "letter": "L-6",
+      "sourceCenterZ": 35.39071836128183,
+      "changedVolume": 1335.177440511652,
+      "percent": 11.012867335450595,
+      "components": [
+        "contour-L-6",
+        "contour-V-7",
+        "transition-10"
+      ],
+      "exposedArea": 1269.8647142918953
+    },
+    {
+      "stage": "after",
+      "letter": "V-7",
+      "sourceCenterZ": 38.08693049880473,
+      "changedVolume": 1375.879467780363,
+      "percent": 11.34858752738436,
+      "components": [
+        "contour-V-3",
+        "contour-L-6",
+        "contour-V-7",
+        "contour-L-8",
+        "transition-10",
+        "transition-13",
+        "transition-16"
+      ],
+      "exposedArea": 1228.8656816983676
+    },
+    {
+      "stage": "after",
+      "letter": "L-8",
+      "sourceCenterZ": 47.67783024217097,
+      "changedVolume": 1645.272487412774,
+      "percent": 13.570606486281147,
+      "components": [
+        "contour-V-7",
+        "contour-L-8",
+        "transition-16"
+      ],
+      "exposedArea": 1283.743981092356
+    },
+    {
+      "stage": "after",
+      "letter": "V-9",
+      "sourceCenterZ": 11.163837845477723,
+      "changedVolume": 1425.161425052867,
+      "percent": 11.755077062786823,
+      "components": [
+        "contour-U-2",
+        "contour-V-9",
+        "transition-17"
+      ],
+      "exposedArea": 1308.1242110740818
+    }
+  ]
+}

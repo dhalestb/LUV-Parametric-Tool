@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "sourceTransformsPreservedExceptExplicitZChange": true,
+  "rejectedUndersizedField": true,
+  "rows": [
+    {
+      "spacing": 12,
+      "floors": [
+        {
+          "id": "occupied-level-1",
+          "bottomZ": 1.8900000000000006,
+          "topZ": 2.6400000000000006,
+          "thickness": 0.75,
+          "sourceIds": [
+            "L-1",
+            "U-2",
+            "V-3",
+            "L-5",
+            "U-6",
+            "V-9"
+          ]
+        },
+        {
+          "id": "occupied-level-2",
+          "bottomZ": 13.89,
+          "topZ": 14.64,
+          "thickness": 0.75,
+          "sourceIds": [
+            "L-1",
+            "U-2",
+            "V-3",
+            "L-5",
+            "U-6",
+            "V-9"
+          ]
+        },
+        {
+          "id": "occupied-level-3",
+          "bottomZ": 25.89,
+          "topZ": 26.64,
+          "thickness": 0.75,
+          "sourceIds": [
+            "L-1",
+            "U-2",
+            "V-3",
+            "L-5",
+            "U-6",
+            "V-9"
+          ]
+        }
+      ],
+      "volume": 5143.047715568951,
+      "triangles": 12938,
+      "elapsedMs": 6093,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 526941,
+        "legacyFlags": 193
+      }
+    },
+    {
+      "spacing": 15,
+      "floors": [
+        {
+          "id": "occupied-level-1",
+          "bottomZ": 1.8900000000000006,
+          "topZ": 2.6400000000000006,
+          "thickness": 0.75,
+          "sourceIds": [
+            "L-1",
+            "U-2",
+            "V-3",
+            "L-5",
+            "U-6",
+            "V-9"
+          ]
+        },
+        {
+          "id": "occupied-level-2",
+          "bottomZ": 16.89,
+          "topZ": 17.64,
+          "thickness": 0.75,
+          "sourceIds": [
+            "L-1",
+            "U-2",
+            "V-3",
+            "L-5",
+            "U-6",
+            "V-9"
+          ]
+        },
+        {
+          "id": "occupied-level-3",
+          "bottomZ": 31.89,
+          "topZ": 32.64,
+          "thickness": 0.75,
+          "sourceIds": [
+            "L-1",
+            "U-2",
+            "V-3",
+            "L-5",
+            "U-6",
+            "V-9"
+          ]
+        }
+      ],
+      "volume": 5787.034915722702,
+      "triangles": 12934,
+      "elapsedMs": 6001,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 526107,
+        "legacyFlags": 272
+      }
+    }
+  ]
+}

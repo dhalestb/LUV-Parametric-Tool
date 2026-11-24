@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "allocationAbsoluteFeet2": 1e-06,
+  "allocationRelative": 1e-08,
+  "meaning": "Existing site-rule allocation tolerance, now also required by the territory solver. Containment and native mesh tolerances are not relaxed."
+}
