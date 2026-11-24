@@ -1,0 +1,834 @@
+{
+  "method": "Positive-volume Manifold intersection of actual saved source solids. All pairs tested; no bounding-box-only collision classification. Node replay is exact for both new designs. A zero-overlap counterfactual is compiled in memory without changing or saving any source file, record or board.",
+  "source": {
+    "engine": "bf7fc3c",
+    "placement": "vendor/lobby-bf7fc3c/src/components/lobbyProof.ts",
+    "placementSHA256": "e32694e6fc9476be3937bb75ac12500043a7e1a7ccd64a4541b5c94f5c315317",
+    "verifiedPackageFiles": 27
+  },
+  "preservation": {
+    "checkedFiles": 1012,
+    "changes": [],
+    "approvedAssetsVerified": 20
+  },
+  "cases": [
+    {
+      "type": "vertical-void-lobby",
+      "kind": "new",
+      "study": "a0462c5d-8882-42d1-881c-dad25e557eea",
+      "count": 8,
+      "field": {
+        "width": 40,
+        "depth": 40,
+        "height": 60
+      },
+      "preferred": 13,
+      "activeLetters": [
+        "L",
+        "U",
+        "V"
+      ],
+      "sourceMeshesExact": true,
+      "measured": {
+        "pairsTested": 28,
+        "count": 1,
+        "pairs": [
+          {
+            "a": "L-7",
+            "b": "U-8",
+            "indices": [
+              6,
+              7
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.12891370505917824,
+            "smallerLetterVolumeFt3": 50.49937260915866,
+            "percentOfSmallerLetter": 0.2552778349483855,
+            "axis": "z",
+            "axisBoundsOverlapFt": 0.29697952277160766,
+            "intersectionBounds": {
+              "min": [
+                -0.7329510400970781,
+                1.6881213066445357,
+                55.79888153076172
+              ],
+              "max": [
+                0.8407820463180542,
+                2.373971301180832,
+                56.095863342285156
+              ]
+            }
+          }
+        ],
+        "letterVolumes": [
+          108.79866172129785,
+          50.49931843486614,
+          18.265210128226045,
+          108.79865844378398,
+          50.499372591870426,
+          18.265209496173743,
+          108.79869356847162,
+          50.49937260915866
+        ],
+        "uniqueOverlappedVolumeFt3": 0.12891345486434602
+      },
+      "nativeValidation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 161606,
+        "legacyFlags": 20
+      },
+      "placementReplayExact": true,
+      "zeroOverlapDiagnostic": {
+        "inMemoryOnly": true,
+        "onlySourceChange": "OVERLAP 0.45 → 0; original fitInside still runs",
+        "saved": false,
+        "measured": {
+          "pairsTested": 28,
+          "count": 0,
+          "pairs": [],
+          "letterVolumes": [
+            97.14207359594441,
+            45.08887001085462,
+            16.30829175481385,
+            97.14207237575218,
+            45.08893762623445,
+            16.308289409614513,
+            97.14206867792088,
+            45.088935516773454
+          ],
+          "uniqueOverlappedVolumeFt3": 0
+        }
+      },
+      "fieldFitFactor": 0.6599544950480197,
+      "nominalOverlapAfterFieldFitFt": 0.2969795227716089
+    },
+    {
+      "type": "vertical-void-lobby",
+      "kind": "approved",
+      "study": 26,
+      "count": 10,
+      "field": {
+        "width": 40,
+        "depth": 40,
+        "height": 40
+      },
+      "preferred": 13,
+      "activeLetters": [
+        "L",
+        "U",
+        "V"
+      ],
+      "sourceMeshesExact": true,
+      "measured": {
+        "pairsTested": 45,
+        "count": 4,
+        "pairs": [
+          {
+            "a": "L-4",
+            "b": "U-5",
+            "indices": [
+              3,
+              4
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.013430162472701701,
+            "smallerLetterVolumeFt3": 6.650238288090848,
+            "percentOfSmallerLetter": 0.20195009398012467,
+            "axis": "z",
+            "axisBoundsOverlapFt": 0.15109278152573324,
+            "intersectionBounds": {
+              "min": [
+                -0.3055431842803955,
+                -0.021461538882487308,
+                17.90162467956543
+              ],
+              "max": [
+                0.3055431842803955,
+                0.2807235449847959,
+                18.052717208862305
+              ]
+            }
+          },
+          {
+            "a": "U-5",
+            "b": "V-6",
+            "indices": [
+              4,
+              5
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.12465961815705046,
+            "smallerLetterVolumeFt3": 2.4053400168054835,
+            "percentOfSmallerLetter": 5.182619392106156,
+            "axis": "z",
+            "axisBoundsOverlapFt": 0.1510927815257368,
+            "intersectionBounds": {
+              "min": [
+                -0.3055431842803955,
+                -1.1256570130659487,
+                21.504348754882812
+              ],
+              "max": [
+                0.3055431842803955,
+                1.6394554011256446,
+                21.655441284179688
+              ]
+            }
+          },
+          {
+            "a": "V-6",
+            "b": "L-7",
+            "indices": [
+              5,
+              6
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.021017982695397314,
+            "smallerLetterVolumeFt3": 2.4053400168054835,
+            "percentOfSmallerLetter": 0.8738050566053094,
+            "axis": "z",
+            "axisBoundsOverlapFt": 0.15109278152573324,
+            "intersectionBounds": {
+              "min": [
+                -0.42776045203208923,
+                -1.2077937177759182,
+                21.811569213867188
+              ],
+              "max": [
+                0.42776045203208923,
+                -0.8588563154743808,
+                21.962663650512695
+              ]
+            }
+          },
+          {
+            "a": "V-9",
+            "b": "L-10",
+            "indices": [
+              8,
+              9
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.015760872980127908,
+            "smallerLetterVolumeFt3": 2.4053393320154988,
+            "percentOfSmallerLetter": 0.6552453024131712,
+            "axis": "z",
+            "axisBoundsOverlapFt": 0.13472439417746784,
+            "intersectionBounds": {
+              "min": [
+                -1.543583631515503,
+                0.46725610310295607,
+                37.14447784423828
+              ],
+              "max": [
+                -0.8305623318693471,
+                0.8106441516679919,
+                37.2773884068751
+              ]
+            }
+          }
+        ],
+        "letterVolumes": [
+          14.327659317178341,
+          6.6502372396638885,
+          2.4053387262747177,
+          14.327657682355996,
+          6.650238288090848,
+          2.4053400168054835,
+          14.327660578114815,
+          6.650236701901927,
+          2.4053393320154988,
+          14.32767834717642
+        ],
+        "uniqueOverlappedVolumeFt3": 0.17486846702604453
+      },
+      "nativeValidation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 146712,
+        "legacyFlags": 7
+      }
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "kind": "new",
+      "study": "12eb8d26-78e1-45b9-a0de-75a8c221f696",
+      "count": 8,
+      "field": {
+        "width": 40,
+        "depth": 20,
+        "height": 20
+      },
+      "preferred": 13,
+      "activeLetters": [
+        "L",
+        "U",
+        "V"
+      ],
+      "sourceMeshesExact": true,
+      "measured": {
+        "pairsTested": 28,
+        "count": 6,
+        "pairs": [
+          {
+            "a": "L-2",
+            "b": "V-3",
+            "indices": [
+              1,
+              2
+            ],
+            "adjacent": true,
+            "volumeFt3": 13.766717126449294,
+            "smallerLetterVolumeFt3": 100.55994664873474,
+            "percentOfSmallerLetter": 13.690060093744599,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.40500000000000114,
+            "intersectionBounds": {
+              "min": [
+                -3.0195000171661377,
+                -5.381999969482422,
+                6.644842554354765
+              ],
+              "max": [
+                -2.614500045776367,
+                4.768123149871826,
+                15.031000137329102
+              ]
+            }
+          },
+          {
+            "a": "V-3",
+            "b": "U-4",
+            "indices": [
+              2,
+              3
+            ],
+            "adjacent": true,
+            "volumeFt3": 19.037800013247285,
+            "smallerLetterVolumeFt3": 109.80609998495159,
+            "percentOfSmallerLetter": 17.33765247637092,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.4049999999999998,
+            "intersectionBounds": {
+              "min": [
+                -1.7864999771118164,
+                -5.674437999725342,
+                6.264350214124833
+              ],
+              "max": [
+                -1.381500005722046,
+                6.1631690096562854,
+                16.1300061503665
+              ]
+            }
+          },
+          {
+            "a": "U-4",
+            "b": "L-5",
+            "indices": [
+              3,
+              4
+            ],
+            "adjacent": true,
+            "volumeFt3": 19.305010174563925,
+            "smallerLetterVolumeFt3": 100.55994673587749,
+            "percentOfSmallerLetter": 19.19751431976081,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.40499999999999947,
+            "intersectionBounds": {
+              "min": [
+                -0.5534999966621399,
+                -5.715426445007324,
+                4.449690818786621
+              ],
+              "max": [
+                -0.1485000103712082,
+                2.895602226257324,
+                16.468876084540504
+              ]
+            }
+          },
+          {
+            "a": "L-5",
+            "b": "V-6",
+            "indices": [
+              4,
+              5
+            ],
+            "adjacent": true,
+            "volumeFt3": 13.766717633489497,
+            "smallerLetterVolumeFt3": 100.55994673587749,
+            "percentOfSmallerLetter": 13.69006058609799,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.4049999999999988,
+            "intersectionBounds": {
+              "min": [
+                0.6794999837875366,
+                -4.215312153732339,
+                4.419827938079834
+              ],
+              "max": [
+                1.0844999551773071,
+                1.2505528926849365,
+                16.535763296466893
+              ]
+            }
+          },
+          {
+            "a": "V-6",
+            "b": "U-7",
+            "indices": [
+              5,
+              6
+            ],
+            "adjacent": true,
+            "volumeFt3": 19.037808156182244,
+            "smallerLetterVolumeFt3": 109.80611532060433,
+            "percentOfSmallerLetter": 17.337657470712777,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.4049999999999996,
+            "intersectionBounds": {
+              "min": [
+                1.912500023841858,
+                -4.283141136169434,
+                4.523423508212519
+              ],
+              "max": [
+                2.317500114440918,
+                5.949709823617664,
+                16.36970529655016
+              ]
+            }
+          },
+          {
+            "a": "U-7",
+            "b": "L-8",
+            "indices": [
+              6,
+              7
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.9787415954274736,
+            "smallerLetterVolumeFt3": 100.5599129797389,
+            "percentOfSmallerLetter": 0.9732920071486869,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.40500000000000025,
+            "intersectionBounds": {
+              "min": [
+                3.1454999446868896,
+                -3.7838556779413954,
+                15.316750526428223
+              ],
+              "max": [
+                3.55049991607666,
+                -1.2869999408721924,
+                16.670276641845703
+              ]
+            }
+          }
+        ],
+        "letterVolumes": [
+          128.07697227840947,
+          100.55994664873474,
+          109.80609998495159,
+          128.0769748722701,
+          100.55994673587749,
+          109.80611532060433,
+          128.07697442538503,
+          100.5599129797389
+        ],
+        "uniqueOverlappedVolumeFt3": 85.89279476768536
+      },
+      "nativeValidation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 99942,
+        "legacyFlags": 21
+      },
+      "placementReplayExact": true,
+      "zeroOverlapDiagnostic": {
+        "inMemoryOnly": true,
+        "onlySourceChange": "OVERLAP 0.45 → 0; original fitInside still runs",
+        "saved": false,
+        "measured": {
+          "pairsTested": 28,
+          "count": 0,
+          "pairs": [],
+          "letterVolumes": [
+            128.07698143436622,
+            100.55993365916518,
+            109.80610801691415,
+            128.07697374740337,
+            100.55994673587749,
+            109.80610771458747,
+            128.07700142218786,
+            100.5599802709499
+          ],
+          "uniqueOverlappedVolumeFt3": 1.1368683772161603e-13
+        }
+      },
+      "fieldFitFactor": 0.9000000000000001,
+      "nominalOverlapAfterFieldFitFt": 0.4050000000000001
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "kind": "approved",
+      "study": 10,
+      "count": 15,
+      "field": {
+        "width": 40,
+        "depth": 20,
+        "height": 20
+      },
+      "preferred": 9,
+      "activeLetters": [
+        "U",
+        "L"
+      ],
+      "sourceMeshesExact": true,
+      "measured": {
+        "pairsTested": 105,
+        "count": 12,
+        "pairs": [
+          {
+            "a": "L-2",
+            "b": "U-3",
+            "indices": [
+              1,
+              2
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.09587512152022779,
+            "smallerLetterVolumeFt3": 7.980597651000515,
+            "percentOfSmallerLetter": 1.2013526519308748,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.25139664388003347,
+            "intersectionBounds": {
+              "min": [
+                -13.465897905937883,
+                -0.3519552946090698,
+                10.553072929382324
+              ],
+              "max": [
+                -13.223464012145996,
+                0.3519552946090698,
+                11.460521028755602
+              ]
+            }
+          },
+          {
+            "a": "U-3",
+            "b": "L-4",
+            "indices": [
+              2,
+              3
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.09558864722736773,
+            "smallerLetterVolumeFt3": 7.980607197270993,
+            "percentOfSmallerLetter": 1.1977615846079321,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.2513966438800317,
+            "intersectionBounds": {
+              "min": [
+                -9.40223503112793,
+                -0.3519552946090698,
+                7.667415383183439
+              ],
+              "max": [
+                -9.150837898254395,
+                0.3519552946090698,
+                11.460523049159336
+              ]
+            }
+          },
+          {
+            "a": "L-4",
+            "b": "U-5",
+            "indices": [
+              3,
+              4
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.09558831292290029,
+            "smallerLetterVolumeFt3": 7.980607197270993,
+            "percentOfSmallerLetter": 1.197757395647629,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.2513966438800317,
+            "intersectionBounds": {
+              "min": [
+                -8.94972038269043,
+                -0.3519552946090698,
+                7.667415383183439
+              ],
+              "max": [
+                -8.698324203491211,
+                0.3519552946090698,
+                11.46052106122015
+              ]
+            }
+          },
+          {
+            "a": "U-5",
+            "b": "L-6",
+            "indices": [
+              4,
+              5
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.19640103823241395,
+            "smallerLetterVolumeFt3": 7.980602793239491,
+            "percentOfSmallerLetter": 2.4609799951300513,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.2513966438800317,
+            "intersectionBounds": {
+              "min": [
+                -4.877094745635986,
+                -0.3519552946090698,
+                7.611721038818359
+              ],
+              "max": [
+                -4.625698089599609,
+                0.3519552946090698,
+                11.460521044987964
+              ]
+            }
+          },
+          {
+            "a": "L-6",
+            "b": "U-7",
+            "indices": [
+              5,
+              6
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.1964011146279403,
+            "smallerLetterVolumeFt3": 7.980602793239491,
+            "percentOfSmallerLetter": 2.4609809523951642,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.2513966438800317,
+            "intersectionBounds": {
+              "min": [
+                -4.424581050872803,
+                -0.3519552946090698,
+                7.611721038818359
+              ],
+              "max": [
+                -4.173184394836426,
+                0.3519552946090698,
+                11.46052203895747
+              ]
+            }
+          },
+          {
+            "a": "U-7",
+            "b": "L-8",
+            "indices": [
+              6,
+              7
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.2649679663036106,
+            "smallerLetterVolumeFt3": 7.980604905351827,
+            "percentOfSmallerLetter": 3.3201489040752032,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.2513966438800324,
+            "intersectionBounds": {
+              "min": [
+                -0.3519552946090698,
+                -0.3519552946090698,
+                7.611721038818359
+              ],
+              "max": [
+                -0.10055866092443466,
+                0.3519552946090698,
+                11.460521921810296
+              ]
+            }
+          },
+          {
+            "a": "L-8",
+            "b": "U-9",
+            "indices": [
+              7,
+              8
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.26496796609682527,
+            "smallerLetterVolumeFt3": 7.980604905351827,
+            "percentOfSmallerLetter": 3.320148901484105,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.2513966438800323,
+            "intersectionBounds": {
+              "min": [
+                0.10055866092443466,
+                -0.3519552946090698,
+                7.611721038818359
+              ],
+              "max": [
+                0.3519552946090698,
+                0.3519552946090698,
+                11.460521921810296
+              ]
+            }
+          },
+          {
+            "a": "U-9",
+            "b": "L-10",
+            "indices": [
+              8,
+              9
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.2726297794320847,
+            "smallerLetterVolumeFt3": 7.980603238420341,
+            "percentOfSmallerLetter": 3.4161550359951027,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.25139664388003435,
+            "intersectionBounds": {
+              "min": [
+                4.173184394836426,
+                -0.3519552946090698,
+                7.611721038818359
+              ],
+              "max": [
+                4.424581050872803,
+                0.3519552946090698,
+                11.46052203895747
+              ]
+            }
+          },
+          {
+            "a": "L-10",
+            "b": "U-11",
+            "indices": [
+              9,
+              10
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.2726297442993572,
+            "smallerLetterVolumeFt3": 7.980603238420341,
+            "percentOfSmallerLetter": 3.4161545957686377,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.25139664388003524,
+            "intersectionBounds": {
+              "min": [
+                4.625698089599609,
+                -0.3519552946090698,
+                7.611721038818359
+              ],
+              "max": [
+                4.877094745635986,
+                0.3519552946090698,
+                11.460521044987964
+              ]
+            }
+          },
+          {
+            "a": "U-11",
+            "b": "L-12",
+            "indices": [
+              10,
+              11
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.26040159283126857,
+            "smallerLetterVolumeFt3": 7.980608043451253,
+            "percentOfSmallerLetter": 3.2629292331296673,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.25139664388003524,
+            "intersectionBounds": {
+              "min": [
+                8.698324203491211,
+                -0.3519552946090698,
+                7.611721038818359
+              ],
+              "max": [
+                8.94972038269043,
+                0.3519552946090698,
+                11.46052106122015
+              ]
+            }
+          },
+          {
+            "a": "L-12",
+            "b": "U-13",
+            "indices": [
+              11,
+              12
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.2604026143126031,
+            "smallerLetterVolumeFt3": 7.980608043451253,
+            "percentOfSmallerLetter": 3.262942032672371,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.25139664388003347,
+            "intersectionBounds": {
+              "min": [
+                9.150837898254395,
+                -0.3519552946090698,
+                7.611721038818359
+              ],
+              "max": [
+                9.40223503112793,
+                0.3519552946090698,
+                11.460523049159336
+              ]
+            }
+          },
+          {
+            "a": "U-13",
+            "b": "L-14",
+            "indices": [
+              12,
+              13
+            ],
+            "adjacent": true,
+            "volumeFt3": 0.2525604774115171,
+            "smallerLetterVolumeFt3": 7.980597122662231,
+            "percentOfSmallerLetter": 3.1646814584128005,
+            "axis": "x",
+            "axisBoundsOverlapFt": 0.25139664388003347,
+            "intersectionBounds": {
+              "min": [
+                13.223464012145996,
+                -0.3519552946090698,
+                7.687150955200195
+              ],
+              "max": [
+                13.474860191345215,
+                0.3519552946090698,
+                9.145251274108887
+              ]
+            }
+          }
+        ],
+        "letterVolumes": [
+          10.164401408318414,
+          7.980597651000515,
+          10.164402918539443,
+          7.980607197270993,
+          10.164402253196602,
+          7.980602793239491,
+          10.164403086061244,
+          7.980604905351827,
+          10.164403086061244,
+          7.980603238420341,
+          10.164402253196602,
+          7.980608043451253,
+          10.164402918539443,
+          7.980597122662231,
+          10.164401271395292
+        ],
+        "uniqueOverlappedVolumeFt3": 2.528414361849798
+      },
+      "nativeValidation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 249274,
+        "legacyFlags": 40
+      }
+    }
+  ]
+}
