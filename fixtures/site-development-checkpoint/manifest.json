@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "checkpoint": "fixtures/site-development-checkpoint/miami-session.json.gz",
+  "sha256": "b23e0595b71c6daee42ff00fa721793da86950865b9f60bb090597240e384b7b",
+  "decodedSha256": "fbea2781a437bf835019434542ba136f960c8aeb6e1f27cb35da88cb1fc1cec7",
+  "site": {
+    "zoneIds": [
+      "zone-1-1210",
+      "zone-2-1082"
+    ],
+    "coordinates": {
+      "unit": "feet",
+      "unitAssumption": "confirmed",
+      "feetPerModel": 1,
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "northDeg": 0,
+      "elevationDatum": 0,
+      "rhinoZToGltfY": true,
+      "policy": "Site display is Three.js Y-up. Rhino Map-Z-to-glTF-Y is already in the file; do not swap axes again. Plan polygons store (x,z) in site feet. Lattice proto forms stay 20×20×20 ft and are not stretched to the property."
+    },
+    "constraints": {
+      "waterfrontGradient": 70,
+      "viewPreservation": 70,
+      "roadNoiseBuffer": 55,
+      "heightLimitFeet": 80,
+      "officeFloorToFloor": 15.5,
+      "collaborativeFloorToFloor": 17,
+      "gatheringFloorToFloor": 20,
+      "doubleHeightFeet": 32,
+      "daytimeOccupants": 450,
+      "eveningGathering": 800,
+      "badgeHolders": 1500
+    }
+  },
+  "orientationCount": 18,
+  "designCount": 13,
+  "territoryAlternativeCount": 4,
+  "assets": [
+    {
+      "id": "6a567fca571206860b15074aeda561f6ac227c22a350d144d7ccf51f25ffb7f9",
+      "publishedAt": "2026-11-19T21:06:52.336Z",
+      "asset": "public/experiment-architecture/683be8b8e5a83fdb296e0392106d22ad3705f283757492d5b421eb183ffc1d86.json",
+      "sha256": "10ee7a41f864b07a4fc37bcaa4d0731d309310bbccc812275538b5f3b9846988",
+      "orientationHash": "04fb1830ae838c7f471d0092a4aa7418371186a296d4e72907211f8c4c58315c",
+      "architectureHash": "c0a5547c0085ca55dbbb8cb8e8e59767b0d663474e396540c9659c7a829fc00e"
+    },
+    {
+      "id": "7e9b57c0d9ffed476ddc54418e27c9f63b680321aa2a445fc5086703d6aef4b5",
+      "publishedAt": "2026-11-20T01:33:36.493Z",
+      "asset": "public/experiment-architecture/832f384a3c2a1ae53173d466742ac30e28a91594a107a43b5be6e7c460e24389.json",
+      "sha256": "e2882017895b948d69fe128142e95051184b0fa7025df50111551dc20b3b66fa",
+      "orientationHash": "d79200859b92e95fa41afc6c3c2f98d7b13d427f70171ab91e99035f321979eb",
+      "architectureHash": "9d4b687beeb702f1f888a48c9a46b59c3869ad95f6abd5e8de22d036c499afbf"
+    },
+    {
+      "id": "1b6e71a2e0c7dfdf04bc840f53ee785aadb0325477d703712ea8b020d8a28382",
+      "publishedAt": null,
+      "asset": "public/experiment-architecture/050765b35f1b457e72a09ab37b2b9b957273ce50e38082dd9b9f97eb75fbdbc3.json",
+      "sha256": "185a40986588ef9e0a0c3733642ed7483f1c72a11a3c3593206ee8d004a19d21",
+      "orientationHash": "728bf50d160c028f0690ffc588c2d4a1d3177f164235193353a9d204b179e4c9",
+      "architectureHash": "dd9e37104ece841797611954d061d65aa71801ceb275d25a1c6bb851c25bf423"
+    },
+    {
+      "id": "031e81fd55a454783902c4963f5dc26a4c9c73289e999a133bf568973ca30431",
+      "publishedAt": null,
+      "asset": "public/experiment-architecture/12a20c9e2aec7159b55966ffedac4f4cc70a4f3d2e35169efaf6a67741144fe1.json",
+      "sha256": "f19303c70e7ba63687c3f263a7a3e707430a351b43d41252ecb8d76f2738a7f3",
+      "orientationHash": "94c83fd0419c9f703478ef0471c89183399c58ab7d2b6f49190274c00c2ffe12",
+      "architectureHash": "2c10c8a61a8bf08858dbd9d3ad0fcdfc6f38888074a56d3566db32c5e35d1c68"
+    },
+    {
+      "id": "f1279e843a470c50544221e0eb1ee48ea201640afde85a6ab3c81a5634422601",
+      "publishedAt": null,
+      "asset": "public/experiment-architecture/70b80050f0f0f12a63f362c0d84c6fc439589a0f76a83e2a708b1cc2a481b786.json",
+      "sha256": "fbe3d0c38eee11b3c763a59a2f897224081fb3f07329c7b95f403517565dacc9",
+      "orientationHash": "87486ccd52479fc4a79474ba64b8e12d4bfc5f9d160a964c2d9ffdf0c2b7e952",
+      "architectureHash": "50eb4edd8a51eb89b876c27fe99262b0c817f72eebbf3421a9acdb92491c2723"
+    },
+    {
+      "id": "ab5502216f465028a4ada63ac037c1bacba219a5443134eed7ea6ce6eba82994",
+      "publishedAt": null,
+      "asset": "public/experiment-architecture/46d3ec5a7e8a402e495df1c246e26cf219e9a39425c3747f1a384c2eb2e66d50.json",
+      "sha256": "f0723a6e08737700df35c308b5971ea4801890ce398fe332cc17080962090829",
+      "orientationHash": "2a464a93d64e6e047389e109e91616550d0d0642ef33ba61b17ed07912fc8140",
+      "architectureHash": "15075fdeca21183ba18074195208509255915da451f247d079e7c971d156bcb7"
+    },
+    {
+      "id": "4bfc2546d321e13cfaa648ae48b86daad169b6c7abab11534ff0d5d0fd697dda",
+      "publishedAt": null,
+      "asset": "public/experiment-architecture/4f4864020ec395466f559fb043cb747d23343288ec094697ba43df062dbb29a4.json",
+      "sha256": "e74f0c491653e65c35e313b8bd86e4c5e67a6c3d27ca4725b6d22e8f0a8c9845",
+      "orientationHash": "3b7b569603e496c8d7d120493826992c523a29821bb5969f18e885937ad0c1ca",
+      "architectureHash": "2cddd1c7856ee399960997c569e42569de1c88c21e78d7a1f61eaf5d12df6690"
+    },
+    {
+      "id": "02101a28b3ac99138d2130ff9e1c2ca883b209b9e8ff624ee09fb48aa6e0462c",
+      "publishedAt": "2026-11-22T20:00:45.898Z",
+      "asset": "public/experiment-architecture/e5312ba99cc57019c9edceb013a0a25ee4b67b317e54dd1fa25a7f33cc9d57d3.json",
+      "sha256": "506cf34353bee4960e5c155596aba7b406dfffc5414cdd41b5dddb60537e43ee",
+      "orientationHash": "3b7b569603e496c8d7d120493826992c523a29821bb5969f18e885937ad0c1ca",
+      "architectureHash": "111a75e4f57661299e59d1344f366b29f664e189bfac52aa95fc005f139dea68"
+    },
+    {
+      "id": "a70e71776aee7b83854020eb4a1f53c7cecd86c435dd1f735fa0f8fe3a65f388",
+      "publishedAt": null,
+      "asset": "public/experiment-architecture/0554cee78c37ecaa1795bb19eb32e50ab2ccd89ab80ac44b404b972dc2ee75c8.json",
+      "sha256": "91013a5d6c051dd7b3b0280144117b0e650b0058544845f134f9d8a239aa10f1",
+      "orientationHash": "c3a43636657f4f2ad5d53ed7074c036b7951fd07935295e3c445d34067aae6c4",
+      "architectureHash": "3697360d253cc79992ed54fe5a64b5c41a5281feedc23127b05ab82c7eb72fa9"
+    },
+    {
+      "id": "acb47f80424428b6d1ac269e58b2931e7c2b515876ca0105e59170ec3b7fc4eb",
+      "publishedAt": "2026-11-23T14:47:04.542Z",
+      "asset": "public/experiment-architecture/a1165a5a92e9b2cfcc046519baae211b30912a2f7cc0787427f963be5b0c768e.json",
+      "sha256": "4393e0c56bd894d8faecd9df211195b6887ffd84113322eb62a0ef11ee4ed379",
+      "orientationHash": "23755c5bb2d7d30e82e7c7f416e3d8c2163f89cee552cbee416b0ba307312d25",
+      "architectureHash": "187f58aa983f508dc00e4e000eee108e4b6677f2e42892db6f5665e4ef6506cb"
+    },
+    {
+      "id": "59cd9b3961d0b0b8f392c1c3b050c88b0e9e67446ef6b4d1844525f4d10e2938",
+      "publishedAt": null,
+      "asset": "public/experiment-architecture/47eedb6fc74c74ddbeeeb60a730567585d6a21b8cacc719cf6ffacdf50fbe14b.json",
+      "sha256": "66050878c9d2f6ea889591f12e34087cf85e54b3df6fb9119a2da947e6115058",
+      "orientationHash": "c2b138fd7fdaf5fbf0d3873816578518ae7a9fbf0d48d395dbebb18f040074d4",
+      "architectureHash": "a0aae20b7604884a1baaedcb9d876c03bc5210e283829c1e7fe9c506eb4aa8ca"
+    },
+    {
+      "id": "3df8eea49a55f5f44df1cc3920270cbf01dd84411978de4949d56c9efe518609",
+      "publishedAt": null,
+      "asset": "public/experiment-architecture/e4a8b6690c6ee6eb42e01f6e45899bdbace0cd09f695e71ecc39447fb857af4c.json",
+      "sha256": "975039cbe6ccef30cd5ff648c230bfb0d49ab723790178ef46563427d4e6e418",
+      "orientationHash": "5494880309d7b44460baedc08b468d0a4b2a3742640b136f31a900b4a2d8964d",
+      "architectureHash": "df3f62fa5b4e7651217e08780e0a2659e811b8a4197ede19dbe8aa2b461ec11e"
+    },
+    {
+      "id": "dd18fffe5ca4a6138e65b0b86bfa88f07cc5fc1111ac5c04529e65ab6f614066",
+      "publishedAt": null,
+      "asset": "public/experiment-architecture/3b13de1d25567d18660acdbcedbc68b208b709dd3ce59e58fa9145b5668d33b8.json",
+      "sha256": "6c3dba1d6c45e91450d7c8741e6b619c4e28f7ff47b9350be12aee461507d339",
+      "orientationHash": "32d4a4b410bec58e3c5a7144f13c2fb30df42d79e66503ffd8a0a3ee9432ece9",
+      "architectureHash": "c1741a5be6268b8171d3d9c13916821d690063134517e04309e0d81899d093e9"
+    }
+  ]
+}

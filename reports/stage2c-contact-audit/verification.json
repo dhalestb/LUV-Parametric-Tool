@@ -1,0 +1,8 @@
+{
+  "cases": 7,
+  "priorPairsProfilesPathsExact": true,
+  "priorEmittedCollisionTrianglesExact": 14,
+  "nondegenerateRejectedConfirmed": 1346,
+  "degenerateRejectedPairs": 14,
+  "sessionSHA256": "6172019acf6d7cd88a4af2dca1ff570cd8e751a10fabc39da4efd65b12bc920b"
+}

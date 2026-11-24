@@ -15,8 +15,26 @@ import {
 } from "./objFidelity";
 import type { CameraMode, ColorMode, ConnectionReport, ContinuityOverlay, DiagnosticMode, ImportedObj, LatticeField, Placement, PortCandidate, PortPair, TileModel, UpAxisMode } from "./types";
 import { LATTICE_FEET, placementWorldZ } from "./types";
+import { worldFromLocal } from "./surfaceAttachment";
 
 export type LatticeViewportHandle = { capture: () => string };
+
+export type SiteViewportOverlay = {
+  id: string;
+  name: string;
+  kind: "zone" | "exclusion" | "selected";
+  color: string;
+  ringLattice: Array<[number, number]>;
+  selected?: boolean;
+};
+
+export type SiteFootprintOverlay = {
+  id: string;
+  zoneId: string;
+  ringLattice: Array<[number, number]>;
+  breached: boolean;
+  colliding: boolean;
+};
 
 type Props = {
   meshes: ImportedObj[];
@@ -34,6 +52,9 @@ type Props = {
   showGeneratedConnectors?: boolean;
   showOriginalTiles?: boolean;
   connectors?: GeneratedConnector[];
+  architecturalMarkers?:Array<{id:string;point:[number,number,number];direction:[number,number,number];role:string;connected:boolean}>;
+  /** Derived working copies, already in architectural coordinates. */
+  workingModels?:TileModel[];
   cameraMode: CameraMode;
   diagnostic: DiagnosticMode;
   continuityOverlay?: ContinuityOverlay;
@@ -43,6 +64,15 @@ type Props = {
   onSelect: (id: string) => void;
   /** When set, shows RAW | REGISTERED | COPY+20'X side-by-side for one source mesh. */
   fidelityMesh?: ImportedObj | null;
+  siteOverlays?: SiteViewportOverlay[];
+  footprintOverlays?: SiteFootprintOverlay[];
+  showSiteBoundaries?: boolean;
+  showSelectedPolygons?: boolean;
+  showExclusionPolygons?: boolean;
+  showObjFootprints?: boolean;
+  showBoundingEnvelopes?: boolean;
+  showCollisionRegions?: boolean;
+  highlightZoneId?: string | null;
 };
 
 function geometryKey(id: string) {
@@ -151,10 +181,38 @@ function FidelityInstance({
   );
 }
 
+function WorkingForm({model,placement}:{model:TileModel;placement:Placement}){
+  const geometry=useMemo(()=>{const g=new THREE.BufferGeometry(),surface=model.connectionSurface!,variant=model.variants.findIndex(v=>v.rotation===placement.rotation&&v.mirror===placement.mirror);
+    const positions=new Float32Array(surface.positions.length),tile={id:model.id,ix:placement.ix,iy:placement.iy,iz:placement.iz,zLift:placement.zLift,variant};
+    for(let i=0;i<positions.length;i+=3){const p=worldFromLocal(Array.from(surface.positions.slice(i,i+3)) as [number,number,number],tile,model);positions.set([p[0],p[2],p[1]],i);}
+    const indices=surface.triangles.slice();
+    // Architectural Z-up to display Y-up reverses handedness; instance mirror
+    // reverses it once more. Normals are derived only for this rendering copy.
+    if(placement.mirror==="none")for(let i=0;i<indices.length;i+=3)[indices[i+1],indices[i+2]]=[indices[i+2],indices[i+1]];
+    g.setAttribute("position",new THREE.BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();return g;
+  },[model,placement]);
+  useEffect(()=>()=>geometry.dispose(),[geometry]);
+  return <mesh geometry={geometry}><meshStandardMaterial color="#B9BEC6" side={THREE.DoubleSide}/></mesh>;
+}
+
+function polygonLineGeometry(ring: Array<[number, number]>, y = 0.35) {
+  const positions: number[] = [];
+  for (let i = 0; i < ring.length - 1; i += 1) {
+    const [x0, z0] = ring[i];
+    const [x1, z1] = ring[i + 1];
+    positions.push(x0, y, z0, x1, y, z1);
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array(positions), 3));
+  return geometry;
+}
+
 function Scene({
   meshes, models, placements, unitScale, upAxisMode, field, colorMode, showLattice, showConnections,
   showGeneratedConnectors = true, showOriginalTiles = true, showConnectionPorts = false, portPairs, portCandidates, connectors = [], cameraMode, diagnostic,
-  continuityOverlay = "all", presentation, selectedId, connections, onSelect, fidelityMesh = null,
+  continuityOverlay = "all", presentation, selectedId, connections, onSelect, fidelityMesh = null, architecturalMarkers=[],workingModels=[],
+  siteOverlays = [], footprintOverlays = [], showSiteBoundaries = true, showSelectedPolygons = true, showExclusionPolygons = true,
+  showObjFootprints = false, showBoundingEnvelopes = false, showCollisionRegions = true, highlightZoneId = null,
 }: Props) {
   const { camera, invalidate } = useThree();
   const fidelityMode = diagnostic === "obj-fidelity" && !!fidelityMesh;
@@ -245,6 +303,44 @@ function Scene({
     return geometry;
   }, [field.cellsX, field.cellsY, field.cellsZ]);
   useEffect(() => () => latticeGeometry.dispose(), [latticeGeometry]);
+
+  const siteBoundaryGeometries = useMemo(() => {
+    if (fidelityMode) return [];
+    return siteOverlays
+      .filter((overlay) => {
+        if (overlay.kind === "exclusion") return showExclusionPolygons;
+        if (overlay.kind === "selected" || overlay.selected) return showSelectedPolygons || showSiteBoundaries;
+        return showSiteBoundaries;
+      })
+      .map((overlay) => ({
+        id: overlay.id,
+        color: highlightZoneId === overlay.id ? "#f5d76e" : overlay.color,
+        lineWidth: highlightZoneId === overlay.id || overlay.selected ? 2 : 1,
+        geometry: polygonLineGeometry(overlay.ringLattice, overlay.kind === "exclusion" ? 0.55 : 0.4),
+        label: overlay.name,
+        centroid: overlay.ringLattice.reduce(
+          (acc, point, _, all) => [acc[0] + point[0] / all.length, acc[1] + point[1] / all.length] as [number, number],
+          [0, 0] as [number, number],
+        ),
+      }));
+  }, [siteOverlays, showSiteBoundaries, showSelectedPolygons, showExclusionPolygons, highlightZoneId, fidelityMode]);
+  useEffect(() => () => siteBoundaryGeometries.forEach((item) => item.geometry.dispose()), [siteBoundaryGeometries]);
+
+  const footprintGeometries = useMemo(() => {
+    if (fidelityMode || (!showObjFootprints && !showBoundingEnvelopes && !showCollisionRegions)) return [];
+    return footprintOverlays
+      .filter((item) => {
+        if (showCollisionRegions && (item.colliding || item.breached)) return true;
+        if (showObjFootprints || showBoundingEnvelopes) return true;
+        return false;
+      })
+      .map((item) => ({
+        id: item.id,
+        color: item.breached ? "#e47079" : item.colliding ? "#d6ad4f" : "#7ec8e3",
+        geometry: polygonLineGeometry(item.ringLattice, 0.7),
+      }));
+  }, [footprintOverlays, showObjFootprints, showBoundingEnvelopes, showCollisionRegions, fidelityMode]);
+  useEffect(() => () => footprintGeometries.forEach((item) => item.geometry.dispose()), [footprintGeometries]);
 
   const connectionGeometry = useMemo(() => {
     if (fidelityMode || !showConnections) return null;
@@ -389,6 +485,7 @@ function Scene({
       <directionalLight position={[40, 80, 30]} intensity={1.1} />
 
       {showOriginalTiles && visibleMeshes.map((mesh, index) => {
+        if(!fidelityMode&&!spread&&workingModels.some(m=>m.id===mesh.id))return null;
         const placement = placements[mesh.id] ?? IDENTITY_PLACEMENT(mesh.id);
         const model = modelById.get(mesh.id) ?? modelById.get(geometryKey(mesh.id));
         const slot = slotById(placement.slotId ?? model?.slotId ?? null);
@@ -431,6 +528,12 @@ function Scene({
         );
       })}
 
+      {showOriginalTiles&&!fidelityMode&&!spread&&workingModels.map(model=>placements[model.id]?<WorkingForm key={model.id} model={model} placement={placements[model.id]}/>:null)}
+      {!fidelityMode&&!spread&&!presentation&&architecturalMarkers.map(marker=>{
+        const p:[number,number,number]=[marker.point[0],marker.point[2]+.5,marker.point[1]],end:[number,number,number]=[p[0]+marker.direction[0]*3,p[1],p[2]+marker.direction[1]*3];
+        const color=marker.role==="projecting branch"?"#D6AD4F":"#71BEDA";
+        return <group key={marker.id}><Line points={[p,end]} color={color} lineWidth={1}/><Html occlude position={p} zIndexRange={[4,0]} style={{fontSize:10,color,whiteSpace:"nowrap",background:"#000000d9",padding:3}}>{marker.role} candidate · {marker.connected?"selected interface":"unconnected / unverified"}</Html></group>;
+      })}
       {!fidelityMode && !spread && showConnectionPorts && models.flatMap(model => {
         const placement = placements[model.id];
         if (!placement) return [];
@@ -451,7 +554,7 @@ function Scene({
         });
       })}
       {!fidelityMode && showConnectionPorts && (portPairs ?? []).map(pair => <Html zIndexRange={[5, 0]} key={`${pair.tileA}:${pair.tileB}`} position={[(pair.from[0]+pair.to[0])/2,(pair.from[2]+pair.to[2])/2+.8,(pair.from[1]+pair.to[1])/2]} style={{fontSize:10,color:"#ffdc87",whiteSpace:"nowrap",background:"#252015cc"}}>
-        <span title={`${pair.tileA} → ${pair.tileB}\nClass: ${pair.connectionClass}\nLateral: ${(pair.lateralOffset??0).toFixed(1)}′ · Angle: ${(pair.angle??0).toFixed(1)}°\nDistance: ${pair.distance.toFixed(1)}′ · ΔZ: ${pair.rise.toFixed(1)}′\nFacing: ${pair.facing.toFixed(2)} · Width compatibility: ${pair.widthCompatibility.toFixed(2)}\nPort score: ${pair.score.toFixed(2)}`}>{pair.connectionClass} {pair.portA} → {pair.portB}</span>
+        <span title={`${pair.tileA} → ${pair.tileB}\nClass: ${pair.connectionClass}\nLateral: ${(pair.lateralOffset??0).toFixed(1)}′ · Angle: ${(pair.angle??0).toFixed(1)}°\nRun: ${pair.plan.toFixed(1)}′ · Rise: ${pair.rise.toFixed(1)}′ · Slope: ${(Math.abs(pair.rise)/Math.max(pair.plan,0.25)).toFixed(3)}\nFacing: ${pair.facing.toFixed(2)} · Width compatibility: ${pair.widthCompatibility.toFixed(2)}\nPort score: ${pair.score.toFixed(2)}`}>{pair.connectionClass} {pair.portA} → {pair.portB}</span>
       </Html>)}
       {!fidelityMode && showConnectionPorts && [...(portCandidates??[]).filter(c=>c.accepted),...(portCandidates??[]).filter(c=>!c.accepted&&!['NETWORK REDUNDANT','PORT IN USE'].includes(c.reason??'')).sort((a,b)=>a.pair.distance-b.pair.distance||b.pair.score-a.pair.score).slice(0,64)].map((candidate,index)=>{
         const pair=candidate.pair,color=!candidate.accepted?"#e47079":pair.connectionClass==="DIRECT"?"#63efb5":pair.connectionClass==="VERTICAL"?"#d5a0ff":"#66bfff";
@@ -468,6 +571,21 @@ function Scene({
       <lineSegments visible={!fidelityMode && showLattice} geometry={latticeGeometry} renderOrder={2}>
         <lineBasicMaterial color="#9a9a9a" depthWrite={false} />
       </lineSegments>
+      {siteBoundaryGeometries.map((item) => (
+        <group key={`site-boundary-${item.id}`}>
+          <lineSegments geometry={item.geometry} renderOrder={3}>
+            <lineBasicMaterial color={item.color} depthWrite={false} />
+          </lineSegments>
+          <Html position={[item.centroid[0], 1.2, item.centroid[1]]} style={{ fontSize: 10, color: item.color, whiteSpace: "nowrap", background: "#000000b8", padding: "2px 4px" }}>
+            {item.label}
+          </Html>
+        </group>
+      ))}
+      {footprintGeometries.map((item) => (
+        <lineSegments key={`footprint-${item.id}`} geometry={item.geometry} renderOrder={4}>
+          <lineBasicMaterial color={item.color} depthWrite={false} />
+        </lineSegments>
+      ))}
       {connectionGeometry && (
         <lineSegments visible={!fidelityMode && showConnections} geometry={connectionGeometry}>
           <lineBasicMaterial vertexColors />

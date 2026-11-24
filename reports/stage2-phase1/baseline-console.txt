@@ -1,0 +1,394 @@
+{
+  "mode": "baseline",
+  "sources": [
+    {
+      "code": "O2",
+      "id": "mesh-14-7xy9tm",
+      "filename": "undulating workspace.obj",
+      "placement": {
+        "id": "mesh-14-7xy9tm",
+        "variant": 0,
+        "ix": 0,
+        "iy": 0,
+        "iz": 0
+      },
+      "rotation": 0,
+      "mirror": "none",
+      "vertices": 8802,
+      "faces": 15487,
+      "geometrySHA256": "282726acafca0eb7d6738eb738bf54e68375bb33cd95eeeb04a24ef5cb337028"
+    },
+    {
+      "code": "O1",
+      "id": "mesh-15-h24ulc",
+      "filename": "void workspace.obj",
+      "placement": {
+        "id": "mesh-15-h24ulc",
+        "variant": 2,
+        "ix": 1,
+        "iy": 0,
+        "iz": 0
+      },
+      "rotation": 0,
+      "mirror": "y",
+      "vertices": 3972,
+      "faces": 5890,
+      "geometrySHA256": "30d5800e346e574d1b1eaae8bb58bb173c2fbb3ccab2047e365c764f22beeebf"
+    },
+    {
+      "code": "G1",
+      "id": "mesh-6-03znsf",
+      "filename": "Gathering, Linear.obj",
+      "placement": {
+        "id": "mesh-6-03znsf",
+        "variant": 0,
+        "ix": 1,
+        "iy": 1,
+        "iz": 0
+      },
+      "rotation": 0,
+      "mirror": "none",
+      "vertices": 20865,
+      "faces": 41604,
+      "geometrySHA256": "838167c2116b726cb0480346d5ba2f7438dadb31a08fa0b34e8fd66a6f6133ee"
+    },
+    {
+      "code": "L1",
+      "id": "mesh-5-bva2xh",
+      "filename": "Lobby, Vertical Void.obj",
+      "placement": {
+        "id": "mesh-5-bva2xh",
+        "variant": 3,
+        "ix": 2,
+        "iy": 1,
+        "iz": 0
+      },
+      "rotation": 90,
+      "mirror": "none",
+      "vertices": 14282,
+      "faces": 28528,
+      "geometrySHA256": "297474087256aee3ed334c20fc5a0a15670b1aa4ff747eb66492098550895637"
+    }
+  ],
+  "trials": [
+    {
+      "cache": "cold",
+      "timings": {
+        "connector geometry": {
+          "calls": 248,
+          "inclusiveMs": 18.988700000001245,
+          "exclusiveMs": 18.988700000001245
+        },
+        "collision and clearance": {
+          "calls": 245,
+          "inclusiveMs": 1503.6094999999964,
+          "exclusiveMs": 1484.793199999995
+        },
+        "candidate generation": {
+          "calls": 2,
+          "inclusiveMs": 1481.7853999999998,
+          "exclusiveMs": 29.79460000000654
+        },
+        "surface attachment selection": {
+          "calls": 177,
+          "inclusiveMs": 271.3792999999955,
+          "exclusiveMs": 271.3792999999955
+        },
+        "network graph": {
+          "calls": 1,
+          "inclusiveMs": 0.1956000000000131,
+          "exclusiveMs": 0.1956000000000131
+        },
+        "search candidate evaluation": {
+          "calls": 1,
+          "inclusiveMs": 1917.4956000000002,
+          "exclusiveMs": 112.34420000000182
+        }
+      },
+      "components": 2,
+      "isolated": [
+        "L1"
+      ],
+      "links": [
+        {
+          "source": "O2",
+          "target": "O1",
+          "portA": "E4",
+          "portB": "P4",
+          "from": [
+            9.999996185302734,
+            -3.8605918884277344,
+            1.7307411432266235
+          ],
+          "to": [
+            16.48145294189453,
+            -8.133686065673828,
+            2.248160955278756
+          ],
+          "width": 2.02838134765625,
+          "sourceGap": {
+            "distance": 0,
+            "kind": "edge",
+            "normalZ": 1
+          },
+          "targetGap": {
+            "distance": 0.0955340269743876,
+            "kind": "floor",
+            "normalZ": 1
+          },
+          "kinds": [
+            "ramp"
+          ]
+        },
+        {
+          "source": "O2",
+          "target": "G1",
+          "portA": "organic",
+          "portB": "organic",
+          "from": [
+            3.8605880737304688,
+            9.999996185302734,
+            9.452584266662598
+          ],
+          "to": [
+            10.571971893310547,
+            18.611456871032715,
+            6.666666507720947
+          ],
+          "width": 2.0283737182617188,
+          "sourceGap": {
+            "distance": 0,
+            "kind": "edge",
+            "normalZ": 1
+          },
+          "targetGap": {
+            "distance": 0,
+            "kind": "edge",
+            "normalZ": 1
+          },
+          "kinds": [
+            "stair"
+          ]
+        }
+      ]
+    },
+    {
+      "cache": "warm",
+      "timings": {
+        "connector geometry": {
+          "calls": 248,
+          "inclusiveMs": 12.159500000001572,
+          "exclusiveMs": 12.159500000001572
+        },
+        "collision and clearance": {
+          "calls": 245,
+          "inclusiveMs": 92.80330000000049,
+          "exclusiveMs": 80.70829999999933
+        },
+        "candidate generation": {
+          "calls": 2,
+          "inclusiveMs": 105.67449999999917,
+          "exclusiveMs": 13.466999999998734
+        },
+        "surface attachment selection": {
+          "calls": 177,
+          "inclusiveMs": 14.511899999998604,
+          "exclusiveMs": 14.511899999998604
+        },
+        "network graph": {
+          "calls": 1,
+          "inclusiveMs": 0.03930000000036671,
+          "exclusiveMs": 0.03930000000036671
+        },
+        "search candidate evaluation": {
+          "calls": 1,
+          "inclusiveMs": 129.2408000000005,
+          "exclusiveMs": 8.354800000001887
+        }
+      },
+      "components": 2,
+      "isolated": [
+        "L1"
+      ],
+      "links": [
+        {
+          "source": "O2",
+          "target": "O1",
+          "portA": "E4",
+          "portB": "P4",
+          "from": [
+            9.999996185302734,
+            -3.8605918884277344,
+            1.7307411432266235
+          ],
+          "to": [
+            16.48145294189453,
+            -8.133686065673828,
+            2.248160955278756
+          ],
+          "width": 2.02838134765625,
+          "sourceGap": {
+            "distance": 0,
+            "kind": "edge",
+            "normalZ": 1
+          },
+          "targetGap": {
+            "distance": 0.0955340269743876,
+            "kind": "floor",
+            "normalZ": 1
+          },
+          "kinds": [
+            "ramp"
+          ]
+        },
+        {
+          "source": "O2",
+          "target": "G1",
+          "portA": "organic",
+          "portB": "organic",
+          "from": [
+            3.8605880737304688,
+            9.999996185302734,
+            9.452584266662598
+          ],
+          "to": [
+            10.571971893310547,
+            18.611456871032715,
+            6.666666507720947
+          ],
+          "width": 2.0283737182617188,
+          "sourceGap": {
+            "distance": 0,
+            "kind": "edge",
+            "normalZ": 1
+          },
+          "targetGap": {
+            "distance": 0,
+            "kind": "edge",
+            "normalZ": 1
+          },
+          "kinds": [
+            "stair"
+          ]
+        }
+      ]
+    },
+    {
+      "cache": "warm",
+      "timings": {
+        "connector geometry": {
+          "calls": 248,
+          "inclusiveMs": 7.912000000007538,
+          "exclusiveMs": 7.912000000007538
+        },
+        "collision and clearance": {
+          "calls": 245,
+          "inclusiveMs": 82.86089999999604,
+          "exclusiveMs": 75.00839999998789
+        },
+        "candidate generation": {
+          "calls": 2,
+          "inclusiveMs": 92.31790000000001,
+          "exclusiveMs": 9.612800000002608
+        },
+        "surface attachment selection": {
+          "calls": 177,
+          "inclusiveMs": 14.615999999999076,
+          "exclusiveMs": 14.615999999999076
+        },
+        "network graph": {
+          "calls": 1,
+          "inclusiveMs": 0.06260000000020227,
+          "exclusiveMs": 0.06260000000020227
+        },
+        "search candidate evaluation": {
+          "calls": 1,
+          "inclusiveMs": 115.66949999999997,
+          "exclusiveMs": 8.45770000000266
+        }
+      },
+      "components": 2,
+      "isolated": [
+        "L1"
+      ],
+      "links": [
+        {
+          "source": "O2",
+          "target": "O1",
+          "portA": "E4",
+          "portB": "P4",
+          "from": [
+            9.999996185302734,
+            -3.8605918884277344,
+            1.7307411432266235
+          ],
+          "to": [
+            16.48145294189453,
+            -8.133686065673828,
+            2.248160955278756
+          ],
+          "width": 2.02838134765625,
+          "sourceGap": {
+            "distance": 0,
+            "kind": "edge",
+            "normalZ": 1
+          },
+          "targetGap": {
+            "distance": 0.0955340269743876,
+            "kind": "floor",
+            "normalZ": 1
+          },
+          "kinds": [
+            "ramp"
+          ]
+        },
+        {
+          "source": "O2",
+          "target": "G1",
+          "portA": "organic",
+          "portB": "organic",
+          "from": [
+            3.8605880737304688,
+            9.999996185302734,
+            9.452584266662598
+          ],
+          "to": [
+            10.571971893310547,
+            18.611456871032715,
+            6.666666507720947
+          ],
+          "width": 2.0283737182617188,
+          "sourceGap": {
+            "distance": 0,
+            "kind": "edge",
+            "normalZ": 1
+          },
+          "targetGap": {
+            "distance": 0,
+            "kind": "edge",
+            "normalZ": 1
+          },
+          "kinds": [
+            "stair"
+          ]
+        }
+      ]
+    }
+  ],
+  "probe": {
+    "confirmed": {
+      "meets": false,
+      "elevation": null
+    },
+    "ordinaryPairs": 1,
+    "provisionalPairs": 0,
+    "provisionalRejections": {
+      "DISTANCE": 305,
+      "ANGLE": 95,
+      "LATERAL OFFSET": 14,
+      "ELEVATION": 6,
+      "NETWORK REDUNDANT": 17
+    }
+  },
+  "fidelity": "PASS: full positions, normals, face records and session file SHA-256 unchanged"
+}

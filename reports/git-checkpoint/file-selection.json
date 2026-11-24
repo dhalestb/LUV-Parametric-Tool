@@ -1,0 +1,1186 @@
+{
+  "files": [
+    {
+      "path": "fixtures/original-obj/README.md",
+      "group": "evidence",
+      "reason": "Byte-identical original fixture and safe restore helper",
+      "bytes": 900,
+      "sha256": "533807f4b34646cc0e6de0c018da809ad117b0ce73bbf29adaadcb2075d6313b"
+    },
+    {
+      "path": "fixtures/original-obj/lattice-session.json.gz",
+      "group": "evidence",
+      "reason": "Byte-identical original fixture and safe restore helper",
+      "bytes": 2615880,
+      "sha256": "434f36f551d2accc5f586772fc95dffb9a0f4641e0ac6a3378a0fc3b23a0f87a"
+    },
+    {
+      "path": "fixtures/original-obj/lattice-session.json.gz.manifest.json",
+      "group": "evidence",
+      "reason": "Byte-identical original fixture and safe restore helper",
+      "bytes": 374,
+      "sha256": "3c5adeb42a3ea53beb5247b8f767ee2e7edc3831814b260c978cdc6b5c19d0bb"
+    },
+    {
+      "path": "reports/git-checkpoint/REPORT.md",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 9831,
+      "sha256": "771fe55e3153f3eb625bc743f55a3d120c75f0c50141acb7448d309e08323f7e"
+    },
+    {
+      "path": "reports/git-checkpoint/divergence.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 2470,
+      "sha256": "5237bea05f2950a56f80f4932613b90c082277464d0d19d7cf042df65a57f768"
+    },
+    {
+      "path": "reports/git-checkpoint/isolated-ui.diff",
+      "group": null,
+      "reason": "Local audit intermediate or redundant raw rerun; retained in snapshot/local directory",
+      "bytes": 103799,
+      "sha256": "ebd66cd12802efb924980f29bbdf8873562ac63fd6462ca81278fa7d6afe8441"
+    },
+    {
+      "path": "reports/git-checkpoint/precommit-tracked.diff",
+      "group": null,
+      "reason": "Local audit intermediate or redundant raw rerun; retained in snapshot/local directory",
+      "bytes": 143403,
+      "sha256": "b39e4a5875e5adb34e8f7b97ba41af6042664abb4781d7abf8cdb5c04752746a"
+    },
+    {
+      "path": "reports/git-checkpoint/prepare-evidence.cjs",
+      "group": null,
+      "reason": "Local audit intermediate or redundant raw rerun; retained in snapshot/local directory",
+      "bytes": 3976,
+      "sha256": "2fbcf91179f0a5abddb7776ea234f0586a425bdf01b7b27f0648e26357a8556a"
+    },
+    {
+      "path": "reports/git-checkpoint/snapshot-parity.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 55,
+      "sha256": "7f47a04f2c3122baf0be61be37eef13b5532ec6cab0f4353d98cb3dbc773285d"
+    },
+    {
+      "path": "reports/git-checkpoint/ui-overlap.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 1288,
+      "sha256": "3962593cda410dfd532d36d5f531daff4e51eb0a49681bddd4babb52a4918fbb"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/adaptive-output.txt",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 1889,
+      "sha256": "451c8e64cc03a65a34bc2a14baf75950385cd2455d0a792ff9bc2fc15b118b00"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/adaptive/results.json",
+      "group": null,
+      "reason": "Local audit intermediate or redundant raw rerun; retained in snapshot/local directory",
+      "bytes": 36320159,
+      "sha256": "27a6889bc154b6ab3eac6ffcf34e0644a71a0e860d904acdb52b887eb4529c9b"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/adaptive/source-solid-audit.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 471,
+      "sha256": "4e3dcdb68dadaca8156b608b63174178626e882f1cba6a02e3fee441d906444a"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/adaptive/synthetic-generated-geometry.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 16893,
+      "sha256": "5ac86962290c154ad8af465f77ae42555c58705077904fd5aa9e1817f0e0270d"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/adaptive/synthetic-opening-geometry.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 3525,
+      "sha256": "b0e003cbd49a00d0dce77abd69ab988fc1cc4b5d8f79ff3f5cbb10ed37822d6b"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/build.txt",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 3225,
+      "sha256": "76e7434d51e4003ebb5a572d2dde17ea376a6795adcf8ddabdba590003b5e0ad"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/descriptor-tests.txt",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 2140,
+      "sha256": "14b558b89ea6c3c5aa5610f65f6836eaed98d1f9bbbb06da238b8b0470988f30"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/feasibility-baseline.txt",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 2419,
+      "sha256": "370f9f480b861c4e924ed4bc42b12522669514d91d511b3841af77a6d5af9e4b"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/feasibility-output.txt",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 2917,
+      "sha256": "8c564c184422e201de19ccb59c0dcbf597962dfb18082bbe3492db5e891717cb"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/feasibility/baseline-pairs.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 5389,
+      "sha256": "0a00d4caead854aceab2b726841dc31f3ce8f4ea32b5a34673bf0331dae235da"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/feasibility/baseline.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 13268,
+      "sha256": "1601f32494426d5ae048c731916febc401ae36bc5a05468b4e0b74e4d1923167"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/feasibility/corrected.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 19316,
+      "sha256": "422fb26c5ad74d0e661b715053ceda7b71883df1453546b603cc8f19c82f4784"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/integrated-output.txt",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 4648,
+      "sha256": "2199217f11f3e98ef9970441e21d3eab863c6c3b0597e786fdeb22701c20c6ed"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/integrated/after-ascending-stair-section.svg",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 780,
+      "sha256": "b2859a5f3fd7888b8334c271adf3b2f7a46b3265a8d2e3d90266c083e8c0a9f9"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/integrated/after-integrated.json",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 863977,
+      "sha256": "7ead00cd4a7b411034e58f9146e1e14a90f326e6165792650c83b3684dcac99f"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/integrated/after-level-flush-section.svg",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 731,
+      "sha256": "4248ae15485ec2bbe0170a58c85c26f5975f677b74dae7d9ad9962d1bb572f4f"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/integrated/after-supported-flush-ramp-section.svg",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 855,
+      "sha256": "14ffd71e1b0eb1d387748fc5f728de6ae2510b9ec007daa28389d31a1000de40"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/lint.txt",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/typescript.txt",
+      "group": "evidence",
+      "reason": "Current checkpoint verification and reproducibility evidence",
+      "bytes": 1512,
+      "sha256": "5a55c16c8724ddc17bf870a45cede1a34ad2ab4b4c1c31fd254698fc8af6c807"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/README.md",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 3914,
+      "sha256": "179c5b842c7d4b3faed109f12f923fcea006b611009cb90d021e7f4663e347fd"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/generate.cjs",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 7885,
+      "sha256": "006315810c4f63f688ca103c99cd5b9084b45e95ad94107778356a713bafdafc"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-2x2x1-black.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 514996,
+      "sha256": "b25d7681872ba851dd7471db85ef3c4b903d92b2cf000a43f1d794f0dfbf6933"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-2x2x1.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 317452,
+      "sha256": "ea85f0f940ddf58c278a0c80b3130c2e192ed7d2a64da563da89c4386db59e48"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-2x2x1.svg",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 6516,
+      "sha256": "ca125e96aabeadf30fcf6a320044609b68c0e51ae4736697ceda4b17eead9f5e"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-4x4x1-black.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 563888,
+      "sha256": "2d9e1a618994c5ce94d0deaefd2f8d589c8bc879435ffd0c49c8357673cce5ed"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-4x4x1.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 381647,
+      "sha256": "9eb008d7ac4b08a939afe8dd44cc6157397968519519aeeb8888cda1ea32cb35"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-4x4x1.svg",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 12055,
+      "sha256": "74170cdd5b7502bb0341e64e7f368a7a5db53e21668efc1194340cdb796f59b7"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-8x8x1-black.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 628539,
+      "sha256": "5563a5fe8c330ad2e69ef02848c6c4392b411b7136870ab21c7fe23ec49f35d1"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-8x8x1.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 477433,
+      "sha256": "ddaa7488d385ccd6c51929303b2630659d3ac19cb8721819564b7883b1461312"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-8x8x1.svg",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 31141,
+      "sha256": "837197a052a2d55cb909528c34e8767385f3a1f200264d0cbf2d3ba7c294036f"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-comparison-horizontal-black.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 1007069,
+      "sha256": "1473ddaad265c4bacbdab38c9e49764a5751bdffc1d91726ff4e3139989d315e"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-comparison-horizontal.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 730846,
+      "sha256": "e6486462eaf01afa501161a33079c01c9114f155a6d9f3e2b345449ef1d2b80e"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/lattice-comparison-horizontal.svg",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 48642,
+      "sha256": "8b4961d0688720315c80dc937cce3008f0321e8cd9b0aacf862b80c12597a3e5"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/manifest.json",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 1626,
+      "sha256": "18b038cb08cc5eed0a702ddf8dec11a032c9a1be63e72e435821816311aaf516"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/preview-2x2.png",
+      "group": null,
+      "reason": "Redundant preview or resolved intermediate failure; retained locally",
+      "bytes": 84206,
+      "sha256": "2ea109b0105a26626561945538324b12b8b197a22e1b1e8e90d1d4d094d76ce2"
+    },
+    {
+      "path": "reports/presentation-assets/lattice-grids/preview.png",
+      "group": null,
+      "reason": "Redundant preview or resolved intermediate failure; retained locally",
+      "bytes": 171140,
+      "sha256": "6cf6ef4e53b5179e4821c1a9cbb6968af4b7a6fd17be60f5f50137a1b6284134"
+    },
+    {
+      "path": "reports/stage2c-contact-audit/REPORT.md",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 24149,
+      "sha256": "b1c7278cebc72130f945ed4604f2c3f73765306ca408d13b6f23d33aa0d0716b"
+    },
+    {
+      "path": "reports/stage2c-contact-audit/audit.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 7686172,
+      "sha256": "0dd08738db88b098cc52552cd428285d762aa68360a170781c123a8efdff8fc9"
+    },
+    {
+      "path": "reports/stage2c-contact-audit/contact-witnesses.csv",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 735242,
+      "sha256": "dbe65550239c52901f51b1e04d62ef0523339be59e9a58a490bc8a390701eb4c"
+    },
+    {
+      "path": "reports/stage2c-contact-audit/run.cjs",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 15504,
+      "sha256": "46d58d695a5e344bf743bd0d2b98fbb6ba5b26c0fe102311cc207b83aabc6c5e"
+    },
+    {
+      "path": "reports/stage2c-contact-audit/verification.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 264,
+      "sha256": "4c8bd5289125428d013f5cc9127fe901aa6b8eec1ba072e639cd69c9df32ee9a"
+    },
+    {
+      "path": "reports/stage2c-feasibility-correction/REPORT.md",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 16234,
+      "sha256": "1be31aa9f7a4d78dbc647ae4770ee4564451d2452a36bf21858785286951bd50"
+    },
+    {
+      "path": "reports/stage2c-feasibility-correction/attachment-check.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 1784,
+      "sha256": "e17e9a867d48876d39cb86f08c57d506cfe1480870ddea06c49508356da33c25"
+    },
+    {
+      "path": "reports/stage2c-feasibility-correction/baseline-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 2145,
+      "sha256": "0b79339c65b8b5a7d1416d635ca556b4b62b30c04ea57ab5509f2076026453eb"
+    },
+    {
+      "path": "reports/stage2c-feasibility-correction/baseline-pairs.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 5389,
+      "sha256": "0a00d4caead854aceab2b726841dc31f3ce8f4ea32b5a34673bf0331dae235da"
+    },
+    {
+      "path": "reports/stage2c-feasibility-correction/baseline.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 13262,
+      "sha256": "25af990999ff7f91c2f55103d6dbbf67c31730ce69f49e36318878c66af6863c"
+    },
+    {
+      "path": "reports/stage2c-feasibility-correction/corrected.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 18857,
+      "sha256": "7daed199f3bf7c5914e6b5e5b1c9c1e8a306c0860aeea36d885ab2ef06e3a4e0"
+    },
+    {
+      "path": "reports/stage2c-feasibility-correction/preservation.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 533,
+      "sha256": "010d0dcd6136cba94c85be021026108897d869c0c992bcd7db7f5db67a4c1548"
+    },
+    {
+      "path": "reports/stage2c-feasibility-correction/test-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 2551,
+      "sha256": "4b0b94d2f76ddafb04839f416b9643bb88ee556aa2fa2f3544a2f3627e39615d"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/REPORT.md",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 25941,
+      "sha256": "cc781d853056e4899b0e3510ed6da1816290ee645551bb03cce323d59141fa50"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-O2-G1-original-section.png",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 52725,
+      "sha256": "9d38819c3b7bf2395ffd00edd905944e2d2f7d1358fb6a241cf2d961525e9f70"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-O2-G1-original-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 112465,
+      "sha256": "21b5a61534b9e6e4b3e3c0a53cd891e740cee2e4f21cd7657ede343711ce3378"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-O2-O1-original-section.png",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 49605,
+      "sha256": "1722cef652daf3785d3f4e7a842334323a37180fd4cdbf22cdc5721cd2131445"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-O2-O1-original-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 53944,
+      "sha256": "08ba99df6d1187e01c5f0296c90d1c134e7d889041d8019f92c516e017ad1368"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-ascending-stair-section.png",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 17998,
+      "sha256": "2befed76a7182e7b5d44250a3dd4f7c2b4439b75c71a317059cec7baee8d14f8"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-ascending-stair-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 780,
+      "sha256": "b2859a5f3fd7888b8334c271adf3b2f7a46b3265a8d2e3d90266c083e8c0a9f9"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-baseline-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 2154,
+      "sha256": "e0464c927e47cb32ef5c5b682867dd2c49dfcb14a752f8e144a90bca6802662b"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-integrated-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 4393,
+      "sha256": "ae16198df35a79a1ea615f1d872326d92f70672a5654cffc304b766612561590"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-integrated.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 863913,
+      "sha256": "abf26c949508c546bb66cfd7e6cb609153780e6643ebb1b5f24dd9fdafc0007e"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-level-flush-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 731,
+      "sha256": "4248ae15485ec2bbe0170a58c85c26f5975f677b74dae7d9ad9962d1bb572f4f"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after-supported-flush-ramp-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 855,
+      "sha256": "14ffd71e1b0eb1d387748fc5f728de6ae2510b9ec007daa28389d31a1000de40"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after/baseline-pairs.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 5389,
+      "sha256": "0a00d4caead854aceab2b726841dc31f3ce8f4ea32b5a34673bf0331dae235da"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after/baseline.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 13271,
+      "sha256": "f1a83677f57c9d086cf3237ad56e21d39abfae912f7ddbd22b408e61c05dbada"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/after/corrected.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 19314,
+      "sha256": "ab6aaec6c4fa5db530ffe0914fd23cd1ce2d64a9ffd081ed5249e39ff46b1d7e"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/attachment-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 1793,
+      "sha256": "9cd74361bcd92e47e42bdf7d6e60af053e9e8810bc6d9ef9e53851e6d1bbb87d"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-O2-G1-original-section.png",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 52446,
+      "sha256": "da001ffd5b2d133371841af9abf49f0273e27cd97b46d60004dbd66aa12d9e42"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-O2-G1-original-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 112471,
+      "sha256": "b35c52ac8590ab05e4e501270ca553f0ca909d15509b38a5c68b7ca91b809126"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-O2-O1-original-section.png",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 49845,
+      "sha256": "cdb2ad269025175ccc22c825cef399773f46a8b3f9f2e99d7b58545fec334264"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-O2-O1-original-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 53921,
+      "sha256": "5c77102eef35f9ccccff264f26cdf39d2b0e9e321f0159c39dde1765e3d766be"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-ascending-stair-section.png",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 19309,
+      "sha256": "ccf0140d7ca5654241d6852efc4977e97b8fc50d8c862c179344e67d20f519c8"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-ascending-stair-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 785,
+      "sha256": "987bf9d836088dc40eceb5df53bc72d26fd89265f7413a9b70c23304e9785f86"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-integrated-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 4202,
+      "sha256": "0b1cd052bf07395c96d9cbf4b172493f4a9fb52138b3394664963d0782171752"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-integrated.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 106508,
+      "sha256": "b9425668479febc47dd63e847de0f917c02efe5be7b05ab40feb980607c42e89"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-level-flush-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 732,
+      "sha256": "97afc62a841150270a6081267e3a23a07895a5863f3828d0cfc7761f72b39016"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before-supported-flush-ramp-section.svg",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 847,
+      "sha256": "a04e582b49d35e94b3ce5df20ea9bd7b5ece9aff96baaec098c2a2a2e4b80eaf"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before/baseline-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 2155,
+      "sha256": "d8db07313a3a80c22b5c7b348cbe742bf87d0be0be2c48eba34461352b23f6c5"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before/baseline-pairs.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 5389,
+      "sha256": "0a00d4caead854aceab2b726841dc31f3ce8f4ea32b5a34673bf0331dae235da"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before/baseline.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 13272,
+      "sha256": "59f5165152f48e1e900d343b31bda9ef0feada4f33c275069882f61fb984085d"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before/corrected-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 2565,
+      "sha256": "def8c0aea35322809ae79762159ee4178eb5a8232c761d1393b68efb9f3596c8"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/before/corrected.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 18869,
+      "sha256": "184ef1ade40c858add359a9e5b9ddd97d0a990b34e44804b62f770cac9c589ac"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/circulation-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 2648,
+      "sha256": "8a8c75be651c6e1367f4b9e3913c635242768a54b29dc23d997d8eaddffab9cb"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/independent-section-audit.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 26891,
+      "sha256": "b9d44e0ceedfa972fbf17b2b7689da387f5e863651ded0eeac0853c7b6bfdb24"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/preservation.json",
+      "group": "circulation",
+      "reason": "Historical source-grounded diagnostics, geometry and results",
+      "bytes": 463,
+      "sha256": "46929c84eaccf5a2c5533046b3de7027d3a66a420002855e82e3a6d4eb8c262e"
+    },
+    {
+      "path": "reports/stage2c-integrated-connectors/test-failure.json",
+      "group": null,
+      "reason": "Redundant preview or resolved intermediate failure; retained locally",
+      "bytes": 8167,
+      "sha256": "9c5aee8340682ceb23e617fc8b16fdbb02f923558d30d9d57252befb89c3dd41"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/REPORT.md",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 20268,
+      "sha256": "c321f59f2d7f44d3b55a4d9f844300486677e1487b2afb71a565302f348b8f07"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/build.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 3225,
+      "sha256": "b982d9856d35790b893006255d0a31d38adec769b5019e3a2a401e4b5f894cba"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/descriptor-tests.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 2144,
+      "sha256": "42acfbc1a8f14c7d7a2e11dc73df2ea83a99caa5248bca8043b1415fd8dff4c0"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/feasibility-baseline-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 2411,
+      "sha256": "9f7283ff8a0fbb41bf462af6378f596adf45f7b1b60be2d94c3c76d054f865a3"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/feasibility-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 2906,
+      "sha256": "ec44353966acd5d67651c0c137cb24c11f9a3257716cc9b6505c9e4325f34908"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/feasibility-regression/baseline-pairs.json",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 5389,
+      "sha256": "0a00d4caead854aceab2b726841dc31f3ce8f4ea32b5a34673bf0331dae235da"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/feasibility-regression/baseline.json",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 13260,
+      "sha256": "330eaf0ace331b8250923ca29111d71cc743ef727ecf4a4b5f257f1261352e18"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/feasibility-regression/corrected.json",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 19303,
+      "sha256": "9b1da33b90e883f1f68ff3d72fcbaa51ea902442283f72ea56a19844f32bf804"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/lint.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/original-O2-G1-unchanged-section.svg",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 112465,
+      "sha256": "21b5a61534b9e6e4b3e3c0a53cd891e740cee2e4f21cd7657ede343711ce3378"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/original-O2-O1-unchanged-section.svg",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 53944,
+      "sha256": "08ba99df6d1187e01c5f0296c90d1c134e7d889041d8019f92c516e017ad1368"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/preservation.json",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 376,
+      "sha256": "dd1c7fbd74e94d5895a4fef720fbb3c5a14fa16a66c94d734321b5836faca920"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/results.json",
+      "group": null,
+      "reason": "Exact compressed archive committed instead; original retained",
+      "bytes": 36320142,
+      "sha256": "6f97fe03a114bfefad338963fca24fcc4c24785680481bcc30524b8b4af54325"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/results.json.gz",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 2897691,
+      "sha256": "3f31516c287786e0838acce76564ef4025d1fc5ff821e1da3dc4553dc4326c5d"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/results.json.gz.manifest.json",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 396,
+      "sha256": "16abda54a1c7b55b8899bb72de5c0c381efe7d2415982a09abb9f5ead773edd3"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/source-solid-audit.json",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 471,
+      "sha256": "4e3dcdb68dadaca8156b608b63174178626e882f1cba6a02e3fee441d906444a"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/stage2c-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 4661,
+      "sha256": "020421b67c3011bd693762aebfbf902917093edd70588c4f9db42f80177007c0"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/stage2c-regression/after-ascending-stair-section.svg",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 780,
+      "sha256": "b2859a5f3fd7888b8334c271adf3b2f7a46b3265a8d2e3d90266c083e8c0a9f9"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/stage2c-regression/after-integrated.json",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 863816,
+      "sha256": "38f79d9401e5786bf9d81684455488667bee91b61c86d3724c7f9fbf120a37a9"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/stage2c-regression/after-level-flush-section.svg",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 731,
+      "sha256": "4248ae15485ec2bbe0170a58c85c26f5975f677b74dae7d9ad9962d1bb572f4f"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/stage2c-regression/after-supported-flush-ramp-section.svg",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 855,
+      "sha256": "14ffd71e1b0eb1d387748fc5f728de6ae2510b9ec007daa28389d31a1000de40"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-axonometric.png",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 377935,
+      "sha256": "1f1c9799c68def5fb9fb3da2946f7d0d76905c891184da3deb098f9c37f9b45c"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-axonometric.svg",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 18351,
+      "sha256": "0c9b9b8caf2d81dd9015f698afe453fe9ce6e265a371c631c087cd1a5fdac7eb"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-generated-geometry.json",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 16893,
+      "sha256": "5ac86962290c154ad8af465f77ae42555c58705077904fd5aa9e1817f0e0270d"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-opening-geometry.json",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 3525,
+      "sha256": "b0e003cbd49a00d0dce77abd69ab988fc1cc4b5d8f79ff3f5cbb10ed37822d6b"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-opening-section.png",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 170348,
+      "sha256": "11a3e0cdd4b857ade66c7bda6da095c4946e75de6a74f27c08c11d340c882c72"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-opening-section.svg",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 2097,
+      "sha256": "9a68c51256040a67938517e044f5b803a122eab0a28ef912b07e0eef068ea3a8"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-plan.png",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 210455,
+      "sha256": "fdf093a021f171517e554f992bd2cc6626e3ff58f40903523fc2fe341fc48084"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-plan.svg",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 18328,
+      "sha256": "36d8859c42dc8900f2a40abfe8b06d43ed90f8593d6c27ccbb8efd8915c26d73"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-section.png",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 189626,
+      "sha256": "0326ef80dd26a9162955cbc3a235f0f7df4c9d678fd9cf0bf5a1235f065aa53b"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/synthetic-section.svg",
+      "group": "adaptive",
+      "reason": "Stage 2D evidence, synthetic views and compressed exact results",
+      "bytes": 5539,
+      "sha256": "c3bafe43c9a8abbc828f1a029b4397aa5d6f8e073c0baaa19c8050ad79cfac6f"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/test-output.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 1889,
+      "sha256": "64552b55dd937b0193490590db891ed9bbd729a16103752aadc8cc582a62af9b"
+    },
+    {
+      "path": "reports/stage2d-adaptive-connectors/typescript.txt",
+      "group": null,
+      "reason": "Historical duplicate logs; current validation logs committed",
+      "bytes": 1512,
+      "sha256": "5a55c16c8724ddc17bf870a45cede1a34ad2ab4b4c1c31fd254698fc8af6c807"
+    },
+    {
+      "path": "reports/ui-color-system/REPORT.md",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 6551,
+      "sha256": "e66a58d1d469bc32ab9921e85e622aa57751436bc021dd81d81ece4e9ec6d968"
+    },
+    {
+      "path": "reports/ui-color-system/board-after.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 50074,
+      "sha256": "ee135f792b24e2822f5035e683c4489ad7552503072e5179bd009fa5ee2212e0"
+    },
+    {
+      "path": "reports/ui-color-system/composition-after.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 87355,
+      "sha256": "1f7299aeca52d6625c96fac6c1d7ebc6e6f4ce02439de57e8243a8346c84376e"
+    },
+    {
+      "path": "reports/ui-color-system/crops-after.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 78022,
+      "sha256": "706ecdc1e5b726850b916af9bf54d02068f70d7d2a843540709d023cdade9b2d"
+    },
+    {
+      "path": "reports/ui-color-system/evaluations-after.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 53640,
+      "sha256": "03647ec81175f46c079c1e43aded2dcffcf6de518b3e63dde51fe28221871efa"
+    },
+    {
+      "path": "reports/ui-color-system/final-interaction-check.json",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 146,
+      "sha256": "faf9a6366222b88251a0cf79a50e189640e4408e3546a4bfe0326419b0da8179"
+    },
+    {
+      "path": "reports/ui-color-system/lattice-after.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 111848,
+      "sha256": "5c365378fa0dce20c5191b3fbd00e0e25e569df2cc2aad0de1db7e33df1b7518"
+    },
+    {
+      "path": "reports/ui-color-system/lattice-before.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 116744,
+      "sha256": "25acaffcb2073bbd612a8a4c02468a3d2f1a21907d90b9f91271889388d4aa90"
+    },
+    {
+      "path": "reports/ui-color-system/route-checks.json",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 10764,
+      "sha256": "afe5602e8359164e3e7da2a85cf2dcaacb9348c1e374aafac74b6c7b62b9998f"
+    },
+    {
+      "path": "reports/ui-color-system/shapes-after.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 38454,
+      "sha256": "23c0d6e35e6d8a3c9d6702137ff87adcfe8eaf22daf70a716f418d639eed5789"
+    },
+    {
+      "path": "reports/ui-color-system/slide-after.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 108028,
+      "sha256": "c9ab3cab48a8496eec1ba8ae318c762fc6aa9de79b94ade3619858a71bd724d9"
+    },
+    {
+      "path": "reports/ui-color-system/source-verification.json",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 1997,
+      "sha256": "fa823246f9959c2c0ee717e2a04592046bb1f15a2678258b344d5c4410dd7877"
+    },
+    {
+      "path": "reports/ui-color-system/voids-after.png",
+      "group": "ui",
+      "reason": "UI verification or presentation assets",
+      "bytes": 32262,
+      "sha256": "d1c8d2952e5cfd368024707962588a3117ff7a829447b7d293ad19ce47fd914e"
+    },
+    {
+      "path": "scripts/adaptive-connector-regression.cjs",
+      "group": "adaptive",
+      "reason": "Stage 2D source or reusable test",
+      "bytes": 17731,
+      "sha256": "6ff92c527a2e565ea8af308f01ea4194fa3ccb61d13c578aa08846204ba60bcd"
+    },
+    {
+      "path": "scripts/adaptive-connector-sections.cjs",
+      "group": "adaptive",
+      "reason": "Stage 2D source or reusable test",
+      "bytes": 4466,
+      "sha256": "202872153c562867211810776ba08fc3d57719df4bad0bfe4e718e527ba8951b"
+    },
+    {
+      "path": "scripts/circulation-feasibility-regression.cjs",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 12305,
+      "sha256": "a439fab8f6c24e8544f29b28a32dfcab9b94bb585da35619f828bf268065766e"
+    },
+    {
+      "path": "scripts/integrated-connector-regression.cjs",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 15286,
+      "sha256": "56a6057e09be76aeb0977de19535064402d6331da01f2572979c3bf467d5b61f"
+    },
+    {
+      "path": "scripts/integrated-connector-sections.cjs",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 4227,
+      "sha256": "d33badc464e4346b57dbe01cc92aea5349c591b92d914842ff34b8e51a3e892f"
+    },
+    {
+      "path": "scripts/restore-lattice-fixture.cjs",
+      "group": "evidence",
+      "reason": "Byte-identical original fixture and safe restore helper",
+      "bytes": 1235,
+      "sha256": "aa1a39db17ede4d477ddcff6fe2f5b0c10cf16c7b36b2d76ecd783b1dd46ee25"
+    },
+    {
+      "path": "src/app/board.css",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 6516,
+      "sha256": "2761602e6506e8bc92b402ee5b5fee5fdfd9419d54a8d5ba90904a0111a5be82"
+    },
+    {
+      "path": "src/app/globals.css",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 2133,
+      "sha256": "6d0cc8c653866569823cec14aaadbe333ad174051b4ff873c70500618932ad1f"
+    },
+    {
+      "path": "src/components/AppNav.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 2062,
+      "sha256": "da2639990f43238c8af20ea6c5d33edfa54ad5535c276c1a48f10e79796d1f91"
+    },
+    {
+      "path": "src/components/CompositionStudio.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 63693,
+      "sha256": "0320cc39dc46ca8a64508a351fc36ea3ae48c898cac2474af5e21714f06a5db7"
+    },
+    {
+      "path": "src/components/CropEvalGrid.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 4599,
+      "sha256": "83e2f4d78c4b495dc42331279c938c11e0022f594564dc1d180abead373a52a1"
+    },
+    {
+      "path": "src/components/CropsPage.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 5342,
+      "sha256": "65ef1dc7d7b59de6035589b23fc99e81098e15951dc1efa2907ed37f947a1b97"
+    },
+    {
+      "path": "src/components/LetterGrid.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 25302,
+      "sha256": "64c55919eed4f59b24f78c925762814bab115dc8ad39ebd60728b20fe5498d70"
+    },
+    {
+      "path": "src/components/PrototypeDemonstration.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 79593,
+      "sha256": "7441780a0f3d160d963cbc0195ea1d8a1a576db117ebc04e5ab6e53cd935197a"
+    },
+    {
+      "path": "src/components/ShapesPage.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 5908,
+      "sha256": "7e2ac74e2be0fba65b0a40a010e143966322cf8d671c3c970df7e41ee38a7d08"
+    },
+    {
+      "path": "src/components/VoidsPage.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 5555,
+      "sha256": "356cee2e5bc6e0221a2610eecb3f939513de6ad5e8640190ba96e70fb72be218"
+    },
+    {
+      "path": "src/components/evaluations/ArchitecturalEvaluations.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 22037,
+      "sha256": "6e4fb5671dcc5eb548323b3b1478ab81217943e5fd4eab20ce6cab4319a1d42c"
+    },
+    {
+      "path": "src/components/lattice/LatticeStudio.tsx",
+      "group": "ui",
+      "reason": "Verified isolated styling patch, also merged in production",
+      "bytes": 95585,
+      "sha256": "dcfb75be5a8b87e44af78a0fadc32fe54f14beb3cfbaeb5c2a653b78ca76d08a"
+    },
+    {
+      "path": "src/components/lattice/adaptiveGeometry.ts",
+      "group": "adaptive",
+      "reason": "Stage 2D source or reusable test",
+      "bytes": 23118,
+      "sha256": "54c5b4b27d8e88b596ef058c74b6dcbfa922ec29531db07d79e0a5de57e01a70"
+    },
+    {
+      "path": "src/components/lattice/alternativeRouting.ts",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 15721,
+      "sha256": "997096748b6fd1adaafad247a00a118b19b2b33fad134d3a5b2cd5577a207a69"
+    },
+    {
+      "path": "src/components/lattice/connectionClearance.ts",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 14355,
+      "sha256": "62bfc789e43804bedb72b3d1775b29055f85b9c58c4fa214cd63ac656ac94b52"
+    },
+    {
+      "path": "src/components/lattice/connectionSynthesis.ts",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 28850,
+      "sha256": "910d39e70fa642886b845da2160a48e1d187420c9c39aaf4ca389d9cd9eeb1bb"
+    },
+    {
+      "path": "src/components/lattice/portConnectionValidation.ts",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 14903,
+      "sha256": "eace64df395fa72b55175c01accdaa8d8802779b413e649ec7df822118341068"
+    },
+    {
+      "path": "src/components/lattice/portMatching.ts",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 16435,
+      "sha256": "5681206a2e1871981fef2e796d8aba7880e0947ca6e529fb68577ee41513ef17"
+    },
+    {
+      "path": "src/components/lattice/surfaceAttachment.ts",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 34738,
+      "sha256": "eff02c6cf1148e623218d1c770b15e6442bf71f9ef5d5b5152247c1500fc677c"
+    },
+    {
+      "path": "src/components/lattice/transitionGeometry.ts",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 10384,
+      "sha256": "3bca221f9f24fb8ed36b99665d06a1920a210ff8eb88a58dab0baf1e7f25bd0f"
+    },
+    {
+      "path": "src/components/lattice/types.ts",
+      "group": "circulation",
+      "reason": "Stage 2C source or reusable test",
+      "bytes": 9803,
+      "sha256": "97677a00b1a5320e924dc294353f209f9a034542bba3bd21300354475a56a493"
+    },
+    {
+      "path": "reports/git-checkpoint/file-selection.json",
+      "group": "evidence",
+      "reason": "This explicit file selection manifest"
+    },
+    {
+      "path": "reports/git-checkpoint/validation/results-summary.json",
+      "group": "evidence",
+      "reason": "Checkpoint test exit codes and counts",
+      "bytes": 270,
+      "sha256": "ebb1b87c5efb2205c516fb5b804dce1b622f0f2ad1e0209f57ad7f120702d7ec"
+    }
+  ],
+  "secretScan": "No private-key blocks, GitHub token patterns or AWS access-key patterns found in selected text files; heuristic scan only"
+}

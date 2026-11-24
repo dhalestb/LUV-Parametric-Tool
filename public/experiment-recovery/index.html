@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LUV Miami checkpoint recovery</title>
+  <style>
+    html { color-scheme: dark; background: #111923; color: #e8eef2; font: 16px/1.5 system-ui, sans-serif; }
+    main { max-width: 44rem; margin: 4rem auto; padding: 0 1.25rem; }
+    h1 { color: #d6ad4f; }
+    input, button { display: block; margin-top: 1rem; font: inherit; }
+    button { padding: .45rem .8rem; }
+    a { color: #b7dce8; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Restore the Miami checkpoint</h1>
+  <p>Restore the bundled Miami geometry and planning settings into an empty local session.</p>
+  <button id="restore" type="button">Restore checkpoint</button>
+  <p id="status" role="status"></p>
+  <a href="/experiment/site-polygon-morphogenesis">Open the experiment</a>
+</main>
+<script type="module" src="/experiment-recovery/restore.js"></script>
+</body>
+</html>

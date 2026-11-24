@@ -1,0 +1,9 @@
+{
+  "source": "checkpoints/lattice-session.json",
+  "archive": "fixtures/original-obj/lattice-session.json.gz",
+  "sourceBytes": 12695412,
+  "archiveBytes": 2615880,
+  "sourceSha256": "6172019acf6d7cd88a4af2dca1ff570cd8e751a10fabc39da4efd65b12bc920b",
+  "archiveSha256": "434f36f551d2accc5f586772fc95dffb9a0f4641e0ac6a3378a0fc3b23a0f87a",
+  "byteIdenticalRoundTrip": true
+}

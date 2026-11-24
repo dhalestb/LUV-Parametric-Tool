@@ -1,0 +1,90 @@
+{
+  "ref": "working tree",
+  "profile": false,
+  "node": "v24.21.0",
+  "field": [
+    4,
+    4,
+    1
+  ],
+  "sources": [
+    {
+      "code": "O2",
+      "filename": "undulating workspace.obj",
+      "placement": {
+        "id": "mesh-14-7xy9tm",
+        "ix": 0,
+        "iy": 0,
+        "iz": 0,
+        "variant": 0
+      },
+      "geometrySHA256": "6c61b56e61cb0c3a8c200a0d19713170eab61d313be9883a9b6085f88089f3af"
+    },
+    {
+      "code": "O1",
+      "filename": "void workspace.obj",
+      "placement": {
+        "id": "mesh-15-h24ulc",
+        "ix": 1,
+        "iy": 0,
+        "iz": 0,
+        "variant": 2
+      },
+      "geometrySHA256": "0050467218bcf92c83da4b736ddaba4b4db52f66b13438df6492b29017dae25e"
+    },
+    {
+      "code": "G1",
+      "filename": "Gathering, Linear.obj",
+      "placement": {
+        "id": "mesh-6-03znsf",
+        "ix": 1,
+        "iy": 1,
+        "iz": 0,
+        "variant": 0
+      },
+      "geometrySHA256": "780b13781015d7dba2ac35824229edb6972569eaccc7a2dea0e41df54663d460"
+    },
+    {
+      "code": "L1",
+      "filename": "Lobby, Vertical Void.obj",
+      "placement": {
+        "id": "mesh-5-bva2xh",
+        "ix": 2,
+        "iy": 1,
+        "iz": 0,
+        "variant": 3
+      },
+      "geometrySHA256": "419ebffbc55238b96ed0f0fea8401c9b6d13115887b992dd7c7b69688bb807a2"
+    }
+  ],
+  "sessionSHA256": "6172019acf6d7cd88a4af2dca1ff570cd8e751a10fabc39da4efd65b12bc920b",
+  "trials": [
+    {
+      "cache": "cold",
+      "elapsedMs": 2695.0616
+    },
+    {
+      "cache": "warm",
+      "elapsedMs": 63.65809999999965
+    },
+    {
+      "cache": "warm",
+      "elapsedMs": 55.152100000000246
+    },
+    {
+      "cache": "warm",
+      "elapsedMs": 55.42870000000039
+    }
+  ],
+  "checks": [
+    "Every port outcome, direct report, graph field, organic rejection, connector vertex/index and score matches Phase 1"
+  ],
+  "classificationsSHA256": "4e1892a91d3e08b8336fb0d82ef7d1ff3ee759b0f7478b809e78a28785cc17e9",
+  "eligiblePreviouslySuppressed": 54,
+  "components": 2,
+  "isolated": [
+    "L1"
+  ],
+  "fidelity": "PASS",
+  "search": "NOT RUN"
+}

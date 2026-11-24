@@ -1,4 +1,6 @@
-@import "tailwindcss";
+/* Scan application templates, not multi-gigabyte OBJ/diagnostic evidence. */
+@import "tailwindcss" source(none);
+@source "../";
 @import "./board.css";
 
 :root {

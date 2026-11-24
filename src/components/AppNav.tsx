@@ -12,6 +12,8 @@ const LINKS = [
   { href: "/composition", label: "Composition" },
   { href: "/evaluations", label: "Evaluations" },
   { href: "/lattice", label: "Lattice" },
+  { href: "/site-development", label: "Site Development" },
+  { href: "/experiment/site-polygon-morphogenesis", label: "Polygon-Driven Architecture" },
 ] as const;
 
 export default function AppNav() {

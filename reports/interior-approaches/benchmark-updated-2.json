@@ -1,0 +1,88 @@
+{
+  "checkpoint": "6d0b6f8496cb5b08b0a151def3215fcc05dea5ff",
+  "node": "v24.21.0",
+  "mode": "updated",
+  "sources": [
+    {
+      "code": "O2",
+      "filename": "undulating workspace.obj",
+      "geometrySHA256": "6c61b56e61cb0c3a8c200a0d19713170eab61d313be9883a9b6085f88089f3af",
+      "placement": {
+        "id": "mesh-14-7xy9tm",
+        "ix": 0,
+        "iy": 0,
+        "iz": 0,
+        "variant": 0
+      },
+      "analysisMs": 529.5405,
+      "classificationMs": 442.13879999999995
+    },
+    {
+      "code": "O1",
+      "filename": "void workspace.obj",
+      "geometrySHA256": "0050467218bcf92c83da4b736ddaba4b4db52f66b13438df6492b29017dae25e",
+      "placement": {
+        "id": "mesh-15-h24ulc",
+        "ix": 1,
+        "iy": 0,
+        "iz": 0,
+        "variant": 2
+      },
+      "analysisMs": 173.2704000000001,
+      "classificationMs": 137.32549999999992
+    },
+    {
+      "code": "G1",
+      "filename": "Gathering, Linear.obj",
+      "geometrySHA256": "780b13781015d7dba2ac35824229edb6972569eaccc7a2dea0e41df54663d460",
+      "placement": {
+        "id": "mesh-6-03znsf",
+        "ix": 1,
+        "iy": 1,
+        "iz": 0,
+        "variant": 0
+      },
+      "analysisMs": 1767.7957999999999,
+      "classificationMs": 1403.8107999999997
+    },
+    {
+      "code": "L1",
+      "filename": "Lobby, Vertical Void.obj",
+      "geometrySHA256": "419ebffbc55238b96ed0f0fea8401c9b6d13115887b992dd7c7b69688bb807a2",
+      "placement": {
+        "id": "mesh-5-bva2xh",
+        "ix": 2,
+        "iy": 1,
+        "iz": 0,
+        "variant": 3
+      },
+      "analysisMs": 1715.6927,
+      "classificationMs": 1236.1462000000001
+    }
+  ],
+  "trials": [
+    {
+      "cache": "cold",
+      "ms": 7075.8331
+    },
+    {
+      "cache": "warm",
+      "ms": 204.85349999999926
+    },
+    {
+      "cache": "warm",
+      "ms": 158.66350000000057
+    },
+    {
+      "cache": "warm",
+      "ms": 150.46490000000085
+    }
+  ],
+  "checks": [
+    "Original two links / six emitted mesh pieces identical; two components and L1 isolated; invalid voxel links rejected",
+    "Original OBJ positions/normals/faces and full session hashes unchanged"
+  ],
+  "fullSearch": "NOT RUN",
+  "stage2B": "NOT STARTED",
+  "sessionSHA256": "6172019acf6d7cd88a4af2dca1ff570cd8e751a10fabc39da4efd65b12bc920b"
+}

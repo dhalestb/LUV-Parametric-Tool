@@ -1,0 +1,1877 @@
+{
+  "id": "832f384a3c2a1ae53173d466742ac30e28a91594a107a43b5be6e7c460e24389",
+  "parent": "7e9b57c0d9ffed476ddc54418e27c9f63b680321aa2a445fc5086703d6aef4b5",
+  "components": 461,
+  "geometryHash": "9d4b687beeb702f1f888a48c9a46b59c3869ad95f6abd5e8de22d036c499afbf",
+  "outsideArea": 0,
+  "protectedArea": 0,
+  "permittedArea": 3834.147940947354,
+  "footprintArea": 1208.0385848176404,
+  "componentOutside": [
+    {
+      "id": "base-wall-1",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-2",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-3",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-4",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-5",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-6",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-7",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-8",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-9",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-10",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-11",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-12",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-13",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-14",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-15",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-16",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-17",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-18",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-19",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-20",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-21",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-22",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-23",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-24",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-25",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-26",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-27",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-28",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-29",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-30",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-31",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-32",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-33",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-34",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-35",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-36",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-37",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-38",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-39",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-40",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-41",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-42",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-43",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-44",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-45",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-46",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-47",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-48",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-49",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-50",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-51",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-52",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-53",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-54",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-55",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-56",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-57",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-58",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-59",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-60",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-61",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-62",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-63",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-64",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-65",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-66",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-67",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-68",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-69",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-70",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-71",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-72",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-73",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-74",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-75",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-76",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-77",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-78",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-79",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-80",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-81",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-82",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-83",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-84",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-85",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-86",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-87",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-88",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-89",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-90",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-91",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-92",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-93",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-94",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-95",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-96",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-97",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-98",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-99",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-100",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-101",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-102",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-103",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-104",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-105",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-106",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-107",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-108",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-109",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-110",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-111",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-112",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-113",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-114",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-115",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-116",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-117",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-118",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-119",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-120",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-121",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-122",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-123",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-124",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-125",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-126",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-127",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-128",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-129",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-130",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-131",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-132",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-133",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-134",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-135",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-136",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-137",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-138",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-139",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-140",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-141",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-142",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-143",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-144",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-145",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-146",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-147",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-148",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-149",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-150",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-151",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-152",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-153",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-154",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-155",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-156",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-157",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-158",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-159",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-160",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-161",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-162",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-163",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-164",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-165",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-166",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-167",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-168",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-169",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-170",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-171",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-172",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-173",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-174",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-175",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-176",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-177",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-178",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-179",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-180",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-181",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-182",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-183",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-184",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-185",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-186",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-187",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-188",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-189",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-190",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-191",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-192",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-193",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-194",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-195",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-196",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-197",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-198",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-199",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-200",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-201",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-202",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-203",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-204",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-205",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-206",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-207",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-208",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-209",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-210",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-211",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-212",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-213",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-214",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-215",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-216",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-217",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-218",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-219",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-220",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-221",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-222",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-223",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-224",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-225",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-226",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-227",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-228",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-229",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-230",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-231",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-232",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-233",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-234",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-235",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-236",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-237",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-238",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-239",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-240",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-241",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-242",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-243",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-244",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-245",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-246",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-247",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-wall-248",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-249",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-250",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-251",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-252",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-253",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-254",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-255",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-256",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-257",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-258",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-259",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-260",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-261",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-262",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-263",
+      "outsideArea": 0
+    },
+    {
+      "id": "contour-floor-264",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-plank-265",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-266",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-267",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-268",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-269",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-270",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-271",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-272",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-273",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-274",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-275",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-276",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-277",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-278",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-279",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-280",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-281",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-282",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-283",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-284",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-285",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-286",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-287",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-288",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-289",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-290",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-291",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-292",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-293",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-294",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-295",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-296",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-297",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-298",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-299",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-300",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-301",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-302",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-303",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-304",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-305",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-306",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-307",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-308",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-309",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-310",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-311",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-312",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-313",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-314",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-315",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-316",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-317",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-318",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-319",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-320",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-321",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-322",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-325",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-326",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-327",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-328",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-329",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-330",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-331",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-332",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-333",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-334",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-335",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-336",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-337",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-338",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-339",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-340",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-341",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-342",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-343",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-344",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-345",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-346",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-347",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-348",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-349",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-350",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-351",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-352",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-353",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-354",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-355",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-356",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-357",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-358",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-359",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-361",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-362",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-363",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-364",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-365",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-366",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-367",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-368",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-369",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-370",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-371",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-372",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-373",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-374",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-375",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-376",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-377",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-378",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-379",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-380",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-381",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-382",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-383",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-384",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-385",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-386",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-387",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-388",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-389",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-390",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-391",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-392",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-393",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-394",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-395",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-396",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-397",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-398",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-399",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-400",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-401",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-402",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-403",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-404",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-405",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-406",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-407",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-408",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-412",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-413",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-414",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-415",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-416",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-417",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-418",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-419",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-420",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-421",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-422",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-423",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-424",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-425",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-426",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-427",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-428",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-429",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-430",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-431",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-432",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-433",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-434",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-435",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-436",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-437",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-438",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-439",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-440",
+      "outsideArea": 0
+    },
+    {
+      "id": "connection-441",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-442",
+      "outsideArea": 0
+    },
+    {
+      "id": "base-wall-443",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-444",
+      "outsideArea": 0
+    },
+    {
+      "id": "wall-445",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-446",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-447",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-448",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-449",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-450",
+      "outsideArea": 0
+    },
+    {
+      "id": "edge-column-451",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-452",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-453",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-454",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-455",
+      "outsideArea": 0
+    },
+    {
+      "id": "plank-return-456",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-457",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-459",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-460",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-461",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-462",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-463",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-464",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-465",
+      "outsideArea": 0
+    },
+    {
+      "id": "daylight-return-466",
+      "outsideArea": 0
+    },
+    {
+      "id": "contour-floor-467",
+      "outsideArea": 0
+    },
+    {
+      "id": "roof-plank-468",
+      "outsideArea": 0
+    }
+  ],
+  "bounds": {
+    "min": [
+      347.58834663991337,
+      0.19913573563098907,
+      -731.2273130843982
+    ],
+    "max": [
+      397.3215302163831,
+      20.11319823563099,
+      -682.7496097527194
+    ]
+  },
+  "heightAboveDatum": 19.9140625,
+  "heightLimit": 20,
+  "nativeVolume": 2929.772499438145,
+  "native": {
+    "passed": true,
+    "failures": []
+  },
+  "triangles": 3130,
+  "sourceMeshHashMatches": true
+}

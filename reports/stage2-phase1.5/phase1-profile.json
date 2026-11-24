@@ -1,0 +1,419 @@
+{
+  "ref": "6a839db",
+  "profile": true,
+  "node": "v24.21.0",
+  "field": [
+    4,
+    4,
+    1
+  ],
+  "sources": [
+    {
+      "code": "O2",
+      "filename": "undulating workspace.obj",
+      "placement": {
+        "id": "mesh-14-7xy9tm",
+        "ix": 0,
+        "iy": 0,
+        "iz": 0,
+        "variant": 0
+      },
+      "geometrySHA256": "6c61b56e61cb0c3a8c200a0d19713170eab61d313be9883a9b6085f88089f3af"
+    },
+    {
+      "code": "O1",
+      "filename": "void workspace.obj",
+      "placement": {
+        "id": "mesh-15-h24ulc",
+        "ix": 1,
+        "iy": 0,
+        "iz": 0,
+        "variant": 2
+      },
+      "geometrySHA256": "0050467218bcf92c83da4b736ddaba4b4db52f66b13438df6492b29017dae25e"
+    },
+    {
+      "code": "G1",
+      "filename": "Gathering, Linear.obj",
+      "placement": {
+        "id": "mesh-6-03znsf",
+        "ix": 1,
+        "iy": 1,
+        "iz": 0,
+        "variant": 0
+      },
+      "geometrySHA256": "780b13781015d7dba2ac35824229edb6972569eaccc7a2dea0e41df54663d460"
+    },
+    {
+      "code": "L1",
+      "filename": "Lobby, Vertical Void.obj",
+      "placement": {
+        "id": "mesh-5-bva2xh",
+        "ix": 2,
+        "iy": 1,
+        "iz": 0,
+        "variant": 3
+      },
+      "geometrySHA256": "419ebffbc55238b96ed0f0fea8401c9b6d13115887b992dd7c7b69688bb807a2"
+    }
+  ],
+  "sessionSHA256": "6172019acf6d7cd88a4af2dca1ff570cd8e751a10fabc39da4efd65b12bc920b",
+  "trials": [
+    {
+      "cache": "cold",
+      "elapsedMs": 5449.099,
+      "timings": {
+        "port candidate assessment": {
+          "calls": 3853,
+          "inclusiveMs": 9.549799999990682,
+          "exclusiveMs": 9.549799999990682
+        },
+        "triangle distance queries": {
+          "calls": 3503,
+          "inclusiveMs": 1814.2806000000005,
+          "exclusiveMs": 1814.2806000000005
+        },
+        "surface attachment selection": {
+          "calls": 593,
+          "inclusiveMs": 1417.8077999999905,
+          "exclusiveMs": 310.48730000000023
+        },
+        "network graph": {
+          "calls": 2,
+          "inclusiveMs": 275.1012999999998,
+          "exclusiveMs": 0.7739999999998872
+        },
+        "port attachment resolution": {
+          "calls": 488,
+          "inclusiveMs": 1830.5923999999923,
+          "exclusiveMs": 8.295199999988654
+        },
+        "connector geometry": {
+          "calls": 415,
+          "inclusiveMs": 37.09600000001274,
+          "exclusiveMs": 37.09600000001274
+        },
+        "triangle collision testing": {
+          "calls": 1050,
+          "inclusiveMs": 1077.2257999999952,
+          "exclusiveMs": 1077.2257999999952
+        },
+        "headroom validation": {
+          "calls": 669,
+          "inclusiveMs": 31.957899999995334,
+          "exclusiveMs": 31.957899999995334
+        },
+        "collision and clearance": {
+          "calls": 412,
+          "inclusiveMs": 3238.2693000000017,
+          "exclusiveMs": 2092.1931
+        },
+        "candidate generation": {
+          "calls": 2,
+          "inclusiveMs": 5323.268,
+          "exclusiveMs": 38.367200000018784
+        },
+        "organic feature extraction": {
+          "calls": 10,
+          "inclusiveMs": 8.363099999998667,
+          "exclusiveMs": 8.363099999998667
+        },
+        "connection synthesis": {
+          "calls": 1,
+          "inclusiveMs": 140.08380000000034,
+          "exclusiveMs": 4.696999999999207
+        }
+      },
+      "counters": {
+        "port assessment: DISTANCE": 3253,
+        "port assessment: ANGLE": 349,
+        "port assessment: LATERAL OFFSET": 113,
+        "port assessment: ELEVATION": 30,
+        "network: provisional interface rejected": 1,
+        "clearance: source triangle collision": 381,
+        "port candidate: COLLISION": 78,
+        "port route: route length": 19,
+        "port route: slope": 12,
+        "port candidate: SLOPE": 8,
+        "clearance: headroom": 28,
+        "port route: surface attachment": 73,
+        "port candidate: SURFACE ATTACHMENT": 15,
+        "port candidate: network redundant": 6,
+        "features: feature limits": 4,
+        "organic: feature proximity": 5,
+        "attachment: proximity": 1662,
+        "attachment: no candidate attachment": 87,
+        "attachment: facing": 444,
+        "organic attachment: no landing surface": 290,
+        "organic attachment: invalid circulation": 92,
+        "organic: draft limit": 5,
+        "organic: profiled route deferred to synthesis": 44,
+        "organic: similar attachment pruned": 35,
+        "organic attachment: too far": 73,
+        "organic: pair proximity": 1,
+        "organic synthesis: route collision": 8
+      }
+    },
+    {
+      "cache": "warm",
+      "elapsedMs": 2269.7506000000003,
+      "timings": {
+        "port candidate assessment": {
+          "calls": 3853,
+          "inclusiveMs": 10.310599999959777,
+          "exclusiveMs": 10.310599999959777
+        },
+        "surface attachment selection": {
+          "calls": 593,
+          "inclusiveMs": 1274.5470000000205,
+          "exclusiveMs": 41.284599999983584
+        },
+        "network graph": {
+          "calls": 2,
+          "inclusiveMs": 0.0907999999999447,
+          "exclusiveMs": 0.0819999999994252
+        },
+        "triangle distance queries": {
+          "calls": 3469,
+          "inclusiveMs": 1872.6332000000102,
+          "exclusiveMs": 1872.6332000000102
+        },
+        "port attachment resolution": {
+          "calls": 488,
+          "inclusiveMs": 1893.0775000000076,
+          "exclusiveMs": 5.656700000017736
+        },
+        "connector geometry": {
+          "calls": 415,
+          "inclusiveMs": 34.91659999999138,
+          "exclusiveMs": 34.91659999999138
+        },
+        "collision and clearance": {
+          "calls": 412,
+          "inclusiveMs": 308.04609999999684,
+          "exclusiveMs": 273.30550000000676
+        },
+        "candidate generation": {
+          "calls": 2,
+          "inclusiveMs": 2234.5715999999993,
+          "exclusiveMs": 24.005600000030427
+        },
+        "organic feature extraction": {
+          "calls": 10,
+          "inclusiveMs": 0.004600000000209548,
+          "exclusiveMs": 0.004600000000209548
+        },
+        "connection synthesis": {
+          "calls": 1,
+          "inclusiveMs": 41.05169999999998,
+          "exclusiveMs": 0.914600000000064
+        }
+      },
+      "counters": {
+        "port assessment: DISTANCE": 3253,
+        "port assessment: ANGLE": 349,
+        "port assessment: LATERAL OFFSET": 113,
+        "port assessment: ELEVATION": 30,
+        "network: provisional interface rejected": 1,
+        "clearance: source triangle collision": 381,
+        "port candidate: COLLISION": 78,
+        "port route: route length": 19,
+        "port route: slope": 12,
+        "port candidate: SLOPE": 8,
+        "clearance: headroom": 28,
+        "port route: surface attachment": 73,
+        "port candidate: SURFACE ATTACHMENT": 15,
+        "port candidate: network redundant": 6,
+        "organic: feature proximity": 5,
+        "attachment: proximity": 1662,
+        "attachment: no candidate attachment": 87,
+        "attachment: facing": 444,
+        "organic attachment: no landing surface": 290,
+        "organic attachment: invalid circulation": 92,
+        "organic: draft limit": 5,
+        "organic: profiled route deferred to synthesis": 44,
+        "organic: similar attachment pruned": 35,
+        "organic attachment: too far": 73,
+        "organic: pair proximity": 1,
+        "organic synthesis: route collision": 8
+      }
+    },
+    {
+      "cache": "warm",
+      "elapsedMs": 2371.9074,
+      "timings": {
+        "port candidate assessment": {
+          "calls": 3853,
+          "inclusiveMs": 6.550499999946624,
+          "exclusiveMs": 6.550499999946624
+        },
+        "surface attachment selection": {
+          "calls": 593,
+          "inclusiveMs": 1344.5698999999931,
+          "exclusiveMs": 27.018600000019433
+        },
+        "network graph": {
+          "calls": 2,
+          "inclusiveMs": 0.14290000000073633,
+          "exclusiveMs": 0.09799999999995634
+        },
+        "triangle distance queries": {
+          "calls": 3469,
+          "inclusiveMs": 1988.4742999999744,
+          "exclusiveMs": 1988.4742999999744
+        },
+        "port attachment resolution": {
+          "calls": 488,
+          "inclusiveMs": 2004.8057999999965,
+          "exclusiveMs": 5.602200000008452
+        },
+        "connector geometry": {
+          "calls": 415,
+          "inclusiveMs": 31.478700000032404,
+          "exclusiveMs": 31.478700000032404
+        },
+        "collision and clearance": {
+          "calls": 412,
+          "inclusiveMs": 311.97269999999116,
+          "exclusiveMs": 280.54639999995925
+        },
+        "candidate generation": {
+          "calls": 2,
+          "inclusiveMs": 2345.971599999999,
+          "exclusiveMs": 24.714700000062294
+        },
+        "organic feature extraction": {
+          "calls": 10,
+          "inclusiveMs": 0.002599999996164115,
+          "exclusiveMs": 0.002599999996164115
+        },
+        "connection synthesis": {
+          "calls": 1,
+          "inclusiveMs": 25.38210000000072,
+          "exclusiveMs": 0.42590000000018335
+        }
+      },
+      "counters": {
+        "port assessment: DISTANCE": 3253,
+        "port assessment: ANGLE": 349,
+        "port assessment: LATERAL OFFSET": 113,
+        "port assessment: ELEVATION": 30,
+        "network: provisional interface rejected": 1,
+        "clearance: source triangle collision": 381,
+        "port candidate: COLLISION": 78,
+        "port route: route length": 19,
+        "port route: slope": 12,
+        "port candidate: SLOPE": 8,
+        "clearance: headroom": 28,
+        "port route: surface attachment": 73,
+        "port candidate: SURFACE ATTACHMENT": 15,
+        "port candidate: network redundant": 6,
+        "organic: feature proximity": 5,
+        "attachment: proximity": 1662,
+        "attachment: no candidate attachment": 87,
+        "attachment: facing": 444,
+        "organic attachment: no landing surface": 290,
+        "organic attachment: invalid circulation": 92,
+        "organic: draft limit": 5,
+        "organic: profiled route deferred to synthesis": 44,
+        "organic: similar attachment pruned": 35,
+        "organic attachment: too far": 73,
+        "organic: pair proximity": 1,
+        "organic synthesis: route collision": 8
+      }
+    },
+    {
+      "cache": "warm",
+      "elapsedMs": 2322.8495999999996,
+      "timings": {
+        "port candidate assessment": {
+          "calls": 3853,
+          "inclusiveMs": 5.002999999978783,
+          "exclusiveMs": 5.002999999978783
+        },
+        "surface attachment selection": {
+          "calls": 593,
+          "inclusiveMs": 1337.861999999992,
+          "exclusiveMs": 26.349299999985305
+        },
+        "network graph": {
+          "calls": 2,
+          "inclusiveMs": 0.11640000000079453,
+          "exclusiveMs": 0.10870000000068103
+        },
+        "triangle distance queries": {
+          "calls": 3469,
+          "inclusiveMs": 1950.1618000000017,
+          "exclusiveMs": 1950.1618000000017
+        },
+        "port attachment resolution": {
+          "calls": 488,
+          "inclusiveMs": 1953.8295000000344,
+          "exclusiveMs": 5.412000000042099
+        },
+        "connector geometry": {
+          "calls": 415,
+          "inclusiveMs": 33.91270000000259,
+          "exclusiveMs": 33.91270000000259
+        },
+        "collision and clearance": {
+          "calls": 412,
+          "inclusiveMs": 307.0962000000145,
+          "exclusiveMs": 273.27800000001116
+        },
+        "candidate generation": {
+          "calls": 2,
+          "inclusiveMs": 2286.1314,
+          "exclusiveMs": 23.088999999976295
+        },
+        "organic feature extraction": {
+          "calls": 10,
+          "inclusiveMs": 0.006699999999909778,
+          "exclusiveMs": 0.006699999999909778
+        },
+        "connection synthesis": {
+          "calls": 1,
+          "inclusiveMs": 42.391200000000026,
+          "exclusiveMs": 0.5796000000009371
+        }
+      },
+      "counters": {
+        "port assessment: DISTANCE": 3253,
+        "port assessment: ANGLE": 349,
+        "port assessment: LATERAL OFFSET": 113,
+        "port assessment: ELEVATION": 30,
+        "network: provisional interface rejected": 1,
+        "clearance: source triangle collision": 381,
+        "port candidate: COLLISION": 78,
+        "port route: route length": 19,
+        "port route: slope": 12,
+        "port candidate: SLOPE": 8,
+        "clearance: headroom": 28,
+        "port route: surface attachment": 73,
+        "port candidate: SURFACE ATTACHMENT": 15,
+        "port candidate: network redundant": 6,
+        "organic: feature proximity": 5,
+        "attachment: proximity": 1662,
+        "attachment: no candidate attachment": 87,
+        "attachment: facing": 444,
+        "organic attachment: no landing surface": 290,
+        "organic attachment: invalid circulation": 92,
+        "organic: draft limit": 5,
+        "organic: profiled route deferred to synthesis": 44,
+        "organic: similar attachment pruned": 35,
+        "organic attachment: too far": 73,
+        "organic: pair proximity": 1,
+        "organic synthesis: route collision": 8
+      }
+    }
+  ],
+  "checks": [],
+  "classificationsSHA256": "4e1892a91d3e08b8336fb0d82ef7d1ff3ee759b0f7478b809e78a28785cc17e9",
+  "eligiblePreviouslySuppressed": 54,
+  "components": 2,
+  "isolated": [
+    "L1"
+  ],
+  "fidelity": "PASS",
+  "search": "NOT RUN"
+}

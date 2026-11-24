@@ -1,0 +1,69 @@
+{
+  "files": [
+    "src/app/board.css",
+    "src/app/globals.css",
+    "src/components/AppNav.tsx",
+    "src/components/CompositionStudio.tsx",
+    "src/components/CropEvalGrid.tsx",
+    "src/components/CropsPage.tsx",
+    "src/components/LetterGrid.tsx",
+    "src/components/PrototypeDemonstration.tsx",
+    "src/components/ShapesPage.tsx",
+    "src/components/VoidsPage.tsx",
+    "src/components/evaluations/ArchitecturalEvaluations.tsx",
+    "src/components/lattice/LatticeStudio.tsx"
+  ],
+  "nonStyleSyntax": [
+    {
+      "file": "src/components/AppNav.tsx",
+      "nonStyleSyntaxUnchanged": true
+    },
+    {
+      "file": "src/components/CompositionStudio.tsx",
+      "nonStyleSyntaxUnchanged": true
+    },
+    {
+      "file": "src/components/CropEvalGrid.tsx",
+      "nonStyleSyntaxUnchanged": true
+    },
+    {
+      "file": "src/components/CropsPage.tsx",
+      "nonStyleSyntaxUnchanged": true
+    },
+    {
+      "file": "src/components/LetterGrid.tsx",
+      "nonStyleSyntaxUnchanged": true
+    },
+    {
+      "file": "src/components/PrototypeDemonstration.tsx",
+      "nonStyleSyntaxUnchanged": true
+    },
+    {
+      "file": "src/components/ShapesPage.tsx",
+      "nonStyleSyntaxUnchanged": true
+    },
+    {
+      "file": "src/components/VoidsPage.tsx",
+      "nonStyleSyntaxUnchanged": true
+    },
+    {
+      "file": "src/components/evaluations/ArchitecturalEvaluations.tsx",
+      "nonStyleSyntaxUnchanged": true
+    },
+    {
+      "file": "src/components/lattice/LatticeStudio.tsx",
+      "nonStyleSyntaxUnchanged": true
+    }
+  ],
+  "checkpointSHA256": "6172019acf6d7cd88a4af2dca1ff570cd8e751a10fabc39da4efd65b12bc920b",
+  "contrast": {
+    "primaryTextOnPanel": 15.78,
+    "secondaryTextOnPanel": 9.12,
+    "cyanOnPanel": 8.18,
+    "goldOnPanel": 8.07,
+    "blackOnActionBlue": 5.98
+  },
+  "productionBuild": "passed final build",
+  "standaloneTypeScript": "pre-existing evaluation test import-extension and incomplete TileVariant errors",
+  "changedComponentLint": "passed"
+}

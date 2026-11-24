@@ -1,0 +1,8 @@
+src/components/evaluations/descriptorCache.test.ts(3,60): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.
+src/components/evaluations/descriptorCache.test.ts(4,85): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.
+src/components/evaluations/descriptorCache.test.ts(13,19): error TS2352: Conversion of type '{ rotation: 0; mirror: "none"; occupied: number[]; floor: never[]; passage: never[]; voidCells: never[]; vertical: never[]; bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number; }; faces: {}; }' to type 'TileVariant' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'faces' are incompatible.
+    Type '{}' is missing the following properties from type 'Record<Direction, FaceLayer>': "+X", "-X", "+Y", "-Y", and 2 more.
+src/components/evaluations/descriptorRank.test.ts(3,61): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.
+src/components/evaluations/descriptorV2.test.ts(3,70): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.
+src/components/evaluations/openVolume.test.ts(3,47): error TS5097: An import path can only end with a '.ts' extension when 'allowImportingTsExtensions' is enabled.

@@ -1,8 +1,13 @@
+import { connectionDiagnostic, connectionDiagnosticsEnabled, startConnectionTiming } from "./connectionDiagnostics";
 import type { ConnectionPort, ImportedObj, TileVariant, Vec3 } from "./types";
 import { packCell, unpackCell } from "./types";
+import { faceTriangles } from "./parseObj";
+import { surfaceOrientation, type SourceSurface } from "./surfaceOrientation";
 
 /** Conservative geometric labels, not semantic recognition. Extract once in the base frame. */
 export function extractConnectionPorts(sourceFormId: string, base: TileVariant, cell: number, samples?: Map<number,{min:Vec3;max:Vec3}>): ConnectionPort[] {
+  const finishTiming = startConnectionTiming("candidate generation");
+  try {
   const floor = new Set(base.floor);
   const occupied = new Set(base.occupied);
   const passage = new Set(base.passage);
@@ -77,23 +82,35 @@ export function extractConnectionPorts(sourceFormId: string, base: TileVariant, 
     }
   }
   // Bound pair evaluation while retaining different sides/elevations and strongest termini.
-  return ports.sort((a,b)=>b.confidence-a.confidence || b.usableDepth-a.usableDepth).slice(0,32);
+  const ranked = ports.sort((a,b)=>b.confidence-a.confidence || b.usableDepth-a.usableDepth);
+  if (connectionDiagnosticsEnabled()) connectionDiagnostic("ports", "proxy port limit", { sourceFormId, total: ranked.length, retained: Math.min(32, ranked.length), omitted: ranked.slice(32) });
+  return ranked.slice(0,32);
+
+  } finally { finishTiming(); }
 }
 
 /** Reliable straight boundary profiles on upward source faces. Raster ports remain the fallback. */
-export function extractSourceEdgePorts(source:ImportedObj,positions:Float32Array,proxyPorts:ConnectionPort[]):ConnectionPort[] {
+export function extractSourceEdgePorts(source:ImportedObj,positions:Float32Array,proxyPorts:ConnectionPort[],surface:SourceSurface={positions,triangles:source.faces.flatMap(faceTriangles).flat()}):ConnectionPort[] {
+  const finishTiming = startConnectionTiming("candidate generation");
+  try {
   const edges=new Map<string,{a:Vec3;b:Vec3;count:number}>();
   const point=(index:number)=>Array.from(positions.slice(index*3,index*3+3)) as Vec3;
   const key=(p:Vec3)=>p.map(v=>v.toFixed(4)).join(',');
+  const orientation=surfaceOrientation(surface);
+  let triangleIndex=0;
   for(const face of source.faces) {
+    const faceMetadata=orientation.triangles.slice(triangleIndex,triangleIndex+faceTriangles(face).length);
+    triangleIndex+=faceMetadata.length;
     if(face.vertices.length<3)continue;
     const a=point(face.vertices[0]),b=point(face.vertices[1]),c=point(face.vertices[2]);
     const ab=b.map((v,i)=>v-a[i]),ac=c.map((v,i)=>v-a[i]);
     const n=[ab[1]*ac[2]-ab[2]*ac[1],ab[2]*ac[0]-ab[0]*ac[2],ab[0]*ac[1]-ab[1]*ac[0]];
     const normalLength=Math.hypot(...n);
-    if(normalLength<1e-8||n[2]/normalLength<.95)continue;
-    for(let i=0;i<face.vertices.length;i++) {
-      const a=point(face.vertices[i]),b=point(face.vertices[(i+1)%face.vertices.length]);
+    if(normalLength<1e-8||!faceMetadata.length||faceMetadata.some(t=>!(t.normalZ>=.95)))continue;
+    // Orient only these analysis edge records; original face arrays stay untouched.
+    const vertices=n[2]<0?[...face.vertices].reverse():face.vertices;
+    for(let i=0;i<vertices.length;i++) {
+      const a=point(vertices[i]),b=point(vertices[(i+1)%vertices.length]);
       const id=[key(a),key(b)].sort().join('|'),old=edges.get(id);
       if(old)old.count++;else edges.set(id,{a,b,count:1});
     }
@@ -126,5 +143,9 @@ export function extractSourceEdgePorts(source:ImportedObj,positions:Float32Array
     reliable.push({id:'E'+(reliable.length+1),sourceFormId:source.id,type:comparableProxy?.type??'PLATFORM_EDGE',localPosition:center,elevation:center[2],outwardDirection:normal,upDirection:[0,0,1],usableWidth:width,usableDepth:proxy?.usableDepth??2,confidence:comparableProxy?Math.max(.8,comparableProxy.confidence):.8,sourceCells:proxy?.sourceCells??[],profile:[edge.a,edge.b]});
   }
   const fallback=proxyPorts.filter(p=>!reliable.some(e=>Math.abs(e.elevation-p.elevation)<.5&&e.outwardDirection[0]*p.outwardDirection[0]+e.outwardDirection[1]*p.outwardDirection[1]>.8&&Math.hypot(e.localPosition[0]-p.localPosition[0],e.localPosition[1]-p.localPosition[1])<3));
-  return [...reliable.sort((a,b)=>b.confidence-a.confidence||a.usableWidth-b.usableWidth),...fallback].slice(0,32);
+  const ranked = [...reliable.sort((a,b)=>b.confidence-a.confidence||a.usableWidth-b.usableWidth),...fallback];
+  if (connectionDiagnosticsEnabled()) connectionDiagnostic("ports", "source port limit", { sourceFormId: source.id, filename: source.filename, total: ranked.length, retained: Math.min(32, ranked.length), omitted: ranked.slice(32) });
+  return ranked.slice(0,32);
+
+  } finally { finishTiming(); }
 }

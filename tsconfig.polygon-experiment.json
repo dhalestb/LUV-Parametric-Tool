@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/components/polygonExperiment/**/*.ts",
+    "src/components/polygonExperiment/**/*.tsx",
+    "src/app/experiment/site-polygon-morphogenesis/page.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "vendor",
+    "reports"
+  ]
+}

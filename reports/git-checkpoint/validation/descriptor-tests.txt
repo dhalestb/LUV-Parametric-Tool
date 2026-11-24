@@ -1,0 +1,40 @@
+▶ descriptor geometry cache
+  ✔ moves other ranks when one form is replaced without recomputing them (56.0461ms)
+✔ descriptor geometry cache (57.1017ms)
+▶ comparative ranks
+  ✔ assigns 1 through 15 once, with 15 as the strongest (0.8356ms)
+  ✔ ranks full-precision scores above their rounded twins (0.1702ms)
+  ✔ breaks exact ties with raw components, then form id (0.1999ms)
+  ✔ re-ranks a replaced form from cached absolute scores (0.4818ms)
+  ✔ is deterministic (0.5926ms)
+✔ comparative ranks (2.8349ms)
+▶ descriptor calibration V2
+  ✔ scores connected levels above disconnected slabs (26.3755ms)
+  ✔ lets an atrium score without a stair and keeps a dense object visually closed (22.6916ms)
+  ✔ scores a multi-approach destination above a compact box (6.4777ms)
+  ✔ scores a dominant hierarchy above equal modules (8.7743ms)
+  ✔ scores a folded form above an orthogonal cube (6.5743ms)
+  ✔ keeps a radial mass more centralized than a hollow ring (12.7412ms)
+  ✔ gives a linear run more sequence depth than a single room (5.9582ms)
+  ✔ finds more intersections in a branched network than in a line (4.03ms)
+  ✔ reads a cantilever as more surreal than a supported cube (5.5089ms)
+  ✔ lets daylight reach an open floor more than a roofed floor (13.0358ms)
+  ✔ is deterministic (4.2319ms)
+  ✔ uses a fixed monumental scale (3.0236ms)
+✔ descriptor calibration V2 (120.6254ms)
+▶ Open Volume
+  ✔ scores a solid cube very low (2.1899ms)
+  ✔ scores a closed hollow box above a solid, with low permeability and real enclosed void (6.7977ms)
+  ✔ scores an open frame very high (13.9908ms)
+  ✔ scores wall-less stacked slabs high, with horizontal permeability and little enclosed void (8.8008ms)
+  ✔ gives a single thin plate high mass-reduction and permeability, but less openness than stacked plates (6.9587ms)
+  ✔ scores a dense multi-wall field below an open frame and below stacked slabs (23.1246ms)
+✔ Open Volume (62.369ms)
+ℹ tests 24
+ℹ suites 4
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 291.7622

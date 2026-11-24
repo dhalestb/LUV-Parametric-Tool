@@ -1,0 +1,588 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "linear-edge-gallery",
+      "name": "Linear Edge Gallery",
+      "variants": [
+        "print-contour",
+        "approved-footprint",
+        "receiver-v3",
+        "legacy-v2",
+        "path-v1"
+      ],
+      "A": {
+        "entry": "src/components/linearGalleryPerimeter.ts#perimeterStudy; scripts/linear-gallery-automatic.cjs#arrangeMixed",
+        "statements": [
+          "Arrange actual L/U/V exterior edges along lower and upper footprint perimeters.",
+          "Retain quantity, physical letter size, running bond, recesses and saved elevation offsets.",
+          "The upper zone starts at half field height; automatic mixed courses can rotate it 25–75°."
+        ],
+        "parameters": {
+          "nominalSpacingFeet": [
+            12,
+            13,
+            14,
+            15
+          ],
+          "defaultSpacingFeet": 13,
+          "elevationOffsetsFeet": [
+            -4,
+            0,
+            4
+          ],
+          "sourceGapFeet": [
+            5,
+            10,
+            15
+          ],
+          "referenceSetbacksFeet": [
+            1,
+            5,
+            10
+          ],
+          "mixedSizeFeet": [
+            4,
+            5,
+            6
+          ],
+          "mixedSetbacksFeet": [
+            0,
+            1,
+            2,
+            0.5
+          ],
+          "exteriorCurves": {
+            "L": [
+              0,
+              5
+            ],
+            "U": [
+              0,
+              3
+            ],
+            "V": [
+              4,
+              6
+            ]
+          },
+          "note": "Schedules depend on saved variant; small fields can use height-dependent offsets."
+        },
+        "bindings": [
+          {
+            "category": "A",
+            "sourceFile": "vendor/architectural-board/src/components/linearGalleryPerimeter.ts",
+            "sha256": "20f5be90b7e5179d4984259f64ea41db9addc79b203c8207d098ddd9eaf5a124"
+          },
+          {
+            "category": "A",
+            "sourceFile": "vendor/architectural-board/scripts/linear-gallery-automatic.cjs",
+            "sha256": "44f03e0ac0425b8c4728165e8c4d63853b0e6849d5a3509192f48423cc63406e"
+          }
+        ]
+      },
+      "B": {
+        "entry": "scripts/source-linear-gallery.cjs#buildGallery",
+        "statements": [
+          "Derive walls from real source edges and recomputed receiver intervals.",
+          "Preserve differences between direct contacts, recessed connections and intentional openings.",
+          "Print variants derive stepped contour floors, roof planks, partial returns and upper columns.",
+          "Keep mesh integrity separate from circulation and structural validation."
+        ],
+        "parameters": {
+          "approvedWallAndDeckFeet": 0.25,
+          "printWallAndSlabFeet": 0.53125,
+          "printOpeningWidthFeet": 3.5,
+          "printOpeningHeightFeet": 7,
+          "toleranceFeet": 1e-7,
+          "receiverContract": "Approved direct walls end at receiver bottoms; print walls use their recorded top-edge rules."
+        },
+        "bindings": [
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/source-linear-gallery.cjs",
+            "sha256": "b366a94c970ddd797e055ecb43b55f538eed19444cfcebfa11199872b335faf5"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/source-polygonal-gallery.cjs",
+            "sha256": "1d3d8f1609ece7d86e16a90a4e6c5a991bc0f0a6b13967a9488af2bca712709a"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/source-gallery-receivers.cjs",
+            "sha256": "201d09126daf20945827818c1709d6f00048c40bca013b9de70de1521174d15e"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/linear-gallery-approved-envelope.cjs",
+            "sha256": "7ac2089d38df6ffd80ef2c3dbdbc77464aedb831be79fd682a02ed2beb8369fc"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/linear-gallery-print.cjs",
+            "sha256": "0ca95098fe2fd7d6e55d934d6228eda91f293430803f0bfe4109fac8cd15c379"
+          }
+        ]
+      },
+      "adaptiveAdapter": "linear-edge-gallery",
+      "supportedAdaptiveVariants": [
+        "print-contour"
+      ],
+      "status": "available"
+    },
+    {
+      "id": "inserted-plate",
+      "name": "Inserted Horizontal Plate",
+      "variants": [
+        "edge-connected",
+        "spanning-v2",
+        "merged-walls",
+        "two-u",
+        "suspended",
+        "legacy"
+      ],
+      "A": {
+        "entry": "src/components/insertedPlatePopulation.ts#populatePerimeterLevels",
+        "statements": [
+          "For edge-connected sources, L and V stand upright; U turns onto its side.",
+          "Arrange perimeter sources by level and preserve their exact poses on regeneration.",
+          "Reserve a horizontal L for the full corner-pier footprint.",
+          "Earlier spanning variants retain horizontal L/U and upright V arrangements."
+        ],
+        "parameters": {
+          "edgeConnected": {
+            "L": {
+              "rx": 87
+            },
+            "V": {
+              "rx": 90
+            },
+            "U": {
+              "rx": 0,
+              "ry": 85
+            }
+          },
+          "rotationOrder": "ZYX",
+          "spacingFeet": [
+            12,
+            15
+          ],
+          "maximumLevels": 4,
+          "minimumLettersPerLevel": 2,
+          "scale": "preferredFeet / 0.92"
+        },
+        "bindings": [
+          {
+            "category": "A",
+            "sourceFile": "vendor/architectural-board/src/components/insertedPlatePopulation.ts",
+            "sha256": "92617729db42a3b22c8d97cb27d1cc28e2c4102e6ae35be91ab90d936236b9d8"
+          }
+        ]
+      },
+      "B": {
+        "entry": "scripts/source-inserted-plate.cjs#insertedPlateEnvelope",
+        "statements": [
+          "Sweep exterior letter edges perpendicular to their faces toward adjoining edges.",
+          "Form horizontal plates between actual inner L/U edges and receiving walls.",
+          "Extrude the full horizontal corner-L footprint down to the base.",
+          "Retain the saved edge-connected, spanning, merged, suspended and legacy variants."
+        ],
+        "parameters": {
+          "plateThicknessFeet": 0.75,
+          "edgeSweepHalfWidthFeet": 0.36,
+          "spanningSourceCount": [
+            9,
+            18
+          ],
+          "spanningSpacingFeet": [
+            12,
+            15
+          ],
+          "requires": "Actual receiver contact and connected envelope; geometric links do not certify circulation."
+        },
+        "bindings": [
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/source-inserted-plate.cjs",
+            "sha256": "fbdcdf31ce61d40a2c2c15a218adc45448a9ac9f68608ad767e7e99f20a15659"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/source-edge-envelope.cjs",
+            "sha256": "117dd1616bfebb2ad354c88857fa70f84bbf2b373c88523bde8361b6e9c64116"
+          }
+        ]
+      },
+      "adaptiveAdapter": "inserted-horizontal-plate/generate-design-v1",
+      "supportedAdaptiveVariants": [
+        "edge-connected"
+      ],
+      "status": "validated-60ft-edge-connected",
+      "integratedBindings": {
+        "sourceSnapshot": "vendor/typology-proof-20261121",
+        "authentication": "reports/multi-typology-first-proof-20261121/dependencies.json",
+        "A": [
+          "insertedPlatePopulation.ts#suggestedPerimeterPlateCount",
+          "insertedPlatePopulation.ts#populatePerimeterLevels",
+          "source-envelope.cjs#derive"
+        ],
+        "B": [
+          "source-envelope.cjs#buildSource",
+          "source-inserted-plate.cjs#insertedPlateEnvelope",
+          "source-edge-envelope.cjs#edgeEnvelope",
+          "full-corner-joints.cjs#fullCornerPier",
+          "fit-planks-to-walls.cjs#fitPlanks"
+        ],
+        "adapter": "inserted-horizontal-plate/corner-l-top-v1",
+        "supportedHeightFeet": [
+          60
+        ],
+        "spacingFeet": [
+          12,
+          15
+        ],
+        "profiles": {
+          "study135-exact-v1": {
+            "adapter": "inserted-horizontal-plate/study135-generate-design-v1",
+            "A": "Study 135 saved request -> source-envelope.cjs#derive",
+            "B": "source-envelope.cjs#buildSource; native edgeEnvelope, fullCornerPier and fitPlanks unchanged",
+            "preferredFeet": 13,
+            "spacingFeet": 15,
+            "field": {
+              "width": 60,
+              "depth": 60,
+              "height": 60
+            },
+            "knownSourceOverlap": "V-5 / U-9; inherited; no clearance correction"
+          },
+          "parameterized-corner-top-v1": {
+            "adapter": "inserted-horizontal-plate/corner-l-top-v1",
+            "unchanged": true
+          }
+        }
+      }
+    },
+    {
+      "id": "vertical-walls",
+      "name": "Stepped Amphitheater",
+      "variants": [
+        "vertical-walls",
+        "profiles-comparison",
+        "levels-comparison"
+      ],
+      "A": {
+        "entry": "src/components/threeLiftPopulation.ts#populateThreeLifts",
+        "statements": [
+          "Arrange surrounding terrace/perimeter sources across saved occupied lifts.",
+          "Perimeter faces start near horizontal with up to ±12° source tilt.",
+          "Middle opening sources stand upright with saved plan direction.",
+          "Keep full upright footprints at least 0.8 ft inside the surrounding source hull during sampling."
+        ],
+        "parameters": {
+          "defaultLifts": 3,
+          "terraceTiltDegrees": [
+            -12,
+            12
+          ],
+          "planYawDegrees": [
+            0,
+            -15,
+            15
+          ],
+          "middleRxDegrees": 90,
+          "middleYawDegrees": [
+            0,
+            90
+          ],
+          "sourceHullClearanceFeet": 0.8,
+          "defaultLower": "0.28 × preferredFeet",
+          "defaultSourceHeight": "min(field.height - 1, 3 × preferredFeet)",
+          "scale": "preferredFeet / 0.92"
+        },
+        "bindings": [
+          {
+            "category": "A",
+            "sourceFile": "vendor/architectural-board/src/components/threeLiftPopulation.ts",
+            "sha256": "47f5e52ff555cf8793d479421cd229893366452d37a4a0929befb433023c2855"
+          },
+          {
+            "category": "A",
+            "sourceFile": "vendor/architectural-board/src/components/sourcePopulation.ts",
+            "sha256": "e291600d03446888789585625341059631dc2ebe940c8258fb8e1a7b343f0119"
+          }
+        ]
+      },
+      "B": {
+        "entry": "scripts/source-vertical-envelope.cjs#verticalEnvelope",
+        "statements": [
+          "Extrude supporting exterior edges along global Z to explicit support planes.",
+          "Follow the actual upper source surface while keeping platforms level.",
+          "Develop inner letter contours into recessed alcoves or directional through-openings.",
+          "Form successive outward terrace bands; preserve protected cutters after positive unions."
+        ],
+        "parameters": {
+          "defaultSupportZ": 0,
+          "platformThicknessFeet": 0.75,
+          "initialOffsetFeet": 0.8,
+          "terraceBands": 2,
+          "extraOffsetPerBand": "0.075 × preferredFeet",
+          "maximumRise": "0.12 × preferredFeet",
+          "maximumLocalBankDepth": "0.45 × preferredFeet",
+          "geometricLinkWidthFeet": 3,
+          "linkRiseIncrementFeet": 1.5,
+          "unsupported": "Arbitrary 75°/105° interior X tilts and certified stairs/ramps."
+        },
+        "bindings": [
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/source-vertical-envelope.cjs",
+            "sha256": "a48425b7afc0b898ae212654bec6e0b13e0ea38a461723567e2331e952e38b9c"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/experimental-opening-profile.cjs",
+            "sha256": "ed55e904af72b61988ba1c85ae30f1a391402850f06d00f17473033cd27a7933"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/upright-opening-profile.cjs",
+            "sha256": "5beb2af56f4401729fe939c3c6f0234fb7b432323cbde0661e32a1a0936fcf2d"
+          }
+        ]
+      },
+      "adaptiveAdapter": "stepped-amphitheater/polygon-territory-v1",
+      "supportedAdaptiveVariants": [
+        "vertical-walls"
+      ],
+      "status": "controlled-proof-validated"
+    },
+    {
+      "id": "room-within-volume",
+      "name": "Room Within Volume",
+      "variants": [
+        "perimeter-room/fullProfiles/suspendedLLV/edgePlatforms",
+        "perimeter-room/fullProfiles/suspendedLLV",
+        "perimeter-room/fullProfiles",
+        "perimeter-room",
+        "contour-walls",
+        "anchored-room",
+        "hull-pilot"
+      ],
+      "A": {
+        "entry": "src/components/perimeterRoomLayout.ts#perimeterRoomSource; src/components/fourLevelStudy.ts#fourLevelStudy",
+        "statements": [
+          "Arrange nearly horizontal perimeter letters on successive levels.",
+          "Keep sampled perimeter placement and established saved fixtures as distinct variants.",
+          "Upright interior letter faces define the room; the suspended fixture specifically uses L/L/V.",
+          "Preserve exact source poses and optionally shuffle only the established upper-level letter order."
+        ],
+        "parameters": {
+          "perimeterLevels": [
+            2,
+            3,
+            4
+          ],
+          "defaultSpacingFeet": 12,
+          "perimeterTiltDegrees": [
+            -4,
+            4
+          ],
+          "ellipseAxes": "width/2 − 0.75×size; depth/2 − 0.75×size",
+          "minimumBaseLetters": 4,
+          "suspendedInterior": "L, L, V",
+          "suspendedYawDegrees": [
+            22,
+            194,
+            22
+          ],
+          "suspendedRxDegrees": 90
+        },
+        "bindings": [
+          {
+            "category": "A",
+            "sourceFile": "vendor/architectural-board/src/components/perimeterRoomLayout.ts",
+            "sha256": "b0dd6b0e5922863da8e5b18fa557d5b09d69c9de3fc497e5b1a4ef4f7a65cc17"
+          },
+          {
+            "category": "A",
+            "sourceFile": "vendor/architectural-board/src/components/fourLevelStudy.ts",
+            "sha256": "989e98d32e6620852974cd183f91f9abd82b1a6eef92a6050d540cf34b050045"
+          }
+        ]
+      },
+      "B": {
+        "entry": "scripts/source-room-volume.cjs#roomWithinVolume",
+        "statements": [
+          "Loft full exterior letter profiles between successive levels.",
+          "Derive a polygonal enclosure from upright interior faces.",
+          "Derive floor and roof elevations from the source jamb and upper edges.",
+          "When selected, extend level-two L/U inner edges to the suspended room and form upper roof planks."
+        ],
+        "parameters": {
+          "defaultShellFeet": 0.35,
+          "printShellFeet": 0.5,
+          "doorWidthFeet": 3,
+          "doorDepthFeet": 2,
+          "doorHeightFeet": 7.1,
+          "landingWidthFeet": 3.8,
+          "roofPlankThicknessFeet": 0.5,
+          "loftPlanBlend": "t² × (3 − 2t)",
+          "loftElevationBlend": "linear",
+          "note": "Variant-specific contact, room-area, surrounding-space and doorway checks apply."
+        },
+        "bindings": [
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/source-room-volume.cjs",
+            "sha256": "95e3de4384d3626e301370d55fadfa3b451840abb32e9d786e6c6d0e8aa2bde7"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/live-perimeter-room.cjs",
+            "sha256": "2b112edabf9586521ab3f33c7bdaf49cf17e895064019d42be7fe9d42bc75d38"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/full-perimeter-lofts.cjs",
+            "sha256": "692cc1807328f425b6258d2898ebdf457e19ccca2a27c4623d3208cb6661a6e5"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/suspended-polygon-room.cjs",
+            "sha256": "f052a094111e12d89961fe668f52f16ca45ed1e85b7395f2a7a9e49a432de704"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/room-edge-platforms.cjs",
+            "sha256": "1feb597e9c4938b60a893b918c50a136ff63533155b2527c6f6e25bf0910da7a"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/room-top-planks.cjs",
+            "sha256": "2c8e08e8ceea32c6c3e4e69709dd3e9f72e84b026172ecb9d4950be882f131ff"
+          }
+        ]
+      },
+      "adaptiveAdapter": null,
+      "supportedAdaptiveVariants": [],
+      "status": "adapter-not-implemented"
+    },
+    {
+      "id": "void-field",
+      "name": "Void Field",
+      "variants": [
+        "face-normal/neighbor-taper/adjacent",
+        "face-normal/straight/adjacent",
+        "vertical/neighbor-taper/adjacent",
+        "vertical/straight/none"
+      ],
+      "A": {
+        "entry": "src/components/voidFieldPopulation.ts#populateVoidField",
+        "statements": [
+          "Sample L/U/V sources spatially, then classify perimeter, terrace and interior roles.",
+          "Group nearly horizontal inner letter contours in plan to define the void field.",
+          "Use three occupied levels or four levels with 15 letters.",
+          "New-source yaw schedules do not silently snap edited saved poses."
+        ],
+        "parameters": {
+          "sourceCount": [
+            9,
+            15
+          ],
+          "fourLevelCount": 15,
+          "exteriorTiltDegrees": [
+            -10,
+            10
+          ],
+          "interiorYawDegrees": [
+            75,
+            90,
+            105
+          ],
+          "interiorRxDegrees": 0,
+          "spacingFeet": [
+            12,
+            15
+          ],
+          "minimumCenterSpacing": "0.36 × preferredFeet",
+          "interiorHullClearance": "0.10 × preferredFeet"
+        },
+        "bindings": [
+          {
+            "category": "A",
+            "sourceFile": "vendor/architectural-board/src/components/voidFieldPopulation.ts",
+            "sha256": "a19b868d8fee581d95d90e5324e225a25f3b3754eb398b322c9c6b8772b0a6cd"
+          }
+        ]
+      },
+      "B": {
+        "entry": "scripts/source-void-field.cjs#voidFieldEnvelope",
+        "statements": [
+          "Close actual L inner quadrants at arm-tip extents and U/V mouths at contour endpoints.",
+          "Develop plan concavities along global Z, straight or with neighbor-derived taper.",
+          "Construct horizontal floors and rims before subtracting protected voids.",
+          "Sweep exterior façades vertically or along negative transformed source-face normals.",
+          "Connect adjacent voids only between floor slabs; retain explicit support overrides."
+        ],
+        "parameters": {
+          "floorThicknessFeet": 0.75,
+          "rimThicknessFeet": 0.85,
+          "sourceOffsetFeet": 0.9,
+          "defaultTaper": 0.35,
+          "taperRange": [
+            0,
+            1
+          ],
+          "taperFormula": "δ = strength × clamp(0.25 × (sqrt(neighborArea/sourceArea) − 1), −0.20, 0.20)",
+          "profileScale": "1 + δ × (z − sourceZ)/(topZ − bottomZ)",
+          "cutterClearanceFeet": 0.001,
+          "normalSweep": "Δx=Δz×nx/nz; Δy=Δz×ny/nz",
+          "fourLevelUpperSupport": "preceding floor underside unless explicitly overridden"
+        },
+        "bindings": [
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/source-void-field.cjs",
+            "sha256": "8af2917cd1e34b48cda21fa8039418245d7f2d38150c2b8c7b321bf4b202449b"
+          },
+          {
+            "category": "B",
+            "sourceFile": "vendor/architectural-board/scripts/source-face-normal-facade.cjs",
+            "sha256": "86e43aae9b13331603eb2394c2c74dd8ebd85bc1397f978fa95940ca8c92d4f5"
+          }
+        ]
+      },
+      "adaptiveAdapter": null,
+      "supportedAdaptiveVariants": [],
+      "status": "adapter-not-implemented"
+    }
+  ],
+  "extensionSlots": [
+    {
+      "slot": 1,
+      "status": "reserved-unassigned",
+      "reason": "Requires authenticated rule definition and adapter; no invented rule."
+    },
+    {
+      "slot": 2,
+      "status": "reserved-unassigned",
+      "reason": "Requires authenticated rule definition and adapter; no invented rule."
+    },
+    {
+      "slot": 3,
+      "status": "reserved-unassigned",
+      "reason": "Requires authenticated rule definition and adapter; no invented rule."
+    },
+    {
+      "slot": 4,
+      "status": "reserved-unassigned",
+      "reason": "Requires authenticated rule definition and adapter; no invented rule."
+    },
+    {
+      "slot": 5,
+      "status": "reserved-unassigned",
+      "reason": "Requires authenticated rule definition and adapter; no invented rule."
+    }
+  ]
+}

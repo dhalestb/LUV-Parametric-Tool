@@ -1,15 +1,23 @@
+import { beginGeometryValidation, geometryRevision } from "./geometryRevision";
+import { acceptCirculationClass, preparePortConnection, portAttachmentMeets, validateCirculationConnection } from "./portConnectionValidation";
+import { connectionDiagnostic, startConnectionTiming } from "./connectionDiagnostics";
 import type { ConnectionPort, ConnectionReport, PlacedTile, PortCandidate, PortPair, PortRejection, TileModel, TileVariant, Vec3 } from "./types";
 import { LATTICE_FEET, packCell, placementWorldZ } from "./types";
-import { transitionPath, transitionMeshes, pathLength } from "./transitionGeometry";
+import { transitionPath, transitionMeshes, pathLength, circulationProfile } from "./transitionGeometry";
 import { transitionSurfaceClear, type ConnectorSurface } from "./connectionClearance";
+import { evaluateAlternativeRoutes } from "./alternativeRouting";
+import { architecturalInterface } from "./architecturalSurfaces";
+import { branchSectionAnchors } from "./branchAdaptation";
+import { sideAdjacentRegistration } from "./adjacentConnections";
 
 export const DEFAULT_PORT_TOLERANCES = Object.freeze({maxDistance:20,maxLateralOffset:12,maxAngularDeviation:115,maxElevation:8,maxDirectElevation:.5,maxDirectSlope:.125,minUsableWidth:2,minConfidence:.55,directDistance:4,directLateralOffset:2,directAngle:35,minCompatibilityScore:4});
 export type PortTolerances = { [K in keyof typeof DEFAULT_PORT_TOLERANCES]: number };
 export function worldPortPosition(tile:PlacedTile,port:ConnectionPort):Vec3 {
   return [tile.ix*LATTICE_FEET+port.localPosition[0],tile.iy*LATTICE_FEET+port.localPosition[1],placementWorldZ(tile)+port.elevation];
 }
-const validatedPairs=new WeakMap<PortPair,{models:TileModel[];tiles:PlacedTile[]}>();
-export function portPairClearanceValidated(pair:PortPair,models:TileModel[],tiles:PlacedTile[]) {const record=validatedPairs.get(pair);return record?.models===models&&record?.tiles===tiles;}
+const modelRevisions = (models: TileModel[]) => models.map(model => `${model.id}:${model.connectionSurface ? geometryRevision(model.connectionSurface).id : "missing"}:${model.variants.map(v => `${v.rotation}/${v.mirror}`).join(",")}`).join("|");
+const validatedPairs=new WeakMap<PortPair,{models:TileModel[];tiles:PlacedTile[];geometry:string;placements:string;sources:string}>();
+export function portPairClearanceValidated(pair:PortPair,models:TileModel[],tiles:PlacedTile[]) {const record=validatedPairs.get(pair);return record?.models===models&&record?.tiles===tiles&&record.geometry===JSON.stringify(pair)&&record.placements===JSON.stringify(tiles)&&record.sources===modelRevisions(models);}
 const occupiedCache=new WeakMap<TileVariant,Set<number>>();
 /** Conservative voxel ribbon/headroom check, retained for source/session compatibility. */
 export function portRouteClear(from:Vec3,to:Vec3,width:number,tiles:PlacedTile[],models:TileModel[],endpointIds:string[]):boolean {
@@ -62,18 +70,21 @@ export function assessPortPair(a:ConnectionPort,ta:PlacedTile,b:ConnectionPort,t
   const widthCompatibility=Math.min(startWidth,endWidth)/Math.max(startWidth,endWidth),confidence=Math.min(a.confidence,b.confidence);
   const terminal=(p:ConnectionPort)=>p.type==="BRANCH_END"||p.type==="PASSAGE_END";
   const priority=terminal(a)&&terminal(b)&&plan<=4?2.5:(a.type==="LANDING_EDGE"&&terminal(b))||(b.type==="LANDING_EDGE"&&terminal(a))?2:terminal(a)&&terminal(b)?1.8:a.type==="PLATFORM_EDGE"||b.type==="PLATFORM_EDGE"?1.2:a.type==="CIRCULATION_END"||b.type==="CIRCULATION_END"?1:.2;
-  const score=3*((fa+fb+2)/4)+2*(1-distance/t.maxDistance)+1.5*(1-Math.abs(rise)/t.maxElevation)+widthCompatibility+confidence+priority-lateralOffset/t.maxLateralOffset-angle/180-distance*(startWidth+endWidth)/2*.015;
-  const connectionClass=Math.abs(rise)>t.maxDirectElevation||(Math.abs(rise)>1e-5&&plan<Math.abs(rise)/t.maxDirectSlope)?"VERTICAL":plan<=t.directDistance&&lateralOffset<=t.directLateralOffset&&angle<=t.directAngle?"DIRECT":"ADAPTIVE";
+  const profile=circulationProfile(plan,rise);
+  const slopeTerm=profile.mode==="level"?2:profile.mode==="ramp"?1.75:profile.mode==="switchback"?1.2:profile.mode==="stair"?0.7:-2;
+  const score=3*((fa+fb+2)/4)+1.2*(1-distance/t.maxDistance)+slopeTerm+widthCompatibility+confidence+priority-lateralOffset/t.maxLateralOffset-angle/180-distance*(startWidth+endWidth)/2*.015;
+  const connectionClass=profile.mode==="ramp"||profile.mode==="switchback"||profile.mode==="stair"?"VERTICAL":plan<=t.directDistance&&lateralOffset<=t.directLateralOffset&&angle<=t.directAngle&&Math.abs(rise)<=t.maxDirectElevation?"DIRECT":"ADAPTIVE";
   const pair:PortPair={tileA:ta.id,tileB:tb.id,portA:a.id,portB:b.id,from,to,plan,rise,distance,facing,widthCompatibility,confidence,usableWidth:Math.min(startWidth,endWidth),startWidth,endWidth,startProfile:ap.profile,endProfile:bp.profile,portOffsetA:ap.offset,portOffsetB:bp.offset,startDirection:da,endDirection:db,angle,lateralOffset,connectionClass,score,fallback:(a.type==="EXPOSED_WALKABLE_EDGE"&&a.confidence<.8)||(b.type==="EXPOSED_WALKABLE_EDGE"&&b.confidence<.8)};
   let reason:PortRejection|undefined;
   if(distance>t.maxDistance)reason="DISTANCE";
   else if(facing<-.35||angle>t.maxAngularDeviation)reason="ANGLE";
   else if(lateralOffset>t.maxLateralOffset)reason="LATERAL OFFSET";
-  else if(Math.abs(rise)>t.maxElevation||(connectionClass==="VERTICAL"&&plan<Math.abs(rise)*1.5))reason="ELEVATION";
+  else if(profile.mode==="reject")reason="ELEVATION";
   else if(Math.min(startWidth,endWidth)<t.minUsableWidth)reason="WIDTH";
   else if(confidence<t.minConfidence)reason="LOW CONFIDENCE";
   else if(score<t.minCompatibilityScore)reason=facing<.5||angle>45?"ANGLE":lateralOffset>t.directLateralOffset?"LATERAL OFFSET":Math.max(a.usableWidth,b.usableWidth)>8?"WIDTH":"DISTANCE";
-  else if(distance<1e-5)reason="DISTANCE"; // No remaining gap: do not create a folded zero-length loft.
+  const constraint = !reason ? undefined : distance > t.maxDistance ? "proximity" : facing < -.35 || angle > t.maxAngularDeviation ? "facing" : lateralOffset > t.maxLateralOffset ? "lateral offset" : profile.mode === "reject" ? "slope classification" : Math.min(startWidth,endWidth) < t.minUsableWidth ? "insufficient usable width" : confidence < t.minConfidence ? "confidence" : "compatibility score";
+  if (reason) connectionDiagnostic("port assessment", reason, { pair, constraint });
   return {pair,reason};
 }
 export function scorePortPair(a:ConnectionPort,ta:PlacedTile,b:ConnectionPort,tb:PlacedTile,tolerances:Partial<PortTolerances>={}):PortPair|null {
@@ -84,28 +95,37 @@ function routeClear(pair:PortPair,tiles:PlacedTile[],models:TileModel[],existing
   for(let i=1;i<path.length;i++) if(!portRouteClear(path[i-1],path[i],Math.max(pair.startWidth??pair.usableWidth,pair.endWidth??pair.usableWidth),proxyTiles,proxyModels,[]))return false;
   return transitionSurfaceClear(pair,tiles,models,existing);
 }
-export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports:ConnectionReport[]=[],tolerances:Partial<PortTolerances>={},collectDiagnostics=true) {
+export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports:ConnectionReport[]=[],tolerances:Partial<PortTolerances>={},collectDiagnostics=true,adjacentConstruction=false) {
+  const finishGeometry = beginGeometryValidation();
+  try {
+  const finishTiming = startConnectionTiming("candidate generation");
+  try {
   const candidates:PortCandidate[]=[],byId=new Map(models.map(m=>[m.id,m]));
+  let detailedRoutes=0;
+  let assessedPairs=0,cheapRejections=0;
   for(let i=0;i<tiles.length;i++)for(let j=i+1;j<tiles.length;j++) {
     const a=tiles[i],b=tiles[j];
     const ma=byId.get(a.id)??byId.get(a.id.split("::")[0]),mb=byId.get(b.id)??byId.get(b.id.split("::")[0]);
-    if(!ma||!mb)continue;
+    if(!ma||!mb){connectionDiagnostic("port candidate", "no source model", { tileA: a, tileB: b });continue;}
+    if (!ma.variants[a.variant].ports?.length || !mb.variants[b.variant].ports?.length) connectionDiagnostic("port candidate", "no candidate attachment", { tileA: a, tileB: b });
     const collision=reports.some(r=>((r.tileA===a.id&&r.tileB===b.id)||(r.tileB===a.id&&r.tileA===b.id))&&r.collision==="FAIL");
     if(!collectDiagnostics&&collision)continue;
     for(const pa of ma.variants[a.variant].ports??[])for(const pb of mb.variants[b.variant].ports??[]) {
+      assessedPairs++;
       if(!collectDiagnostics) {
         const from=worldPortPosition(a,pa),to=worldPortPosition(b,pb),maxDistance=tolerances.maxDistance??DEFAULT_PORT_TOLERANCES.maxDistance;
         const na=Math.hypot(pa.outwardDirection[0],pa.outwardDirection[1])||1,nb=Math.hypot(pb.outwardDirection[0],pb.outwardDirection[1])||1;
         const opposition=-(pa.outwardDirection[0]*pb.outwardDirection[0]+pa.outwardDirection[1]*pb.outwardDirection[1])/(na*nb);
-        if(opposition+1e-10<Math.cos(Math.max(0,Math.min(180,tolerances.maxAngularDeviation??DEFAULT_PORT_TOLERANCES.maxAngularDeviation))*Math.PI/180))continue;
-        if(Math.min(pa.usableWidth,pb.usableWidth)<(tolerances.minUsableWidth??DEFAULT_PORT_TOLERANCES.minUsableWidth)||Math.min(pa.confidence,pb.confidence)<(tolerances.minConfidence??DEFAULT_PORT_TOLERANCES.minConfidence))continue;
+        if(opposition+1e-10<Math.cos(Math.max(0,Math.min(180,tolerances.maxAngularDeviation??DEFAULT_PORT_TOLERANCES.maxAngularDeviation))*Math.PI/180)){cheapRejections++;continue;}
+        if(Math.min(pa.usableWidth,pb.usableWidth)<(tolerances.minUsableWidth??DEFAULT_PORT_TOLERANCES.minUsableWidth)||Math.min(pa.confidence,pb.confidence)<(tolerances.minConfidence??DEFAULT_PORT_TOLERANCES.minConfidence)){cheapRejections++;continue;}
         const halfA=pa.profile?pa.usableWidth*.5:0,halfB=pb.profile?pb.usableWidth*.5:0;
         // Opening centers can slide only along their source edges, not in every direction.
-        if(Math.abs(to[0]-from[0])>maxDistance+1e-8+Math.abs(pa.outwardDirection[1]/na)*halfA+Math.abs(pb.outwardDirection[1]/nb)*halfB||Math.abs(to[1]-from[1])>maxDistance+1e-8+Math.abs(pa.outwardDirection[0]/na)*halfA+Math.abs(pb.outwardDirection[0]/nb)*halfB)continue;
+        if(Math.abs(to[0]-from[0])>maxDistance+1e-8+Math.abs(pa.outwardDirection[1]/na)*halfA+Math.abs(pb.outwardDirection[1]/nb)*halfB||Math.abs(to[1]-from[1])>maxDistance+1e-8+Math.abs(pa.outwardDirection[0]/na)*halfA+Math.abs(pb.outwardDirection[0]/nb)*halfB){cheapRejections++;continue;}
         const reach=halfA+halfB;
-        if(from.reduce((sum,v,i)=>sum+(v-to[i])**2,0)>(maxDistance+reach)**2)continue;
+        if(from.reduce((sum,v,i)=>sum+(v-to[i])**2,0)>(maxDistance+reach)**2){cheapRejections++;continue;}
       }
       const {pair,reason}=assessPortPair(pa,a,pb,b,tolerances);
+      if(reason)cheapRejections++;
       if(!collectDiagnostics&&reason)continue;
       candidates.push({pair,accepted:false,reason:reason??(collision?"COLLISION":undefined)});
     }
@@ -114,27 +134,71 @@ export function matchAssemblyPorts(models:TileModel[],tiles:PlacedTile[],reports
   const find=(id:string):string=>parent.get(id)===id?id:find(parent.get(id)!);
   const join=(a:string,b:string)=>parent.set(find(a),find(b));
   // Only proven source circulation is already an edge. Mere proxy overlap is not circulation.
-  for(const r of reports) if(r.collision!=="FAIL"&&r.interlock==="PASS"&&(r.floor==="PASS"||r.circulation==="PASS"))join(r.tileA,r.tileB);
+  // Point-only interface reports have no full-width approach evidence. The port gate below can qualify a direct route.
+  const confirmedReports: ConnectionReport[] = [];
+  for(const r of confirmedReports) join(r.tileA,r.tileB);
   const componentsBefore=new Set(tiles.map(t=>find(t.id))).size;
   const pairs:PortPair[]=[],used=new Map<string,Array<{offset:number;width:number}>>(),surfaces:ConnectorSurface[]=[];
   const sorted=candidates.filter(c=>!c.reason).sort((a,b)=>Number(a.pair.fallback??false)-Number(b.pair.fallback??false)||b.pair.score-a.pair.score||a.pair.distance-b.pair.distance||(`${a.pair.tileA}:${a.pair.tileB}:${a.pair.portA}:${a.pair.portB}`).localeCompare(`${b.pair.tileA}:${b.pair.tileB}:${b.pair.portA}:${b.pair.portB}`));
   for(const candidate of sorted) {
     const pair=candidate.pair,ka=`${pair.tileA}:${pair.portA}`,kb=`${pair.tileB}:${pair.portB}`;
-    if(find(pair.tileA)===find(pair.tileB)){candidate.reason="NETWORK REDUNDANT";continue;}
+    if(find(pair.tileA)===find(pair.tileB)){candidate.reason="NETWORK REDUNDANT";connectionDiagnostic("port candidate", "network redundant", { pair });continue;}
     const occupied=(key:string,offset:number,width:number)=>(used.get(key)??[]).some(span=>Math.abs(span.offset-offset)<(span.width+width)/2+.25);
-    if(occupied(ka,pair.portOffsetA??0,pair.startWidth??pair.usableWidth)||occupied(kb,pair.portOffsetB??0,pair.endWidth??pair.usableWidth)){candidate.reason="PORT IN USE";continue;}
+    if(occupied(ka,pair.portOffsetA??0,pair.startWidth??pair.usableWidth)||occupied(kb,pair.portOffsetB??0,pair.endWidth??pair.usableWidth)){candidate.reason="PORT IN USE";connectionDiagnostic("port candidate", "port occupied", { pair });continue;}
     let accepted:PortPair|undefined;
-    for(const bend of [0,2,-2,4,-4]) {
-      const routed={...pair,path:transitionPath(pair,bend),connectionClass:bend&&pair.connectionClass==="DIRECT"?"ADAPTIVE" as const:pair.connectionClass};
-      if(pathLength(routed.path)>(tolerances.maxDistance??DEFAULT_PORT_TOLERANCES.maxDistance)*1.4)continue;
+    let validationReason:PortRejection = "COLLISION";
+    const profile=circulationProfile(pair.plan,pair.rise);
+    const bends=profile.mode==="switchback"?[profile.bend,-profile.bend,0,4,-4]:[0,2,-2,4,-4];
+    for(const bend of bends) {
+      const routed=preparePortConnection({...pair,path:transitionPath(pair,bend),connectionClass:bend&&pair.connectionClass==="DIRECT"?"ADAPTIVE" as const:pair.connectionClass});
+      if(pathLength(routed.path!)>(tolerances.maxDistance??DEFAULT_PORT_TOLERANCES.maxDistance)*1.4){validationReason="DISTANCE";connectionDiagnostic("port route", "route length", { pair: routed, bend });continue;}
+      if (!portAttachmentMeets(routed, models, tiles)) { validationReason = "SURFACE ATTACHMENT"; connectionDiagnostic("port route", "surface attachment", { pair: routed, bend }); continue; }
+      if (!acceptCirculationClass(routed)) { validationReason = "SLOPE"; connectionDiagnostic("port route", "slope", { pair: routed, bend }); continue; }
+      detailedRoutes++;
+      const complete=validateCirculationConnection(routed,models,tiles,surfaces);
+      if(complete.reason!=="accepted"){validationReason="CIRCULATION VALIDATION";connectionDiagnostic("port route",complete.reason,{pair:routed,bend,details:complete.details});continue;}
+      validationReason = "COLLISION";
       if(routeClear(routed,tiles,models,surfaces)){accepted=routed;break;}
     }
-    if(!accepted){candidate.reason="COLLISION";continue;}
-    validatedPairs.set(accepted,{models,tiles});candidate.pair=accepted;candidate.accepted=true;pairs.push(accepted);
-    for(const [key,offset,width] of [[ka,pair.portOffsetA??0,pair.startWidth??pair.usableWidth],[kb,pair.portOffsetB??0,pair.endWidth??pair.usableWidth]] as const){const spans=used.get(key)??[];spans.push({offset,width});used.set(key,spans);}join(pair.tileA,pair.tileB);surfaces.push(...transitionMeshes(accepted).map(mesh=>({...mesh,portPair:accepted})));
+    if(!accepted){candidate.reason=validationReason;connectionDiagnostic("port candidate", validationReason, { pair });continue;}
+    validatedPairs.set(accepted,{models,tiles,geometry:JSON.stringify(accepted),placements:JSON.stringify(tiles),sources:modelRevisions(models)});candidate.pair=accepted;candidate.accepted=true;pairs.push(accepted);
+    for(const [key,offset,width] of [[ka,accepted.portOffsetA??0,accepted.startWidth??accepted.usableWidth],[kb,accepted.portOffsetB??0,accepted.endWidth??accepted.usableWidth]] as const){const spans=used.get(key)??[];spans.push({offset,width});used.set(key,spans);}join(pair.tileA,pair.tileB);surfaces.push(...transitionMeshes(accepted).map(mesh=>({...mesh,portPair:accepted})));
+  }
+  // Final assignment verification has a separate bounded construction pass.
+  // Early straight-span/angle/offset rejection cannot suppress an adjacent
+  // source-responsive relationship. Cheap placement scoring stays unchanged.
+  const constructionDiagnostics:Array<{source:string;target:string;routes:number;counts:Record<string,number>;approachRejections:unknown[]}> = [];
+  let constructedRoutes=0;
+  if(adjacentConstruction)for(let i=0;i<tiles.length;i++)for(let j=i+1;j<tiles.length;j++){
+    const a=tiles[i],b=tiles[j],ma=byId.get(a.id)??byId.get(a.id.split("::")[0]),mb=byId.get(b.id)??byId.get(b.id.split("::")[0]);
+    if(constructedRoutes>=64||find(a.id)===find(b.id)||!sideAdjacentRegistration(a,b)
+      ||!ma?.sourceResponsiveExtensions||!mb?.sourceResponsiveExtensions||!ma.connectionSurface||!mb.connectionSurface)continue;
+    // Local aliases preserve source arrays and transforms while allowing the
+    // route discovery API to resolve distinct placement instances exactly.
+    const routeModels=tiles.flatMap(t=>{const m=byId.get(t.id)??byId.get(t.id.split("::")[0]);return m?[{...m,id:t.id}]:[];});
+    const evaluated=evaluateAlternativeRoutes(routeModels,tiles,a.id,b.id,surfaces,
+      {attachments:16,pairs:2,routes:Math.min(16,64-constructedRoutes),maxSpan:50,maxRun:72},{
+        additionalAnchors:(m,t)=>branchSectionAnchors(m,t,16),
+        interfaceRank:(m,t,anchor)=>architecturalInterface(m,t,anchor.point)?.role==="projecting branch"?10:0,
+      });
+    constructedRoutes+=evaluated.outcomes.length;
+    constructionDiagnostics.push({source:a.id,target:b.id,routes:evaluated.outcomes.length,counts:evaluated.counts,approachRejections:evaluated.approachRejections});
+    for(const outcome of evaluated.outcomes)connectionDiagnostic("adjacent construction",outcome.reason,{pair:outcome.pair,route:outcome.route,details:outcome.details});
+    const accepted=evaluated.accepted[0];if(!accepted)continue;
+    const pair=accepted.pair;
+    // Recheck the exact chosen path/material against the original scene and
+    // already accepted connectors. No graph insertion on a mere surface touch.
+    if(validateCirculationConnection(pair,models,tiles,surfaces,{maxRun:72}).reason!=="accepted")continue;
+    validatedPairs.set(pair,{models,tiles,geometry:JSON.stringify(pair),placements:JSON.stringify(tiles),sources:modelRevisions(models)});
+    pairs.push(pair);candidates.push({pair,accepted:true});join(a.id,b.id);
+    surfaces.push(...transitionMeshes(pair).map(mesh=>({...mesh,portPair:pair})));
   }
   const componentsAfter=new Set(tiles.map(t=>find(t.id))).size,connectivityBonus=(componentsBefore-componentsAfter)*5;
   const rejectionCounts:Partial<Record<PortRejection,number>>={};
   for(const c of candidates)if(c.reason)rejectionCounts[c.reason]=(rejectionCounts[c.reason]??0)+1;
-  return {pairs,candidates,componentsBefore,componentsAfter,rejectionCounts,score:pairs.reduce((sum,p)=>sum+p.score,0)+connectivityBonus,multiConnectionBonus:connectivityBonus};
+  return {pairs,candidates,confirmedReports,componentsBefore,componentsAfter,rejectionCounts,constructionDiagnostics,assessedPairs,cheapRejections,detailedRoutes:detailedRoutes+constructedRoutes,score:pairs.reduce((sum,p)=>sum+p.score,0)+connectivityBonus,multiConnectionBonus:connectivityBonus};
+
+  } finally { finishTiming(); }
+
+  } finally { finishGeometry(); }
 }
