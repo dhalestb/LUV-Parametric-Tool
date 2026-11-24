@@ -1,0 +1,86 @@
+[
+  {
+    "file": "scripts/source-envelope.cjs",
+    "sha256": "78c1df5575eb8d6d0ebc287aa18598d791c0b558cb8b9780538da67cafa0c695",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "proof/rule-amphitheater.cjs",
+    "sha256": "e6333f82b22da3d731d640f5edd553fbd8714b68be6865451dbc0ba8599f37da",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "proof/render.cjs",
+    "sha256": "e32f6f1e9d8ff3058b4a10a2d6a95cdb5c6f6177ba76e79fa1641a263f6d946f",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "proof/field-config.cjs",
+    "sha256": "ab4638d193c69f8e98a2596f78691477d8a035c664f8f470dad9476954c37396",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "src/components/letterGeometry3d.ts",
+    "sha256": "ade11f4e8cd6123ed9c63a0e17629f09988c2685fd13dd9b5b9d86115a0f5b47",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "src/components/architecturalLetterSizing.ts",
+    "sha256": "6abc8deffdb15e1423d88e8a71c1d98210b939e6656d8b39c1f63f823a8a2d2f",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "src/components/letterVolumeLayout.ts",
+    "sha256": "5c722c04c38431db93c714a12517e2a55e2f32f78c67f04742644b8ac50bce71",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "src/components/voidFieldPopulation.ts",
+    "sha256": "a19b868d8fee581d95d90e5324e225a25f3b3754eb398b322c9c6b8772b0a6cd",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "scripts/source-profile-envelope.cjs",
+    "sha256": "fb288d212d8dc9d8840e2b8052f9462518e1221eea7040fb80b980fed8677bbe",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "scripts/source-void-field.cjs",
+    "sha256": "8af2917cd1e34b48cda21fa8039418245d7f2d38150c2b8c7b321bf4b202449b",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "scripts/source-vertical-envelope.cjs",
+    "sha256": "a48425b7afc0b898ae212654bec6e0b13e0ea38a461723567e2331e952e38b9c",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "scripts/source-face-normal-facade.cjs",
+    "sha256": "86e43aae9b13331603eb2394c2c74dd8ebd85bc1397f978fa95940ca8c92d4f5",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "scripts/source-atrium-openings.cjs",
+    "sha256": "95bee59e9f9ad77b4dd1d6c6c3cda515944ea86cee14a4a85062255860cc7ba2",
+    "originalExists": true,
+    "matchesOriginal": true
+  },
+  {
+    "file": "scripts/source-level-envelope.cjs",
+    "sha256": "22e4bf20457cf5649e0b914406c24a70303d6cf49d46ca5c605d3e8a7251929c",
+    "originalExists": true,
+    "matchesOriginal": true
+  }
+]

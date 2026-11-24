@@ -1,0 +1,156 @@
+{
+  "passed": true,
+  "broadPhaseFlags": 6,
+  "preciseMethod": "all nonadjacent BVH pairs tested with independent segment/triangle crossings and coplanar polygon clipping; original preflight retained separately",
+  "exports": [
+    {
+      "file": "combined-envelope.obj",
+      "status": "NoError",
+      "volume": 5482.526196703604,
+      "vertices": 1213,
+      "triangles": 2462
+    },
+    {
+      "file": "boundary-L-1.obj",
+      "status": "NoError",
+      "volume": 155.09879436493216,
+      "vertices": 105,
+      "triangles": 206
+    },
+    {
+      "file": "boundary-U-2.obj",
+      "status": "NoError",
+      "volume": 92.03170397420716,
+      "vertices": 838,
+      "triangles": 1672
+    },
+    {
+      "file": "boundary-V-3.obj",
+      "status": "NoError",
+      "volume": 170.4000909668567,
+      "vertices": 99,
+      "triangles": 194
+    },
+    {
+      "file": "boundary-U-4.obj",
+      "status": "NoError",
+      "volume": 51.27441853191676,
+      "vertices": 576,
+      "triangles": 1148
+    },
+    {
+      "file": "boundary-V-5.obj",
+      "status": "NoError",
+      "volume": 117.2024066869567,
+      "vertices": 35,
+      "triangles": 66
+    },
+    {
+      "file": "boundary-L-6.obj",
+      "status": "NoError",
+      "volume": 95.6615213510137,
+      "vertices": 93,
+      "triangles": 182
+    },
+    {
+      "file": "boundary-U-7.obj",
+      "status": "NoError",
+      "volume": 60.606626839511115,
+      "vertices": 291,
+      "triangles": 578
+    },
+    {
+      "file": "boundary-L-8.obj",
+      "status": "NoError",
+      "volume": 155.16382936246902,
+      "vertices": 105,
+      "triangles": 206
+    },
+    {
+      "file": "boundary-U-9.obj",
+      "status": "NoError",
+      "volume": 92.03071486929804,
+      "vertices": 694,
+      "triangles": 1384
+    },
+    {
+      "file": "boundary-V-10.obj",
+      "status": "NoError",
+      "volume": 170.3959508531776,
+      "vertices": 64,
+      "triangles": 124
+    },
+    {
+      "file": "boundary-U-11.obj",
+      "status": "NoError",
+      "volume": 53.54986831539143,
+      "vertices": 417,
+      "triangles": 830
+    },
+    {
+      "file": "boundary-V-12.obj",
+      "status": "NoError",
+      "volume": 125.7312400895091,
+      "vertices": 21,
+      "triangles": 38
+    },
+    {
+      "file": "boundary-L-13.obj",
+      "status": "NoError",
+      "volume": 94.91080057566029,
+      "vertices": 109,
+      "triangles": 214
+    },
+    {
+      "file": "boundary-U-14.obj",
+      "status": "NoError",
+      "volume": 60.66641726514588,
+      "vertices": 327,
+      "triangles": 650
+    },
+    {
+      "file": "plate-L-1.obj",
+      "status": "NoError",
+      "volume": 26.57694041852255,
+      "vertices": 34,
+      "triangles": 64
+    },
+    {
+      "file": "plate-U-4.obj",
+      "status": "NoError",
+      "volume": 25.339963691834377,
+      "vertices": 50,
+      "triangles": 96
+    },
+    {
+      "file": "plate-L-8.obj",
+      "status": "NoError",
+      "volume": 27.57863974207339,
+      "vertices": 34,
+      "triangles": 64
+    },
+    {
+      "file": "plate-U-11.obj",
+      "status": "NoError",
+      "volume": 27.072444010881973,
+      "vertices": 52,
+      "triangles": 100
+    },
+    {
+      "file": "corner-pier-L-15.obj",
+      "status": "NoError",
+      "volume": 4082.795148060288,
+      "vertices": 12,
+      "triangles": 20
+    }
+  ],
+  "coplanarAreas": [],
+  "nonAdjacentTriangleChecks": 172304,
+  "selfIntersectionPairs": 0,
+  "coplanar": 0,
+  "nonCoplanar": 0,
+  "examples": [],
+  "shellVolumes": [
+    5482.526216563607
+  ]
+}

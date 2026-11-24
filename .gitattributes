@@ -1,0 +1,19 @@
+# Frozen rule bindings and saved model records are authenticated by byte hash.
+/vendor/** -text
+/public/experiment-architecture/** -text
+/public/experiment-designs/** -text
+/public/experiment-inputs/** -text
+/public/experiment-authentic-domain/** -text
+/public/experiment-full-zone/** -text
+/public/experiment-height-aware-perimeter/** -text
+/public/experiment-independent-fields/** -text
+/public/experiment-prototypes/** -text
+/public/geometry-runtime/** -text
+/fixtures/site-development-checkpoint/** -text
+/reports/plate-source-role-review-20261124/** -text
+/reports/plate-exterior-facing-20261124/** -text
+/reports/void-collision-gated-search-20261124/input.json -text
+/reports/void-field-integration-20261123/domain.json -text
+/reports/room-optional-platforms-20261123/reference-replay/input.json -text
+/reports/plate-corner-top-proof-20261121/control-spacing13p5/result.json -text
+/reports/minimum-polygon-corrections-20261121/runs/field-fit-rectangular-field/result.json -text

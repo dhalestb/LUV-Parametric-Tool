@@ -20,7 +20,10 @@ export default function AppNav() {
 
   return (
     <nav aria-label="Application" className="app-nav flex items-center gap-1">
-      {LINKS.map((link) => {
+      {[...LINKS,
+        { href: "/site-development", label: "Site Development" },
+        { href: "/experiment/site-polygon-morphogenesis", label: "Polygon-Driven Architecture" },
+      ].map((link) => {
         const active =
           link.href === "/"
             ? pathname === "/"

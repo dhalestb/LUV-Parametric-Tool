@@ -1,0 +1,2193 @@
+{
+  "passed": true,
+  "broadPhaseFlags": 163,
+  "preciseMethod": "all nonadjacent BVH pairs tested with independent segment/triangle crossings and coplanar polygon clipping; original preflight retained separately",
+  "exports": [
+    {
+      "file": "combined-envelope.obj",
+      "status": "NoError",
+      "volume": 4662.387930984728,
+      "vertices": 1603,
+      "triangles": 3382
+    },
+    {
+      "file": "base-wall-1.obj",
+      "status": "NoError",
+      "volume": 0.9879631996154795,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-2.obj",
+      "status": "NoError",
+      "volume": 4.325452327728276,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-3.obj",
+      "status": "NoError",
+      "volume": 2.7173385620117223,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-4.obj",
+      "status": "NoError",
+      "volume": 11.771327972412086,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-5.obj",
+      "status": "NoError",
+      "volume": 0.1255912780761712,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-6.obj",
+      "status": "NoError",
+      "volume": 4.986835241317749,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-7.obj",
+      "status": "NoError",
+      "volume": 10.188929557800293,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-8.obj",
+      "status": "NoError",
+      "volume": 2.3418741226196294,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-9.obj",
+      "status": "NoError",
+      "volume": 0.13205337524414046,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-10.obj",
+      "status": "NoError",
+      "volume": 4.176060676574707,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-11.obj",
+      "status": "NoError",
+      "volume": 6.729766845703125,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-12.obj",
+      "status": "NoError",
+      "volume": 1.9575576782226562,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-13.obj",
+      "status": "NoError",
+      "volume": 1.9007084369659424,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-14.obj",
+      "status": "NoError",
+      "volume": 7.0689697265625,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-15.obj",
+      "status": "NoError",
+      "volume": 5.82568359375,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-16.obj",
+      "status": "NoError",
+      "volume": 2.2615966796875,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-17.obj",
+      "status": "NoError",
+      "volume": 7.784492254257202,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-18.obj",
+      "status": "NoError",
+      "volume": 8.25390887260437,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-19.obj",
+      "status": "NoError",
+      "volume": 3.390836715698242,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-20.obj",
+      "status": "NoError",
+      "volume": 0.6519675254821768,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-21.obj",
+      "status": "NoError",
+      "volume": 0.997629642486574,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-22.obj",
+      "status": "NoError",
+      "volume": 3.4322781562805234,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-23.obj",
+      "status": "NoError",
+      "volume": 0.18007755279541068,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-24.obj",
+      "status": "NoError",
+      "volume": 4.312803268432617,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-25.obj",
+      "status": "NoError",
+      "volume": 12.346761703491207,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-26.obj",
+      "status": "NoError",
+      "volume": 2.055870056152342,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-27.obj",
+      "status": "NoError",
+      "volume": 3.2696342468261737,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-28.obj",
+      "status": "NoError",
+      "volume": 1.1570549011230469,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-29.obj",
+      "status": "NoError",
+      "volume": 4.189624786376953,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-30.obj",
+      "status": "NoError",
+      "volume": 2.6708335876464844,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-31.obj",
+      "status": "NoError",
+      "volume": 3.805492401123047,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "plank-return-32.obj",
+      "status": "NoError",
+      "volume": 1.2175025939941406,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-33.obj",
+      "status": "NoError",
+      "volume": 5.035843849182129,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-34.obj",
+      "status": "NoError",
+      "volume": 1.883082389831543,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-35.obj",
+      "status": "NoError",
+      "volume": 1.1967658996582031,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-36.obj",
+      "status": "NoError",
+      "volume": 0.6855010986328117,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-37.obj",
+      "status": "NoError",
+      "volume": 1.6444540023803706,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-38.obj",
+      "status": "NoError",
+      "volume": 3.644242286682129,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-39.obj",
+      "status": "NoError",
+      "volume": 4.54952955245971,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-40.obj",
+      "status": "NoError",
+      "volume": 8.127425909042355,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-41.obj",
+      "status": "NoError",
+      "volume": 1.9546973705291735,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-42.obj",
+      "status": "NoError",
+      "volume": 7.119071960449219,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-43.obj",
+      "status": "NoError",
+      "volume": 6.10546875,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-44.obj",
+      "status": "NoError",
+      "volume": 3.8536376953125,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-45.obj",
+      "status": "NoError",
+      "volume": 2.0381119251251207,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-46.obj",
+      "status": "NoError",
+      "volume": 6.801093578338623,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-47.obj",
+      "status": "NoError",
+      "volume": 7.427659988403326,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-48.obj",
+      "status": "NoError",
+      "volume": 2.958661079406739,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-49.obj",
+      "status": "NoError",
+      "volume": 0.351189613342285,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-50.obj",
+      "status": "NoError",
+      "volume": 2.6921157836914027,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-51.obj",
+      "status": "NoError",
+      "volume": 10.391357421874991,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-52.obj",
+      "status": "NoError",
+      "volume": 0.32472991943359397,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-53.obj",
+      "status": "NoError",
+      "volume": 2.9180927276611377,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-54.obj",
+      "status": "NoError",
+      "volume": 9.231164932250973,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-55.obj",
+      "status": "NoError",
+      "volume": 1.5032196044921877,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-56.obj",
+      "status": "NoError",
+      "volume": 2.3844337463378893,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-57.obj",
+      "status": "NoError",
+      "volume": 2.2775697708129834,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-58.obj",
+      "status": "NoError",
+      "volume": 3.299088478088379,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-59.obj",
+      "status": "NoError",
+      "volume": 1.094484329223633,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-60.obj",
+      "status": "NoError",
+      "volume": 6.791971445083614,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-61.obj",
+      "status": "NoError",
+      "volume": 12.32501912117004,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-62.obj",
+      "status": "NoError",
+      "volume": 3.047391891479491,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-63.obj",
+      "status": "NoError",
+      "volume": 0.7771134376525884,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-64.obj",
+      "status": "NoError",
+      "volume": 1.8366422653198242,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-65.obj",
+      "status": "NoError",
+      "volume": 3.542996406555176,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-66.obj",
+      "status": "NoError",
+      "volume": 6.253669738769531,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-67.obj",
+      "status": "NoError",
+      "volume": 5.0445263385772705,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-68.obj",
+      "status": "NoError",
+      "volume": 1.8789429664611814,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-69.obj",
+      "status": "NoError",
+      "volume": 0.5996131896972661,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-70.obj",
+      "status": "NoError",
+      "volume": 0.7639169692993163,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-71.obj",
+      "status": "NoError",
+      "volume": 1.0215377807617188,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-72.obj",
+      "status": "NoError",
+      "volume": 2.3006186485290527,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-73.obj",
+      "status": "NoError",
+      "volume": 2.976786136627197,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-74.obj",
+      "status": "NoError",
+      "volume": 6.323807716369629,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-75.obj",
+      "status": "NoError",
+      "volume": 8.05775499343872,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-76.obj",
+      "status": "NoError",
+      "volume": 0.12466287612915054,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-77.obj",
+      "status": "NoError",
+      "volume": 3.282416820526128,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-78.obj",
+      "status": "NoError",
+      "volume": 11.755081176757793,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-79.obj",
+      "status": "NoError",
+      "volume": 1.5627841949462875,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-80.obj",
+      "status": "NoError",
+      "volume": 0.13034868240356454,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-81.obj",
+      "status": "NoError",
+      "volume": 3.5899081230163596,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-82.obj",
+      "status": "NoError",
+      "volume": 10.523485183715811,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-83.obj",
+      "status": "NoError",
+      "volume": 1.7091827392578116,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-84.obj",
+      "status": "NoError",
+      "volume": 2.47535181045532,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-85.obj",
+      "status": "NoError",
+      "volume": 3.687905788421631,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-86.obj",
+      "status": "NoError",
+      "volume": 5.9430999755859375,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-87.obj",
+      "status": "NoError",
+      "volume": 1.6891846656799312,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-88.obj",
+      "status": "NoError",
+      "volume": 5.40430212020874,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-89.obj",
+      "status": "NoError",
+      "volume": 10.536445140838623,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-90.obj",
+      "status": "NoError",
+      "volume": 2.547756195068361,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-91.obj",
+      "status": "NoError",
+      "volume": 0.6465077400207528,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-92.obj",
+      "status": "NoError",
+      "volume": 2.14357852935791,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-93.obj",
+      "status": "NoError",
+      "volume": 2.2728395462036133,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-94.obj",
+      "status": "NoError",
+      "volume": 0.17952919006347645,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-95.obj",
+      "status": "NoError",
+      "volume": 9.237030029296875,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-96.obj",
+      "status": "NoError",
+      "volume": 7.318450927734373,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-97.obj",
+      "status": "NoError",
+      "volume": 3.0443115234375,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-98.obj",
+      "status": "NoError",
+      "volume": 3.296670913696289,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-99.obj",
+      "status": "NoError",
+      "volume": 2.4930131435394287,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-100.obj",
+      "status": "NoError",
+      "volume": 2.8521406650543213,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-101.obj",
+      "status": "NoError",
+      "volume": 2.3930797576904297,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-102.obj",
+      "status": "NoError",
+      "volume": 1.7744579315185547,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-103.obj",
+      "status": "NoError",
+      "volume": 3.808908462524414,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-104.obj",
+      "status": "NoError",
+      "volume": 0.8995914459228516,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-105.obj",
+      "status": "NoError",
+      "volume": 1.013031005859375,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-106.obj",
+      "status": "NoError",
+      "volume": 0.9791679382324221,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-107.obj",
+      "status": "NoError",
+      "volume": 4.286945343017579,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-108.obj",
+      "status": "NoError",
+      "volume": 2.6929955482482955,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-109.obj",
+      "status": "NoError",
+      "volume": 9.855458498001116,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-110.obj",
+      "status": "NoError",
+      "volume": 1.9348833560943604,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-111.obj",
+      "status": "NoError",
+      "volume": 4.71302604675293,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-112.obj",
+      "status": "NoError",
+      "volume": 8.419501304626465,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-113.obj",
+      "status": "NoError",
+      "volume": 2.0249433517456055,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-114.obj",
+      "status": "NoError",
+      "volume": 1.4339866638183583,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-115.obj",
+      "status": "NoError",
+      "volume": 2.9976806640624964,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-116.obj",
+      "status": "NoError",
+      "volume": 0.7080631256103513,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-117.obj",
+      "status": "NoError",
+      "volume": 0.17919540405273443,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-118.obj",
+      "status": "NoError",
+      "volume": 6.881402492523191,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-119.obj",
+      "status": "NoError",
+      "volume": 7.7877917289733745,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-120.obj",
+      "status": "NoError",
+      "volume": 0.5963087081909172,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-121.obj",
+      "status": "NoError",
+      "volume": 4.31934499740601,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-122.obj",
+      "status": "NoError",
+      "volume": 3.6905322074890115,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-123.obj",
+      "status": "NoError",
+      "volume": 1.4669036865234382,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-124.obj",
+      "status": "NoError",
+      "volume": 1.5835475921630866,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-125.obj",
+      "status": "NoError",
+      "volume": 2.3414471149444567,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-126.obj",
+      "status": "NoError",
+      "volume": 7.406990289688108,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-127.obj",
+      "status": "NoError",
+      "volume": 1.913244724273681,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-128.obj",
+      "status": "NoError",
+      "volume": 3.2546072006225577,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-129.obj",
+      "status": "NoError",
+      "volume": 12.56253051757811,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-130.obj",
+      "status": "NoError",
+      "volume": 3.3144111633300732,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-131.obj",
+      "status": "NoError",
+      "volume": 0.3936729431152344,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-132.obj",
+      "status": "NoError",
+      "volume": 3.9805376529693484,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-133.obj",
+      "status": "NoError",
+      "volume": 7.396330833435083,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-134.obj",
+      "status": "NoError",
+      "volume": 0.2823722362518315,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-135.obj",
+      "status": "NoError",
+      "volume": 6.240916252136243,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-136.obj",
+      "status": "NoError",
+      "volume": 9.311389923095723,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-137.obj",
+      "status": "NoError",
+      "volume": 1.8692970275878933,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-138.obj",
+      "status": "NoError",
+      "volume": 2.6827316284179665,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-139.obj",
+      "status": "NoError",
+      "volume": 3.1245574951171875,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-140.obj",
+      "status": "NoError",
+      "volume": 2.57501220703125,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-141.obj",
+      "status": "NoError",
+      "volume": 0.9996490478515643,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-142.obj",
+      "status": "NoError",
+      "volume": 9.256103038787842,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-143.obj",
+      "status": "NoError",
+      "volume": 9.814260005950928,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-144.obj",
+      "status": "NoError",
+      "volume": 3.0382642745971715,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-145.obj",
+      "status": "NoError",
+      "volume": 0.7717847824096663,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-146.obj",
+      "status": "NoError",
+      "volume": 2.490878105163574,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-147.obj",
+      "status": "NoError",
+      "volume": 2.84969806671143,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-148.obj",
+      "status": "NoError",
+      "volume": 3.6936879158020037,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-149.obj",
+      "status": "NoError",
+      "volume": 3.6444387435913095,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "plank-return-150.obj",
+      "status": "NoError",
+      "volume": 1.3263988494873047,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-151.obj",
+      "status": "NoError",
+      "volume": 3.703707695007325,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-152.obj",
+      "status": "NoError",
+      "volume": 2.5516555309295654,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-153.obj",
+      "status": "NoError",
+      "volume": 0.7604503631591788,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-154.obj",
+      "status": "NoError",
+      "volume": 1.017379760742187,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-155.obj",
+      "status": "NoError",
+      "volume": 1.5170793533325195,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-156.obj",
+      "status": "NoError",
+      "volume": 0.6838607788085943,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-157.obj",
+      "status": "NoError",
+      "volume": 0.9026169776916504,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-158.obj",
+      "status": "NoError",
+      "volume": 1.6510963439941415,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-159.obj",
+      "status": "NoError",
+      "volume": 3.6589622497558594,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-160.obj",
+      "status": "NoError",
+      "volume": 4.520587921142581,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-161.obj",
+      "status": "NoError",
+      "volume": 9.893045425415044,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-162.obj",
+      "status": "NoError",
+      "volume": 0.1249408721923829,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-163.obj",
+      "status": "NoError",
+      "volume": 7.109962463378906,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-164.obj",
+      "status": "NoError",
+      "volume": 8.003173828125,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-165.obj",
+      "status": "NoError",
+      "volume": 2.3391666412353516,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-166.obj",
+      "status": "NoError",
+      "volume": 0.13100433349609317,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-167.obj",
+      "status": "NoError",
+      "volume": 6.780881881713867,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-168.obj",
+      "status": "NoError",
+      "volume": 5.588264465332031,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-169.obj",
+      "status": "NoError",
+      "volume": 2.2255496978759766,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-170.obj",
+      "status": "NoError",
+      "volume": 2.1694278717041025,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-171.obj",
+      "status": "NoError",
+      "volume": 2.702899932861329,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-172.obj",
+      "status": "NoError",
+      "volume": 8.750244140624996,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-173.obj",
+      "status": "NoError",
+      "volume": 2.0087699890136728,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-174.obj",
+      "status": "NoError",
+      "volume": 2.9264259338378915,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-175.obj",
+      "status": "NoError",
+      "volume": 11.079425811767575,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-176.obj",
+      "status": "NoError",
+      "volume": 2.9545593261718732,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-177.obj",
+      "status": "NoError",
+      "volume": 0.5693435668945312,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-178.obj",
+      "status": "NoError",
+      "volume": 2.2821540832519567,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-179.obj",
+      "status": "NoError",
+      "volume": 4.141300201416027,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-180.obj",
+      "status": "NoError",
+      "volume": 0.2611160278320306,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-181.obj",
+      "status": "NoError",
+      "volume": 6.7764472961425755,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-182.obj",
+      "status": "NoError",
+      "volume": 9.81576919555664,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-183.obj",
+      "status": "NoError",
+      "volume": 2.0474395751953116,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-184.obj",
+      "status": "NoError",
+      "volume": 3.2596206665039076,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-185.obj",
+      "status": "NoError",
+      "volume": 1.819555282592772,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-186.obj",
+      "status": "NoError",
+      "volume": 3.5100345611572243,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-187.obj",
+      "status": "NoError",
+      "volume": 3.8020763397216797,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-188.obj",
+      "status": "NoError",
+      "volume": 3.792966842651367,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "plank-return-189.obj",
+      "status": "NoError",
+      "volume": 1.213495254516602,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-190.obj",
+      "status": "NoError",
+      "volume": 3.6766185760498065,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-191.obj",
+      "status": "NoError",
+      "volume": 1.8930816650390625,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-192.obj",
+      "status": "NoError",
+      "volume": 1.1862773895263672,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-193.obj",
+      "status": "NoError",
+      "volume": 0.6823730468750003,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-194.obj",
+      "status": "NoError",
+      "volume": 2.3100643157958984,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-195.obj",
+      "status": "NoError",
+      "volume": 2.989007949829108,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-196.obj",
+      "status": "NoError",
+      "volume": 6.331124782562256,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-197.obj",
+      "status": "NoError",
+      "volume": 6.251702070236202,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-198.obj",
+      "status": "NoError",
+      "volume": 1.940183401107788,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-199.obj",
+      "status": "NoError",
+      "volume": 3.2896814346313463,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-200.obj",
+      "status": "NoError",
+      "volume": 9.880920410156245,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-201.obj",
+      "status": "NoError",
+      "volume": 3.8506221771240234,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-202.obj",
+      "status": "NoError",
+      "volume": 2.0308141708374023,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-203.obj",
+      "status": "NoError",
+      "volume": 3.152578353881835,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-204.obj",
+      "status": "NoError",
+      "volume": 11.062477111816406,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-205.obj",
+      "status": "NoError",
+      "volume": 2.9631843566894522,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-206.obj",
+      "status": "NoError",
+      "volume": 0.3567771911621097,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-207.obj",
+      "status": "NoError",
+      "volume": 4.402242422103882,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-208.obj",
+      "status": "NoError",
+      "volume": 8.783370971679682,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-209.obj",
+      "status": "NoError",
+      "volume": 0.3272650241851812,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-210.obj",
+      "status": "NoError",
+      "volume": 4.745939254760742,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-211.obj",
+      "status": "NoError",
+      "volume": 7.431890487670901,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-212.obj",
+      "status": "NoError",
+      "volume": 1.4974641799926747,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-213.obj",
+      "status": "NoError",
+      "volume": 2.382681369781494,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-214.obj",
+      "status": "NoError",
+      "volume": 3.1036341190338135,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-215.obj",
+      "status": "NoError",
+      "volume": 2.458993196487429,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-216.obj",
+      "status": "NoError",
+      "volume": 1.0917305946350102,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-217.obj",
+      "status": "NoError",
+      "volume": 9.25012493133545,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-218.obj",
+      "status": "NoError",
+      "volume": 9.807921409606934,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-219.obj",
+      "status": "NoError",
+      "volume": 3.0396909713745135,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-220.obj",
+      "status": "NoError",
+      "volume": 0.7756233215332029,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-221.obj",
+      "status": "NoError",
+      "volume": 2.47152042388916,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-222.obj",
+      "status": "NoError",
+      "volume": 1.9581727981567338,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-223.obj",
+      "status": "NoError",
+      "volume": 1.344094276428223,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-224.obj",
+      "status": "NoError",
+      "volume": 0.8693790435791016,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-225.obj",
+      "status": "NoError",
+      "volume": 2.6928820610046387,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-226.obj",
+      "status": "NoError",
+      "volume": 9.413772583007812,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-227.obj",
+      "status": "NoError",
+      "volume": 2.2300567626953143,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-228.obj",
+      "status": "NoError",
+      "volume": 2.3923444747924805,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-229.obj",
+      "status": "NoError",
+      "volume": 0.9914813041687015,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "roof-wall-230.obj",
+      "status": "NoError",
+      "volume": 4.34085512161255,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-231.obj",
+      "status": "NoError",
+      "volume": 5.850992202758789,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-232.obj",
+      "status": "NoError",
+      "volume": 3.511136054992676,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-233.obj",
+      "status": "NoError",
+      "volume": 2.5671701431274414,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-234.obj",
+      "status": "NoError",
+      "volume": 3.807058095932007,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "plank-return-235.obj",
+      "status": "NoError",
+      "volume": 1.3391661643981934,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-236.obj",
+      "status": "NoError",
+      "volume": 0.6020164489746089,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-237.obj",
+      "status": "NoError",
+      "volume": 0.7697210311889648,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-238.obj",
+      "status": "NoError",
+      "volume": 1.0124588012695312,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-239.obj",
+      "status": "NoError",
+      "volume": 1.0203170776367185,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "contour-floor-240.obj",
+      "status": "NoError",
+      "volume": 1382.0235452651978,
+      "vertices": 168,
+      "triangles": 332
+    },
+    {
+      "file": "roof-plank-241.obj",
+      "status": "NoError",
+      "volume": 1392.327651977539,
+      "vertices": 180,
+      "triangles": 356
+    },
+    {
+      "file": "base-wall-242.obj",
+      "status": "NoError",
+      "volume": 1.2161097843199964,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-243.obj",
+      "status": "NoError",
+      "volume": 6.485918849706657,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-244.obj",
+      "status": "NoError",
+      "volume": 7.327841008082037,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-245.obj",
+      "status": "NoError",
+      "volume": 5.623161213639828,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-246.obj",
+      "status": "NoError",
+      "volume": 9.102081964490944,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-247.obj",
+      "status": "NoError",
+      "volume": 2.888460013113217,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-248.obj",
+      "status": "NoError",
+      "volume": 6.367081374199188,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-249.obj",
+      "status": "NoError",
+      "volume": 3.894372915339772,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-250.obj",
+      "status": "NoError",
+      "volume": 17.513993765969644,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-251.obj",
+      "status": "NoError",
+      "volume": 1.1014635271567386,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-252.obj",
+      "status": "NoError",
+      "volume": 1.1405531992859324,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-253.obj",
+      "status": "NoError",
+      "volume": 3.692142756757675,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-254.obj",
+      "status": "NoError",
+      "volume": 6.4534932218957675,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-255.obj",
+      "status": "NoError",
+      "volume": 4.809093506701176,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-256.obj",
+      "status": "NoError",
+      "volume": 3.0785010036779568,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-257.obj",
+      "status": "NoError",
+      "volume": 19.365613151341677,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-258.obj",
+      "status": "NoError",
+      "volume": 5.152192747336815,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-259.obj",
+      "status": "NoError",
+      "volume": 2.9206291573354974,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-260.obj",
+      "status": "NoError",
+      "volume": 9.824220566166334,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-261.obj",
+      "status": "NoError",
+      "volume": 12.829865690255247,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-262.obj",
+      "status": "NoError",
+      "volume": 1.2675149593196688,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-263.obj",
+      "status": "NoError",
+      "volume": 1.2734822550046385,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-264.obj",
+      "status": "NoError",
+      "volume": 1.2065903339534998,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-265.obj",
+      "status": "NoError",
+      "volume": 11.385262638330454,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-266.obj",
+      "status": "NoError",
+      "volume": 2.3203660268336535,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-267.obj",
+      "status": "NoError",
+      "volume": 1.8451010976300621,
+      "vertices": 16,
+      "triangles": 24
+    },
+    {
+      "file": "wall-268.obj",
+      "status": "NoError",
+      "volume": 1.8379217159272245,
+      "vertices": 16,
+      "triangles": 24
+    },
+    {
+      "file": "connection-269.obj",
+      "status": "NoError",
+      "volume": 1.4130566822681203,
+      "vertices": 14,
+      "triangles": 20
+    },
+    {
+      "file": "wall-270.obj",
+      "status": "NoError",
+      "volume": 4.279022855295607,
+      "vertices": 16,
+      "triangles": 28
+    },
+    {
+      "file": "edge-column-271.obj",
+      "status": "NoError",
+      "volume": 3.8922252228367142,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-272.obj",
+      "status": "NoError",
+      "volume": 17.51331441817456,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-273.obj",
+      "status": "NoError",
+      "volume": 1.6393305888050234,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-274.obj",
+      "status": "NoError",
+      "volume": 3.1759545175373196,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-275.obj",
+      "status": "NoError",
+      "volume": 0.776383450458525,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-276.obj",
+      "status": "NoError",
+      "volume": 3.6892494502535533,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-277.obj",
+      "status": "NoError",
+      "volume": 3.9682683162391172,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-278.obj",
+      "status": "NoError",
+      "volume": 7.285492611845252,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-279.obj",
+      "status": "NoError",
+      "volume": 3.075851547277125,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-280.obj",
+      "status": "NoError",
+      "volume": 15.142653771210462,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-281.obj",
+      "status": "NoError",
+      "volume": 6.824167308717729,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-282.obj",
+      "status": "NoError",
+      "volume": 7.124408284718816,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-283.obj",
+      "status": "NoError",
+      "volume": 9.779963321809195,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-284.obj",
+      "status": "NoError",
+      "volume": 12.82437012414448,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-285.obj",
+      "status": "NoError",
+      "volume": 2.499079310058732,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-286.obj",
+      "status": "NoError",
+      "volume": 0.8503701461668247,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-287.obj",
+      "status": "NoError",
+      "volume": 1.212688731844537,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-288.obj",
+      "status": "NoError",
+      "volume": 8.955239865928888,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-289.obj",
+      "status": "NoError",
+      "volume": 4.819660344510341,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-290.obj",
+      "status": "NoError",
+      "volume": 5.620772054709957,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-291.obj",
+      "status": "NoError",
+      "volume": 12.597528029233217,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-292.obj",
+      "status": "NoError",
+      "volume": 2.8959323621238573,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-293.obj",
+      "status": "NoError",
+      "volume": 2.8650627983151966,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-294.obj",
+      "status": "NoError",
+      "volume": 3.8940444447216604,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-295.obj",
+      "status": "NoError",
+      "volume": 17.55095028602227,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-296.obj",
+      "status": "NoError",
+      "volume": 1.103178820747416,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-297.obj",
+      "status": "NoError",
+      "volume": 1.1370117711485372,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-298.obj",
+      "status": "NoError",
+      "volume": 3.6893629132537136,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-299.obj",
+      "status": "NoError",
+      "volume": 8.92887831106782,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-300.obj",
+      "status": "NoError",
+      "volume": 2.325228726840578,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "base-wall-301.obj",
+      "status": "NoError",
+      "volume": 1.6156517258405079,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-302.obj",
+      "status": "NoError",
+      "volume": 5.744539469655133,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "connection-303.obj",
+      "status": "NoError",
+      "volume": 2.8038806355159807,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "wall-304.obj",
+      "status": "NoError",
+      "volume": 7.134733784292088,
+      "vertices": 12,
+      "triangles": 20
+    },
+    {
+      "file": "edge-column-305.obj",
+      "status": "NoError",
+      "volume": 9.766711510819736,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "edge-column-306.obj",
+      "status": "NoError",
+      "volume": 12.832319685185203,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-307.obj",
+      "status": "NoError",
+      "volume": 1.7851858453068423,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "daylight-return-308.obj",
+      "status": "NoError",
+      "volume": 1.268232922673632,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "contour-floor-309.obj",
+      "status": "NoError",
+      "volume": 793.9433216130766,
+      "vertices": 48,
+      "triangles": 92
+    },
+    {
+      "file": "roof-plank-310.obj",
+      "status": "NoError",
+      "volume": 802.9773925629792,
+      "vertices": 46,
+      "triangles": 88
+    }
+  ],
+  "coplanarAreas": [],
+  "nonAdjacentTriangleChecks": 179958,
+  "selfIntersectionPairs": 0,
+  "coplanar": 0,
+  "nonCoplanar": 0,
+  "examples": [],
+  "shellVolumes": [
+    4662.388011159302
+  ]
+}
