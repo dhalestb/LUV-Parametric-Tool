@@ -372,7 +372,7 @@ export default function ArchitecturalEvaluations() {
       }}/>
       <ArchitecturalRegionExperiment meshes={meshes} unit={unit} upAxisMode={upAxisMode}/>
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>
-        Unit {unit}. Up axis {upAxisMode}. The highest horizontal plane on every lobby is roof and is not scored. Compressed and continuous keep two floors, and topographic keeps one. Vertical void and linear keep every floor below that roof. {includeTopDecks ? "Uncovered top decks on a counted level are scored as open-to-sky floor. Roof lids stay excluded. Press Analyze All Forms after changing this." : "Official v4.1: uncovered top decks are excluded from interior Open Volume, visibility, and light. Press Analyze All Forms after changing this."}
+        Unit {unit}. Up axis {upAxisMode}. The highest horizontal plane on every lobby is roof and is not scored. A lobby floor counts only where a ceiling leaves at least 7 ft of clear height. Compressed and continuous keep two such floors, and topographic keeps one. Vertical void keeps every such floor below that roof. Linear keeps only the floor at 5 ft, and that floor is read as one floor. {includeTopDecks ? "Uncovered top decks on a counted level are scored as open-to-sky floor. Roof lids stay excluded. Press Analyze All Forms after changing this." : "Official v4.1: uncovered top decks are excluded from interior Open Volume, visibility, and light. Press Analyze All Forms after changing this."}
       </p>
       {!geometryPersisted && (
         <p className="text-[12px]" style={{ color: "var(--muted)" }}>

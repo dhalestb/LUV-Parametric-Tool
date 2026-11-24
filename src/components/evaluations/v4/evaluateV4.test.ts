@@ -208,9 +208,9 @@ function term(evaluation: ReturnType<typeof evaluateV4>, id: string, name: strin
 }
 
 describe("v4 version constants", () => {
-  it("publishes v4.3.0, Open Volume v4.4.0, and keeps v3.5 as the legacy constant", () => {
-    assert.equal(DESCRIPTOR_ALGORITHM_VERSION, "v4.3.0");
-    assert.equal(OPEN_VOLUME_ALGORITHM_VERSION, "v4.4.0");
+  it("publishes v4.3.4, Open Volume v4.4.1, and keeps v3.5 as the legacy constant", () => {
+    assert.equal(DESCRIPTOR_ALGORITHM_VERSION, "v4.3.4");
+    assert.equal(OPEN_VOLUME_ALGORITHM_VERSION, "v4.4.1");
     assert.equal(LEGACY_DESCRIPTOR_ALGORITHM_VERSION, "v3.5");
   });
 });
@@ -234,6 +234,63 @@ describe("v4 shared geometry", () => {
     assert.ok(Math.abs(hall.field.levels[1].elevation - 12) < 0.01);
     // Roof top samples are exposed and do not form a level.
     assert.ok(hall.field.levels.every((level) => level.elevation < 23));
+  });
+
+  it("counts a lobby floor only under a ceiling with at least 7 ft clear", () => {
+    const low = buildV4Context(closedHall(6.9), "lobby-low", { lobbySlotId: "L1" });
+    assert.equal(low.field.levels.length, 0, "6.9 ft under a ceiling is not a lobby floor");
+    const enough = buildV4Context(closedHall(7), "lobby-7", { lobbySlotId: "L1" });
+    assert.equal(enough.field.levels.length, 1, "7 ft under a ceiling is a lobby floor");
+    const partial = new MeshBuilder();
+    partial.plate(0, 0, 30, 0, 30);
+    partial.plate(8, 0, 12, 0, 12);
+    const covered = buildV4Context(partial.source(), "lobby-partial", { lobbySlotId: "L1" });
+    assert.equal(covered.field.levels.length, 1);
+    assert.ok(covered.field.levels[0].area < 200, "open sky beside the ceiling does not count");
+    assert.ok(covered.field.levels[0].area > 16);
+    const other = buildV4Context(closedHall(6.9), "other-low");
+    assert.equal(other.field.levels.length, 1, "the 7 ft lobby rule does not apply outside lobby slots");
+  });
+
+  it("counts only the linear floor at 5 ft", () => {
+    const mesh = new MeshBuilder();
+    mesh.plate(0, 0, 20, 0, 16);
+    mesh.plate(5, 0, 20, 0, 16);
+    mesh.plate(12, 0, 20, 0, 16);
+    mesh.plate(20, 0, 20, 0, 16);
+    const ctx = buildV4Context(mesh.source(), "linear-5", { lobbySlotId: "L5" });
+    assert.equal(ctx.field.levels.length, 1);
+    assert.ok(Math.abs(ctx.field.levels[0].elevation - 5) < 0.5);
+    assert.ok(ctx.field.levels[0].area > 16);
+  });
+
+  it("reads separated parts of the linear floor as one floor", () => {
+    const mesh = new MeshBuilder();
+    mesh.plate(5, 0, 8, 0, 10);
+    mesh.plate(5, 10, 18, 0, 10);
+    mesh.plate(5, 8, 10, 0, 10);
+    mesh.plate(13, 0, 8, 0, 10);
+    mesh.plate(13, 10, 18, 0, 10);
+    const ctx = buildV4Context(mesh.source(), "linear-one", { lobbySlotId: "L5" });
+    assert.equal(ctx.field.levels.length, 1);
+    assert.ok(ctx.field.levels[0].area > 140, "the open strip stays with the 5 ft floor");
+    assert.equal(ctx.network.regions.length, 1);
+  });
+
+  it("keeps every part of the topographic ground floor, including the wide part", () => {
+    const mesh = new MeshBuilder();
+    mesh.plate(0, 0, 8, 0, 8);
+    mesh.plate(8, 0, 8, 0, 8);
+    mesh.plate(0, 12, 28, 0, 16);
+    mesh.plate(10, 12, 28, 0, 16);
+    mesh.plate(16, 30, 40, 0, 12);
+    mesh.plate(24, 30, 40, 0, 12);
+    const ctx = buildV4Context(mesh.source(), "topo-split", { lobbySlotId: "L4" });
+    assert.equal(ctx.field.levels.length, 1);
+    assert.ok(ctx.field.levels[0].area > 100, "the separated wide ground plate counts with the narrow one");
+    const open = evaluateV4(mesh.source(), "topo-split-open", { lobbySlotId: "L4" }).descriptors.find((item) => item.id === "openVolume");
+    assert.ok(open);
+    assert.ok((open.evidence.measurements.continuousFieldFloorFt2 as number) > 0, "the wide ground plate meets the lobby clear width");
   });
 
   it("keeps a closed hall as one level: the roof cap is not a storey", () => {
@@ -308,11 +365,11 @@ describe("v4 descriptor behaviour on fixtures", () => {
   const stackedEval = evaluateV4(stacked(), "stacked");
 
   it("reports twelve descriptors with the v4 version and a source hash", () => {
-    assert.equal(hall.version, "v4.3.0");
+    assert.equal(hall.version, "v4.3.4");
     assert.equal(hall.descriptors.length, 12);
     assert.match(hall.sourceHash, /^[0-9a-f]{8}$/);
     for (const item of hall.descriptors) {
-      assert.equal(item.evidence.version, item.id === "openVolume" ? OPEN_VOLUME_ALGORITHM_VERSION : item.id === "centralized" ? CENTRALIZED_ALGORITHM_VERSION : "v4.3.0");
+      assert.equal(item.evidence.version, item.id === "openVolume" ? OPEN_VOLUME_ALGORITHM_VERSION : item.id === "centralized" ? CENTRALIZED_ALGORITHM_VERSION : "v4.3.4");
     }
   });
 
@@ -337,6 +394,9 @@ describe("v4 descriptor behaviour on fixtures", () => {
     assert((open(7.5,30).evidence.measurements.continuousFieldFloorFt2 as number)>0,'exactly 7.5 ft must qualify');
     assert.equal(open(12,9).evidence.measurements.continuousFieldFloorFt2,0,'9 ft-wide hall must not qualify');
     assert((open(12,12).evidence.measurements.continuousFieldFloorFt2 as number)>0,'12 ft-wide hall must contain qualifying positions');
+    const lobby=(width:number)=>descriptor(evaluateV4(closedHall(12,width),`lobby-width-${width}`,{lobbySlotId:'L1'}),'openVolume');
+    assert.equal(lobby(7).evidence.measurements.continuousFieldFloorFt2,0,'lobby hall under 7.5 ft wide must not qualify');
+    assert((lobby(9).evidence.measurements.continuousFieldFloorFt2 as number)>0,'lobby hall 9 ft wide must qualify at the 7.5 ft clear width');
     const a=open(8,30),b=open(20,30);
     assert.equal(a.absoluteScore,b.absoluteScore,'extra height must not increase the score');
     assert.equal(a.evidence.measurements.clearanceVolumeFt3,b.evidence.measurements.clearanceVolumeFt3);

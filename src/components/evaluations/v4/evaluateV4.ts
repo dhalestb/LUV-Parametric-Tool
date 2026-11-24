@@ -85,6 +85,8 @@ export type V4Context = {
   light: LightResult;
   eyeHeight: number;
   includeTopDecks: boolean;
+  /** Lattice slot. L1–L5 use the lobby Open Volume clear width. */
+  lobbySlotId?: string;
 };
 
 export type V4DescriptorResult = {
@@ -120,6 +122,8 @@ const VOLUME_CLEAR_CAP_FEET = 20;
 const OPEN_VOLUME_REFERENCE_FT3 = 3000;
 const OPEN_VOLUME_MIN_HEIGHT = 7.5;
 const OPEN_VOLUME_CLEAR_RADIUS = 5;
+/** Lobby slots use a 7.5 ft clear width. The radius is half of that width. */
+const LOBBY_OPEN_VOLUME_CLEAR_RADIUS = 3.75;
 const MONUMENTAL_VOLUME_REFERENCE_FT3 = 10000;
 
 const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
@@ -139,7 +143,7 @@ export function buildV4Context(source: DescriptorSource, sourceId: string, optio
   const crossLevel = crossLevelVisibility(network, field, grid, eyeHeight, includeTopDecks);
   const voids = analyzeVoids(field, grid, mesh.bounds.planDiagonal);
   const light = lightExposure(network, field, grid, includeTopDecks);
-  return { mesh, grid, field, network, sameLevel, crossLevel, voids, light, eyeHeight, includeTopDecks, centralityWeights: options.centralityWeights ?? DEFAULT_CENTRALITY_WEIGHTS };
+  return { mesh, grid, field, network, sameLevel, crossLevel, voids, light, eyeHeight, includeTopDecks, lobbySlotId: options.lobbySlotId, centralityWeights: options.centralityWeights ?? DEFAULT_CENTRALITY_WEIGHTS };
 }
 
 type Draft = Omit<ComponentEvidence, "status"> & { status?: ComponentEvidence["status"] };
@@ -213,18 +217,24 @@ function scoredInteriorArea(field: FloorField, includeTopDecks: boolean) {
 }
 
 /* ------------------------------------------------------------------ Open Volume */
-function openVolume(ctx: Pick<V4Context, "mesh" | "grid" | "field" | "includeTopDecks">): V4DescriptorResult {
+function openVolumeClearRadius(slotId: string | undefined) {
+  return slotId === "L1" || slotId === "L2" || slotId === "L3" || slotId === "L4" || slotId === "L5" ? LOBBY_OPEN_VOLUME_CLEAR_RADIUS : OPEN_VOLUME_CLEAR_RADIUS;
+}
+
+function openVolume(ctx: Pick<V4Context, "mesh" | "grid" | "field" | "includeTopDecks" | "lobbySlotId">): V4DescriptorResult {
   const { field, includeTopDecks } = ctx;
   const feet = field.sampleFeet;
+  const clearRadius = openVolumeClearRadius(ctx.lobbySlotId);
+  const clearWidth = clearRadius * 2;
   const sheltered = field.samples.filter((sample) => sample.floorClass === "sheltered");
-  // Eight horizontal directions, sampled at three heights, establish a 10 ft
-  // diameter clearance around each floor sample. This is a sampled test, not
-  // a proof of a continuous 10 ft-wide route or unobstructed solid cylinder.
+  // Eight horizontal directions, sampled at three heights, establish the clear
+  // width around each floor sample. This is a sampled test, not a proof of a
+  // continuous clear route or unobstructed solid cylinder.
   const clearSpan=(sample:FloorSample)=>{
     if(sample.clearance!==null&&sample.clearance<OPEN_VOLUME_MIN_HEIGHT-1e-6)return false;
     for(const z of [1,3.75,7.49])for(let i=0;i<8;i++){
       const angle=i*Math.PI/4;
-      if(ctx.grid.raycast([sample.position[0],sample.position[1],sample.position[2]+z],[Math.cos(angle),Math.sin(angle),0],OPEN_VOLUME_CLEAR_RADIUS-1e-5,{skipTriangle:sample.triangleId}))return false;
+      if(ctx.grid.raycast([sample.position[0],sample.position[1],sample.position[2]+z],[Math.cos(angle),Math.sin(angle),0],clearRadius-1e-5,{skipTriangle:sample.triangleId}))return false;
     }
     return true;
   };
@@ -247,7 +257,7 @@ function openVolume(ctx: Pick<V4Context, "mesh" | "grid" | "field" | "includeTop
     component({
       name: "Sheltered Clearance Share",
       intent: "How much interior floor belongs to the largest connected field meeting the sampled horizontal and vertical clearance thresholds.",
-      formula: "connected qualifying sample area / interior floor area; each sample requires ≥7.5 ft vertical and a sampled 10 ft horizontal clear diameter",
+      formula: `connected qualifying sample area / interior floor area; each sample requires ≥7.5 ft vertical and a sampled ${clearWidth} ft horizontal clear width`,
       units: "share",
       normalization: "share × 100",
       weight: 0.45,
@@ -259,7 +269,7 @@ function openVolume(ctx: Pick<V4Context, "mesh" | "grid" | "field" | "includeTop
     component({
       name: "Open Void Share",
       intent: "Interior floor that opens to the sky inside the form (courts, atria).",
-      formula: "qualifying open-void and enabled top-deck area / interior floor area; same 10 ft horizontal gate applies",
+      formula: `qualifying open-void and enabled top-deck area / interior floor area; same ${clearWidth} ft horizontal gate applies`,
       units: "share",
       normalization: "share × 100",
       weight: 0.25,
@@ -304,7 +314,7 @@ function openVolume(ctx: Pick<V4Context, "mesh" | "grid" | "field" | "includeTop
     { ...patchLayer({ id: "ov-field", label: connected.field ? `Continuous field ${connected.field.floorAreaFt2.toFixed(0)} ft²` : "Continuous field", color: PALETTE.gold, status: "verified", components: ["Continuous Field"] }, samplePatches(fieldSamples, feet)), dimensions: fieldMetricsLine },
     { ...patchLayer({ id: "ov-field-volume", label: connected.field ? `Qualifying field volume ${shelteredVolume.toFixed(0)} ft³ at 7.5 ft` : "Qualifying field volume", color: PALETTE.gold, status: "verified", components: [], opacity: 0.16 }, fieldPrisms, 240), kind: "volume", total: fieldSamples.length },
     patchLayer({ id: "ov-void", label: includeTopDecks ? "Open void and counted top decks (measured)" : "Open void to sky, laterally enclosed (measured)", color: PALETTE.lightBlue, status: "measured", components: ["Open Void Share"] }, samplePatches(creditedOpen, feet)),
-    patchLayer({ id: "ov-sheltered-low", label: "Sheltered floor failing 7.5 ft height or sampled 10 ft horizontal clearance", color: PALETTE.paleAqua, status: "measured", components: [] }, samplePatches(sheltered.filter((sample) => !clearSpan(sample)), feet)),
+    patchLayer({ id: "ov-sheltered-low", label: `Sheltered floor failing 7.5 ft height or sampled ${clearWidth} ft horizontal clearance`, color: PALETTE.paleAqua, status: "measured", components: [] }, samplePatches(sheltered.filter((sample) => !clearSpan(sample)), feet)),
     patchLayer({ id: "ov-uncertain", label: "Uncertain exposure 0.25–0.5 enclosure (reported, not credited)", color: PALETTE.paleAqua, status: "potential", components: [] }, samplePatches(uncertain, feet)),
     patchLayer({ id: "ov-obstructed", label: "Obstructed ≤ 5 ft (excluded)", color: PALETTE.gray, status: "excluded", components: [] }, samplePatches(obstructed, feet)),
     patchLayer({ id: "ov-exposed", label: "Exterior roof / uncovered exposure (excluded from interior volume)", color: PALETTE.gray, status: "excluded", components: [], opacity: 0.25 }, samplePatches(exposed, feet)),
@@ -312,7 +322,7 @@ function openVolume(ctx: Pick<V4Context, "mesh" | "grid" | "field" | "includeTop
   const notes = interior
     ? [
       ...connected.notes,
-      "Qualifying samples require at least 7.5 ft overhead and no obstacle within a 5 ft radius along eight tested directions at three heights. This sampling does not prove a continuous clear cylinder or an accessible route. Taller spaces receive no additional height credit. The sheltered field counts only the largest connected qualifying area.",
+      `Qualifying samples require at least 7.5 ft overhead and no obstacle within a ${clearRadius} ft radius along eight tested directions at three heights. This sampling does not prove a continuous clear cylinder or an accessible route. Taller spaces receive no additional height credit. The sheltered field counts only the largest connected qualifying area.`,
       ...(uncertain.length ? [`${field.areaByClass.uncertain.toFixed(0)} ft² of floor has ambiguous lateral enclosure and is reported, not credited.`] : []),
     ]
     : ["No interior floor surface found. Open Volume is absent (scored 0) and the form is still ranked."];
@@ -1639,7 +1649,7 @@ export function evaluateOpenVolumeDescriptor(source: DescriptorSource, sourceId:
   const grid = new TriangleGrid(mesh, 2);
   const field = sampleFloors(mesh, grid);
   restrictLobbyFloors(field, options.lobbySlotId);
-  return openVolume({ mesh, grid, field, includeTopDecks: Boolean(options.includeTopDecks) });
+  return openVolume({ mesh, grid, field, includeTopDecks: Boolean(options.includeTopDecks), lobbySlotId: options.lobbySlotId });
 }
 
 export function evaluateV4(source: DescriptorSource, sourceId: string, options: V4Options = {}): V4Evaluation {

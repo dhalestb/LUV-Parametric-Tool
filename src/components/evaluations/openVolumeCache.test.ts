@@ -63,7 +63,7 @@ describe("Open Volume cache version", () => {
   it("rejects a stored Open Volume result unless its version matches the current Open Volume version and keeps the other descriptors", () => {
     const form = model("cache-hall");
     const source = hall();
-    const key = v4CacheKeyFor(form, source);
+    const key = v4CacheKeyFor(form, source, { lobbySlotId: form.slotId });
     assert.match(key, new RegExp(`^${DESCRIPTOR_ALGORITHM_VERSION}:${OPEN_VOLUME_ALGORITHM_VERSION}:`));
 
     const first = evaluateTileModel(form, source);

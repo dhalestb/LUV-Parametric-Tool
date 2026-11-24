@@ -14,6 +14,10 @@ export const SAMPLE_FEET = 1;
 export const UPWARD_NORMAL = 0.68;
 /** Clearance at or below this height is not usable standing space. */
 export const CLEARANCE_MIN_FEET = 5;
+/** Lobby floors count only under a ceiling that leaves at least this much clear height. */
+export const LOBBY_FLOOR_CLEARANCE_FEET = 7;
+/** Linear keeps the floor at this elevation and drops the other floors. */
+export const LINEAR_FLOOR_ELEVATION_FEET = 5;
 /** Clearance credit reaches 1 here. */
 export const CLEARANCE_REFERENCE_FEET = 10;
 /** Standing points with less than this above them are slab interiors or sliver gaps, not floors. */
@@ -224,7 +228,7 @@ export function sampleFloors(mesh: AnalysisMesh, grid: TriangleGrid, sampleFeet 
   return field;
 }
 
-/** Lowest floors kept. Vertical void and linear keep every floor below the roof. */
+/** Lowest floors kept. Vertical void keeps every floor below the roof. Linear keeps the 5 ft floor. */
 export function lobbyFloorLimit(slotId: string | undefined): number | null {
   if (slotId === "L2" || slotId === "L3") return 2;
   if (slotId === "L4") return 1;
@@ -235,10 +239,24 @@ function isLobbySlot(slotId: string | undefined) {
   return slotId === "L1" || slotId === "L2" || slotId === "L3" || slotId === "L4" || slotId === "L5";
 }
 
+function linearFloor<T extends { samples: FloorSample[]; elevation: number }>(bands: T[][]) {
+  const ranked = bands.map((band) => {
+    const area = band.reduce((sum, plate) => sum + plate.samples.reduce((total, sample) => total + sample.area, 0), 0);
+    const elevation = band.reduce((sum, plate) => sum + plate.elevation * plate.samples.reduce((total, sample) => total + sample.area, 0), 0) / area;
+    return { band, elevation };
+  }).sort((left, right) => Math.abs(left.elevation - LINEAR_FLOOR_ELEVATION_FEET) - Math.abs(right.elevation - LINEAR_FLOOR_ELEVATION_FEET) || left.elevation - right.elevation);
+  const chosen = ranked[0];
+  return chosen && Math.abs(chosen.elevation - LINEAR_FLOOR_ELEVATION_FEET) <= LEVEL_TOLERANCE_FEET ? chosen : undefined;
+}
+
 /**
  * Lobby floor rule. The highest horizontal plane is roof and is not analyzed.
- * Compressed, continuous, and topographic also keep only their lowest floors:
- * two, two, and one. Vertical void and linear keep every floor below that roof.
+ * A remaining floor counts only where a ceiling is overhead and clear height
+ * is at least 7 ft. Open sky does not count. Compressed, continuous, and
+ * topographic also keep only their lowest qualifying floors: two, two, and one.
+ * Separate parts of the same floor stay together.
+ * Linear keeps only the floor at 5 ft and reads every part of that floor as one floor.
+ * Vertical void keeps every qualifying floor below that roof.
  */
 export function restrictLobbyFloors(field: FloorField, slotId: string | undefined) {
   if (!isLobbySlot(slotId)) return;
@@ -246,7 +264,10 @@ export function restrictLobbyFloors(field: FloorField, slotId: string | undefine
   const walking = field.samples.filter((sample) => sample.floorClass !== "obstructed" && sample.area > 0);
   if (!walking.length) return;
   const top = walking.reduce((high, sample) => Math.max(high, sample.position[2]), -Infinity);
-  const eligible = walking.filter((sample) => sample.position[2] < top - ROOF_BAND_FEET);
+  const eligible = walking.filter((sample) =>
+    sample.position[2] < top - ROOF_BAND_FEET
+    && sample.clearance !== null
+    && sample.clearance >= LOBBY_FLOOR_CLEARANCE_FEET - 1e-4);
   const parent = new Map<number, number>();
   const find = (id: number): number => {
     const current = parent.get(id) ?? id;
@@ -291,9 +312,19 @@ export function restrictLobbyFloors(field: FloorField, slotId: string | undefine
     const elevation = samples.reduce((sum, sample) => sum + sample.position[2] * sample.area, 0) / area;
     return [{ samples, elevation }];
   }).sort((left, right) => left.elevation - right.elevation);
-  const kept = new Set(limit == null
+  const bands: Array<typeof plates> = [];
+  for (const plate of plates) {
+    const current = bands[bands.length - 1];
+    if (current && plate.elevation - current[0].elevation <= LEVEL_TOLERANCE_FEET) current.push(plate);
+    else bands.push([plate]);
+  }
+  const linear = slotId === "L5" ? linearFloor(bands) : undefined;
+  const counted = slotId === "L5"
+    ? linear ? [{ samples: walking.filter((sample) => sample.position[2] < top - ROOF_BAND_FEET && Math.abs(sample.position[2] - linear.elevation) <= LEVEL_TOLERANCE_FEET), elevation: linear.elevation }] : []
+    : limit == null ? null : bands.slice(0, limit).flat();
+  const kept = new Set(counted == null
     ? eligible.map((sample) => sample.id)
-    : plates.slice(0, limit).flatMap((plate) => plate.samples.map((sample) => sample.id)));
+    : counted.flatMap((plate) => plate.samples.map((sample) => sample.id)));
   for (const sample of walking) {
     if (kept.has(sample.id)) continue;
     if (sample.position[2] >= top - ROOF_BAND_FEET) sample.roofLid = true;
