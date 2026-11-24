@@ -4,6 +4,8 @@ import { generateSpatialCandidate } from "./geometryGenerator";
 import type { CandidateFocus, OptimizationInput, SpatialAlternative } from "./optimizerTypes";
 import { selectBestSubvolume, selectionEvaluationGrid } from "./selectionSearch";
 import type { Letter } from "./letterTypes";
+import { isHeightRoutingActive } from "./selectionHeightRouting";
+import { UNIT_LETTER_SPAN } from "./letterVolumeLayout";
 
 function rankingValue(alternative: SpatialAlternative) {
   if (!alternative.evaluation.constraints.feasible) return -1000 - alternative.evaluation.constraints.violations.length;
@@ -32,12 +34,14 @@ function candidateFocus(input: OptimizationInput, index: number): CandidateFocus
 
 function evaluateCandidate(input: OptimizationInput, focus: CandidateFocus, seed: number, generation: number, parent?: SpatialAlternative | null) {
   const generationParent = parent?.fullPlacements ? { ...parent, placements: parent.fullPlacements } : parent;
-  const selectionMaximum = input.selection.enabled
+  // Height-routed architectural letters may span multiple cells and trim at the
+  // selection boundary — do not shrink below the user-defined size range.
+  const selectionMaximum = input.selection.enabled && !isHeightRoutingActive(input.selection)
     ? Math.max(input.rules.minimumLetterSize, Math.min(
         input.rules.maximumLetterSize,
-        Math.max(0.05, (input.selection.width - input.rules.minimumClearance) / 2) * 0.92,
-        input.selection.height * 0.72,
-        input.selection.depth * 0.9,
+        Math.max(0.05, (input.selection.width - input.rules.minimumClearance) / UNIT_LETTER_SPAN),
+        Math.max(0.05, (input.selection.height - input.rules.minimumClearance) / UNIT_LETTER_SPAN),
+        Math.max(0.05, input.selection.depth * 0.9 / UNIT_LETTER_SPAN),
       ))
     : input.rules.maximumLetterSize;
   const generationRules = { ...input.rules, maximumLetterSize: selectionMaximum };

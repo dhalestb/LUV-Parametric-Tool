@@ -1,0 +1,54 @@
+[
+  {
+    "seed": 19,
+    "count": 8,
+    "passed": true,
+    "milliseconds": 2189.8186
+  },
+  {
+    "seed": 20,
+    "count": 12,
+    "passed": false,
+    "milliseconds": 1771.2721000000001,
+    "error": "Error: Vertical envelope is disconnected or contains unintended cavities; adjust source/support/void relationships. Shell volumes: [23183.86845377986,-0.002101320657358038]"
+  },
+  {
+    "seed": 21,
+    "count": 8,
+    "passed": true,
+    "milliseconds": 1672.7255999999998
+  },
+  {
+    "seed": 22,
+    "count": 12,
+    "passed": false,
+    "milliseconds": 2311.5910000000003,
+    "error": "Error: Exported geometry rejected: (node:50632) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed."
+  },
+  {
+    "seed": 23,
+    "count": 8,
+    "passed": true,
+    "milliseconds": 1934.9707000000017
+  },
+  {
+    "seed": 24,
+    "count": 12,
+    "passed": true,
+    "milliseconds": 3386.6499999999996
+  },
+  {
+    "seed": 25,
+    "count": 8,
+    "passed": false,
+    "milliseconds": 1186.9665999999997,
+    "error": "Error: directional-U-3: soffit is incomplete across the recessed bay."
+  },
+  {
+    "seed": 26,
+    "count": 12,
+    "passed": false,
+    "milliseconds": 1570.5431000000026,
+    "error": "Error: directional-V-3: soffit is incomplete across the recessed bay."
+  }
+]

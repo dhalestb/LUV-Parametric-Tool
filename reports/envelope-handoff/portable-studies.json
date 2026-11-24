@@ -1,0 +1,91 @@
+{
+  "passed": true,
+  "count": 12,
+  "latestThreeMatchSavedSourceAndArchitectureExactly": true,
+  "studies": [
+    {
+      "id": "870aec85-3bf6-44d4-97ef-5404293e55cf",
+      "name": "void-field-open-vertical-15",
+      "sources": 9,
+      "triangles": 13722,
+      "volume": 5214.919340015359
+    },
+    {
+      "id": "2e69a8d4-aeae-49f0-b9bb-5cee619e5dfa",
+      "name": "void-field-open-face-normal-15",
+      "sources": 9,
+      "triangles": 13386,
+      "volume": 5145.37302505122
+    },
+    {
+      "id": "9c33b2ef-f0c4-4592-ac17-c92d332b5c60",
+      "name": "void-field-enclosed-15",
+      "sources": 9,
+      "triangles": 12934,
+      "volume": 5787.034915722702
+    },
+    {
+      "id": "7c93a9ee-f4e9-4c34-a0cf-1501db228b82",
+      "name": "stepped-amphitheater-latest",
+      "sources": 10,
+      "triangles": 7100,
+      "volume": 9238.781965315136
+    },
+    {
+      "id": "4ca1c9e6-7ba6-4975-a94e-096ffbda0a29",
+      "name": "inserted-plate-19",
+      "sources": 9,
+      "triangles": 3734,
+      "volume": 2781.81612804401
+    },
+    {
+      "id": "b59daa25-f240-4e98-9997-755677253012",
+      "name": "void-field-12",
+      "sources": 12,
+      "triangles": 12658,
+      "volume": 4827.395708446812
+    },
+    {
+      "id": "b59daa25-f240-4e98-9997-755677253015",
+      "name": "void-field-15",
+      "sources": 15,
+      "triangles": 14474,
+      "volume": 6126.545943137796
+    },
+    {
+      "id": "42536cbc-756c-4082-a9bd-0806a3dd6847",
+      "name": "four-level-original-12",
+      "sources": 12,
+      "triangles": 13060,
+      "volume": 7297.2336917658395
+    },
+    {
+      "id": "e3b715b8-153d-4f09-9881-400000000015",
+      "name": "four-level-void",
+      "sources": 15,
+      "triangles": 17714,
+      "volume": 9131.118515479382
+    },
+    {
+      "id": "c1fbdb4a-6f45-4b98-86d3-0255b7fdab01",
+      "name": "four-level-face-normal",
+      "sources": 15,
+      "triangles": 18224,
+      "volume": 9122.88073155914
+    },
+    {
+      "id": "e25e46af-6500-4c94-b12f-981b9ded68c3",
+      "name": "void-field-latest-12-face-normal",
+      "sources": 12,
+      "triangles": 14158,
+      "volume": 5163.006368969406
+    },
+    {
+      "id": "f4ad38e4-36b1-4169-aa03-8dbf82aeea8d",
+      "name": "inserted-plate-latest",
+      "sources": 9,
+      "triangles": 3398,
+      "volume": 2098.627138189803
+    }
+  ]
+}

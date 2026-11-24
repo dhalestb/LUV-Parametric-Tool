@@ -4,6 +4,8 @@ import { gridDimensions } from "./constraintValidation";
 import { letterDepthSpan, octetBoxes, UNIT_LETTER_SPAN } from "./letterVolumeLayout";
 import type { CandidateFocus, GenerationRules, OptimizerControls, OrthogonalGrid, SelectionVolume, SpatialAlternative } from "./optimizerTypes";
 import type { Letter } from "./letterTypes";
+import { isHeightRoutingActive } from "./selectionHeightRouting";
+import { intersectingSelectionPlacements } from "./selectionFieldGeometry";
 
 function axisCenters(overall: number, selection: number, step: number) {
   const extent = Math.max(0, (overall - selection) / 2);
@@ -94,7 +96,9 @@ export function selectBestSubvolume(args: {
     height: Math.min(args.selection.height, overall.height),
     depth: Math.min(args.selection.depth, overall.depth),
   };
-  const dashedBoxes = octetBoxes(args.fullPlacements.map((placement) => {
+  const heightRouting = isHeightRoutingActive(args.selection);
+  // Height-routed fields keep a fixed 20 × 20 × H window. Dashed octet boxes must not resize them.
+  const dashedBoxes = heightRouting ? [] : octetBoxes(args.fullPlacements.map((placement) => {
     const width = placement.scale * (placement.scaleX ?? 1);
     const height = placement.scale * (placement.scaleY ?? 1);
     const depth = placement.scale * (placement.scaleZ ?? 1);
@@ -141,6 +145,7 @@ export function selectBestSubvolume(args: {
   const centers = dashedCenters.length
     ? dashedCenters
     : [...new Map([...adaptiveCenters, ...alignedCenters].map((center) => [`${center.x.toFixed(5)}:${center.y.toFixed(5)}:${center.z.toFixed(5)}`, center])).values()];
+  const thickness = args.rules.letterThicknessPercent ?? 12;
   const candidates: SpatialAlternative[] = [];
   centers.forEach((center, centerIndex) => {
     const window = {
@@ -151,7 +156,9 @@ export function selectBestSubvolume(args: {
       height: center.height,
       depth: center.depth,
     };
-    const contained = args.fullPlacements.filter((placement) => placementCenterInSelection(placement, window));
+    const contained = heightRouting
+      ? intersectingSelectionPlacements(args.fullPlacements, window, thickness)
+      : args.fullPlacements.filter((placement) => placementCenterInSelection(placement, window));
     if (!contained.length) return;
     const localPlacements = contained.map((placement) => ({ ...structuredClone(placement), x: placement.x - center.x, y: placement.y - center.y, z: placement.z - center.z }));
     const evaluation = evaluateSpatialDesign({
@@ -161,7 +168,7 @@ export function selectBestSubvolume(args: {
       descriptors: args.descriptors,
       controls: args.controls,
       focus: args.focus,
-      bounds: "center",
+      bounds: heightRouting ? "body" : "center",
       ignoreCirculationClearance: args.ignoreCirculationClearance,
     });
     candidates.push({
@@ -182,6 +189,7 @@ export function selectBestSubvolume(args: {
         evaluatedPositions: centers.length,
         totalPositions: allCenters.length,
         exhaustive,
+        heightRouting: args.selection.heightRouting ?? null,
       },
     });
   });

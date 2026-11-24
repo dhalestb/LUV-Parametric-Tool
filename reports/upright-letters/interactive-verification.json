@@ -1,0 +1,28 @@
+{
+  "before": "446f03d9-c5a7-4649-a25a-eec40e6ca584",
+  "after": "91366d9d-f6df-4874-b450-78c0d53dae49",
+  "sourceMeshesIdentical": true,
+  "sourceTransformationsIdentical": true,
+  "beforeVolume": 16604.580194046757,
+  "afterVolume": 16716.08822829259,
+  "editedDepth": 4,
+  "apiValidation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 226621,
+    "legacyFlags": 98
+  },
+  "reopened": true,
+  "modes": [
+    "A",
+    "B",
+    "C",
+    "section"
+  ],
+  "field": {
+    "width": 40,
+    "depth": 40,
+    "height": 60
+  },
+  "preferredFeet": 13
+}

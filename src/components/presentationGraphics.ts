@@ -1,13 +1,13 @@
 import type { PrototypeTypologyId } from "./amphitheaterPrototype";
 
 export type PresentationGraphic = { typology: PrototypeTypologyId; name: string; image: Blob };
-export type PresentationBoard = 'blank' | 'geometry' | 'rules';
-const storeName = (board: PresentationBoard) => board === 'geometry' ? 'geometry' : 'graphics';
+export type PresentationBoard = 'blank' | 'geometry' | 'rules' | 'lobby-proofs' | 'lobby-isos';
+const storeName = (board: PresentationBoard) => board === 'geometry' ? 'geometry' : board === 'lobby-proofs' ? 'lobbyProofs' : board === 'lobby-isos' ? 'lobbyProofIsos' : 'graphics';
 let databasePromise: Promise<IDBDatabase> | null = null;
 function openStore(): Promise<IDBDatabase> {
   if (databasePromise) return databasePromise;
   databasePromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open("composition-presentation", 4);
+    const request = indexedDB.open("composition-presentation", 6);
     request.onupgradeneeded = (event) => {
       const db = request.result;
       if (event.oldVersion < 1) db.createObjectStore("graphics", { keyPath: "typology" });
@@ -22,6 +22,8 @@ function openStore(): Promise<IDBDatabase> {
       }
       if (event.oldVersion < 3) db.createObjectStore("geometry", { keyPath: "typology" });
       if (event.oldVersion < 4) db.createObjectStore("pdfBoard");
+      if (event.oldVersion < 5 && !db.objectStoreNames.contains("lobbyProofs")) db.createObjectStore("lobbyProofs", { keyPath: "typology" });
+      if (event.oldVersion < 6 && !db.objectStoreNames.contains("lobbyProofIsos")) db.createObjectStore("lobbyProofIsos", { keyPath: "typology" });
     };
     request.onsuccess = () => {
       const db = request.result;
@@ -143,7 +145,7 @@ export async function importPresentationBackup(backup: PresentationBackup): Prom
   if (backup?.version !== 1 || !Array.isArray(backup.boards) || !Array.isArray(backup.pdfs) || !Array.isArray(backup.geometry) || !Array.isArray(backup.rules)
     || backup.boards.some(board => !board || typeof board.id !== 'string' || typeof board.title !== 'string')
     || new Set(backup.boards.map(board => board.id)).size !== backup.boards.length
-    || backup.boards.some(board => ['boards', 'geometry', 'rules', 'video'].includes(board.id))) throw new Error('Invalid GitHub board backup.');
+    || backup.boards.some(board => ['boards', 'geometry', 'rules', 'lobby-proofs', 'video'].includes(board.id))) throw new Error('Invalid GitHub board backup.');
   const ids = new Set(backup.boards.map(board => board.id));
   const pdfs = backup.pdfs.map(item => {
     if (!item || !ids.has(item.id)) throw new Error('Invalid PDF board in backup.');

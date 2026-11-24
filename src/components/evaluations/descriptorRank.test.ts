@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { assignComparativeRanks, type RankDescriptor } from "./descriptorRank.ts";
+import { OPEN_VOLUME_ALGORITHM_VERSION } from "./descriptorVersion.ts";
+import { assignComparativeRanks, rejectStaleOpenVolumeSnapshot, type RankDescriptor } from "./descriptorRank.ts";
 
 function form(formId: string, scores: number[], raws: number[][] = []) {
   const descriptors: RankDescriptor[] = scores.map((absoluteScore, index) => ({
@@ -88,6 +89,44 @@ describe("comparative ranks", () => {
     assert.equal(computes, 3);
   });
 
+  it("ranks Sequential by verified gain, then higher levels, and reports ties", () => {
+    const forms: Array<{formId:string;descriptors:import("./descriptorRank").RankDescriptor[]}> = [
+      { formId: "A", descriptors: [{ id: "sequential", absoluteScore: 8, components: [{ name: "Verified Vertical Gain", raw: 8, weight: 1 }, { name: "Higher Levels Reached", raw: 0, weight: 0.5 }] }] },
+      { formId: "B", descriptors: [{ id: "sequential", absoluteScore: 12, components: [{ name: "Verified Vertical Gain", raw: 12, weight: 1 }, { name: "Higher Levels Reached", raw: 1, weight: 0.5 }] }] },
+      { formId: "C", descriptors: [{ id: "sequential", absoluteScore: 8, components: [{ name: "Verified Vertical Gain", raw: 8, weight: 1 }, { name: "Higher Levels Reached", raw: 2, weight: 0.5 }] }] },
+      { formId: "D", descriptors: [{ id: "sequential", absoluteScore: 8, components: [{ name: "Verified Vertical Gain", raw: 8, weight: 1 }, { name: "Higher Levels Reached", raw: 2, weight: 0.5 }] }] },
+    ];
+    assignComparativeRanks(forms);
+    const rank = Object.fromEntries(forms.map((item) => [item.formId, item.descriptors[0]]));
+    assert.equal(rank.A.comparativeRank, 1);
+    assert.equal(rank.C.comparativeRank, 2);
+    assert.equal(rank.D.comparativeRank, 3);
+    assert.equal(rank.B.comparativeRank, 4);
+    assert.equal(rank.C.tieBreakUsed, true);
+    assert.equal(rank.D.tieBreakUsed, true);
+    assert.equal(rank.B.tieBreakUsed, false);
+  });
+
+  it("drops Open Volume ranks unless the stored version matches the current Open Volume version", () => {
+    const forms = [{
+      slotId: "O5",
+      meshId: "o5",
+      filename: "void.obj",
+      descriptors: {
+        openVolume: { absoluteScore: 17.8, comparativeRank: 1 },
+        sculptural: { absoluteScore: 40, comparativeRank: 4 },
+      },
+    }];
+    const stale = rejectStaleOpenVolumeSnapshot({ version: "v4.3.0", forms });
+    assert.equal(stale.forms[0].descriptors.openVolume, undefined);
+    assert.equal(stale.forms[0].descriptors.sculptural.absoluteScore, 40);
+    const near = rejectStaleOpenVolumeSnapshot({ version: "v4.3.0", openVolumeVersion: "v4.3.10", forms });
+    assert.equal(near.forms[0].descriptors.openVolume, undefined);
+    const current = rejectStaleOpenVolumeSnapshot({ version: "v4.3.0", openVolumeVersion: OPEN_VOLUME_ALGORITHM_VERSION, forms });
+    assert.equal(current.forms[0].descriptors.openVolume?.absoluteScore, 17.8);
+    assert.equal(current.forms[0].descriptors.sculptural.comparativeRank, 4);
+  });
+
   it("is deterministic", () => {
     const once = [form("L1", [3.2, 8]), form("G1", [9.1, 1]), form("O3", [9.1, 4])];
     const twice = [form("O3", [9.1, 4]), form("L1", [3.2, 8]), form("G1", [9.1, 1])];
@@ -100,3 +139,10 @@ describe("comparative ranks", () => {
     assert.deepEqual(read(once), read(twice));
   });
 });
+
+ it('never ranks historical and reviewed Centralized methods in one cohort',()=>{
+ const forms=[{formId:'old',descriptors:[{id:'centralized',version:'graph-v1',absoluteScore:6.1,components:[]}]},{formId:'new',descriptors:[{id:'centralized',version:'verified-v2',absoluteScore:70,components:[]}]}];
+ assignComparativeRanks(forms);
+ assert.equal((forms[0].descriptors[0] as typeof forms[0]['descriptors'][0] & {cohortSize?:number}).cohortSize,1);
+ assert.equal((forms[1].descriptors[0] as RankDescriptor).cohortSize,1);
+ });

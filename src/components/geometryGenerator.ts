@@ -1,4 +1,5 @@
 import { DESCRIPTORS, type CompositionPlacement, type DescriptorSettings } from "./compositionEngine";
+import { sampleLetterScale } from "./architecturalLetterSizing";
 import { attractorBlend, diagonalAttractorScale, pullToOctet, scaleTowardOctet, UNIT_LETTER_SPAN } from "./letterVolumeLayout";
 import type { CandidateFocus, GenerationRules, OrthogonalGrid, SpatialAlternative } from "./optimizerTypes";
 import type { Cell } from "./letterTypes";
@@ -179,18 +180,19 @@ export function generateSpatialCandidate(args: {
   let targetCount = Math.min(sourceCells.length, availableSlots.length);
   if (rules.allowRepeat) targetCount = availableSlots.length;
   if (rules.allowRemove) targetCount = Math.max(1, Math.round(targetCount * (0.86 + random() * 0.14)));
-  const baseScale = Math.max(rules.minimumLetterSize, rules.maximumLetterSize);
+  const referenceScale = rules.preferredLetterSize ?? Math.max(rules.minimumLetterSize, rules.maximumLetterSize);
   const placements: CompositionPlacement[] = [];
   for (let index = 0; index < targetCount; index++) {
     const slot = availableSlots[index];
     const sourceIndex = rules.allowRepeat ? Math.floor(random() * sourceCells.length) : index % sourceCells.length;
     const cell = sourceCells[sourceIndex];
+    const letterScale = sampleLetterScale(rules, random);
     const jitter = rules.allowReposition && !rules.lockExistingLocations ? intensity / 100 * 0.12 : 0;
     const xyBlend = attractorBlend(rules.xyGap ?? 56);
     const zBlend = attractorBlend(rules.zGap ?? 56);
     const diagonalScale = rules.attractorGap == null
       ? 1
-      : diagonalAttractorScale(rules.attractorGap, rules.xyGap ?? 56, baseScale * UNIT_LETTER_SPAN);
+      : diagonalAttractorScale(rules.attractorGap, rules.xyGap ?? 56, referenceScale * UNIT_LETTER_SPAN);
     const steps = {
       col: slot.col, row: slot.row, layer: slot.layerIndex,
       cols: grid.xCells, rows: grid.yCells, layers: grid.zCells,
@@ -211,7 +213,7 @@ export function generateSpatialCandidate(args: {
       rx: rules.allowRotationX ? snapRotation((random() - 0.5) * 120 * intensity / 100, rules) : 0,
       ry: rules.allowRotationY ? snapRotation((random() - 0.5) * 2 * (rules.maximumRotationY ?? 90) * intensity / 100, rules) : 0,
       rz: rules.allowRotationZ ? clampZRotation(cell.rotation, cell.rotation + (random() - 0.5) * 2 * maxZOffset, maxZOffset, rules.rotationStep) : cell.rotation,
-      scale: baseScale,
+      scale: letterScale,
       scaleX: 1,
       scaleY: rules.preserveProportions ? 1 : 0.82 + random() * 0.36,
       scaleZ: rules.preserveProportions ? 1 : 0.82 + random() * 0.36,

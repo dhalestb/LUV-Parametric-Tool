@@ -1,0 +1,488 @@
+{
+  "passed": false,
+  "sourceGeometryChecks": [
+    {
+      "id": "L-0",
+      "sourceIndex": 0,
+      "transformedBoundsError": 2.9206276153104227e-7
+    },
+    {
+      "id": "L-1",
+      "sourceIndex": 3,
+      "transformedBoundsError": 1.7006760000271015e-7
+    },
+    {
+      "id": "L-2",
+      "sourceIndex": 0,
+      "transformedBoundsError": 4.816231502502433e-7
+    },
+    {
+      "id": "L-3",
+      "sourceIndex": 3,
+      "transformedBoundsError": 1.3626088435358952e-7
+    },
+    {
+      "id": "L-4",
+      "sourceIndex": 0,
+      "transformedBoundsError": 2.031093071508394e-7
+    },
+    {
+      "id": "L-5",
+      "sourceIndex": 3,
+      "transformedBoundsError": 3.275016098314154e-7
+    },
+    {
+      "id": "L-6",
+      "sourceIndex": 0,
+      "transformedBoundsError": 4.518939125119914e-7
+    },
+    {
+      "id": "L-7",
+      "sourceIndex": 3,
+      "transformedBoundsError": 5.762862151925674e-7
+    },
+    {
+      "id": "U-0",
+      "sourceIndex": 1,
+      "transformedBoundsError": 4.014345122982377e-7
+    },
+    {
+      "id": "U-1",
+      "sourceIndex": 4,
+      "transformedBoundsError": 6.676368116131925e-7
+    },
+    {
+      "id": "U-2",
+      "sourceIndex": 1,
+      "transformedBoundsError": 0.0000011652060152300692
+    },
+    {
+      "id": "U-3",
+      "sourceIndex": 4,
+      "transformedBoundsError": 0.0000016627752259523731
+    },
+    {
+      "id": "V-0",
+      "sourceIndex": 2,
+      "transformedBoundsError": 4.5699917627928244e-7
+    },
+    {
+      "id": "V-1",
+      "sourceIndex": 5,
+      "transformedBoundsError": 5.73189403496599e-7
+    },
+    {
+      "id": "V-2",
+      "sourceIndex": 2,
+      "transformedBoundsError": 7.942966817608976e-7
+    },
+    {
+      "id": "V-3",
+      "sourceIndex": 5,
+      "transformedBoundsError": 5.73189403496599e-7
+    },
+    {
+      "id": "V-4",
+      "sourceIndex": 2,
+      "transformedBoundsError": 8.642673492431641e-7
+    },
+    {
+      "id": "V-5",
+      "sourceIndex": 5,
+      "transformedBoundsError": 5.73189403496599e-7
+    },
+    {
+      "id": "V-6",
+      "sourceIndex": 2,
+      "transformedBoundsError": 6.154827438820121e-7
+    }
+  ],
+  "independentSourceObjectIDs": [
+    "L-0",
+    "L-1",
+    "L-2",
+    "L-3",
+    "L-4",
+    "L-5",
+    "L-6",
+    "L-7",
+    "U-0",
+    "U-1",
+    "U-2",
+    "U-3",
+    "V-0",
+    "V-1",
+    "V-2",
+    "V-3",
+    "V-4",
+    "V-5",
+    "V-6"
+  ],
+  "ascendingTerraces": 8,
+  "logicalElevations": [
+    1.978260869565217,
+    3.956521739130434,
+    5.934782608695651,
+    7.913043478260868,
+    9.891304347826086,
+    11.869565217391303,
+    13.84782608695652,
+    15.826086956521737
+  ],
+  "sourceAnchorDisplacements": [
+    3.250000000000001,
+    3.2499999999999996,
+    3.25,
+    3.2499999999999996,
+    3.25,
+    3.2499999999999996,
+    3.250000000000001
+  ],
+  "horizontalDisplacements": [
+    3.250769016444552,
+    3.250769016444552,
+    3.2662583319892127,
+    3.274030184922844,
+    3.2768156907653707,
+    3.2823935779975613,
+    3.2823935779975635
+  ],
+  "nominalMinorRise": 1.978260869565217,
+  "risers": [
+    {
+      "id": "riser-1",
+      "contacts": [
+        2.408037920849912,
+        2.1183297912307095
+      ]
+    },
+    {
+      "id": "riser-2",
+      "contacts": [
+        2.408038603583845,
+        2.1161324321306654
+      ]
+    },
+    {
+      "id": "riser-3",
+      "contacts": [
+        2.389855326064345,
+        2.0997192308980868
+      ]
+    },
+    {
+      "id": "riser-4",
+      "contacts": [
+        2.380491393091327,
+        2.0895202650319873
+      ]
+    },
+    {
+      "id": "riser-5",
+      "contacts": [
+        2.3763341408664136,
+        2.0856225632866927
+      ]
+    },
+    {
+      "id": "riser-6",
+      "contacts": [
+        2.369295250548093,
+        2.077373070353039
+      ]
+    },
+    {
+      "id": "riser-7",
+      "contacts": [
+        2.388027330276894,
+        1.9666437837940187
+      ]
+    }
+  ],
+  "backing": [
+    {
+      "id": "recess-enclosure-left-U-0",
+      "nominalBacking": 1.4150386568076248,
+      "probe": [
+        -8.834687934393168,
+        -4.506778728036923,
+        9.616409652574614
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-enclosure-left-U-1",
+      "nominalBacking": 1.6803209694971493,
+      "probe": [
+        -8.12774575018568,
+        0.1821606829850264,
+        17.937532771978272
+      ],
+      "backingMaterialAtProbe": false
+    },
+    {
+      "id": "recess-enclosure-left-U-2",
+      "nominalBacking": 1.5553458268430758,
+      "probe": [
+        -8.255478947507513,
+        5.550439019099009,
+        30.100755091384592
+      ],
+      "backingMaterialAtProbe": false
+    },
+    {
+      "id": "recess-enclosure-right-U-0",
+      "nominalBacking": 1.4150386568076248,
+      "probe": [
+        8.530667358910273,
+        -5.812048369125202,
+        9.349971641697161
+      ],
+      "backingMaterialAtProbe": true
+    },
+    {
+      "id": "recess-enclosure-right-U-1",
+      "nominalBacking": 1.6803209694971493,
+      "probe": [
+        7.823552309457916,
+        -1.5329620120393357,
+        17.67599534197939
+      ],
+      "backingMaterialAtProbe": false
+    },
+    {
+      "id": "recess-enclosure-right-U-2",
+      "nominalBacking": 1.5553458268430758,
+      "probe": [
+        8.453444873676604,
+        7.28282277800491,
+        30.221861727691195
+      ],
+      "backingMaterialAtProbe": false
+    },
+    {
+      "id": "recess-rear-enclosure",
+      "nominalBacking": 2.833152760171699,
+      "probe": [
+        9.493913720382217,
+        9.060328461498868,
+        36.42934782608695
+      ],
+      "backingMaterialAtProbe": false
+    }
+  ],
+  "constructionContributors": [
+    {
+      "id": "L-0",
+      "components": [
+        "terrace-0",
+        "riser-1",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0",
+        "presentation-focus-surface",
+        "focus-terrace-threshold"
+      ]
+    },
+    {
+      "id": "L-1",
+      "components": [
+        "terrace-1",
+        "riser-1",
+        "riser-2",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0"
+      ]
+    },
+    {
+      "id": "L-2",
+      "components": [
+        "terrace-2",
+        "riser-2",
+        "riser-3",
+        "enclosure-left-U-0",
+        "enclosure-left-U-1",
+        "enclosure-right-U-0",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "L-3",
+      "components": [
+        "terrace-3",
+        "riser-3",
+        "riser-4",
+        "enclosure-left-U-1",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "L-4",
+      "components": [
+        "terrace-4",
+        "riser-4",
+        "riser-5",
+        "enclosure-left-U-1",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "L-5",
+      "components": [
+        "terrace-5",
+        "riser-5",
+        "riser-6",
+        "enclosure-left-U-1",
+        "enclosure-left-U-2",
+        "enclosure-right-U-1",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "L-6",
+      "components": [
+        "terrace-6",
+        "riser-6",
+        "riser-7",
+        "enclosure-left-U-2",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "L-7",
+      "components": [
+        "terrace-7",
+        "riser-7",
+        "enclosure-left-U-2",
+        "enclosure-right-U-2",
+        "rear-enclosure"
+      ]
+    },
+    {
+      "id": "U-0",
+      "components": [
+        "terrace-0",
+        "terrace-1",
+        "riser-1",
+        "terrace-2",
+        "riser-2",
+        "riser-3",
+        "enclosure-left-U-0",
+        "enclosure-left-U-1",
+        "enclosure-right-U-0",
+        "enclosure-right-U-1",
+        "presentation-focus-surface",
+        "focus-terrace-threshold"
+      ]
+    },
+    {
+      "id": "U-1",
+      "components": [
+        "terrace-1",
+        "riser-1",
+        "terrace-2",
+        "riser-2",
+        "terrace-3",
+        "riser-3",
+        "terrace-4",
+        "riser-4",
+        "riser-5",
+        "enclosure-left-U-0",
+        "enclosure-left-U-1",
+        "enclosure-right-U-0",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "U-2",
+      "components": [
+        "terrace-3",
+        "riser-3",
+        "terrace-4",
+        "riser-4",
+        "terrace-5",
+        "riser-5",
+        "terrace-6",
+        "riser-6",
+        "riser-7",
+        "enclosure-left-U-1",
+        "enclosure-left-U-2",
+        "enclosure-right-U-1",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "U-3",
+      "components": [
+        "terrace-5",
+        "riser-5",
+        "terrace-6",
+        "riser-6",
+        "terrace-7",
+        "riser-7",
+        "enclosure-left-U-1",
+        "enclosure-left-U-2",
+        "enclosure-right-U-1",
+        "enclosure-right-U-2",
+        "rear-enclosure"
+      ]
+    },
+    {
+      "id": "V-0",
+      "components": [
+        "enclosure-left-U-0",
+        "enclosure-right-U-0"
+      ]
+    },
+    {
+      "id": "V-1",
+      "components": [
+        "riser-1",
+        "riser-2",
+        "enclosure-left-U-0",
+        "enclosure-right-U-0"
+      ]
+    },
+    {
+      "id": "V-2",
+      "components": [
+        "enclosure-left-U-1",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "V-3",
+      "components": [
+        "riser-3",
+        "riser-4",
+        "enclosure-left-U-1",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "V-4",
+      "components": [
+        "enclosure-left-U-1",
+        "enclosure-right-U-1"
+      ]
+    },
+    {
+      "id": "V-5",
+      "components": [
+        "riser-5",
+        "riser-6",
+        "enclosure-left-U-2",
+        "enclosure-right-U-2"
+      ]
+    },
+    {
+      "id": "V-6",
+      "components": [
+        "riser-7",
+        "enclosure-left-U-2",
+        "enclosure-right-U-2"
+      ]
+    }
+  ],
+  "majorLevelSpacingIsSeparate": 12,
+  "sourceObjects": 19
+}

@@ -22,6 +22,19 @@ const rows: { category: PrototypeCategory; title: string; typologies: { id: Prot
 type DisplayGraphic = { name: string; url: string };
 type ReadyBoard = { url: string; image: boolean };
 const walkthroughUrl = "/tutorials/vertical-void-walkthrough.mp4";
+const lobbyTypologies = rows[0].typologies;
+const graphicBoards = ['geometry', 'rules', 'lobby-proofs'] as const;
+type GraphicBoard = (typeof graphicBoards)[number];
+function isGraphicBoard(value: string): value is GraphicBoard {
+  return (graphicBoards as readonly string[]).includes(value);
+}
+function boardLabel(value: string, pdfTitle: string) {
+  if (value === 'video') return 'Demo';
+  if (value === 'rules') return 'Graphic Rules Board';
+  if (value === 'geometry') return 'Geometry Board';
+  if (value === 'lobby-proofs') return 'Lobby Proofs';
+  return pdfTitle;
+}
 function rememberBoard(file: Blob) {
   const url = URL.createObjectURL(file);
   const image = file.type.startsWith('image/');
@@ -41,8 +54,10 @@ export default function CompositionPresentationPage() {
     window.dispatchEvent(new PopStateEvent('popstate'));
   };
   const [graphics, setGraphics] = useState<Partial<Record<PrototypeTypologyId, DisplayGraphic>>>({});
+  const [isoGraphics, setIsoGraphics] = useState<Partial<Record<PrototypeTypologyId, DisplayGraphic>>>({});
   const [error, setError] = useState("");
   const [zoom, setZoom] = useState(100);
+  const [exportingLobby, setExportingLobby] = useState(false);
   const [board, setBoard] = useState('current');
   const [pdfBoards, setPdfBoards] = useState<PdfBoard[]>([{id:'current', title:'Blank Board'}]);
   const [syncing, setSyncing] = useState(false);
@@ -51,8 +66,9 @@ export default function CompositionPresentationPage() {
   useEffect(() => { setLocalApp(/^(localhost|127\.0\.0\.1|\[::1\])$/i.test(window.location.hostname)); }, []);
   const [boardRevision, setBoardRevision] = useState(0);
   const [draggedBoard, setDraggedBoard] = useState<string | null>(null);
-  const isPdfBoard = board !== 'geometry' && board !== 'rules' && board !== 'video';
+  const isPdfBoard = !isGraphicBoard(board) && board !== 'video';
   const [published, setPublished] = useState<PublishedPresentation | null>(null);
+  const [catalogReady, setCatalogReady] = useState(false);
   useEffect(() => {
     const request = new AbortController();
     void (async () => {
@@ -64,7 +80,8 @@ export default function CompositionPresentationPage() {
       if (request.signal.aborted) return;
       setPublished(snapshot); setPdfBoards(boards);
       setBoard(current => boards.some(item => item.id === current) ? current : boards[0]?.id ?? 'geometry');
-    })().catch(() => { if (!request.signal.aborted) setError('Could not load board titles.'); });
+    })().catch(() => { if (!request.signal.aborted) setError('Could not load board titles.'); })
+      .finally(() => { if (!request.signal.aborted) setCatalogReady(true); });
     return () => request.abort();
   }, []);
   const [readyBoards, setReadyBoards] = useState<Record<string, ReadyBoard>>({});
@@ -74,12 +91,13 @@ export default function CompositionPresentationPage() {
   const checkedRef = useRef(checkedBoards);
   checkedRef.current = checkedBoards;
   const seenRevision = useRef(boardRevision);
-  const graphicCache = useRef<Partial<Record<'geometry' | 'rules', { graphics: Partial<Record<PrototypeTypologyId, DisplayGraphic>>; urls: string[] }>>>({});
+  const graphicCache = useRef<Partial<Record<GraphicBoard, { graphics: Partial<Record<PrototypeTypologyId, DisplayGraphic>>; urls: string[] }>>>({});
+  const isoUrlRef = useRef<string[]>([]);
   const [pdfError, setPdfError] = useState('');
   const [draggingPdf, setDraggingPdf] = useState(false);
   const graphicRevision = useRef(boardRevision);
   useEffect(() => {
-    if (board !== 'geometry' && board !== 'rules') return;
+    if (!isGraphicBoard(board)) return;
     let active = true;
     if (graphicRevision.current !== boardRevision) {
       graphicRevision.current = boardRevision;
@@ -93,9 +111,9 @@ export default function CompositionPresentationPage() {
         const records = await loadPresentationGraphics(board);
         if (!active) return;
         const next: Partial<Record<PrototypeTypologyId, DisplayGraphic>> = {}; const nextUrls: string[] = [];
-        for (const record of published?.[board] ?? []) next[record.typology] = { name: record.name, url: record.url };
+        for (const record of board === 'lobby-proofs' ? [] : published?.[board] ?? []) next[record.typology] = { name: record.name, url: record.url };
         for (const record of records) {
-          const image = record.image.type === 'image/webp' ? record.image : await lightenBoardFile(record.image);
+          const image = board === 'lobby-proofs' || record.image.type === 'image/webp' ? record.image : await lightenBoardFile(record.image);
           if (image !== record.image) await savePresentationGraphic(record.typology, record.name, image, board);
           const url = URL.createObjectURL(image); nextUrls.push(url); next[record.typology] = { name: record.name, url };
         }
@@ -103,6 +121,18 @@ export default function CompositionPresentationPage() {
         graphicCache.current[board] = { graphics: next, urls: nextUrls };
         setGraphics(next); setError("");
         previous?.urls.forEach(URL.revokeObjectURL);
+        if (board === 'lobby-proofs') {
+          const isoRecords = await loadPresentationGraphics('lobby-isos');
+          if (!active) return;
+          const isoNext: Partial<Record<PrototypeTypologyId, DisplayGraphic>> = {}; const isoUrls: string[] = [];
+          for (const record of isoRecords) {
+            const url = URL.createObjectURL(record.image); isoUrls.push(url); isoNext[record.typology] = { name: record.name, url };
+          }
+          const previousIso = isoUrlRef.current;
+          isoUrlRef.current = isoUrls;
+          setIsoGraphics(isoNext);
+          previousIso.forEach(URL.revokeObjectURL);
+        }
       } catch { if (active) setError("Could not load the saved presentation graphics."); }
     };
     if (!cached || published) void refresh();
@@ -112,6 +142,7 @@ export default function CompositionPresentationPage() {
   }, [board, boardRevision, published]);
   useEffect(() => {
     let active = true;
+    if (!catalogReady) return () => { active = false; };
     if (seenRevision.current !== boardRevision) {
       seenRevision.current = boardRevision;
       for (const item of Object.values(readyRef.current)) URL.revokeObjectURL(item.url);
@@ -120,9 +151,9 @@ export default function CompositionPresentationPage() {
       setReadyBoards({});
       setCheckedBoards({});
     }
-    const order = [...pdfBoards.map(item => item.id), 'geometry', 'rules', 'video'];
+    const order = [...pdfBoards.map(item => item.id), 'geometry', 'rules', 'lobby-proofs', 'video'];
     const index = order.indexOf(board);
-    const wanted = [order[index - 1], order[index], order[index + 1]].filter((id): id is string => Boolean(id) && id !== 'geometry' && id !== 'rules' && id !== 'video');
+    const wanted = [order[index - 1], order[index], order[index + 1]].filter((id): id is string => Boolean(id) && !isGraphicBoard(id) && id !== 'video');
     const missing = wanted.filter(id => !readyRef.current[id] && !checkedRef.current[id]);
     if (!missing.length) return () => { active = false; };
     void loadPresentationPdfs(missing).then(async files => {
@@ -157,7 +188,7 @@ export default function CompositionPresentationPage() {
       for (const id of missing) checkedRef.current[id] = true;
     }).catch(() => { if (active) setPdfError('Could not convert this PDF into a WebP slide.'); });
     return () => { active = false; };
-  }, [board, pdfBoards, boardRevision, published]);
+  }, [board, pdfBoards, boardRevision, published, catalogReady]);
   useEffect(() => () => { for (const item of Object.values(readyRef.current)) URL.revokeObjectURL(item.url); }, []);
   const addPdf = async (file?: File) => {
     if (!file) return;
@@ -176,7 +207,7 @@ export default function CompositionPresentationPage() {
     }
     catch { setPdfError('Could not add this PDF to the board.'); }
   };
-  const boardOrder = [...pdfBoards.map(item => item.id), 'geometry', 'rules', 'video'];
+  const boardOrder = [...pdfBoards.map(item => item.id), 'geometry', 'rules', 'lobby-proofs', 'video'];
   const updateBoards = (next: PdfBoard[]) => { setPdfBoards(next); void savePdfBoards(next).catch(() => setError('Could not save board order or title.')); };
   const currentTitle = pdfBoards.find(item => item.id === board)?.title ?? 'PDF Board';
   const boardIndex = boardOrder.indexOf(board);
@@ -224,6 +255,60 @@ export default function CompositionPresentationPage() {
     } catch (error) { setSyncMessage(error instanceof Error ? error.message : 'Could not sync boards.'); }
     finally { setSyncing(false); }
   };
+  const exportLobbyProofPng = async () => {
+    setExportingLobby(true);
+    setError("");
+    try {
+      const width = 4096;
+      const height = Math.round(width * 2 / 5);
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Could not export the Lobby Proofs board.");
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, width, height);
+      const gap = Math.round(width * 8 / 1200);
+      const border = Math.max(1, Math.round(width / 1400));
+      const cellWidth = (width - gap * 4) / 5;
+      const cellHeight = (height - gap) / 2;
+      const load = async (url?: string) => url ? createImageBitmap(await (await fetch(url)).blob()) : null;
+      for (const [sources, row] of [[isoGraphics, 0], [graphics, 1]] as const) {
+        for (const [col, item] of lobbyTypologies.entries()) {
+          const x = col * (cellWidth + gap);
+          const y = row * (cellHeight + gap);
+          ctx.strokeStyle = "#b9bec6";
+          ctx.lineWidth = border;
+          ctx.strokeRect(x + border / 2, y + border / 2, cellWidth - border, cellHeight - border);
+          const bitmap = await load(sources[item.id]?.url);
+          if (bitmap) {
+            const scale = Math.min((cellWidth - border * 2) / bitmap.width, (cellHeight - border * 2) / bitmap.height);
+            const drawWidth = bitmap.width * scale;
+            const drawHeight = bitmap.height * scale;
+            ctx.drawImage(bitmap, x + (cellWidth - drawWidth) / 2, y + (cellHeight - drawHeight) / 2, drawWidth, drawHeight);
+            bitmap.close();
+          } else {
+            ctx.fillStyle = "#d6ad4f";
+            ctx.font = `600 ${Math.round(cellWidth * 0.045)}px Arial, sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(item.name, x + cellWidth / 2, y + cellHeight / 2, cellWidth * 0.9);
+          }
+        }
+      }
+      const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(new Error("Could not export the Lobby Proofs board.")), "image/png"));
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "lobby-proofs-4096.png";
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (exportError) {
+      setError(exportError instanceof Error ? exportError.message : "Could not export the Lobby Proofs board.");
+    } finally {
+      setExportingLobby(false);
+    }
+  };
   return (
     <main data-board-page="presentation" className={`relative flex flex-col bg-black px-4 py-4 md:px-5 ${presentationMode ? 'h-full min-h-0' : 'min-h-screen'}`}>
       {!presentationMode && <div className="flex flex-wrap items-center gap-4">
@@ -238,37 +323,54 @@ export default function CompositionPresentationPage() {
       </div>}</>}
       <div className={presentationMode && isPdfBoard ? "absolute left-1/2 top-10 z-30 w-max max-w-[95%] -translate-x-1/2 rounded bg-black/90 px-3 pb-3" : ""}><div className={`mt-4 flex flex-wrap items-center gap-3 text-xs ${presentationMode ? 'justify-center' : ''}`} aria-label="Board navigation">
         {!presentationMode && <><button type="button" aria-label="Previous board" disabled={boardIndex === 0} onClick={() => setBoard(boardOrder[boardIndex - 1])} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor: "var(--line)"}}>←</button>
-        <span aria-live="polite" className="min-w-32 text-center font-semibold" style={{color:"#d6ad4f"}}>{isPdfBoard ? currentTitle : board === 'video' ? 'Demo' : board === 'rules' ? 'Graphic Rules Board' : 'Geometry Board'}</span>
+        <span aria-live="polite" className="min-w-32 text-center font-semibold" style={{color:"#d6ad4f"}}>{boardLabel(board, currentTitle)}</span>
         <button type="button" aria-label="Next board" disabled={boardIndex === boardOrder.length - 1} onClick={() => setBoard(boardOrder[boardIndex + 1])} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor: "var(--line)"}}>→</button></>}
       <div className="flex flex-wrap items-center gap-2 text-xs" aria-label="Board tabs">
         {pdfBoards.map(item => <button key={item.id} type="button" draggable onDragStart={event => {setDraggedBoard(item.id);event.dataTransfer.effectAllowed='move';}} onDragEnd={() => setDraggedBoard(null)} onDragOver={event => {if(draggedBoard)event.preventDefault();}} onDrop={event => {event.preventDefault();if(!draggedBoard || draggedBoard===item.id)return;const next=[...pdfBoards];const from=next.findIndex(value=>value.id===draggedBoard),to=next.findIndex(value=>value.id===item.id);if(from<0||to<0)return;const [moved]=next.splice(from,1);next.splice(to,0,moved);updateBoards(next);setDraggedBoard(null);}} onClick={() => setBoard(item.id)} aria-pressed={board===item.id} title="Drag to reorder PDF boards" className="rounded border px-3 py-1" style={{borderColor:board===item.id?'#d6ad4f':'var(--line)'}}>{item.title || 'Untitled Board'}</button>)}
         <button type="button" aria-pressed={board==='geometry'} onClick={() => setBoard('geometry')} className="rounded border px-3 py-1" style={{borderColor:board==='geometry'?'#d6ad4f':'var(--line)'}}>Geometry Board</button>
         <button type="button" aria-pressed={board==='rules'} onClick={() => setBoard('rules')} className="rounded border px-3 py-1" style={{borderColor:board==='rules'?'#d6ad4f':'var(--line)'}}>Graphic Rules Board</button>
+        <button type="button" aria-pressed={board==='lobby-proofs'} onClick={() => setBoard('lobby-proofs')} className="rounded border px-3 py-1" style={{borderColor:board==='lobby-proofs'?'#d6ad4f':'var(--line)'}}>Lobby Proofs</button>
         <button type="button" aria-pressed={board==='video'} onClick={() => setBoard('video')} className="rounded border px-3 py-1" style={{borderColor:board==='video'?'#d6ad4f':'var(--line)'}}>Demo</button>
       </div>
       </div>
       <div className={`mt-3 flex items-center gap-2 text-xs ${presentationMode ? 'justify-center' : ''}`} aria-label="Board zoom controls">
         {presentationMode && <><button type="button" aria-label="Previous board" disabled={boardIndex === 0} onClick={() => setBoard(boardOrder[boardIndex - 1])} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor:"var(--line)"}}>←</button>
-        <span aria-live="polite" className="min-w-32 text-center font-semibold" style={{color:"#d6ad4f"}}>{isPdfBoard ? currentTitle : board === 'video' ? 'Demo' : board === 'rules' ? 'Graphic Rules Board' : 'Geometry Board'}</span>
+        <span aria-live="polite" className="min-w-32 text-center font-semibold" style={{color:"#d6ad4f"}}>{boardLabel(board, currentTitle)}</span>
         <button type="button" aria-label="Next board" disabled={boardIndex === boardOrder.length - 1} onClick={() => setBoard(boardOrder[boardIndex + 1])} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor:"var(--line)"}}>→</button></>}
         <label className="flex items-center gap-1">Zoom <select aria-label="Board zoom percentage" value={zoom} onChange={event => setZoom(Number(event.target.value))} className="rounded border bg-black px-2 py-1 text-white" style={{borderColor:'var(--line)'}}>{[0,25,50,75,100,200,300,400,500,600,700,800,900,1000].map(value => <option key={value} value={value}>{value}%</option>)}</select></label>
         {board === 'video' && <a href={walkthroughUrl} download className="rounded border px-3 py-1" style={{borderColor:'var(--line)',color:'#d6ad4f'}}>Download video</a>}
+        {board === 'lobby-proofs' && <button type="button" disabled={exportingLobby} onClick={() => void exportLobbyProofPng()} className="rounded border px-3 py-1 disabled:opacity-40" style={{borderColor:'var(--line)',color:'#d6ad4f'}}>{exportingLobby ? 'Exporting PNG…' : 'Export PNG · 4096 px'}</button>}
         {presentationMode && <button data-board-edit-control type="button" onClick={() => setPresentationMode(false)} className="rounded border px-3 py-1" style={{borderColor:'var(--line)',color:'#d6ad4f'}}>Exit presentation mode</button>}
       </div></div>
       {!presentationMode && <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
-        <label className="flex items-center gap-2">Board <select aria-label="Select board to edit" value={board} onChange={event => setBoard(event.target.value)} className="rounded border bg-black px-2 py-1 text-white" style={{borderColor:'var(--line)'}}>{pdfBoards.map(item => <option key={item.id} value={item.id}>{item.title || 'Untitled Board'}</option>)}<option value="geometry">Geometry Board</option><option value="rules">Graphic Rules Board</option><option value="video">Demo</option></select></label>
+        <label className="flex items-center gap-2">Board <select aria-label="Select board to edit" value={board} onChange={event => setBoard(event.target.value)} className="rounded border bg-black px-2 py-1 text-white" style={{borderColor:'var(--line)'}}>{pdfBoards.map(item => <option key={item.id} value={item.id}>{item.title || 'Untitled Board'}</option>)}<option value="geometry">Geometry Board</option><option value="rules">Graphic Rules Board</option><option value="lobby-proofs">Lobby Proofs</option><option value="video">Demo</option></select></label>
         <button type="button" onClick={() => {const item={id:'pdf-'+crypto.randomUUID(),title:'PDF Board '+(pdfBoards.length+1)};updateBoards([...pdfBoards,item]);setBoard(item.id);}} className="rounded border px-3 py-1" style={{borderColor:'var(--line)'}}>Add Board</button>
         {isPdfBoard && <label className="flex items-center gap-2">Title <input aria-label="PDF board title" value={currentTitle} onChange={event => updateBoards(pdfBoards.map(item => item.id===board ? {...item,title:event.target.value} : item))} className="rounded border bg-black px-2 py-1 text-white" style={{borderColor:'var(--line)'}} /></label>}
         {isPdfBoard && <button type="button" onClick={() => void removeCurrentBoard()} className="rounded border px-3 py-1" style={{borderColor:'var(--line)'}}>Delete board</button>}
       </div>}
-      <div className={`presentation-board-viewport relative mt-2 flex min-h-0 w-full flex-1 ${isPdfBoard || board === 'video' ? 'pdf-board-viewport overflow-hidden' : 'overflow-auto'} ${board === 'geometry' || board === 'rules' ? 'graphic-board-viewport' : ''}`} style={presentationMode ? undefined : {height:'calc(100dvh - 17rem)'}} aria-label="Presentation board viewport">
+      <div className={`presentation-board-viewport relative mt-2 flex min-h-0 w-full flex-1 ${isPdfBoard || board === 'video' ? 'pdf-board-viewport overflow-hidden' : 'overflow-auto'} ${isGraphicBoard(board) ? 'graphic-board-viewport' : ''}`} style={presentationMode ? undefined : {height:'calc(100dvh - 17rem)'}} aria-label="Presentation board viewport">
       <div onDragEnter={event => {if(!isPdfBoard)return;event.preventDefault();setDraggingPdf(true);}} onDragOver={event => {if(isPdfBoard)event.preventDefault();}} onDragLeave={event => {if(!isPdfBoard)return;if(!event.currentTarget.contains(event.relatedTarget as Node|null))setDraggingPdf(false);}} onDrop={event => {if(!isPdfBoard)return;event.preventDefault();setDraggingPdf(false);void addPdf(event.dataTransfer.files[0]);}} className="presentation-pdf-board relative min-h-0 w-full flex-1 overflow-hidden border border-dashed" style={isPdfBoard ? {borderColor:draggingPdf?'#d6ad4f':'#b9bec6',background:'#050709'} : {position:'absolute',inset:0,visibility:'hidden',pointerEvents:'none'}} aria-hidden={!isPdfBoard}>
         {(() => { const index = boardOrder.indexOf(board); return [boardOrder[index - 1], board, boardOrder[index + 1]].filter((id): id is string => Boolean(id) && Boolean(readyBoards[id])).map(id => { const item = readyBoards[id]; const active = id === board; return <img key={item.url} alt={active ? 'Presentation board' : ''} src={item.url} decoding={active ? 'sync' : 'async'} className="absolute inset-0 h-full w-full" style={{visibility: active ? 'visible' : 'hidden', objectFit:'cover', transform:`scale(${Math.max(zoom, 1) / 100})`}} />; }); })()}
         {isPdfBoard && (readyBoards[board] ? <div aria-hidden="true" className="absolute inset-0 z-10" /> : checkedBoards[board] ? <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-2 text-center text-xs text-white"><span>Drop a PDF, WebP, or JPEG here</span><span className="text-[#d6ad4f]">PDFs are saved and shown as WebP</span><input type="file" accept="application/pdf,image/webp,image/jpeg,.pdf,.webp,.jpg,.jpeg" className="sr-only" onChange={event => void addPdf(event.target.files?.[0])}/></label> : <p className="text-xs text-white">Loading slide…</p>)}
         {isPdfBoard && pdfError && <p role="alert" className="absolute bottom-2 left-2 bg-black/80 p-2 text-xs text-red-300">{pdfError}</p>}
       </div>
       {(board === 'video' || boardOrder[boardIndex - 1] === 'video' || boardOrder[boardIndex + 1] === 'video') && <div className={board === 'video' ? 'relative min-h-0 w-full flex-1 overflow-hidden bg-black' : 'absolute h-px w-px overflow-hidden'} aria-hidden={board !== 'video'}><video className="absolute inset-0 h-full w-full" style={{objectFit:'contain'}} controls preload="auto" playsInline aria-label="Vertical Void Lobby walkthrough"><source src={walkthroughUrl} type="video/mp4" />Your browser does not support video playback.</video></div>}
-      {board !== 'video' && !isPdfBoard ? <div className={`space-y-2 ${presentationMode ? 'mx-auto' : ''}`} style={{width: zoom + "%", minWidth: (11 * zoom) + "px"}}>
+      {board === 'lobby-proofs' ? <div className={presentationMode ? 'lobby-proofs-frame' : 'mx-auto'} style={presentationMode ? undefined : {width: zoom + "%", minWidth: (11 * zoom) + "px"}}>
+        <div className={`grid grid-cols-5 grid-rows-2 gap-2 ${presentationMode ? 'lobby-proofs-board' : ''}`} style={presentationMode ? {height: zoom + "%"} : {aspectRatio: "5 / 2", width: "100%"}} aria-label="Lobby proofs, five typologies wide by two rows">
+          {lobbyTypologies.map((item) => {
+            const isoGraphic = isoGraphics[item.id];
+            return <article key={item.id} aria-label={`Lobby isometric: ${item.name}`} className="relative min-h-0 min-w-0 overflow-hidden border border-[#b9bec6]">
+              {isoGraphic ? <img alt={`${isoGraphic.name} isometric view`} src={isoGraphic.url} className="absolute inset-0 h-full w-full object-contain object-center" /> : <div className="flex h-full flex-col items-center justify-center p-2 text-center"><h3 className="truncate text-[10px] font-semibold sm:text-xs" style={{ color: "#d6ad4f" }}>{item.name}</h3><p className="mt-1 text-[9px] text-white sm:text-[10px]">Export ISO to Board for this typology to fill this panel.</p></div>}
+            </article>;
+          })}
+          {lobbyTypologies.map((item) => {
+            const graphic = graphics[item.id];
+            return <article key={item.id + "-rules"} aria-label={`Lobby rules: ${item.name}`} className="relative flex min-h-0 min-w-0 items-center justify-center overflow-hidden border border-[#b9bec6] p-2 text-center">
+              {graphic ? <img alt={`${graphic.name} presentation export`} src={graphic.url} className="absolute inset-0 h-full w-full object-contain object-center" /> : <h3 className="text-[10px] font-semibold sm:text-xs" style={{ color: "#d6ad4f" }}>{item.name}<span className="mt-1 block text-[9px] font-normal text-white sm:text-[10px]">Export PNG to Board for this typology to fill this panel.</span></h3>}
+            </article>;
+          })}
+        </div>
+      </div> : board !== 'video' && !isPdfBoard ? <div className={`space-y-2 ${presentationMode ? 'mx-auto' : ''}`} style={{width: zoom + "%", minWidth: (11 * zoom) + "px"}}>
         {rows.map((row) => <section key={row.category} aria-label={`${row.title} typologies`}>
           <h2 className="mb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: "#d6ad4f" }}>{row.title}</h2>
           <div className="grid grid-cols-5 gap-2 md:gap-3">

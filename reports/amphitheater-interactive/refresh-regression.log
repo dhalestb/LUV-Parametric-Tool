@@ -1,0 +1,16 @@
+(node:9676) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ empty refresh preserves the loaded study source and valid selection (1.6883ms)
+✔ refresh replaces current Composition data by ID without duplicates (0.1949ms)
+✔ refresh removes unavailable unselected live entries but keeps selected snapshot (0.1223ms)
+✔ collector retains Composition source transforms and current/saved identities (0.4451ms)
+✔ refresh feedback explains empty state and generation remains a separate action (0.2355ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18.0037

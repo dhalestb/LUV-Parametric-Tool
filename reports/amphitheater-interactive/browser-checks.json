@@ -1,0 +1,15 @@
+{
+ "browser":"Codex in-app browser",
+ "route":"http://127.0.0.1:4181/amphitheater?study=1d6164db-6e86-4605-875f-529dd5019208",
+ "initialSettings":{"width":40,"depth":40,"height":60,"preferredFeet":13,"population":"auto"},
+ "actualGenerationVerified":true,
+ "displayModesVerified":["A","B","C"],
+ "viewsVerified":["isometric","plan","elevation","section"],
+ "orbitVerified":true,"zoomVerified":true,"panEnabledButNotSeparatelyAutomated":true,
+ "instanceSelectionVerified":true,"componentIsolationVerified":true,"studyComparisonVerified":true,
+ "sourceEditorGenerationVerified":true,"savedStudyUrlReloadVerified":true,
+ "dimensionAndLetterPresetIndependenceVerified":true,
+ "sourcePreservingOperational":false,
+ "architecturalValidationPass":false,
+ "productionBuiltAppGenerationVerified":true
+}

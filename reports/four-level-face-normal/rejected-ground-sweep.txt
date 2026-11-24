@@ -1,0 +1,7 @@
+(node:48944) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Error: Void field envelope is disconnected: [10560.280979509012,-411.71481590089456,-4.532988937985033]
+    at Object.voidFieldEnvelope (C:\Users\DHale\Documents\Codex\LUV-Gathering-Envelope-Experiment\scripts\source-void-field.cjs:147:40)
+    at Object.buildSource (C:\Users\DHale\Documents\Codex\LUV-Gathering-Envelope-Experiment\scripts\source-envelope.cjs:35:214)
+    at async C:\Users\DHale\Documents\Codex\LUV-Gathering-Envelope-Experiment\scripts\amphitheater-interactive-worker.cjs:23:13

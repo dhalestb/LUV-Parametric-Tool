@@ -1,0 +1,263 @@
+[
+  {
+    "floors": [
+      {
+        "source": "L-1",
+        "elevation": 26.80484015002616,
+        "horizontalExposedArea": 99.11493016181883
+      },
+      {
+        "source": "V-2",
+        "elevation": 33.78445897004636,
+        "horizontalExposedArea": 122.1026070693184
+      },
+      {
+        "source": "U-3",
+        "elevation": 20.010869561006192,
+        "horizontalExposedArea": 102.98718866652771
+      }
+    ],
+    "id": "11111111-1111-4111-8111-111111111075",
+    "yaw": 75,
+    "passed": true,
+    "milliseconds": 1236.2642,
+    "triangles": 1666,
+    "volume": 3524.0146183418174,
+    "validation": {
+      "passed": true,
+      "selfIntersectionPairs": 0,
+      "nonAdjacentTriangleChecks": 58589,
+      "legacyFlags": 15
+    },
+    "walls": [
+      {
+        "source": "L-1",
+        "verticalFaces": 38,
+        "roofFaces": 29,
+        "bottomFaces": 11,
+        "maximumRoofErrorFeet": 0.0000015740396418710235,
+        "roofRange": [
+          28.116708755493164,
+          33.195159912109375
+        ],
+        "supportZ": 0
+      },
+      {
+        "source": "V-2",
+        "verticalFaces": 93,
+        "roofFaces": 59,
+        "bottomFaces": 28,
+        "maximumRoofErrorFeet": 0.0000016255864081189802,
+        "roofRange": [
+          34.73017120361328,
+          39.40382385253906
+        ],
+        "supportZ": 0
+      }
+    ],
+    "voids": [
+      {
+        "source": "U-3",
+        "yaw": 75,
+        "axis": [
+          0.9659258262890683,
+          -0.25881904510252074,
+          0
+        ],
+        "profile": "convex hull minus source L/U/V concavity",
+        "center": [
+          0,
+          0,
+          21
+        ],
+        "probe": {
+          "start": [
+            -54.64101615137755,
+            14.641016151377546,
+            18.803600542885917
+          ],
+          "end": [
+            54.64101615137755,
+            -14.641016151377546,
+            18.803600542885917
+          ]
+        }
+      }
+    ],
+    "ambiguities": []
+  },
+  {
+    "floors": [
+      {
+        "source": "U-1",
+        "elevation": 27.184172942672767,
+        "horizontalExposedArea": 103.01642179164759
+      },
+      {
+        "source": "L-2",
+        "elevation": 35.30315234636082,
+        "horizontalExposedArea": 110.55402278687862
+      },
+      {
+        "source": "U-3",
+        "elevation": 20.010869561006192,
+        "horizontalExposedArea": 112.73743181303632
+      }
+    ],
+    "id": "11111111-1111-4111-8111-111111111090",
+    "yaw": 90,
+    "passed": true,
+    "milliseconds": 1520.9578999999999,
+    "triangles": 2728,
+    "volume": 2708.5356418585743,
+    "validation": {
+      "passed": true,
+      "selfIntersectionPairs": 0,
+      "nonAdjacentTriangleChecks": 90048,
+      "legacyFlags": 27
+    },
+    "walls": [
+      {
+        "source": "U-1",
+        "verticalFaces": 278,
+        "roofFaces": 229,
+        "bottomFaces": 102,
+        "maximumRoofErrorFeet": 0.0000015893842249256166,
+        "roofRange": [
+          28.8250732421875,
+          33.25002670288086
+        ],
+        "supportZ": 0
+      },
+      {
+        "source": "L-2",
+        "verticalFaces": 67,
+        "roofFaces": 46,
+        "bottomFaces": 19,
+        "maximumRoofErrorFeet": 0.000001822245151858884,
+        "roofRange": [
+          36.12920379638672,
+          40.110801696777344
+        ],
+        "supportZ": 0
+      }
+    ],
+    "voids": [
+      {
+        "source": "U-3",
+        "yaw": 90,
+        "axis": [
+          1,
+          -6.123233995736766e-17,
+          0
+        ],
+        "profile": "convex hull minus source L/U/V concavity",
+        "center": [
+          0,
+          0,
+          21
+        ],
+        "probe": {
+          "start": [
+            -56.568542494923804,
+            3.5262742700771384e-15,
+            18.803600542885917
+          ],
+          "end": [
+            56.568542494923804,
+            -3.4013741798068083e-15,
+            18.803600542885917
+          ]
+        }
+      }
+    ],
+    "ambiguities": []
+  },
+  {
+    "floors": [
+      {
+        "source": "L-1",
+        "elevation": 26.80484015002616,
+        "horizontalExposedArea": 79.21851923565775
+      },
+      {
+        "source": "V-2",
+        "elevation": 33.78445897004636,
+        "horizontalExposedArea": 122.1026070693184
+      },
+      {
+        "source": "U-3",
+        "elevation": 20.010869561006192,
+        "horizontalExposedArea": 89.41746864655585
+      }
+    ],
+    "id": "11111111-1111-4111-8111-111111111105",
+    "yaw": 105,
+    "passed": true,
+    "milliseconds": 1404.857,
+    "triangles": 1712,
+    "volume": 3524.9610304958555,
+    "validation": {
+      "passed": true,
+      "selfIntersectionPairs": 0,
+      "nonAdjacentTriangleChecks": 60149,
+      "legacyFlags": 18
+    },
+    "walls": [
+      {
+        "source": "L-1",
+        "verticalFaces": 38,
+        "roofFaces": 29,
+        "bottomFaces": 11,
+        "maximumRoofErrorFeet": 0.0000015740396418710235,
+        "roofRange": [
+          28.116708755493164,
+          33.195159912109375
+        ],
+        "supportZ": 0
+      },
+      {
+        "source": "V-2",
+        "verticalFaces": 93,
+        "roofFaces": 59,
+        "bottomFaces": 28,
+        "maximumRoofErrorFeet": 0.0000016255864081189802,
+        "roofRange": [
+          34.73017120361328,
+          39.40382385253906
+        ],
+        "supportZ": 0
+      }
+    ],
+    "voids": [
+      {
+        "source": "U-3",
+        "yaw": 105,
+        "axis": [
+          0.9659258262890683,
+          0.25881904510252085,
+          0
+        ],
+        "profile": "convex hull minus source L/U/V concavity",
+        "center": [
+          0,
+          0,
+          21
+        ],
+        "probe": {
+          "start": [
+            -54.64101615137755,
+            -14.641016151377551,
+            18.803600542885917
+          ],
+          "end": [
+            54.64101615137755,
+            14.641016151377551,
+            18.803600542885917
+          ]
+        }
+      }
+    ],
+    "ambiguities": []
+  }
+]

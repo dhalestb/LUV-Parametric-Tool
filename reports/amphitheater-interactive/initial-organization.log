@@ -1,0 +1,12 @@
+(node:17684) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+AssertionError [ERR_ASSERTION]: Recess backing missing
+    at C:\Users\DHale\Documents\Codex\LUV-Amphitheater-Proof\scripts\amphitheater-interactive-organization.cjs:65:2 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "files": [
+    {
+      "file": "C:\\Users\\DHale\\Downloads\\Stepped-Amphitheater-Board.png",
+      "width": 4096,
+      "height": 4608,
+      "dpi": 300
+    },
+    {
+      "file": "C:\\Users\\DHale\\Downloads\\Stepped-Amphitheater-U12-Void-Detail.png",
+      "width": 4096,
+      "height": 4096,
+      "dpi": 300
+    }
+  ],
+  "header": "Stepped Amphitheater",
+  "minimumBoardCaptionPoints": 10.5,
+  "detailStages": [
+    "Source letter",
+    "Inner contour + cutter",
+    "Opening through form"
+  ],
+  "detailSource": "U-12",
+  "context": "clipped saved architectural mesh",
+  "build": "passed"
+}

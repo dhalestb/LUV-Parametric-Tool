@@ -34,6 +34,7 @@ import {
 } from "./amphitheaterPrototype";
 
 export type Props = {
+  envelopeHeight?: 20 | 40 | 60;
   selectionOnly?: boolean;
   sourcePlacements: CompositionPlacement[];
   completeSourcePlacements: CompositionPlacement[];

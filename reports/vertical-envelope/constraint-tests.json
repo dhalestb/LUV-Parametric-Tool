@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "populationPosesPreserved": true,
+  "rows": [
+    {
+      "name": "interior-L",
+      "passed": true,
+      "accepted": true
+    },
+    {
+      "name": "interior-V",
+      "passed": true,
+      "accepted": true
+    },
+    {
+      "name": "raised-support",
+      "passed": true,
+      "accepted": true
+    },
+    {
+      "name": "invalid-interior-yaw",
+      "passed": true,
+      "accepted": false
+    },
+    {
+      "name": "invalid-interior-tilt",
+      "passed": true,
+      "accepted": false
+    }
+  ]
+}

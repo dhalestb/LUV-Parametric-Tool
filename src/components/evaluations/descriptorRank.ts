@@ -1,12 +1,18 @@
+import { OPEN_VOLUME_ALGORITHM_VERSION } from "./descriptorVersion";
+
 export const DESCRIPTOR_RANK_STORAGE_KEY = "vul-descriptor-ranks";
 
 export type DescriptorRankSnapshot = {
   version: string;
+  /** Present only when Open Volume was scored by this exact algorithm. */
+  openVolumeVersion?: string;
+  centralizedVersion?: string;
   forms: Array<{
     slotId: string;
     meshId: string;
     filename: string;
-    descriptors: Record<string, { absoluteScore: number; comparativeRank?: number }>;
+    /** absoluteScore is null when the descriptor was unavailable for that form (v4). */
+    descriptors: Record<string, { absoluteScore: number | null; comparativeRank?: number }>;
   }>;
 };
 
@@ -18,6 +24,7 @@ export type RankComponent = {
 
 export type RankDescriptor = {
   id: string;
+  version?: string;
   absoluteScore: number;
   components: RankComponent[];
   comparativeRank?: number;
@@ -28,27 +35,45 @@ export type RankDescriptor = {
 };
 
 /**
- * Unique comparative ranks. 15 is the strongest expression in the current set.
+ * Unique comparative ranks. The highest rank is the strongest expression in the current set.
  * Order: full-precision absolute score, then raw components by descending weight,
  * then stable form id. The absolute score is never changed to break a tie.
+ * A measured 0 is ranked. Forms whose score is not finite (processing failure)
+ * receive no rank and do not count toward the cohort for that descriptor.
  */
 export function assignComparativeRanks<T extends { formId: string; descriptors: RankDescriptor[] }>(forms: T[]) {
-  const count = forms.length;
-  if (!count) return forms;
-  const ids = forms[0].descriptors.map((descriptor) => descriptor.id);
+  if (!forms.length) return forms;
+  const centralVersions = new Set(forms.flatMap(f=>f.descriptors.filter(d=>d.id==='centralized').map(d=>d.version??'legacy')));
+  if(centralVersions.size>1)for(const version of centralVersions){
+    assignComparativeRanks(forms.flatMap(f=>{
+      const descriptors=f.descriptors.filter(d=>d.id==='centralized'&&(d.version??'legacy')===version);
+      return descriptors.length?[{formId:f.formId,descriptors}]:[];
+    }));
+  }
+  const ids = forms[0].descriptors.map((descriptor) => descriptor.id).filter(id=>id!=='centralized'||centralVersions.size<=1);
   for (const id of ids) {
-    const rows = forms.map((form, index) => {
+    const rows = forms.flatMap((form, index) => {
       const descriptor = form.descriptors.find((item) => item.id === id);
-      const components = [...(descriptor?.components ?? [])]
+      if (!descriptor) return [];
+      if (!Number.isFinite(descriptor.absoluteScore)) {
+        descriptor.comparativeRank = undefined;
+        descriptor.relativeRank = undefined;
+        descriptor.relativePercentile = undefined;
+        descriptor.cohortSize = undefined;
+        descriptor.tieBreakUsed = undefined;
+        return [];
+      }
+      const components = [...descriptor.components]
         .filter((component) => component.weight > 0)
         .sort((left, right) => right.weight - left.weight || left.name.localeCompare(right.name));
-      return {
+      return [{
         index,
         formId: form.formId,
-        absolute: descriptor?.absoluteScore ?? 0,
+        absolute: descriptor.absoluteScore,
         components,
-      };
+      }];
     });
+    const count = rows.length;
     rows.sort((left, right) => {
       if (left.absolute !== right.absolute) return left.absolute - right.absolute;
       const limit = Math.max(left.components.length, right.components.length);
@@ -77,4 +102,19 @@ export function assignComparativeRanks<T extends { formId: string; descriptors: 
     });
   }
   return forms;
+}
+
+/** Drop Open Volume unless its stored version is exactly the current Open Volume algorithm. Other descriptors stay. */
+export function rejectStaleOpenVolumeSnapshot(snapshot: DescriptorRankSnapshot): DescriptorRankSnapshot {
+  if (snapshot.openVolumeVersion === OPEN_VOLUME_ALGORITHM_VERSION) return snapshot;
+  return {
+    version: snapshot.version,
+    openVolumeVersion: snapshot.openVolumeVersion,
+    forms: snapshot.forms.map((form) => {
+      if (!Object.prototype.hasOwnProperty.call(form.descriptors, "openVolume")) return form;
+      const descriptors = { ...form.descriptors };
+      delete descriptors.openVolume;
+      return { ...form, descriptors };
+    }),
+  };
 }

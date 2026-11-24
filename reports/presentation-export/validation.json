@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "study": "195c5cdb-b1e3-43e9-9694-7eebf7f1628e",
+  "png": [
+    {
+      "name": "board",
+      "width": 4096,
+      "height": 4608,
+      "dpi": 300,
+      "bytes": 1708808
+    },
+    {
+      "name": "letters",
+      "width": 4096,
+      "height": 4096,
+      "dpi": 300,
+      "bytes": 688784
+    },
+    {
+      "name": "form",
+      "width": 4096,
+      "height": 4096,
+      "dpi": 300,
+      "bytes": 892762
+    },
+    {
+      "name": "orientation",
+      "width": 4096,
+      "height": 4096,
+      "dpi": 300,
+      "bytes": 855182
+    },
+    {
+      "name": "generation",
+      "width": 4096,
+      "height": 4096,
+      "dpi": 300,
+      "bytes": 1734977
+    }
+  ],
+  "transparent": {
+    "width": 2048,
+    "height": 2048,
+    "dpi": 300,
+    "cornerAlpha": 0,
+    "opaquePixels": 702225
+  },
+  "obj": [
+    {
+      "kind": "letters",
+      "vertices": 9336,
+      "faces": 3112,
+      "bytes": 594571
+    },
+    {
+      "kind": "form",
+      "vertices": 4493,
+      "faces": 9022,
+      "bytes": 404546
+    }
+  ]
+}

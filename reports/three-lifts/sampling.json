@@ -1,0 +1,33 @@
+[
+  {
+    "seed": 19,
+    "passed": true,
+    "milliseconds": 3422.907
+  },
+  {
+    "seed": 21,
+    "passed": true,
+    "milliseconds": 3235.9906
+  },
+  {
+    "seed": 24,
+    "passed": true,
+    "milliseconds": 3037.113000000001
+  },
+  {
+    "seed": 37,
+    "passed": true,
+    "milliseconds": 3254.8601
+  },
+  {
+    "seed": 41,
+    "passed": true,
+    "milliseconds": 3235.4288000000015
+  },
+  {
+    "seed": 51,
+    "passed": false,
+    "error": "Error: Exported geometry rejected: (node:54916) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.",
+    "milliseconds": 2748.543700000002
+  }
+]

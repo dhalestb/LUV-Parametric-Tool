@@ -18,6 +18,16 @@ export type GenerationRules = {
   minimumClearance: number;
   minimumLetterSize: number;
   maximumLetterSize: number;
+  /**
+   * Preferred placement.scale (unit-letter multiplier). Footprint feet ≈ scale × 0.92.
+   * Optional for backward-compatible sessions; generators fall back to maximumLetterSize.
+   */
+  preferredLetterSize?: number;
+  /**
+   * 0–100. Optimizer samples letter scales between min and max around the preferred size.
+   * Optional for backward-compatible sessions.
+   */
+  letterSizeVariation?: number;
   allowRotationX: boolean;
   allowRotationY: boolean;
   maximumRotationY: number;
@@ -57,6 +67,12 @@ export type SelectionVolume = {
   stepX: number;
   stepY: number;
   stepZ: number;
+  /**
+   * When set to 20 | 40 | 60, Composition locks a 20 × 20 plan × height Z
+   * selection field and skips dashed-group auto-sizing. Null/undefined keeps
+   * the legacy free-form selection behavior.
+   */
+  heightRouting?: 20 | 40 | 60 | null;
 };
 
 export type MetricValue = {
@@ -140,6 +156,7 @@ export type SpatialAlternative = {
     evaluatedPositions: number;
     totalPositions: number;
     exhaustive: boolean;
+    heightRouting?: 20 | 40 | 60 | null;
   };
 };
 
@@ -167,8 +184,12 @@ export const DEFAULT_GRID: OrthogonalGrid = {
 
 export const DEFAULT_RULES: GenerationRules = {
   minimumClearance: 0.8,
-  minimumLetterSize: 0.45,
-  maximumLetterSize: 1.1,
+  /** ~6 ft plan footprint (scale × 0.92). */
+  minimumLetterSize: 6 / 0.92,
+  preferredLetterSize: 9 / 0.92,
+  /** ~12 ft plan footprint. */
+  maximumLetterSize: 12 / 0.92,
+  letterSizeVariation: 35,
   allowRotationX: true,
   allowRotationY: true,
   maximumRotationY: 90,
@@ -205,4 +226,5 @@ export const DEFAULT_SELECTION: SelectionVolume = {
   stepX: 1,
   stepY: 1,
   stepZ: 1,
+  heightRouting: null,
 };

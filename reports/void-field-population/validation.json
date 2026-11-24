@@ -1,0 +1,90 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "count": 10,
+      "seed": 211,
+      "volume": 4489.5826891166835,
+      "triangles": 11210,
+      "elapsedMs": 6182,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 480293,
+        "legacyFlags": 154
+      },
+      "rejected": []
+    },
+    {
+      "count": 11,
+      "seed": 149,
+      "volume": 4831.368705179462,
+      "triangles": 11996,
+      "elapsedMs": 6434,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 541774,
+        "legacyFlags": 184
+      },
+      "rejected": []
+    },
+    {
+      "count": 12,
+      "seed": 149,
+      "volume": 4827.395708446812,
+      "triangles": 12658,
+      "elapsedMs": 6901,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 588759,
+        "legacyFlags": 191
+      },
+      "rejected": []
+    },
+    {
+      "count": 13,
+      "seed": 37,
+      "volume": 5549.1764959240945,
+      "triangles": 12298,
+      "elapsedMs": 6680,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 589152,
+        "legacyFlags": 173
+      },
+      "rejected": []
+    },
+    {
+      "count": 14,
+      "seed": 149,
+      "volume": 5152.623273147893,
+      "triangles": 12518,
+      "elapsedMs": 6702,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 507400,
+        "legacyFlags": 145
+      },
+      "rejected": []
+    },
+    {
+      "count": 15,
+      "seed": 37,
+      "volume": 6126.545943137796,
+      "triangles": 14474,
+      "elapsedMs": 7378,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 651809,
+        "legacyFlags": 209
+      },
+      "rejected": []
+    }
+  ],
+  "unchangedMeshThresholds": true
+}

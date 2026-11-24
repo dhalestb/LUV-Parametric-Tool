@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "base": "http://127.0.0.1:4194",
+  "exactEditedSourcePreserved": true,
+  "architectureChanged": true,
+  "previousStudiesRetained": true,
+  "rows": [
+    {
+      "id": "b58806ce-4347-43c5-84c1-bdbdbf9d778f",
+      "sourceName": "Design · 12 letters · seed 37",
+      "triangles": 11052,
+      "volume": 18517.693066884647,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 348864,
+        "legacyFlags": 171
+      },
+      "operations": 9
+    },
+    {
+      "id": "102dc7d7-bee3-4db9-80b2-9c16abb5e4d0",
+      "sourceName": "Composition",
+      "triangles": 11100,
+      "volume": 18557.325546696964,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 344461,
+        "legacyFlags": 170
+      },
+      "operations": 9
+    },
+    {
+      "id": "2e04e4c6-724f-45da-bd31-54a5039df958",
+      "sourceName": "Design · 12 letters · seed 1234714759",
+      "triangles": 14050,
+      "volume": 19064.578724941624,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 447545,
+        "legacyFlags": 275
+      },
+      "operations": 16
+    }
+  ]
+}
