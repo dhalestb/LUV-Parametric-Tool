@@ -51,6 +51,14 @@
 .fields {grid-template-columns:repeat(5,minmax(0,1fr))}
 .fields label {display:flex;flex-direction:column;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:550;gap:4px}
 .fields label>span {display:flex;align-items:center;gap:8px;background:var(--field);border:1px solid #759399;border-radius:4px;padding-right:10px}
+.distribution{display:flex;align-items:center;gap:18px 36px;flex-wrap:wrap;margin:12px 0}.distribution .clustering{width:min(100%,440px)}
+.allocationPreview{margin:0;display:grid;gap:4px;font-size:12px;color:var(--muted)}.allocationPreview svg{height:98px;width:155px;background:var(--field);border-radius:4px}
+.areaReport{width:100%;border-collapse:collapse;margin:14px 0;font-variant-numeric:tabular-nums}
+.areaReport caption,.areaReport th:first-child,.areaReport td:first-child{text-align:left}
+.areaReport th,.areaReport td{text-align:right;border-bottom:1px solid var(--border-color);padding:6px 4px}
+.clustering{display:grid;grid-template-columns:1fr auto;gap:5px 12px;max-width:440px;margin:18px 0 12px;color:var(--muted);font-size:13px}
+.clustering label{color:var(--ink);font-weight:600}.clustering output{color:var(--cyan);text-align:right}
+.clustering input{grid-column:1/-1;width:100%;accent-color:var(--gold);cursor:pointer}.clustering span:last-child{text-align:right}
 .fields label>span:focus-within{outline:2px solid var(--cyan);outline-offset:1px}
 .fields input[type=number] {background:transparent;min-width:0;width:100%;border:0;font:600 20px/1.1 ui-monospace,monospace;padding:7px 8px;color:#f4f6ed;outline:0}
 .fields b {font-size:14px;color:var(--cyan)}.fields em {font-size:11px;color:var(--gold)}

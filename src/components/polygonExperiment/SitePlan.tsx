@@ -1,8 +1,8 @@
 'use client';
 
-import {useEffect,useRef} from 'react';
-import {TYPOLOGIES,newAssignment,type SiteInput,type Zone,type Experiment,type Registry} from './model';
-import {currentTerritoryResult,type Ring} from './territories';
+import {useEffect,useRef,useState} from 'react';
+import {TYPOLOGIES,newAssignment,type Assignment,type SiteInput,type Zone,type Experiment,type Registry} from './model';
+import {currentTerritoryResult,compositionControls,generateTerritories,geometryKernel,type Result,type Controls,type Ring} from './territories';
 import {useArchitecture} from './ArchitectureLayer';
 import type {OrientationResult} from './orientationStore';
 import styles from './workflow.module.css';
@@ -13,6 +13,33 @@ function bounds(ring:Ring){
   const xs=ring.map(p=>p[0]),zs=ring.map(p=>p[1]);
   const x=Math.min(...xs),y=-Math.max(...zs);
   return {x,y,w:Math.max(...xs)-x,h:-Math.min(...zs)-y};
+}
+
+
+type PreviewProps={site:SiteInput;zone:Zone;assignment:Assignment;controls:Controls;registry:Registry};
+export function AllocationPreview({site,zone,assignment,controls,registry}:PreviewProps){
+  const [plan,setPlan]=useState<Result>(),[error,setError]=useState('');
+  useEffect(()=>{
+    let active=true;
+    const timer=setTimeout(async()=>{
+      try{
+        const api=await geometryKernel();
+        if(!active)return;
+        const result=generateTerritories(api,site,zone,assignment,compositionControls(controls),'area',registry);
+        if(!result.metrics.valid)throw Error('Allocation failed its area check.');
+        setPlan(result);setError('');
+      }catch(e){if(active){setPlan(undefined);setError(e instanceof Error?e.message:String(e));}}
+    },100);
+    return()=>{active=false;clearTimeout(timer);};
+  },[site,zone,assignment,controls,registry]);
+  const {x,y,w,h}=bounds(zone.polygon),pad=.04*Math.max(w,h);
+  return <figure className={styles.allocationPreview}>
+    <figcaption>Allocation preview · {zone.name}</figcaption>
+    {error?<small role="status">{error}</small>:<svg viewBox={[x-pad,y-pad,w+2*pad,h+2*pad].join(' ')} role="img" aria-label={'Allocation preview for '+zone.name}>
+      <path d={path([zone.polygon,...zone.holes])} fill="#233e44" fillRule="evenodd"/>
+      {plan?.territories.map(t=><path key={t.id} data-preview-type={t.typology} d={path(t.contours)} fill={colors[TYPOLOGIES.indexOf(t.typology)]} stroke="#16262a" vectorEffect="non-scaling-stroke"><title>{registry.items.find(r=>r.id===t.typology)?.name} · {t.achievedPercent.toFixed(1)}%</title></path>)}
+    </svg>}
+  </figure>;
 }
 
 // Project the saved world mesh using the same X/Z coordinates as the site.
@@ -26,6 +53,24 @@ function ArchitecturePlan({zone,record}:{zone:Zone;record:OrientationResult}){
     const scale=768/Math.max(w,h);
     el.width=Math.max(1,Math.ceil(w*scale));el.height=Math.max(1,Math.ceil(h*scale));
     ctx.scale(el.width/w,el.height/h);ctx.translate(-x,-y);
+    if(result.planLayers){
+      ctx.lineWidth=Math.max(w/el.width,h/el.height)*1.4;
+      ctx.lineJoin='round';
+      for(const layer of [...result.planLayers].sort((a,b)=>a.top-b.top)){
+        const index=TYPOLOGIES.findIndex(t=>t===layer.typology);
+        ctx.beginPath();
+        for(const ring of layer.contours){
+          if(!ring.length)continue;
+          ctx.moveTo(ring[0][0],-ring[0][1]);
+          for(const [px,pz] of ring.slice(1))ctx.lineTo(px,-pz);
+          ctx.closePath();
+        }
+        ctx.globalAlpha=layer.top<1?.45:.82;
+        ctx.fillStyle=colors[index]??'#c1ae85';ctx.fill('evenodd');
+        ctx.globalAlpha=1;ctx.strokeStyle=layer.top<1?'#304348':'#f9eac9';ctx.stroke();
+      }
+      return;
+    }
     const {positions,indices}=result.architecture;
     ctx.fillStyle='#fcf2d3';ctx.beginPath();
     for(let i=0;i<indices.length;i+=3){

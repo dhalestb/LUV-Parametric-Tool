@@ -12,7 +12,9 @@ import {saveDesignReference,saveDesignReferences} from './alternatives';
 import {ensureSiteSelection,saveOrientation,removeAllocatedOrientations,type OrientationResult} from './orientationStore';
 import {useSiteHandoff} from './siteHandoffStore';
 import {generateAllocatedSite} from './allocatedDesign';
-import {validateAllocation} from './territories';
+import {generateContinuousSite} from './continuousDesign';
+import {compositionControls,validateAllocation} from './territories';
+import {AllocationPreview} from './SitePlan';
 import DesignPanel from './DesignPanel';
 import WorkflowAction,{reveal,type RunAction} from './WorkflowAction';
 import cohort from './hybrid-cohort.json';
@@ -63,7 +65,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       const next={...state.territoryByZone};
       for(const z of enabledZones){
         try{
-          const c=next[z.id]?.controls??territoryDefaults();
+          const c=compositionControls(next[z.id]?.controls);
           const area=generateTerritories(kernel,site,z,state.assignments[z.id]??newAssignment(),c,'area',registry);
           if(!area.metrics.valid)throw Error('Territory validation failed.');
           next[z.id]={controls:c,results:{...next[z.id]?.results,area}};
@@ -160,11 +162,12 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       catch(e){allocationBlocker=z.name+' · '+(e instanceof Error?e.message:String(e));break;}
     }
   }
-  async function generateAll(){
+  async function generateAll(nativeStudies=false){
     if(allocationBlocker||inFlight.current||busy||preparing)return;
     inFlight.current=true;setBusy(true);setMessage('Preparing site territories…');
     try{
-      const batch=await generateAllocatedSite(state,registry,readSiteRules,setMessage);
+      const generator=nativeStudies?generateAllocatedSite:generateContinuousSite;
+      const batch=await generator(state,registry,readSiteRules,setMessage);
       const ids=batch.records.map(record=>record.orientation.id);
       const assertCurrent=()=>{if(latest.current!==state)throw Error('The site or allocations changed during generation. Run again with the current settings.');};
       assertCurrent();
@@ -183,7 +186,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       patch({territoryByZone:batch.territoryByZone});
       for(const record of batch.records)onSaved(record.orientation);
       const count=batch.records.reduce((n,r)=>n+r.architecture.provenance.members.length,0);
-      setMessage('Generated '+count+' typology placements across '+ids.length+' polygon'+(ids.length===1?'':'s')+'.');
+      setMessage('Generated '+count+(nativeStudies?' typology placements across ':' typology compositions across ')+ids.length+' polygon'+(ids.length===1?'':'s')+'.');
       document.getElementById('combined-site-plan')?.scrollIntoView({block:'start'});
     }catch(e){setMessage('Generation blocked. '+(e instanceof Error?e.message:String(e)));}
     finally{inFlight.current=false;setBusy(false);}
@@ -200,6 +203,17 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         <legend>{method==='hybrid-rule'?'Architectural rule influence':method==='typology-area'?'Polygon area by typology':'Polygon area by descriptor'}{zone&&' · '+zone.name}</legend>
         <div className={styles.fields}>{rows.map(r=><label key={r.id}>{r.name}<span><input aria-label={r.name+' percentage'} type="number" min="0" max="100" step="any" onFocus={e=>e.currentTarget.select()} value={r.value} disabled={r.locked} onChange={e=>edit(r.id,Number(e.target.value))}/><b>%</b></span>{r.locked&&<em>Locked or disabled</em>}</label>)}</div>
       </fieldset>
+      {method==='typology-area'&&site&&zone&&<div className={styles.distribution}><div className={styles.clustering}>
+        <label htmlFor="composition-clustering">Typology clustering · {zone.name}</label>
+        <output htmlFor="composition-clustering">{territory.clustering??65}%</output>
+        <input id="composition-clustering" type="range" min="0" max="100" step="1"
+          value={territory.clustering??65} disabled={busy||preparing} onChange={e=>{
+            const c={...territory,clustering:Number(e.currentTarget.value)};
+            patch({territoryByZone:{...state.territoryByZone,[zone.id]:{controls:c,results:state.territoryByZone[zone.id]?.results??{}}}});
+            setPlanNotice('');setMessage('');
+          }}/>
+        <span>Dispersed</span><span>Clustered</span>
+      </div><AllocationPreview site={site} zone={zone} assignment={assignment} controls={territory} registry={registry}/></div>}
       {!zone&&<p>Set your percentages now. Select a polygon to apply them and generate.</p>}
       {zone&&pending[method]&&<button className={styles.textButton} disabled={busy} onClick={()=>{
         const values=Object.fromEntries(rows.map(r=>[r.id,r.locked?r.value:pending[method]?.[r.id]??r.value]));
@@ -207,7 +221,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         else patch({generation:{method,zones:{...zones,[draftKey]:method==='descriptor'?{...draft,descriptors:values}:{...draft,rules:values as typeof assignment.shares}}}});
         const next={...pending};delete next[method];storePending(next);setMessage('');
       }}>Apply draft percentages to this polygon</button>}
-      <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>Building footprint coverage is measured after generation.</span></div>
+      <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>{method==='typology-area'?'Shares use buildable ground, including open court floors and terraces.':'Building footprint coverage is measured after generation.'}</span></div>
       {method==='typology-area'&&site&&<div className={styles.zoneTabs}><button type="button" onClick={prepareAreas} aria-describedby="territory-preparation-status" disabled={busy||preparing||!!preparationBlocker}>{preparing?'Preparing territories…':'Prepare site territories'}</button><a href="#combined-site-plan">View site plan</a></div>}
       {method==='typology-area'&&site&&<p role="status" id="territory-preparation-status">{planNotice||preparationBlocker||(
         preparedCount===enabledZones.length?'Territories prepared. View the site plan or prepare again after editing percentages.':
@@ -222,9 +236,9 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         <details><summary>Evaluations scores and eligibility</summary>{regions.map(r=><p key={r.descriptor}>{descriptorNames[r.descriptor]} · {r.evaluationVersion} · {r.ratings.map(x=>(x.typology==='vertical-walls'?'Stepped':'Plate')+' '+x.score.toFixed(2)).join(' / ')}</p>)}</details><p>Comparable scores are unavailable for Gallery, Room Within Volume and Void Field.</p></div>}
     </section>
     {method==='typology-area'?<>
-      <WorkflowAction local site={site?.name??'No site selected'} method="All allocated typologies"
-        allocation={<><span>Places one full-scale native study in each positive allocation. Cut directions can adjust to fit the buildings.</span>{enabledZones.map(z=><span key={z.id} style={{display:'block'}}><strong>{z.name}</strong>{' · '+registry.items.filter(t=>(state.assignments[z.id]??newAssignment()).shares[t.id]>0).map(t=>t.name+' '+(state.assignments[z.id]??newAssignment()).shares[t.id]+'%').join(' · ')}</span>)}</>}
-        action={{run:generateAll,busy:busy||preparing,reason:allocationBlocker,message,fix:!site?recovery:undefined}}/>
+      <WorkflowAction local site={site?.name??'No site selected'} method="Continuous typology composition"
+        allocation={<><span>Forms connected galleries, decks, terraces, rooms and courts across the enabled polygons.</span>{enabledZones.map(z=><span key={z.id} style={{display:'block'}}><strong>{z.name}</strong>{' · '+registry.items.filter(t=>(state.assignments[z.id]??newAssignment()).shares[t.id]>0).map(t=>t.name+' '+(state.assignments[z.id]??newAssignment()).shares[t.id]+'%').join(' · ')}</span>)}</>}
+        action={{run:()=>generateAll(),busy:busy||preparing,reason:allocationBlocker,message,fix:!site?recovery:undefined}}/>
       <details className={styles.advanced}><summary>Generate a single typology with custom settings</summary>
         <DesignPanel state={state} controls={controls} onSaved={onSaved} onBusy={setBusy} commonBlocked={!!reason||busy} openTerritories={openTerritories}
           renderAction={a=><div><p>{reason||a.reason||a.target}</p>{reason?fix:a.fix&&a.reason?a.fix:null}
@@ -233,6 +247,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       </details>
     </>:action({run:generate,busy,message,eligible:method==='descriptor'?'Inserted Horizontal Plate and Stepped Amphitheater':undefined,correction:<button onClick={()=>reveal('allocation-inputs')}>Edit percentages</button>})}
     <details className={styles.advanced}><summary>Advanced generation settings</summary>{advanced}
+      {method==='typology-area'&&<button disabled={busy||preparing||!!allocationBlocker} onClick={()=>generateAll(true)}>Generate individual native study placements</button>}
       {method!=='typology-area'&&<p>Miami Cluster Zone 1 uses the Roadways/Water 60/40/20-ft height regions. Plate seed 39 supplies stations for the three native lifts of Stepped seed 69. Within-lift spacing and orientation are preserved. The planning clearance is {Math.max(territory.minimumDiameter['vertical-walls'],territory.minimumDiameter['inserted-plate'])} ft in diameter.</p>}
       {method==='descriptor'&&<p>Evaluations {cohort.version} measures the two independent Rule B studies with {cohort.forms[0].cellFeet}-ft voxels. A sweep along the site X axis allocates the requested areas. A lift receives its rule weights from its source-letter footprint in each region. Every selected region requires native source geometry.</p>}{method!=='typology-area'&&handoff.enabled&&<label><input type="checkbox" checked={useFullZone} onChange={e=>chooseDomain(e.target.checked)}/> Use the full polygon for {meta.name}</label>}</details>
   </>;

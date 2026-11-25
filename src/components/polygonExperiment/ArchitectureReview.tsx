@@ -88,7 +88,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
     <h2 id="review-heading"><small>04</small> Review Generated Architecture</h2>
     {site&&site.zones.length>0&&<section id="combined-site-plan"><h3>Combined site plan</h3>
       <SitePlan state={state} site={site} registry={registry} records={Object.fromEntries(matches.map(m=>[m.zone.id,m.shown?.r]))}/>
-      <p>Territory colors show prepared area allocations. Light footprints show completed architecture in site coordinates.</p>
+      <p>Territory colors identify typologies. Floor, wall and roof outlines show the generated composition in plan.</p>
       <div className={styles.zoneChoices}>{matches.map(({zone,options,key,shown})=><label key={key}>{zone.name}
         {options.length?<select aria-label={zone.name+' plan design'} value={shown?.d.id??''} onChange={e=>setZoneChoices({...zoneChoices,[key]:e.target.value})}>
           <option value="">Hide architecture</option>{options.map(o=><option key={o.d.id} value={o.d.id}>{o.d.name}</option>)}</select>:<small>No completed design for this site revision</small>}
@@ -107,11 +107,15 @@ export default function ArchitectureReview({state,registry,results,selected,view
     {!record&&<p>{reference?'Loading saved study…':'Generate a design or select a saved study to review its geometry.'}</p>}
     {record&&<><h3>{title}</h3>{record.provenance.ruleInfluence!==undefined&&<p>Plate perimeter stations guide native Stepped Rule A placement. Authentic Stepped Rule B generates the walls, terraces and openings.</p>}
       {result?<div className={styles.metrics}>
-        <div><span>Building footprint</span><strong>{result.validation.footprintArea.toFixed(2)} ft²</strong></div>
+        <div><span>{result.provenance.adapter==='polygon-composition/v1'?'Developed ground footprint':'Building footprint'}</span><strong>{result.validation.footprintArea.toFixed(2)} ft²</strong></div>
         <div><span>Actual coverage</span><strong>{result.measurements?result.measurements.buildingCoveragePercent.toFixed(2)+'%':'Unrecorded'}</strong></div>
-        <div><span>Site containment</span><strong>{result.validation.outsideArea<=1e-6&&result.validation.protectedArea<=1e-6?'Passed':'Review'}</strong></div>
+        <div><span>Site containment</span><strong>{result.validation.outsideArea<=(result.validation.areaToleranceFeet2??1e-6)&&result.validation.protectedArea<=(result.validation.areaToleranceFeet2??1e-6)?'Passed':'Review'}</strong></div>
         <div><span>Site height check</span><strong>{heightPassed===undefined?'Unrecorded':heightPassed?'Passed':'Review'}</strong></div>
       </div>:<p role="status">{loading?'Loading architectural geometry…':error||'Only source-letter geometry is available.'}</p>}
+      {result?.provenance.adapter==='polygon-composition/v1'&&<table className={styles.areaReport}><caption>Measured composition · {result.provenance.clustering}% clustering · {result.provenance.buildableAreaFeet2?.toLocaleString(undefined,{maximumFractionDigits:1})} ft² buildable ground</caption>
+        <thead><tr><th>Typology</th><th>Requested</th><th>Built share</th><th>Footprint</th></tr></thead>
+        <tbody>{result.provenance.members?.map(m=><tr key={m.typology}><td>{m.name}</td><td>{m.allocatedPercent}%</td><td>{m.achievedPercent.toFixed(2)}%</td><td>{m.footprintAreaFeet2.toLocaleString(undefined,{maximumFractionDigits:1})} ft²</td></tr>)}</tbody>
+      </table>}
       <div className={styles.viewer}><OrientationView result={record} view={reference?referenceView:view}/></div>
       <div className={styles.alternative}><label>Alternative name<input aria-label="Alternative name" value={name} onChange={e=>setName(e.target.value)}/></label>
         <button disabled={!result||saving||!name.trim()} onClick={save}>Save Alternative</button>
