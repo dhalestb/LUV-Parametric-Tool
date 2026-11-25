@@ -21,7 +21,7 @@ export function redistribute(shares:Assignment['shares'],c:Controls):Assignment[
  const each=free.length?(100-locked)/free.length:0;free.forEach((t,i)=>{next[t]=i===free.length-1?100-locked-each*i:each;});return next;
 }
 export function validateAllocation(a:Assignment,c:Controls){let sum=0;for(const t of TYPOLOGIES){const n=a.shares[t];if(!Number.isFinite(n)||n<0||n>100)throw Error('Percentages must be finite and between 0 and 100.');if(!c.enabled[t]&&n!==0)throw Error('Disabled typologies must have zero allocation. Use explicit redistribution.');if(c.enabled[t])sum+=n;if(!Number.isFinite(c.minimumDiameter[t])||c.minimumDiameter[t]<=0)throw Error('Planning diameter must be positive.');}if(Math.abs(sum-100)>1e-8)throw Error(`Enabled allocations total ${sum}%; exactly 100% is required.`);if(!Number.isSafeInteger(c.seed))throw Error('Seed must be an integer.');}
-export const signature=(site:SiteInput,zone:Zone,a:Assignment,c:Controls)=>JSON.stringify({version:2,source:site.fingerprint,zone:zone.id,polygon:zone.polygon,holes:zone.holes,exclusions:site.exclusions,corridors:site.corridors,reservedAreas:site.reservedAreas,shares:a.shares,variants:a.variants,controls:c});
+export const signature=(site:SiteInput,zone:Zone,a:Assignment,c:Controls)=>JSON.stringify({version:c.clustering===undefined?2:3,source:site.fingerprint,zone:zone.id,polygon:zone.polygon,holes:zone.holes,exclusions:site.exclusions,corridors:site.corridors,reservedAreas:site.reservedAreas,shares:a.shares,variants:a.variants,controls:c});
 export function currentTerritoryResult(site:SiteInput,zone:Zone,a:Assignment,c:Controls,r:Result){return r.signature===signature(site,zone,a,c)&&r.source.id===zone.id&&r.source.fingerprint===site.fingerprint&&r.source.revision===site.revision&&r.metrics.valid&&r.metrics.maxAreaError<=allocationAreaTolerance(r.allocatableArea);}
 let initializing:Promise<ManifoldToplevel>|undefined;
 export function geometryKernel(){if(!initializing){const entry='/geometry-runtime/manifold-3.5.3/manifold.js';initializing=import(/* webpackIgnore: true */ entry).then(async module=>{const api:ManifoldToplevel=await module.default();api.setup();return api;}).catch(error=>{initializing=undefined;throw error;});}return initializing;}
@@ -35,6 +35,21 @@ function interiorLabel(rings:Ring[]):Point {
  return best;
 }
 export function generateTerritories(api:ManifoldToplevel,site:SiteInput,zone:Zone,a:Assignment,c:Controls,strategy:Strategy,registry:Registry):Result {
+ const xs=zone.polygon.map(p=>p[0]),zs=zone.polygon.map(p=>p[1]);
+ const longerInDepth=c.clustering!==undefined&&Math.max(...zs)-Math.min(...zs)>Math.max(...xs)-Math.min(...xs);
+ const angle=c.areaCutAngle??(longerInDepth?90:0);
+ const solve=(direction:number)=>territoriesAtAngle(api,site,zone,a,c,strategy,registry,direction);
+ const initial=solve(angle);
+ if(strategy!=='area'||c.clustering===undefined||initial.territories.every(t=>t.screen!=='infeasible'))return initial;
+ // Try another sweep direction before declaring a constrained layout infeasible.
+ // The stored controls still describe the requested clustering and area shares.
+ for(const delta of [90,45,-45,30,-30,60,-60,15,-15,75,-75]){
+   const candidate=solve((angle+delta+180)%180);
+   if(candidate.metrics.valid&&candidate.territories.every(t=>t.screen!=='infeasible'))return candidate;
+ }
+ return initial;
+}
+function territoriesAtAngle(api:ManifoldToplevel,site:SiteInput,zone:Zone,a:Assignment,c:Controls,strategy:Strategy,registry:Registry,angle:number):Result {
  const start=performance.now();validateAllocation(a,c);
  if(c.clustering!==undefined&&(!Number.isFinite(c.clustering)||c.clustering<0||c.clustering>100))throw Error('Clustering must be between 0 and 100.');
  if(!site.protectionMetadataComplete)throw Error('Reimport the source Site JSON to recover corridor and protected-area metadata omitted by the foundation.');
@@ -58,9 +73,7 @@ export function generateTerritories(api:ManifoldToplevel,site:SiteInput,zone:Zon
 
  for(let index=0;index<order.length;index++){
  const id=order[index],requested=area*a.shares[id]/100;
- const xs=zone.polygon.map(p=>p[0]),zs=zone.polygon.map(p=>p[1]);
- const alongDepth=c.clustering!==undefined&&Math.max(...zs)-Math.min(...zs)>Math.max(...xs)-Math.min(...xs);
- const radians=(c.areaCutAngle??(alongDepth?90:0))*Math.PI/180;
+ const radians=angle*Math.PI/180;
  let n:Point=[Math.cos(radians),Math.sin(radians)];
  if(strategy==='geometry'){let length=-1;for(const r of remaining.toPolygons()){if(signedArea(r as Ring)<=0)continue;for(let i=0;i<r.length;i++){const p=r[i],q=r[(i+1)%r.length],dx=q[0]-p[0],dy=q[1]-p[1],d=Math.hypot(dx,dy);if(d>length+1e-8){length=d;n=[-dy/d,dx/d];}}}}
  cutDirections.push(n);const piece=index===order.length-1?remaining:own(strategy==='area'&&c.clustering!==undefined&&c.clustering<100?clusteredCut(api,remaining,zone.polygon,n,requested,allocationTolerance,c.clustering):cutArea(api,remaining,zone.polygon,n,requested,allocationTolerance));sections.push(piece);const contours=piece.toPolygons() as Ring[],measured=piece.area(),parts=piece.decompose();

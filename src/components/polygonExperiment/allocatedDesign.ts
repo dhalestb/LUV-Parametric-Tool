@@ -28,7 +28,7 @@ async function loadStudy(type:Typology):Promise<PreparedStudy>{
   }
   return {...study,center,height};
 }
-function studyFor(type:Typology){
+export function studyFor(type:Typology){
   if(!cache.has(type))cache.set(type,loadStudy(type).catch(e=>{cache.delete(type);throw e;}));
   return cache.get(type)!;
 }
