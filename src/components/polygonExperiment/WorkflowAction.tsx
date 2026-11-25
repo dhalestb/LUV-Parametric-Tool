@@ -13,7 +13,7 @@ export function reveal(id:string) {
   (el.matches('button,input,select')?el:el.querySelector<HTMLElement>('summary,button,input,select'))?.focus({preventScroll:true});
 }
 
-export default function WorkflowAction({action,site,method,allocation}:{action:RunAction;site:string;method:string;allocation:string}){
+export default function WorkflowAction({action,site,method,allocation,local=false}:{action:RunAction;site:string;method:string;allocation:ReactNode;local?:boolean}){
   const {busy,run,reason,fix,message,target,eligible,correction}=action;
   const setup=useRef<HTMLDetailsElement>(null);
   const access=useRef<HTMLDivElement>(null);
@@ -26,6 +26,6 @@ export default function WorkflowAction({action,site,method,allocation}:{action:R
       {message&&<p role="status" className={styles.feedback}>{message}</p>}
       {correction&&/^(Generation blocked|Error:)/.test(message)&&!/access key/i.test(message)&&<div className={styles.fix}>{correction}</div>}
     </div>
-    <div ref={access} className={styles.runActions}><button className={styles.primary} disabled={busy||!!reason&&!action.setup} onClick={()=>{if(reason&&setup.current){setup.current.open=true;setup.current.querySelector('button')?.focus();}else run();}}>{busy?'Generating…':'Generate Design'}</button><WorkerAccess/></div>
+    <div ref={access} className={styles.runActions}><button className={styles.primary} disabled={busy||!!reason&&!action.setup} onClick={()=>{if(reason&&setup.current){setup.current.open=true;setup.current.querySelector('button')?.focus();}else run();}}>{busy?'Generating…':'Generate Design'}</button>{!local&&<WorkerAccess/>}</div>
   </section>;
 }

@@ -62,13 +62,15 @@ export default function ArchitectureReview({state,registry,results,selected,view
   const [zoneChoices,setZoneChoices]=useState<Record<string,string>>({});
   const [showSite3D,setShowSite3D]=useState(false);
   const site=state.site;
+  const selectedRun=(selected?.provenance as {runId?:string}|undefined)?.runId;
   const matches=(site?.zones??[]).map(zone=>{
     const options=library.filter(d=>d.status==='complete'&&d.zoneId===zone.id&&d.site.fingerprint===site!.fingerprint&&d.site.revision===site!.revision)
       .flatMap(d=>{const r=results.find(r=>r.id===d.id&&r.geometryHash===d.orientationHash&&r.zoneId===zone.id&&r.site.fingerprint===site!.fingerprint&&r.site.revision===site!.revision);return r?[{d,r}]:[];})
       .sort((a,b)=>b.d.createdAt.localeCompare(a.d.createdAt));
-    const key=JSON.stringify([site!.fingerprint,zone.id]);
+    const key=JSON.stringify([site!.fingerprint,zone.id,selectedRun]);
     const choice=zoneChoices[key];
-    const shown=choice===''?undefined:options.find(o=>o.d.id===choice)??options[0];
+    const defaultChoice=selectedRun?options.find(o=>(o.r.provenance as {runId?:string}).runId===selectedRun):options[0];
+    const shown=choice===''?undefined:options.find(o=>o.d.id===choice)??defaultChoice;
     return {zone,options,key,shown};
   });
   const group=matches.flatMap(m=>m.shown?[m.shown.r]:[]);
@@ -81,7 +83,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
       setNotice('The selected designs are ready together in Site Development. Choose Architecture Only to see their buildings.');
     }catch(e){setNotice(String(e));}
   }
-  const local=result?.validation.occupiedSiteEnvelope;
+  const heightPassed=result?.validation.occupiedSiteEnvelope?.passed??result?.validation.allocatedHeightChecked;
   return <section id="review-architecture" className={styles.review} aria-labelledby="review-heading">
     <h2 id="review-heading"><small>04</small> Review Generated Architecture</h2>
     {site&&site.zones.length>0&&<section id="combined-site-plan"><h3>Combined site plan</h3>
@@ -108,7 +110,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
         <div><span>Building footprint</span><strong>{result.validation.footprintArea.toFixed(2)} ft²</strong></div>
         <div><span>Actual coverage</span><strong>{result.measurements?result.measurements.buildingCoveragePercent.toFixed(2)+'%':'Unrecorded'}</strong></div>
         <div><span>Site containment</span><strong>{result.validation.outsideArea<=1e-6&&result.validation.protectedArea<=1e-6?'Passed':'Review'}</strong></div>
-        <div><span>Local height check</span><strong>{local?(local.passed?'Passed':'Review'):'Unrecorded'}</strong></div>
+        <div><span>Site height check</span><strong>{heightPassed===undefined?'Unrecorded':heightPassed?'Passed':'Review'}</strong></div>
       </div>:<p role="status">{loading?'Loading architectural geometry…':error||'Only source-letter geometry is available.'}</p>}
       <div className={styles.viewer}><OrientationView result={record} view={reference?referenceView:view}/></div>
       <div className={styles.alternative}><label>Alternative name<input aria-label="Alternative name" value={name} onChange={e=>setName(e.target.value)}/></label>

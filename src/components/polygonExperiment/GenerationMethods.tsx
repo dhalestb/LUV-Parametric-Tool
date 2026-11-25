@@ -5,12 +5,14 @@ import {descriptorNames,descriptorRegions,influenceVersion,type AreaShares,type 
 import {newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
 import {defaults as territoryDefaults,geometryKernel,generateTerritories,currentTerritoryResult} from './territories';
 import {applyStudyUnits} from './syncSiteFeet';
-import {requestSiteWorker} from './workerClient';
+import {requestSiteWorker,WorkerAccess} from './workerClient';
 import {readSiteRules} from './SiteRulePanel';
-import {saveBrowserDesign} from './browserDesigns';
-import {saveDesignReference} from './alternatives';
-import {ensureSiteSelection,saveOrientation,type OrientationResult} from './orientationStore';
+import {saveBrowserDesign,removeAllocatedArchitectures} from './browserDesigns';
+import {saveDesignReference,saveDesignReferences} from './alternatives';
+import {ensureSiteSelection,saveOrientation,removeAllocatedOrientations,type OrientationResult} from './orientationStore';
 import {useSiteHandoff} from './siteHandoffStore';
+import {generateAllocatedSite} from './allocatedDesign';
+import {validateAllocation} from './territories';
 import DesignPanel from './DesignPanel';
 import WorkflowAction,{reveal,type RunAction} from './WorkflowAction';
 import cohort from './hybrid-cohort.json';
@@ -150,6 +152,42 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       setMessage('Saved alternative · '+result.orientation.components.length+' letters · '+result.architecture.components+' components · replay matched.');
     }catch(e){setMessage('Generation blocked. '+(e instanceof Error?e.message:String(e)));}finally{setBusy(false);}
   }
+  const inFlight=useRef(false);
+  let allocationBlocker=site?preparationBlocker:'Select a site before generating.';
+  if(!allocationBlocker){
+    for(const z of enabledZones){
+      try{validateAllocation(state.assignments[z.id]??newAssignment(),state.territoryByZone[z.id]?.controls??territoryDefaults());}
+      catch(e){allocationBlocker=z.name+' · '+(e instanceof Error?e.message:String(e));break;}
+    }
+  }
+  async function generateAll(){
+    if(allocationBlocker||inFlight.current||busy||preparing)return;
+    inFlight.current=true;setBusy(true);setMessage('Preparing site territories…');
+    try{
+      const batch=await generateAllocatedSite(state,registry,readSiteRules,setMessage);
+      const ids=batch.records.map(record=>record.orientation.id);
+      const assertCurrent=()=>{if(latest.current!==state)throw Error('The site or allocations changed during generation. Run again with the current settings.');};
+      assertCurrent();
+      try{
+        ensureSiteSelection();
+        for(const {orientation,architecture} of batch.records){
+          await saveBrowserDesign(orientation,architecture,{architecture});
+          await saveOrientation(orientation);
+        }
+        assertCurrent();
+        saveDesignReferences(batch.records.map(record=>({...record,status:'complete'})));
+      }catch(e){
+        await Promise.all([removeAllocatedArchitectures(ids),removeAllocatedOrientations(ids)]);
+        throw e;
+      }
+      patch({territoryByZone:batch.territoryByZone});
+      for(const record of batch.records)onSaved(record.orientation);
+      const count=batch.records.reduce((n,r)=>n+r.architecture.provenance.members.length,0);
+      setMessage('Generated '+count+' typology placements across '+ids.length+' polygon'+(ids.length===1?'':'s')+'.');
+      document.getElementById('combined-site-plan')?.scrollIntoView({block:'start'});
+    }catch(e){setMessage('Generation blocked. '+(e instanceof Error?e.message:String(e)));}
+    finally{inFlight.current=false;setBusy(false);}
+  }
   const action=(a:RunAction)=><WorkflowAction action={{...a,reason:reason||a.reason,fix:reason?fix:a.fix,setup:reason?setup:a.setup}}
     site={zone?site!.name+' / '+zone.name:'No site selected'} method={meta.name} allocation={summary}/>;
   return <>
@@ -174,7 +212,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       {method==='typology-area'&&site&&<p role="status" id="territory-preparation-status">{planNotice||preparationBlocker||(
         preparedCount===enabledZones.length?'Territories prepared. View the site plan or prepare again after editing percentages.':
         preparedCount>0?preparedCount+' of '+enabledZones.length+' polygons have current territories. Prepare again to update the site plan.':
-        'Prepare a 2D territory plan from the drawn polygons and their percentages.'
+        'Generate Design prepares territories automatically. Use Prepare site territories to preview the allocation.'
       )}</p>}
       {method==='typology-area'&&<button className={styles.textButton} onClick={openTerritories}>Territory allocation &amp; constraints ↗</button>}
       {method==='hybrid-rule'&&<p className={styles.note}>Verified pair · Inserted Horizontal Plate guides native Stepped Rule A placement. Stepped Rule B forms the architecture. Other rule connections await validation.</p>}
@@ -183,7 +221,17 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         {!regions.length&&<p>{scoreError||'Complete a 100% allocation to calculate contributions.'}</p>}
         <details><summary>Evaluations scores and eligibility</summary>{regions.map(r=><p key={r.descriptor}>{descriptorNames[r.descriptor]} · {r.evaluationVersion} · {r.ratings.map(x=>(x.typology==='vertical-walls'?'Stepped':'Plate')+' '+x.score.toFixed(2)).join(' / ')}</p>)}</details><p>Comparable scores are unavailable for Gallery, Room Within Volume and Void Field.</p></div>}
     </section>
-    {method==='typology-area'?<DesignPanel state={state} controls={controls} onSaved={onSaved} onBusy={setBusy} renderAction={action} commonBlocked={!!reason} openTerritories={openTerritories}/>:action({run:generate,busy,message,eligible:method==='descriptor'?'Inserted Horizontal Plate and Stepped Amphitheater':undefined,correction:<button onClick={()=>reveal('allocation-inputs')}>Edit percentages</button>})}
+    {method==='typology-area'?<>
+      <WorkflowAction local site={site?.name??'No site selected'} method="All allocated typologies"
+        allocation={<><span>Places one full-scale native study in each positive allocation. Cut directions can adjust to fit the buildings.</span>{enabledZones.map(z=><span key={z.id} style={{display:'block'}}><strong>{z.name}</strong>{' · '+registry.items.filter(t=>(state.assignments[z.id]??newAssignment()).shares[t.id]>0).map(t=>t.name+' '+(state.assignments[z.id]??newAssignment()).shares[t.id]+'%').join(' · ')}</span>)}</>}
+        action={{run:generateAll,busy:busy||preparing,reason:allocationBlocker,message,fix:!site?recovery:undefined}}/>
+      <details className={styles.advanced}><summary>Generate a single typology with custom settings</summary>
+        <DesignPanel state={state} controls={controls} onSaved={onSaved} onBusy={setBusy} commonBlocked={!!reason||busy} openTerritories={openTerritories}
+          renderAction={a=><div><p>{reason||a.reason||a.target}</p>{reason?fix:a.fix&&a.reason?a.fix:null}
+            <button disabled={busy||!!reason||!!a.reason} onClick={a.run}>Generate single typology</button>
+            {a.message&&<p role="status">{a.message}</p>}<WorkerAccess/></div>}/>
+      </details>
+    </>:action({run:generate,busy,message,eligible:method==='descriptor'?'Inserted Horizontal Plate and Stepped Amphitheater':undefined,correction:<button onClick={()=>reveal('allocation-inputs')}>Edit percentages</button>})}
     <details className={styles.advanced}><summary>Advanced generation settings</summary>{advanced}
       {method!=='typology-area'&&<p>Miami Cluster Zone 1 uses the Roadways/Water 60/40/20-ft height regions. Plate seed 39 supplies stations for the three native lifts of Stepped seed 69. Within-lift spacing and orientation are preserved. The planning clearance is {Math.max(territory.minimumDiameter['vertical-walls'],territory.minimumDiameter['inserted-plate'])} ft in diameter.</p>}
       {method==='descriptor'&&<p>Evaluations {cohort.version} measures the two independent Rule B studies with {cohort.forms[0].cellFeet}-ft voxels. A sweep along the site X axis allocates the requested areas. A lift receives its rule weights from its source-letter footprint in each region. Every selected region requires native source geometry.</p>}{method!=='typology-area'&&handoff.enabled&&<label><input type="checkbox" checked={useFullZone} onChange={e=>chooseDomain(e.target.checked)}/> Use the full polygon for {meta.name}</label>}</details>

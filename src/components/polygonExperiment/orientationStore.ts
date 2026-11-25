@@ -5,6 +5,15 @@ export type OrientationSelection={siteGroup?:{id:string;hash:string;zoneId:strin
 export const selectionDefault:OrientationSelection={id:null,letters:true,organizing:true,boundaries:true,siteVisible:false};
 function db():Promise<IDBDatabase>{return new Promise((resolve,reject)=>{const r=indexedDB.open('luv-experiment-orientations-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('results',{keyPath:'id'});r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
 export async function saveOrientation(result:OrientationResult){const d=await db();try{await new Promise<void>((resolve,reject)=>{const t=d.transaction('results','readwrite');t.objectStore('results').put(result);t.oncomplete=()=>resolve();t.onerror=()=>reject(t.error);t.onabort=()=>reject(t.error);});}finally{d.close();}}
+export async function removeAllocatedOrientations(ids:string[]){
+  const database=await db();
+  try{await new Promise<void>((resolve,reject)=>{
+    const tx=database.transaction('results','readwrite');
+    for(const id of ids)tx.objectStore('results').delete(id);
+    tx.oncomplete=()=>resolve();tx.onabort=()=>reject(tx.error);
+  });}finally{database.close();}
+}
+
 export async function readOrientation(id:string):Promise<OrientationResult|undefined>{const d=await db();try{return await new Promise((resolve,reject)=>{const r=d.transaction('results').objectStore('results').get(id);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}finally{d.close();}}
 export async function listOrientations():Promise<OrientationResult[]>{const d=await db();try{return await new Promise((resolve,reject)=>{const r=d.transaction('results').objectStore('results').getAll();r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}finally{d.close();}}
 export function readSelection():OrientationSelection{const s=localStorage.getItem(ORIENTATION_KEY);return s?{...selectionDefault,...JSON.parse(s)}:selectionDefault;}

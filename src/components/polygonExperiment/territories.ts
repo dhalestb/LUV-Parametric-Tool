@@ -7,7 +7,7 @@ export const allocationAreaTolerance=(area:number)=>Math.max(tolerancePolicy.all
 export type Point=[number,number];
 export type Ring=Point[];
 export type Strategy='area'|'geometry';
-export type Controls={enabled:Record<Typology,boolean>;locked:Record<Typology,boolean>;minimumDiameter:Record<Typology,number>;seed:number;reserved:{id:string;polygon:Ring}[]};
+export type Controls={areaCutAngle?:number;enabled:Record<Typology,boolean>;locked:Record<Typology,boolean>;minimumDiameter:Record<Typology,number>;seed:number;reserved:{id:string;polygon:Ring}[]};
 export type Territory={id:string;typology:Typology;contours:Ring[];area:number;requestedPercent:number;achievedPercent:number;label:Point;components:number;screen:'passes-planning-screen'|'infeasible';findings:string[];rules:ReturnType<typeof adapterForVariant>;parameters:{A:Record<string,unknown>;B:Record<string,unknown>}};
 export type Result={strategy:Strategy;seed:number;signature:string;source:{id:string;revision:string;fingerprint:string};permitted:Ring[];protected:Ring[];grossArea:number;protectedArea:number;allocatableArea:number;territories:Territory[];metrics:{outside:number;overlap:number;omitted:number;maxAreaError:number;tolerance:number;allocationTolerance?:number;valid:boolean;milliseconds:number};cutDirections:Point[]};
 export type TerritoryState={controls:Controls;results:Partial<Record<Strategy,Result>>};
@@ -54,7 +54,9 @@ export function generateTerritories(api:ManifoldToplevel,site:SiteInput,zone:Zon
  let remaining=permitted;const sections:CrossSection[]=[],territories:Territory[]=[],cutDirections:Point[]=[];
 
  for(let index=0;index<order.length;index++){
- const id=order[index],requested=area*a.shares[id]/100;let n:Point=[1,0];
+ const id=order[index],requested=area*a.shares[id]/100;
+ const radians=(c.areaCutAngle??0)*Math.PI/180;
+ let n:Point=[Math.cos(radians),Math.sin(radians)];
  if(strategy==='geometry'){let length=-1;for(const r of remaining.toPolygons()){if(signedArea(r as Ring)<=0)continue;for(let i=0;i<r.length;i++){const p=r[i],q=r[(i+1)%r.length],dx=q[0]-p[0],dy=q[1]-p[1],d=Math.hypot(dx,dy);if(d>length+1e-8){length=d;n=[-dy/d,dx/d];}}}}
  cutDirections.push(n);const piece=index===order.length-1?remaining:own(cutArea(api,remaining,zone.polygon,n,requested,allocationTolerance));sections.push(piece);const contours=piece.toPolygons() as Ring[],measured=piece.area(),parts=piece.decompose();
  let label:Point=[0,0],bestArea=-1,screen:Territory['screen']='passes-planning-screen';const findings:string[]=[];

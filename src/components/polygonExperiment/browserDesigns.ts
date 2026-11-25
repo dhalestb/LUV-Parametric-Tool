@@ -58,6 +58,15 @@ export async function saveBrowserDesign(
   }
 }
 
+export async function removeAllocatedArchitectures(ids:string[]){
+  const database=await openDesigns();
+  try{await new Promise<void>((resolve,reject)=>{
+    const tx=database.transaction('designs','readwrite');
+    for(const id of ids)tx.objectStore('designs').delete(id);
+    tx.oncomplete=()=>resolve();tx.onabort=()=>reject(tx.error);
+  });}finally{database.close();}
+}
+
 export function downloadDesignRecord(data: unknown, filename: string) {
   const url = URL.createObjectURL(new Blob([JSON.stringify(data)], {type: 'application/json'}));
   const link = document.createElement('a');
