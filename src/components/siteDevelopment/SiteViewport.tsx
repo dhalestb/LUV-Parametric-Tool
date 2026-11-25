@@ -1,6 +1,7 @@
 "use client";
 
 import {DisplayModeSelector} from '../polygonExperiment/architecturalDisplay';
+import {writeSiteSelection,selectionDefault} from '../polygonExperiment/orientationStore';
 import {OrientationGeometry,useSiteOrientation} from '../polygonExperiment/OrientationScene';
 import SharedAlternatives,{useSceneLayers,usePublished} from "../polygonExperiment/SharedAlternatives";
 import { Html, Line, OrbitControls, OrthographicCamera, PerspectiveCamera } from "@react-three/drei";
@@ -468,7 +469,7 @@ export default function SiteViewport(props: Props) {
   const formOpacity = overlayMode === "compare" ? 0.35 : 1;
 
   return (
-    <><div style={{position:'absolute',top:8,right:8,zIndex:20,background:'var(--panel-background)',padding:8,fontSize:11}}>{(['model','polygons','clusters'] as const).map(key=><label key={key} style={{marginRight:10}}><input type='checkbox' aria-label={'Shared viewport '+key} checked={scene.layers[key]} onChange={()=>scene.toggle(key)}/>{key}</label>)}<span>One world-space camera · territories are previews</span><DisplayModeSelector/><p role="status" aria-label="C1 shared visibility" style={{maxWidth:480,marginBottom:0}}>{orientation.message}</p></div><Canvas gl={{ antialias: true, alpha: false }} style={{ width: "100%", height: "100%", background: "#000", cursor: drawing ? "crosshair" : "default" }} onPointerMissed={() => { if (!drawing) { props.onSelectZone(null); props.onSelectCluster(null); } }}>
+    <><div style={{position:'absolute',top:8,right:8,zIndex:20,background:'var(--panel-background)',padding:8,fontSize:11}}>{(['model','polygons','clusters'] as const).map(key=><label key={key} style={{marginRight:10}}><input type='checkbox' aria-label={'Shared viewport '+key} checked={scene.layers[key]} onChange={()=>scene.toggle(key)}/>{key}</label>)}<span>One world-space camera · territories are previews</span><DisplayModeSelector/><p role="status" aria-label="C1 shared visibility" style={{maxWidth:480,marginBottom:0}}>{orientation.message}</p>{orientation.grouped&&<button onClick={()=>writeSiteSelection(selectionDefault)}>Hide combined designs</button>}</div><Canvas gl={{ antialias: true, alpha: false }} style={{ width: "100%", height: "100%", background: "#000", cursor: drawing ? "crosshair" : "default" }} onPointerMissed={() => { if (!drawing) { props.onSelectZone(null); props.onSelectCluster(null); } }}>
       <color attach="background" args={["#000000"]} />
       <ambientLight intensity={0.55} />
       <directionalLight position={[80, 140, 40]} intensity={1.1} />
@@ -477,7 +478,7 @@ export default function SiteViewport(props: Props) {
       <Aim view={props.view} aim={props.aim} span={props.span} />
       <DrawingCapture enabled={drawing} onPointer={props.onPointer} />
       <group ref={siteRef} visible={scene.layers.model} />
-      <SharedAlternatives datum={props.siteSurfaceDatumY??0} zones={props.zones}/>{orientation.visible&&orientation.result&&<OrientationGeometry result={orientation.result} view={orientation.view}/>}
+      <SharedAlternatives datum={props.siteSurfaceDatumY??0} zones={props.zones}/>{orientation.records.map(r=><OrientationGeometry key={r.id} result={r} view={orientation.view}/>)}
       {props.zones.filter((zone) => scene.layers.polygons && zone.visible !== false).map((zone) => {
         const geometry = shapeGeometry(zone.polygon);
         const ring = polygonClosed(zone.polygon).map(([x, z]) => [x, overlayY + 0.15, z] as [number, number, number]);

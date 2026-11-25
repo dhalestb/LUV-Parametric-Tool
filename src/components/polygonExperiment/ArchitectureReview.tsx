@@ -5,7 +5,7 @@ import {useEffect,useState,type ReactNode} from 'react';
 import {ArchitectureControls,useArchitecture} from './ArchitectureLayer';
 import {DisplayModeSelector} from './architecturalDisplay';
 import {readLibrary,writeLibrary,saveDesignReference,publishDesign,type DesignReference} from './alternatives';
-import {readOrientation,saveOrientation,selectionDefault,type OrientationResult,type OrientationSelection} from './orientationStore';
+import {readOrientation,saveOrientation,writeSiteSelection,selectionDefault,type OrientationResult,type OrientationSelection} from './orientationStore';
 import cohort from './hybrid-cohort.json';
 import type {Experiment,Registry} from './model';
 import SitePlan from './SitePlan';
@@ -71,6 +71,16 @@ export default function ArchitectureReview({state,registry,results,selected,view
     const shown=choice===''?undefined:options.find(o=>o.d.id===choice)??options[0];
     return {zone,options,key,shown};
   });
+  const group=matches.flatMap(m=>m.shown?[m.shown.r]:[]);
+  function showGroupOnSite(){
+    if(group.length<2||site?.origin==='fixture')return;
+    try{
+      const ids=new Set(group.map(r=>r.id)),time=new Date().toISOString();
+      writeLibrary(l=>({...l,activeDesignId:'',designs:l.designs?.map(d=>ids.has(d.id)?{...d,publishedAt:d.publishedAt??time}:d)}));
+      writeSiteSelection({...selectionDefault,siteVisible:true,organizing:false,siteGroup:group.map(r=>({id:r.id,hash:r.geometryHash,zoneId:r.zoneId}))});
+      setNotice('The selected designs are ready together in Site Development. Choose Architecture Only to see their buildings.');
+    }catch(e){setNotice(String(e));}
+  }
   const local=result?.validation.occupiedSiteEnvelope;
   return <section id="review-architecture" className={styles.review} aria-labelledby="review-heading">
     <h2 id="review-heading"><small>04</small> Review Generated Architecture</h2>
@@ -82,7 +92,8 @@ export default function ArchitectureReview({state,registry,results,selected,view
           <option value="">Hide architecture</option>{options.map(o=><option key={o.d.id} value={o.d.id}>{o.d.name}</option>)}</select>:<small>No completed design for this site revision</small>}
       </label>)}</div>
       {matches.some(m=>m.shown)&&<><button className={styles.textButton} aria-expanded={showSite3D} onClick={()=>setShowSite3D(!showSite3D)}>{showSite3D?'Close combined 3D view':'View combined architecture in 3D'}</button>
-        {showSite3D&&<CombinedArchitecture site={site} records={matches.flatMap(m=>m.shown?[m.shown.r]:[])}/>}</>}
+        {group.length>1&&site.origin!=='fixture'&&<div className={styles.zoneTabs}><button onClick={showGroupOnSite}>Show selected designs together in Site Development</button><a href="/site-development">Open Site Development</a></div>}
+        {showSite3D&&<CombinedArchitecture site={site} records={group}/>}</>}
     </section>}
     <div className={styles.reviewBar}><label>Saved alternatives &amp; reference studies
       <select aria-label="Saved orientation result" value={reference?'ref/'+reference:selected?.id??''} onChange={e=>choose(e.target.value)}>
