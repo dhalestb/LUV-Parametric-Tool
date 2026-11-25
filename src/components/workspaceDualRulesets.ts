@@ -15,6 +15,7 @@ export const WORKSPACE_TYPOLOGIES = [
 ] as const;
 
 export type WorkspaceTypology = (typeof WORKSPACE_TYPOLOGIES)[number][0];
+export const WORKSPACE_FIELD_PRESETS = [20, 40, 60] as const;
 
 export function workspaceTypologyName(typology: WorkspaceTypology) {
   return WORKSPACE_TYPOLOGIES.find(([id]) => id === typology)?.[1] ?? typology;
@@ -39,6 +40,7 @@ export type DualRuleResult = {
   measured?: string;
   threshold?: string;
   units?: string;
+  requirements?: string[];
   evidence: string[];
 };
 export type DualRulesetReport = {
@@ -52,7 +54,7 @@ export type DualRulesetReport = {
   rules: DualRuleResult[];
 };
 
-type Binding = { title: string; labels: string[]; hard?: boolean };
+type Binding = { title: string; labels: string[]; hard?: boolean; requirements?: string[] };
 
 /** Letter-arrangement bindings — poses, vocabulary, footprint ratios, orientation. */
 
@@ -90,6 +92,7 @@ function buildStage(
       title: binding.title,
       status: aggregate(evidenceChecks),
       hard: binding.hard ?? true,
+      ...(binding.requirements ? { requirements: binding.requirements } : {}),
       evidence: evidenceChecks.length
         ? evidenceChecks.map((check) => `${check.label} [${check.status}]: ${check.detail}`)
         : ["No measurement was recorded for this rule on the relevant geometry."],
@@ -153,6 +156,14 @@ const policies = {
 "void-edge-workspace": policy3,
 "folded-undulating-work-surface": policy4
 };
+export function requirementsForWorkspaceRule(report: DualRulesetReport, rule: DualRuleResult) {
+  if (rule.requirements) return rule.requirements;
+  const policy = policies[report.typology];
+  if (!policy || policy.version !== report.rulesetVersion) return [];
+  const bindings: Binding[] = report.stage === "letter-arrangement" ? policy.letterBindings : policy.architectureBindings;
+  return bindings.find(binding => binding.title === rule.title)?.requirements ?? [];
+}
+
 export function workspaceRulesetIds(typology: WorkspaceTypology) {
  if (!Object.hasOwn(policies,typology)) throw Error("Unknown workspace typology: "+typology);
  return {letter: typology+"/letter-arrangement",architecture: typology+"/architectural-generation",version:policies[typology].version};

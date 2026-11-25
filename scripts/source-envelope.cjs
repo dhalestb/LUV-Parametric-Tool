@@ -3,17 +3,24 @@ const fs=require('node:fs'),path=require('node:path'),T=require('three');
 require('../proof/rule-amphitheater.cjs'); // registers the project's TypeScript glyph loader
 const {getLetterShape,getLetterVolumeGeometry}=require('../src/components/letterGeometry3d.ts');
 const v=(x,y,z)=>new T.Vector3(x,y,z),distance=(a,b)=>a.distanceTo(b);
-function derive(r){
+function derive(r,{lettersOnly=false}={}){
  const letters=[],nodes=r.source.map((p,i)=>{
  const matrix=new T.Matrix4().compose(v(p.x,p.y,p.z+r.field.height/2),new T.Quaternion().setFromEuler(new T.Euler(...[p.rx,p.ry,p.rz].map(T.MathUtils.degToRad),p.rotationOrder??'XYZ')),v(p.scale*p.scaleX,p.scale*p.scaleY,p.scale*p.scaleZ));
  const g=getLetterVolumeGeometry(p.letter,12),attr=g.getAttribute('position'),positions=[],indices=[];
- for(let k=0;k<attr.count;k++){const q=new T.Vector3().fromBufferAttribute(attr,k).applyMatrix4(matrix);if(Math.abs(q.x)>r.field.width/2||Math.abs(q.y)>r.field.depth/2||q.z<0||q.z>r.field.height)throw Error('Letter '+(i+1)+' extends outside the selected field. Edit its pose or enlarge the field.');positions.push(...q.toArray());}
+ const perimeterReference=r.generator==='workspace-ten-rule'&&r.workspaceTypology==='void-edge-workspace'&&p.voidEdgeRole==='wall';
+ for(let k=0;k<attr.count;k++){
+  const q=new T.Vector3().fromBufferAttribute(attr,k).applyMatrix4(matrix);
+  const outsidePlan=Math.abs(q.x)>r.field.width/2||Math.abs(q.y)>r.field.depth/2;
+  if((outsidePlan&&!perimeterReference)||q.z<0||q.z>r.field.height)throw Error('Letter '+(i+1)+' extends outside the selected field. Edit its pose or enlarge the field.');
+  positions.push(...q.toArray());
+ }
  for(let k=0;k<(g.index?.count??attr.count);k++)indices.push(g.index?g.index.getX(k):k);
  const id=p.letter+'-'+(i+1);letters.push({id,mesh:{positions,indices}});
  const shape=getLetterShape(p.letter),raw=['profiles','vertical-walls','void-field','inserted-plate','room-within-volume'].includes(r.envelopeVersion)?require('./source-profile-envelope.cjs').featurePoints(shape,p.scale*Math.max(p.scaleX,p.scaleY,p.scaleZ)):shape.getPoints(6),center=new T.Box2().setFromPoints(shape.getPoints(16)).getCenter(new T.Vector2());
  const line=raw.map(pt=>v(pt.x-center.x,pt.y-center.y,0).applyMatrix4(matrix));
  return {id,line,relationshipLine:shape.getPoints(6).map(pt=>v(pt.x-center.x,pt.y-center.y,0).applyMatrix4(matrix)),matrix:matrix.toArray(),p};
  });
+ if(lettersOnly)return {nodes,edges:[],letters};
  const pairs=[];
  for(let i=0;i<nodes.length;i++)for(let j=0;j<i;j++){
  let best;const a=nodes[i].relationshipLine,b=nodes[j].relationshipLine;

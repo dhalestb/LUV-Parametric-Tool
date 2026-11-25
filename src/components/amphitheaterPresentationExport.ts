@@ -20,10 +20,22 @@ export function meshGeometry(mesh:ProofMesh){
   geometry.setIndex(mesh.indices);
   return geometry;
 }
+export function separateVoidEdgeShell(result:AmphitheaterResult){
+  return result.request.workspaceTypology==='void-edge-workspace'&&result.request.voidEdgeJoinShell===false
+    ?result.workspaceLayers?.filter(layer=>layer.role==='support'||layer.role==='wall')??[]
+    :[];
+}
+
 export function studyOBJ(result:AmphitheaterResult,kind:'letters'|'form'){
   const group=new THREE.Group(),geometries:THREE.BufferGeometry[]=[];
   try{
-    const items=kind==='form'?[{id:'architecture',mesh:result.architecture}]:result.letters;
+    const {workspaceTypology,architecturalGenerationRulesetVersion}=result.request;
+    const currentSeparateWalls=(workspaceTypology==='open-hall-workspace'&&architecturalGenerationRulesetVersion==='1.6.0')
+      ||(workspaceTypology==='flat-deep-plan-plate'&&architecturalGenerationRulesetVersion==='2.2.0');
+    const items=kind==='form'?
+      [{id:'architecture',mesh:result.architecture},...separateVoidEdgeShell(result),
+        ...(currentSeparateWalls&&result.perimeterWalls?.indices.length?[{id:'perimeter-walls',mesh:result.perimeterWalls}]:[])]:
+      result.letters;
     for(const item of items){
       const geometry=meshGeometry(item.mesh);
       geometries.push(geometry);
@@ -78,6 +90,126 @@ export function workspacePresentationLessons(result:AmphitheaterResult):{
   const typology=result.request.workspaceTypology??result.letterArrangementReport?.typology??'workspace';
   const faces=result.request.openHall?.mezzanineFaces??2;
   const wrap=faces===2?'an L along two faces':faces===3?'a three-sided channel':'the full perimeter';
+  // Keep captions for existing saved studies tied to their recorded ruleset.
+  const version=result.request.architecturalGenerationRulesetVersion??result.architecturalGenerationReport?.rulesetVersion;
+  if(typology==='open-hall-workspace'&&version==='1.6.0'){
+    return {
+      orientation:[
+        {
+          title:'GROUND LETTERS',
+          focus:'ground-letters',
+          lines:[
+            'Four L guides mark the square floor.',
+            'Their outer tips set the corners.',
+            'The smaller field span limits the square.',
+          ],
+        },
+        {
+          title:'MEZZANINE LETTERS',
+          focus:'mezz-letters',
+          lines:[
+            'L guides mark the upper band corners.',
+            `That band wraps ${wrap}.`,
+            'Every guide matches one plan slot.',
+          ],
+        },
+      ],
+      generation:[
+        {
+          title:'GROUND PLATE',
+          focus:'ground-plate',
+          lines:[
+            'Build a continuous square floor.',
+            'Wall depth follows the thickness setting.',
+            faces===2?'Entry spans the south and west edges.':'Entry opens along the south edge.',
+          ],
+        },
+        {
+          title:'MEZZANINE WRAP',
+          focus:'mezzanine',
+          lines:[
+            'Raise a band at mid-height.',
+            'Leave a 20–40% opening over the hall.',
+            'Keep bands at least 10 ft wide.',
+          ],
+        },
+        {
+          title:'SUPPORTS AND ROOF',
+          focus:'supports',
+          lines:[
+            'Stand L columns on an equal XY grid.',
+            'A center node also receives a pier.',
+            'Use a roof L for one skylight per bay.',
+          ],
+        },
+      ],
+    };
+  }
+  if(typology==='flat-deep-plan-plate'&&version==='2.2.0'){
+    return {
+      orientation:[
+        {title:'GROUND GUIDES',focus:'ground-letters',lines:[
+          'Four L tips set the ground corners.',
+          'The field leaves a 2 ft margin per edge.',
+          'Grid nodes receive column L guides.',
+        ]},
+        {title:'MEZZANINE GUIDES',focus:'mezz-letters',lines:[
+          'Four L tips set the mezzanine corners.',
+          'It spans the full length and half the width.',
+          'Wall Ls trace bands and stepped ends.',
+        ]},
+      ],
+      generation:[
+        {title:'GROUND PLATE',focus:'ground-plate',lines:[
+          'Build one continuous rectangular slab.',
+          'Four 2 ft bands line the long edges.',
+          'Stepped panels close parts of the ends.',
+        ]},
+        {title:'MEZZANINE',focus:'mezzanine',lines:[
+          'Set the mezzanine at mid-height.',
+          'The selected thickness applies to all slabs.',
+          'Require more than 8 ft below the mezzanine.',
+        ]},
+        {title:'SUPPORTS AND ROOF',focus:'supports',lines:[
+          'Fill the L pocket at each grid node.',
+          'The solid roof follows the floor footprint.',
+          'Check field fit and coverage of every joined part.',
+        ]},
+      ],
+    };
+  }
+  if(typology==='void-edge-workspace'&&version==='2.21.0'){
+    return {
+      orientation:[
+        {title:'PLATE U GUIDES',focus:'ground-letters',lines:[
+          'Each plate and the roof have a main U group.',
+          'Intermediate guides turn in height-specific steps.',
+          'An intermediate core U group locates each opening.',
+        ]},
+        {title:'WALL U AND COLUMN L GUIDES',focus:'mezz-letters',lines:[
+          'Horizontal U bends pair four outer walls across a story.',
+          'Sideways U bends control the wall bow.',
+          'The paired bottom L guides turn 45° from the upper guides.',
+        ]},
+      ],
+      generation:[
+        {title:'ELLIPTICAL PLATES',focus:'ground-plate',lines:[
+          'Main U extents set the plate ellipses.',
+          'A ten-foot datum sets each occupied level.',
+          'The ground and roof remain solid across the core.',
+        ]},
+        {title:'ALTERNATING SECTIONS',focus:'mezzanine',lines:[
+          'Hollow cores rise on alternating stories.',
+          'Four outer walls cover half each receiving perimeter.',
+          'L profiles loft down on stories without a core segment.',
+        ]},
+        {title:'ASSEMBLY',focus:'supports',lines:[
+          'Check the wall and column connections at the plates.',
+          'Verify coverage of all parts in the joined export.',
+        ]},
+      ],
+    };
+  }
   if(typology==='open-hall-workspace'){
     return {
       orientation:[

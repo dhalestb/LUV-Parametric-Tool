@@ -5,6 +5,9 @@
  */
 
 import type { WorkspaceTypology } from "./workspaceDualRulesets";
+import { reportRules as flatDeepPlanPlateRules } from "./workspace-rules/flat-deep-plan-plate.report";
+import { reportRules as openHallRules } from "./workspace-rules/open-hall-workspace.report";
+import { reportRules as voidEdgeRules } from "./workspace-rules/void-edge-workspace.report";
 import {
   ARCHITECTURAL_GENERATION_RULESET_VERSION,
   LETTER_ARRANGEMENT_RULESET_VERSION,
@@ -37,6 +40,9 @@ export type WorkspaceRuleSection = {
   checkLabels: string[];
 };
 
+const describeRules = (bindings: { title: string; requirements: string[] }[]) =>
+  bindings.map(({ title, requirements }) => [`${title}.`, ...requirements].join(" "));
+
 export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
   {
     id: "open-hall-letter",
@@ -45,12 +51,9 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     axis: "letter-arrangement",
     title: "Open Hall · Letter arrangement",
     rulesetId: "open-hall-workspace/letter-arrangement",
-    rulesetVersion: LETTER_ARRANGEMENT_RULESET_VERSION,
-    requirements: [
-      "Letter-arrangement ruleset orients L-only role sets: 4 floor corner Ls (outer tips), mezzanine 2/3/4-channel outer + pocket Ls (inner crooks), column grid Ls, vertical wall Ls, roof quadrant Ls; orthogonal 0/90/180/270.",
-      "Equal XY column grid at 15 / 20 / 25 ft bounded by the floor-plate perimeter; column / floor-mezz / wall / roof letter sizes independent; letters inside field; no uniform rescale.",
-    ],
-    checkLabels: ["Letter variations", "Orthogonal footprint", "Column L guides", "Column guide size", "Floor mezz L guides", "Floor mezz guide size", "Wall L guides", "Roof L guides", "Letter-derived plates", "Letters inside field", "No uniform rescale"],
+    rulesetVersion: openHallRules.version,
+    requirements: describeRules(openHallRules.letterBindings),
+    checkLabels: openHallRules.letterBindings.flatMap(({ labels }) => labels),
   },
   {
     id: "open-hall-architecture",
@@ -59,12 +62,9 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     axis: "architectural-generation",
     title: "Open Hall · Architectural generation",
     rulesetId: "open-hall-workspace/architectural-generation",
-    rulesetVersion: ARCHITECTURAL_GENERATION_RULESET_VERSION,
-    requirements: [
-      "Architectural-generation ruleset fills L footprints from arranged letters: ground from floor L outer edges + L corner fills; mezz pads from mezz letters (25–40% opening, ≥10 ft band); filled-pocket piers from column L letters on every equal XY column-grid node (including centre).",
-      "L wall fills at wall letters plus 1.5 ft shell/entry; L skylights from roof letters; headroom >8 ft; field containment. Daylight/structure unverified.",
-    ],
-    checkLabels: ["Field envelope", "Ground plate filled", "Central hall", "Mezzanine opening", "Mezzanine platform width", "Mezzanine elevation", "Column grid", "Supports and movement", "Perimeter walls and entry", "Roof plate filled", "Skylight bays", "Headroom"],
+    rulesetVersion: openHallRules.version,
+    requirements: describeRules(openHallRules.architectureBindings),
+    checkLabels: openHallRules.architectureBindings.flatMap(({ labels }) => labels),
   },
   {
     id: "flat-deep-letter",
@@ -73,12 +73,9 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     axis: "letter-arrangement",
     title: "Flat-Deep Plan Plate · Letter arrangement",
     rulesetId: "flat-deep-plan-plate/letter-arrangement",
-    rulesetVersion: LETTER_ARRANGEMENT_RULESET_VERSION,
-    requirements: [
-      "L/V variations form one continuous rectangular plate; ratio 3:2–5:2; 15° rotation; ≥5 ft longitudinal strip joining short ends.",
-      "Vertical L supports in a repeating pattern without obstructing the strip; openings along both long edges.",
-    ],
-    checkLabels: ["Letter variations", "Working plate ratio", "15° footprint rotation", "Longitudinal strip", "Single working level", "No uniform rescale"],
+    rulesetVersion: flatDeepPlanPlateRules.version,
+    requirements: describeRules(flatDeepPlanPlateRules.letterBindings),
+    checkLabels: flatDeepPlanPlateRules.letterBindings.flatMap(({ labels }) => labels),
   },
   {
     id: "flat-deep-architecture",
@@ -87,11 +84,9 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     axis: "architectural-generation",
     title: "Flat-Deep Plan Plate · Architectural generation",
     rulesetId: "flat-deep-plan-plate/architectural-generation",
-    rulesetVersion: ARCHITECTURAL_GENERATION_RULESET_VERSION,
-    requirements: [
-      "One continuous working plate at a single elevation; protected longitudinal route ≥5 ft; repeating supports; daylight edges; >10 ft clear headroom; field containment.",
-    ],
-    checkLabels: ["Field envelope", "Daylight edges", "One-level tile", "Clear height"],
+    rulesetVersion: flatDeepPlanPlateRules.version,
+    requirements: describeRules(flatDeepPlanPlateRules.architectureBindings),
+    checkLabels: flatDeepPlanPlateRules.architectureBindings.flatMap(({ labels }) => labels),
   },
   {
     id: "cascaded-letter",
@@ -127,11 +122,9 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     axis: "letter-arrangement",
     title: "Void-Edge Workspace · Letter arrangement",
     rulesetId: "void-edge-workspace/letter-arrangement",
-    rulesetVersion: LETTER_ARRANGEMENT_RULESET_VERSION,
-    requirements: [
-      "U variations form a continuous footprint; ratio 1:1–5:4; 15° rotation; one internal opening 10–25% offset from center; ≥5 ft at the narrowest band; continuous loop and entry.",
-    ],
-    checkLabels: ["Letter variations", "Footprint ratio", "15° footprint rotation", "Internal void", "Working depth", "Circulation loop", "No uniform rescale"],
+    rulesetVersion: voidEdgeRules.version,
+    requirements: describeRules(voidEdgeRules.letterBindings),
+    checkLabels: voidEdgeRules.letterBindings.flatMap(({ labels }) => labels),
   },
   {
     id: "void-edge-architecture",
@@ -140,11 +133,9 @@ export const WORKSPACE_RULE_SECTIONS: WorkspaceRuleSection[] = [
     axis: "architectural-generation",
     title: "Void-Edge Workspace · Architectural generation",
     rulesetId: "void-edge-workspace/architectural-generation",
-    rulesetVersion: ARCHITECTURAL_GENERATION_RULESET_VERSION,
-    requirements: [
-      "Continuous plate with offset internal void 10–25%; ≥5 ft narrowest band; continuous route; level band; void through overhead; supports outside; >10 ft clear height; field containment.",
-    ],
-    checkLabels: ["Field envelope", "Level band and vertical void", "Clear height"],
+    rulesetVersion: voidEdgeRules.version,
+    requirements: describeRules(voidEdgeRules.architectureBindings),
+    checkLabels: voidEdgeRules.architectureBindings.flatMap(({ labels }) => labels),
   },
   {
     id: "undulating-letter",
