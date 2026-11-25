@@ -116,8 +116,8 @@ export default function ArchitectureReview({state,registry,results,selected,view
         <div><span>Site height check</span><strong>{heightPassed===undefined?'Unrecorded':heightPassed?'Passed':'Review'}</strong></div>
       </div>:<p role="status">{loading?'Loading architectural geometry…':error||'Only source-letter geometry is available.'}</p>}
       {result?.provenance.adapter==='polygon-composition/v1'&&<table className={styles.areaReport}><caption>Measured composition · {result.provenance.clustering}% clustering · {result.provenance.buildableAreaFeet2?.toLocaleString(undefined,{maximumFractionDigits:1})} ft² buildable ground</caption>
-        <thead><tr><th>Typology</th><th>Requested</th><th>Built share</th><th>Footprint</th><th>Source letters</th></tr></thead>
-        <tbody>{result.provenance.members?.map(m=><tr key={m.typology}><td>{m.name}</td><td>{m.allocatedPercent}%</td><td>{m.achievedPercent.toFixed(2)}%</td><td>{m.footprintAreaFeet2.toLocaleString(undefined,{maximumFractionDigits:1})} ft²</td><td>{m.sourceCount??'—'}</td></tr>)}</tbody>
+        <thead><tr><th>Typology</th><th>Requested</th><th>Built share</th><th>Footprint</th><th>Letters placed</th><th>Letter target</th></tr></thead>
+        <tbody>{result.provenance.members?.map(m=><tr key={m.typology}><td>{m.name}</td><td>{m.allocatedPercent}%</td><td>{m.achievedPercent.toFixed(2)}%</td><td>{m.footprintAreaFeet2.toLocaleString(undefined,{maximumFractionDigits:1})} ft²</td><td>{m.sourceCount??'—'}</td><td>{m.letterTarget??'—'}</td></tr>)}</tbody>
       </table>}
       {result?.provenance.heightRegions?.length ? <table className={styles.areaReport}>
         <caption>Site heights above base · {result.provenance.heightPolicy}</caption>

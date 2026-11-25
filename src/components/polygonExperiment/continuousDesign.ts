@@ -1,5 +1,5 @@
 import type {CrossSection,Manifold,ManifoldToplevel} from 'manifold-3d';
-import {fingerprint,newAssignment,type Experiment,type Registry,type SiteInput,type Zone} from './model';
+import {fingerprint,newAssignment,type Experiment,type LetterTargets,type Registry,type SiteInput,type Zone} from './model';
 import {allocationAreaTolerance,compositionControls,currentTerritoryResult,generateTerritories,geometryKernel,type Point,type Ring} from './territories';
 import {siteHeightBands} from './compositionHeights';
 import type {HeightRecord} from './SiteRulePanel';
@@ -11,7 +11,7 @@ import {formTerritory,projectMesh,siteMesh,type FormationPart,type PlanLayer} fr
 const recipe='Continuous polygon composition';
 type Plan=ReturnType<typeof generateTerritories>;
 
-async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Plan,registry:Registry,clustering:number,
+async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Plan,registry:Registry,clustering:number,letterTargets:LetterTargets,
   rules:HeightRecord|null,runId:string,progress:(s:string)=>void){
   const owned:{delete():void}[]=[];
   function own<T extends {delete():void}>(s:T):T{owned.push(s);return s;}
@@ -34,13 +34,13 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
       const bands=envelope.bands.filter(b=>own(region.intersect(b.section)).area()>1e-7);
       const cap=bands.length?Math.max(...bands.map(b=>b.cap)):envelope.zoneCap;
       const result=formTerritory(api,region,origin,datum,rule,await studyFor(rule.id),
-        [t.label[0]-origin[0],t.label[1]-origin[1]],clustering,cap,bands);
+        [t.label[0]-origin[0],t.label[1]-origin[1]],clustering,cap,bands,letterTargets[t.typology]);
       formed.push(own(result.solid));
       if(result.height>cap+1e-5)throw Error(rule.name+' exceeds the site height limit.');
       sourceArea+=result.sourceArea;letters.push(...result.letters);components.push(...result.parts);planLayers.push(...result.layers);
       members.push({typology:t.typology,name:rule.name,territory:t.id,allocatedPercent:t.requestedPercent,
         achievedPercent:100*result.footprintArea/plan.allocatableArea,territoryAreaFeet2:t.area,footprintAreaFeet2:result.footprintArea,
-        missingFeet2:result.missing,outsideFeet2:result.outside,sourceStudyHash:hashes[t.typology],sourceCount:result.letters.length,
+        missingFeet2:result.missing,outsideFeet2:result.outside,sourceStudyHash:hashes[t.typology],sourceCount:result.letters.length,letterTarget:result.letterTarget,
         sourceEntry:rule.A.entry,formationDimensions:rule.B.parameters,heightFeet:result.height,heightCapFeet:Number.isFinite(cap)?cap:null});
     }
     // The common lower course joins matching floor edges across typology seams.
@@ -116,7 +116,8 @@ export async function generateContinuousSite(state:Experiment,registry:Registry,
           if(area>allocationAreaTolerance(plan.allocatableArea)){shape.delete();throw Error('Enabled polygons overlap. Each occupied area must belong to one polygon.');}
         }
         previous.push(shape);
-        records.push(await composeZone(api,site,z,plan,registry,c.clustering!,readRules(site,z.id),runId,progress));
+        const letterTargets=state.generation?.zones[JSON.stringify([site.fingerprint,z.id])]?.letterTargets??{};
+        records.push(await composeZone(api,site,z,plan,registry,c.clustering!,letterTargets,readRules(site,z.id),runId,progress));
         territoryByZone[z.id]={controls:c,results:{...stored?.results,area:plan}};
       }catch(e){throw new Error(z.name+' · '+(e instanceof Error?e.message:String(e)),{cause:e});}
     }

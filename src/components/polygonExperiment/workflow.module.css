@@ -56,6 +56,11 @@
 .areaReport{width:100%;border-collapse:collapse;margin:14px 0;font-variant-numeric:tabular-nums}
 .areaReport caption,.areaReport th:first-child,.areaReport td:first-child{text-align:left}
 .areaReport th,.areaReport td{text-align:right;border-bottom:1px solid var(--border-color);padding:6px 4px}
+.densityHint{margin:0 0 10px;color:var(--muted);font-size:13px}
+.densityFields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,155px),1fr));gap:16px;margin-bottom:16px}
+.densityFields>div{display:flex;flex-direction:column;align-items:stretch;gap:4px}
+.densityFields label{color:var(--ink);font-size:13px}.densityFields output{color:var(--cyan);font-size:13px}
+.densityFields input{width:100%;accent-color:var(--gold);cursor:pointer}.densityFields button{align-self:flex-start}
 .clustering{display:grid;grid-template-columns:1fr auto;gap:5px 12px;max-width:440px;margin:18px 0 12px;color:var(--muted);font-size:13px}
 .clustering label{color:var(--ink);font-weight:600}.clustering output{color:var(--cyan);text-align:right}
 .clustering input{grid-column:1/-1;width:100%;accent-color:var(--gold);cursor:pointer}.clustering span:last-child{text-align:right}

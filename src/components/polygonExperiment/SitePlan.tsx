@@ -1,7 +1,7 @@
 'use client';
 
-import {useEffect,useRef,useState} from 'react';
-import {TYPOLOGIES,newAssignment,type Assignment,type SiteInput,type Zone,type Experiment,type Registry} from './model';
+import {useEffect,useRef,useState,type ReactNode} from 'react';
+import {TYPOLOGIES,newAssignment,automaticLetterTarget,maxLetterTarget,type LetterTargets,type Typology,type Assignment,type SiteInput,type Zone,type Experiment,type Registry} from './model';
 import {currentTerritoryResult,compositionControls,generateTerritories,geometryKernel,type Result,type Controls,type Ring} from './territories';
 import {useArchitecture} from './ArchitectureLayer';
 import type {OrientationResult} from './orientationStore';
@@ -16,8 +16,9 @@ function bounds(ring:Ring){
 }
 
 
-type PreviewProps={site:SiteInput;zone:Zone;assignment:Assignment;controls:Controls;registry:Registry};
-export function AllocationPreview({site,zone,assignment,controls,registry}:PreviewProps){
+type DistributionProps={site:SiteInput;zone:Zone;assignment:Assignment;controls:Controls;registry:Registry;
+  children:ReactNode;disabled:boolean;letterTargets?:LetterTargets;onLetterTarget:(type:Typology,count?:number)=>void};
+export function CompositionDistribution({site,zone,assignment,controls,registry,children,disabled,letterTargets,onLetterTarget}:DistributionProps){
   const [plan,setPlan]=useState<Result>(),[error,setError]=useState('');
   useEffect(()=>{
     let active=true;
@@ -33,13 +34,32 @@ export function AllocationPreview({site,zone,assignment,controls,registry}:Previ
     return()=>{active=false;clearTimeout(timer);};
   },[site,zone,assignment,controls,registry]);
   const {x,y,w,h}=bounds(zone.polygon),pad=.04*Math.max(w,h);
-  return <figure className={styles.allocationPreview}>
+  return <><div className={styles.distribution}>{children}<figure className={styles.allocationPreview}>
     <figcaption>Allocation preview · {zone.name}</figcaption>
     {error?<small role="status">{error}</small>:<svg viewBox={[x-pad,y-pad,w+2*pad,h+2*pad].join(' ')} role="img" aria-label={'Allocation preview for '+zone.name}>
       <path d={path([zone.polygon,...zone.holes])} fill="#233e44" fillRule="evenodd"/>
       {plan?.territories.map(t=><path key={t.id} data-preview-type={t.typology} d={path(t.contours)} fill={colors[TYPOLOGIES.indexOf(t.typology)]} stroke="#16262a" vectorEffect="non-scaling-stroke"><title>{registry.items.find(r=>r.id===t.typology)?.name} · {t.achievedPercent.toFixed(1)}%</title></path>)}
     </svg>}
-  </figure>;
+  </figure></div>
+    {plan&&<fieldset className={styles.inputs} disabled={disabled}>
+      <legend>Letter density · {zone.name}</legend>
+      <p className={styles.densityHint}>Set a target count per typology. Full-size letters are placed where they fit.</p>
+      <div className={styles.densityFields}>{plan.territories.map(t=>{
+        const id='letter-target-'+t.typology;
+        const name=registry.items.find(item=>item.id===t.typology)!.name;
+        const custom=letterTargets?.[t.typology];
+        const count=custom??automaticLetterTarget(t.area);
+        return <div key={id}>
+          <label htmlFor={id}>{name}</label>
+          <output htmlFor={id}>{count} {count===1?'letter':'letters'}{custom===undefined?' · Auto':''}</output>
+          <input id={id} type="range" min={1} max={maxLetterTarget} step={1} value={count}
+            aria-valuetext={count+' source letters'} onChange={e=>onLetterTarget(t.typology,Number(e.currentTarget.value))}/>
+          {custom!==undefined&&<button type="button" className={styles.textButton} aria-label={'Use automatic count for '+name}
+            onClick={()=>onLetterTarget(t.typology)}>Use auto</button>}
+        </div>;
+      })}</div>
+    </fieldset>}
+  </>;
 }
 
 // Project the saved world mesh using the same X/Z coordinates as the site.

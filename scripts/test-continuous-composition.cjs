@@ -167,6 +167,34 @@ async function main(){
     assert(bands[0].builtFeet>bands[1].builtFeet+5 && bands[1].builtFeet>bands[2].builtFeet+5);
     console.log(orientation.typologyName,orientation.components.length,'source letters');
   }
+  // A density edit reuses the prepared territory geometry and affects only the selected study members.
+  state.territoryByZone=miami.territoryByZone;
+  const key=z=>JSON.stringify([state.site.fingerprint,z.id]);
+  const gallery='linear-edge-gallery',stepped='vertical-walls';
+  state.generation={method:'typology-area',zones:{
+    [key(a)]:{letterTargets:{[gallery]:1}},
+    [key(b)]:{letterTargets:{[gallery]:7,[stepped]:24}}
+  }};
+  const restored=model.loadState(JSON.stringify(state));
+  const denser=await generateContinuousSite(restored,registry,()=>null,()=>{});
+  for(const [index,{architecture,orientation}] of denser.records.entries()){
+    const z=state.site.zones[index],targets=state.generation.zones[key(z)].letterTargets;
+    assert.equal(denser.territoryByZone[z.id].results.area,restored.territoryByZone[z.id].results.area);
+    assert.equal(architecture.provenance.clustering,65);
+    assert.equal(architecture.validation.connectedBodies,1);
+    for(const m of architecture.provenance.members){
+      const original=miami.records[index].architecture.provenance.members.find(p=>p.typology===m.typology);
+      assert.equal(m.territoryAreaFeet2,original.territoryAreaFeet2);
+      assert(Math.abs(m.achievedPercent-25)<.0001);
+      assert.equal(m.letterTarget,targets[m.typology]??original.letterTarget);
+      assert.equal(m.sourceCount,orientation.components.filter(l=>l.id.startsWith(m.typology+'/')).length);
+      if(targets[m.typology]===undefined)assert.equal(m.sourceCount,original.sourceCount);
+      else if(m.typology===gallery)assert.equal(m.sourceCount,targets[gallery]);
+      else assert(m.sourceCount>original.sourceCount&&m.sourceCount<=m.letterTarget);
+    }
+  }
+  console.log('Passed per-cluster letter targets, settings reload, area conservation and independent clustering.');
+  delete state.generation;
   state.site.zones[1].enabled=false;state.site.zones[0].inputParameters.maxHeightFeet=8;
   await assert.rejects(generate,/ft of height/);
   console.log('Passed exact shares, finished-mesh coverage, protected area, connectivity, height, zero shares, per-polygon clustering and deterministic replay.');

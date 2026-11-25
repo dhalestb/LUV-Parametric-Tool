@@ -12,7 +12,10 @@ export type Zone = { id:string; name:string; polygon:[number,number][]; holes:Ri
 export type SiteInput = { modelReference?:{id:string;scale:number}; unitConfirmation?:{sourceFingerprint:string;sourceRevision:string}; name:string; revision:string; fingerprint:string; coordinates:SiteCoordinates; zones:Zone[]; exclusions:{id:string;polygon:[number,number][]}[]; constraints:unknown; protectionMetadataComplete:boolean; corridors:{id:string;points:Ring;widthFeet:number}[]; reservedAreas:{id:string;polygon:Ring}[]; origin:'file'|'fixture' };
 export type Assignment = { shares:Record<Typology,number>; variants:Record<Typology,string>; targets:Five<number|null> };
 export type GenerationMethod = 'typology-area'|'hybrid-rule'|'descriptor';
-export type MethodDrafts = {fullZone?:Partial<Record<'hybrid-rule'|'descriptor',string>>;rules?:Record<Typology,number>; descriptors?:Partial<Record<import('./descriptorInfluence').Descriptor,number>>};
+export type LetterTargets = Partial<Record<Typology,number>>;
+export const maxLetterTarget = 48;
+export const automaticLetterTarget = (areaFeet2:number) => Math.min(maxLetterTarget, Math.max(3, Math.round(areaFeet2 / 850)));
+export type MethodDrafts = {letterTargets?:LetterTargets;fullZone?:Partial<Record<'hybrid-rule'|'descriptor',string>>;rules?:Record<Typology,number>; descriptors?:Partial<Record<import('./descriptorInfluence').Descriptor,number>>};
 export type Experiment = { generation?:{method:GenerationMethod;zones:Record<string,MethodDrafts>}; version:2; territoryByZone:Record<string,TerritoryState>; descriptorAllocation:boolean; descriptorSpatialTargeting:boolean; legacyDescriptorDrafts?:unknown; site:SiteInput|null; selected:string[]; focus:string|null; unitsConfirmed:boolean; transform:'within'|'derived'; allocation:'territories'|'blended'; seedMethod:'letters'|'features'; assignments:Record<string,Assignment>; descriptorIds:Five<string|null>; profiles:Record<Typology,RuleProfile> };
 export type Rule = { entry:string; statements:string[]; parameters:Record<string,unknown>; bindings:{category:'A'|'B';sourceFile:string;sha256:string}[] };
 export type RegistryItem = { id:Typology; name:string; A:Rule; B:Rule; variants:string[]; evidence:{id:string;variant:string;sourceCount:number;request:Record<string,unknown>;validation:unknown;architecturalValidation:unknown}[] };
@@ -56,7 +59,7 @@ export function withImportedSite(state:Experiment,site:SiteInput):Experiment {
     }
     if(!sameSnapshot&&sameBoundary&&generation){
       const prior=generation.zones[JSON.stringify([previous!.fingerprint,zone.id])];
-      if(prior)generation.zones[JSON.stringify([site.fingerprint,zone.id])]={rules:prior.rules,descriptors:prior.descriptors};
+      if(prior)generation.zones[JSON.stringify([site.fingerprint,zone.id])]={rules:prior.rules,descriptors:prior.descriptors,letterTargets:prior.letterTargets};
     }
   }
   const enabled=site.zones.filter(z=>z.enabled).map(z=>z.id);

@@ -1,5 +1,5 @@
 import type {CrossSection,Manifold,ManifoldToplevel} from 'manifold-3d';
-import type {RegistryItem} from './model';
+import {automaticLetterTarget,maxLetterTarget,type RegistryItem} from './model';
 import type {OrientationResult} from './orientationStore';
 import {signedArea,type Point,type Ring} from './territories';
 
@@ -63,7 +63,7 @@ function template(letter:Letter){
 }
 
 export function formTerritory(api:ManifoldToplevel,domain:CrossSection,origin:Point,datum:number,
-  rule:RegistryItem,study:SourceStudy,label:Point,clustering:number,cap:number,bands:HeightBand[]=[]){
+  rule:RegistryItem,study:SourceStudy,label:Point,clustering:number,cap:number,bands:HeightBand[]=[],letterTarget?:number){
   const owned:{delete():void}[]=[];
   function own<T extends {delete():void}>(shape:T):T{owned.push(shape);return shape;}
   const parts:FormationPart[]=[],layers:PlanLayer[]=[],letters:Letter[]=[],solids:Manifold[]=[];
@@ -93,7 +93,8 @@ export function formTerritory(api:ManifoldToplevel,domain:CrossSection,origin:Po
     const pool=candidates(domain,label),{min,max}=domain.bounds(),diagonal=Math.hypot(max[0]-min[0],max[1]-min[1]);
     const prototypes=[...new Set(study.letters.map(l=>l.letter))].map(g=>template(study.letters.find(l=>l.letter===g)!));
     const chosen:{point:Point;radius:number}[]=[];
-    const quantity=Math.min(48,Math.max(3,Math.round(domain.area()/850)));
+    const quantity=letterTarget??automaticLetterTarget(domain.area());
+    if(!Number.isInteger(quantity)||quantity<1||quantity>maxLetterTarget)throw Error(rule.name+' letter target must be between 1 and '+maxLetterTarget+'.');
     const height=bands.length?Math.max(...bands.map(b=>b.cap)):Math.min(cap,rule.id==='vertical-walls'?22:rule.id==='linear-edge-gallery'?26:39);
     const minRise=rule.id==='linear-edge-gallery'?number('printOpeningHeightFeet')+2*base:
       rule.id==='room-within-volume'?number('doorHeightFeet')+2*base:
@@ -235,6 +236,6 @@ export function formTerritory(api:ManifoldToplevel,domain:CrossSection,origin:Po
     const outside=own(plan.subtract(domain)).area(),missing=own(domain.subtract(plan)).area();
     const tolerance=Math.max(.01,domain.area()*1e-6);
     if(Math.max(outside,missing)>tolerance)throw Error(rule.name+' failed the footprint check ('+missing.toFixed(3)+' ft² missing, '+outside.toFixed(3)+' ft² outside).');
-    return {solid:solid.translate([0,0,0]),letters,parts,layers,sourceArea:footprint.area(),footprintArea:plan.area(),outside,missing,height:solid.boundingBox().max[2]};
+    return {solid:solid.translate([0,0,0]),letterTarget:quantity,letters,parts,layers,sourceArea:footprint.area(),footprintArea:plan.area(),outside,missing,height:solid.boundingBox().max[2]};
   }finally{for(const shape of owned.reverse())shape.delete();}
 }

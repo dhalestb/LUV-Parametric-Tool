@@ -14,7 +14,7 @@ import {useSiteHandoff} from './siteHandoffStore';
 import {generateAllocatedSite} from './allocatedDesign';
 import {generateContinuousSite} from './continuousDesign';
 import {compositionControls,validateAllocation} from './territories';
-import {AllocationPreview} from './SitePlan';
+import {CompositionDistribution} from './SitePlan';
 import DesignPanel from './DesignPanel';
 import WorkflowAction,{reveal,type RunAction} from './WorkflowAction';
 import cohort from './hybrid-cohort.json';
@@ -97,6 +97,13 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   function selectMethod(next:GenerationMethod){
     setMessage('');patch({generation:{method:next,zones}});
     const url=new URL(location.href);url.searchParams.set('method',next);history.replaceState(history.state,'',url);
+  }
+  function editLetterTarget(typology:Typology,count?:number){
+    const letterTargets={...draft.letterTargets};
+    if(count===undefined)delete letterTargets[typology];
+    else letterTargets[typology]=count;
+    patch({generation:{method,zones:{...zones,[draftKey]:{...draft,letterTargets}}}});
+    setMessage('');
   }
   function edit(id:string,n:number){
     setMessage('');
@@ -203,7 +210,9 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         <legend>{method==='hybrid-rule'?'Architectural rule influence':method==='typology-area'?'Polygon area by typology':'Polygon area by descriptor'}{zone&&' · '+zone.name}</legend>
         <div className={styles.fields}>{rows.map(r=><label key={r.id}>{r.name}<span><input aria-label={r.name+' percentage'} type="number" min="0" max="100" step="any" onFocus={e=>e.currentTarget.select()} value={r.value} disabled={r.locked} onChange={e=>edit(r.id,Number(e.target.value))}/><b>%</b></span>{r.locked&&<em>Locked or disabled</em>}</label>)}</div>
       </fieldset>
-      {method==='typology-area'&&site&&zone&&<div className={styles.distribution}><div className={styles.clustering}>
+      {method==='typology-area'&&site&&zone&&<CompositionDistribution key={draftKey} site={site} zone={zone} assignment={assignment} controls={territory}
+        registry={registry} letterTargets={draft.letterTargets} onLetterTarget={editLetterTarget} disabled={busy||preparing}>
+        <div className={styles.clustering}>
         <label htmlFor="composition-clustering">Typology clustering · {zone.name}</label>
         <output htmlFor="composition-clustering">{territory.clustering??65}%</output>
         <input id="composition-clustering" type="range" min="0" max="100" step="1"
@@ -213,7 +222,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
             setPlanNotice('');setMessage('');
           }}/>
         <span>Dispersed</span><span>Clustered</span>
-      </div><AllocationPreview site={site} zone={zone} assignment={assignment} controls={territory} registry={registry}/></div>}
+      </div></CompositionDistribution>}
       {!zone&&<p>Set your percentages now. Select a polygon to apply them and generate.</p>}
       {zone&&pending[method]&&<button className={styles.textButton} disabled={busy} onClick={()=>{
         const values=Object.fromEntries(rows.map(r=>[r.id,r.locked?r.value:pending[method]?.[r.id]??r.value]));
