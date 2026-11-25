@@ -1,0 +1,240 @@
+{
+  "id": "bb7ebcd5-c9f6-45ca-b17b-c4fff24aeab5",
+  "variant": "sequential-shell",
+  "sourceCount": 15,
+  "request": {
+    "proof": "lobby",
+    "typologyName": "Compressed Sequential Lobby",
+    "generator": "source-preserving",
+    "organization": "proximity",
+    "articulationElevation": "feature",
+    "articulation": 0.75,
+    "field": {
+      "width": 60,
+      "depth": 20,
+      "height": 20
+    },
+    "preferredFeet": 13,
+    "population": 15,
+    "sourceId": "106d24da-36f2-48ba-a5b5-fdcd9141da42",
+    "sourceName": "Compressed Sequential Lobby · 15 letters",
+    "source": [
+      {
+        "letter": "L",
+        "x": -26.5987006372659,
+        "y": 0,
+        "z": 0,
+        "rx": 89.99999999999999,
+        "ry": 90,
+        "rz": 0,
+        "scale": 3.007829091500375,
+        "scaleX": 0.5,
+        "scaleY": 0.5,
+        "scaleZ": 1
+      },
+      {
+        "letter": "U",
+        "x": -23.214823839760047,
+        "y": 0,
+        "z": 0,
+        "rx": 77.14285714285712,
+        "ry": 89.99999914622636,
+        "rz": 0,
+        "scale": 2.476125021908518,
+        "scaleX": 0.5,
+        "scaleY": 0.5,
+        "scaleZ": 1
+      },
+      {
+        "letter": "V",
+        "x": -19.885036688733166,
+        "y": 0,
+        "z": 0,
+        "rx": 64.28571428571429,
+        "ry": 90,
+        "rz": 0,
+        "scale": 2.235119859376278,
+        "scaleX": 0.5,
+        "scaleY": 0.5,
+        "scaleZ": 1
+      },
+      {
+        "letter": "U",
+        "x": -16.57712200573861,
+        "y": 0,
+        "z": 0,
+        "rx": 51.42857142857143,
+        "ry": 90,
+        "rz": 0,
+        "scale": 2.163661307532544,
+        "scaleX": 0.5,
+        "scaleY": 0.5,
+        "scaleZ": 1
+      },
+      {
+        "letter": "V",
+        "x": -13.27790134249683,
+        "y": 0,
+        "z": 0,
+        "rx": 38.57142857142858,
+        "ry": 90,
+        "rz": 0,
+        "scale": 2.1109195777225107,
+        "scaleX": 0.5,
+        "scaleY": 0.5,
+        "scaleZ": 1
+      },
+      {
+        "letter": "U",
+        "x": -9.966952328304302,
+        "y": 0,
+        "z": 0,
+        "rx": 25.714285714285715,
+        "ry": 90,
+        "rz": 0,
+        "scale": 2.331209177544262,
+        "scaleX": 0.5,
+        "scaleY": 0.5,
+        "scaleZ": 1
+      },
+      {
+        "letter": "V",
+        "x": -6.631448794354732,
+        "y": 0,
+        "z": 0,
+        "rx": 12.857142857142863,
+        "ry": 90,
+        "rz": 0,
+        "scale": 2.461698429901026,
+        "scaleX": 0.5,
+        "scaleY": 0.5,
+        "scaleZ": 1
+      },
+      {
+        "letter": "U",
+        "x": -3.3465111857319876,
+        "y": 0,
+        "z": 0,
+        "rx": 0,
+        "ry": 90,
+        "rz": 0,
+        "scale": 1.6088388188079428,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      {
+        "letter": "V",
+        "x": 0.018168902519633434,
+        "y": 0,
+        "z": 0,
+        "rx": 0,
+        "ry": 77.14285714285714,
+        "rz": 0,
+        "scale": 1.4556001060012618,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      {
+        "letter": "U",
+        "x": 3.6835964509027015,
+        "y": 0,
+        "z": 0,
+        "rx": 0,
+        "ry": 64.28571428571432,
+        "rz": 0,
+        "scale": 1.655863515180435,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      {
+        "letter": "V",
+        "x": 7.6820852095289425,
+        "y": 0,
+        "z": 0,
+        "rx": 0,
+        "ry": 51.428571428571445,
+        "rz": 0,
+        "scale": 1.6779526252879868,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      {
+        "letter": "U",
+        "x": 12.081162145815057,
+        "y": 0,
+        "z": 0,
+        "rx": 0,
+        "ry": 38.571428571428584,
+        "rz": 0,
+        "scale": 2.1429335107038305,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      {
+        "letter": "V",
+        "x": 17.071658771739322,
+        "y": 0,
+        "z": 0,
+        "rx": 0,
+        "ry": 25.71428571428572,
+        "rz": 0,
+        "scale": 2.58472177621644,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      {
+        "letter": "U",
+        "x": 22.165646684914122,
+        "y": 0,
+        "z": 0,
+        "rx": 0,
+        "ry": 12.857142857142863,
+        "rz": 0,
+        "scale": 2.110062538177422,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      },
+      {
+        "letter": "L",
+        "x": 26.44617050115967,
+        "y": 0,
+        "z": 0,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 0.8443678310890044,
+        "scaleX": 1,
+        "scaleY": 1,
+        "scaleZ": 1
+      }
+    ]
+  },
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 95094,
+    "legacyFlags": 1
+  },
+  "architecturalValidation": {
+    "volume": 1710.2780390003277,
+    "bounds": {
+      "min": [
+        -30,
+        -10,
+        0
+      ],
+      "max": [
+        30,
+        10,
+        20
+      ]
+    }
+  }
+}
