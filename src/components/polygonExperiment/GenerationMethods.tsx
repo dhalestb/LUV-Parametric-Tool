@@ -15,6 +15,7 @@ import {generateAllocatedSite} from './allocatedDesign';
 import {generateContinuousSite} from './continuousDesign';
 import {compositionControls,validateAllocation} from './territories';
 import {CompositionDistribution} from './SitePlan';
+import {categoryByTypology,spaceCategories,type SpaceCategory} from './typologyCategories';
 import DesignPanel from './DesignPanel';
 import WorkflowAction,{reveal,type RunAction} from './WorkflowAction';
 import cohort from './hybrid-cohort.json';
@@ -37,6 +38,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   const site=state.site,zone=site?.zones.find(z=>z.id===state.focus),zoneId=zone?.id;
   const draftKey=JSON.stringify([site?.fingerprint,zoneId]), zones=state.generation?.zones??{},draft=zones[draftKey]??{};
   type DraftValues=Partial<Record<GenerationMethod,Record<string,number>>>;
+  const [category,setCategory]=useState<SpaceCategory|'all'>('all');
   const storageKey='luv-pending-generation-percentages-v1';
   const [pending,setPending]=useState<DraftValues>({});
   useEffect(()=>{try{setPending(JSON.parse(localStorage.getItem(storageKey)??'{}')??{});}catch{}},[]);
@@ -75,8 +77,8 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
     }catch(e){setPlanNotice(e instanceof Error?e.message:String(e));}finally{setPreparing(false);}
   }
   const handoff=useSiteHandoff();
-  const rows=method==='descriptor'?Object.entries(descriptorNames).map(([id,name])=>({id,name,value:areas[id as Descriptor]??0,locked:false})):
-    registry.items.filter(t=>method!=='hybrid-rule'||t.id!=='vertical-void-lobby').map(t=>({id:t.id,name:t.name,value:(method==='hybrid-rule'?rules:areaValues)[t.id]??0,
+  const rows=method==='descriptor'?Object.entries(descriptorNames).map(([id,name])=>({id,name,value:areas[id as Descriptor]??0,locked:false,category:undefined})):
+    registry.items.filter(t=>method!=='hybrid-rule'||t.id!=='vertical-void-lobby').map(t=>({id:t.id,name:t.name,category:categoryByTypology[t.id],value:(method==='hybrid-rule'?rules:areaValues)[t.id]??0,
       locked:method==='typology-area'&&(territory.locked[t.id]||!territory.enabled[t.id])}));
   const total=rows.reduce((sum,r)=>sum+r.value,0),positive=rows.filter(r=>r.value>0);
   const summary=positive.map(r=>r.name+' '+r.value+'%').join(' · ')||'No allocation selected';
@@ -198,6 +200,9 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
     }catch(e){setMessage('Generation blocked. '+(e instanceof Error?e.message:String(e))+' This run produced no new saved design.');}
     finally{inFlight.current=false;setBusy(false);}
   }
+  function percentageField(r:typeof rows[number]) {
+    return <label key={r.id}>{r.name}<span><input aria-label={r.name+' percentage'} type="number" min="0" max="100" step="any" onFocus={e=>e.currentTarget.select()} value={r.value} disabled={r.locked} onChange={e=>edit(r.id,Number(e.target.value))}/><b>%</b></span>{r.locked&&<em>Locked or disabled</em>}</label>;
+  }
   const action=(a:RunAction)=><WorkflowAction action={{...a,reason:reason||a.reason,fix:reason?fix:a.fix,setup:reason?setup:a.setup}}
     site={zone?site!.name+' / '+zone.name:'No site selected'} method={meta.name} allocation={summary}/>;
   return <>
@@ -208,10 +213,26 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       {site&&site.zones.length>1&&<div className={styles.zoneTabs} role="group" aria-label="Edit polygon allocation">{site.zones.map(z=><button key={z.id} disabled={busy||preparing} aria-pressed={z.id===zoneId} onClick={()=>patch({focus:z.id})}>{z.name}</button>)}</div>}
       <fieldset className={styles.inputs} id="allocation-inputs" disabled={busy}>
         <legend>{method==='hybrid-rule'?'Architectural rule influence':method==='typology-area'?'Polygon area by typology':'Polygon area by descriptor'}{zone&&' · '+zone.name}</legend>
-        <div className={styles.fields}>{rows.map(r=><label key={r.id}>{r.name}<span><input aria-label={r.name+' percentage'} type="number" min="0" max="100" step="any" onFocus={e=>e.currentTarget.select()} value={r.value} disabled={r.locked} onChange={e=>edit(r.id,Number(e.target.value))}/><b>%</b></span>{r.locked&&<em>Locked or disabled</em>}</label>)}</div>
+        {method==='typology-area'?<>
+          <label className={styles.categoryFilter}>Space category
+            <select value={category} onChange={e=>setCategory(e.currentTarget.value as SpaceCategory|'all')}>
+              <option value="all">All categories</option>
+              {spaceCategories.map(name=><option key={name}>{name}</option>)}
+            </select>
+          </label>
+          {spaceCategories.filter(name=>category==='all'||category===name).map(name=>{
+            const members=rows.filter(row=>row.category===name);
+            if(!members.length) return category==='all'?null:<p key={name}>No typologies available in {name} yet.</p>;
+            const share=members.reduce((sum,row)=>sum+row.value,0);
+            return <fieldset className={styles.categoryGroup} key={name}>
+              <legend>{name} <span>· {Number(share.toFixed(6))}%</span></legend>
+              <div className={styles.fields}>{members.map(percentageField)}</div>
+            </fieldset>;
+          })}
+        </>:<div className={styles.fields}>{rows.map(percentageField)}</div>}
       </fieldset>
       {method==='typology-area'&&site&&zone&&<CompositionDistribution key={draftKey} site={site} zone={zone} assignment={assignment} controls={territory}
-        registry={registry} letterTargets={draft.letterTargets} onLetterTarget={editLetterTarget} disabled={busy||preparing}>
+        registry={registry} category={category} letterTargets={draft.letterTargets} onLetterTarget={editLetterTarget} disabled={busy||preparing}>
         <div className={styles.clustering}>
         <label htmlFor="composition-clustering">Typology clustering · {zone.name}</label>
         <output htmlFor="composition-clustering">{territory.clustering??65}%</output>
@@ -230,7 +251,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         else patch({generation:{method,zones:{...zones,[draftKey]:method==='descriptor'?{...draft,descriptors:values}:{...draft,rules:values as typeof assignment.shares}}}});
         const next={...pending};delete next[method];storePending(next);setMessage('');
       }}>Apply draft percentages to this polygon</button>}
-      <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>{method==='typology-area'?'Shares use buildable ground, including open court floors and terraces.':'Building footprint coverage is measured after generation.'}</span></div>
+      <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>{method==='typology-area'?'Total across all space categories, including open court floors and terraces.':'Building footprint coverage is measured after generation.'}</span></div>
       {method==='typology-area'&&site&&<div className={styles.zoneTabs}><button type="button" onClick={prepareAreas} aria-describedby="territory-preparation-status" disabled={busy||preparing||!!preparationBlocker}>{preparing?'Preparing territories…':'Prepare site territories'}</button><a href="#combined-site-plan">View site plan</a></div>}
       {method==='typology-area'&&site&&<p role="status" id="territory-preparation-status">{planNotice||preparationBlocker||(
         preparedCount===enabledZones.length?'Territories prepared. View the site plan or prepare again after editing percentages.':

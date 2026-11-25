@@ -2,6 +2,7 @@
 
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {TYPOLOGIES,newAssignment,automaticLetterTarget,maxLetterTarget,type LetterTargets,type Typology,type Assignment,type SiteInput,type Zone,type Experiment,type Registry} from './model';
+import {categoryByTypology,type SpaceCategory} from './typologyCategories';
 import {currentTerritoryResult,compositionControls,generateTerritories,geometryKernel,type Result,type Controls,type Ring} from './territories';
 import {useArchitecture} from './ArchitectureLayer';
 import type {OrientationResult} from './orientationStore';
@@ -17,8 +18,8 @@ function bounds(ring:Ring){
 
 
 type DistributionProps={site:SiteInput;zone:Zone;assignment:Assignment;controls:Controls;registry:Registry;
-  children:ReactNode;disabled:boolean;letterTargets?:LetterTargets;onLetterTarget:(type:Typology,count?:number)=>void};
-export function CompositionDistribution({site,zone,assignment,controls,registry,children,disabled,letterTargets,onLetterTarget}:DistributionProps){
+  category:SpaceCategory|'all';children:ReactNode;disabled:boolean;letterTargets?:LetterTargets;onLetterTarget:(type:Typology,count?:number)=>void};
+export function CompositionDistribution({site,zone,assignment,controls,registry,category,children,disabled,letterTargets,onLetterTarget}:DistributionProps){
   const [plan,setPlan]=useState<Result>(),[error,setError]=useState('');
   useEffect(()=>{
     let active=true;
@@ -34,6 +35,7 @@ export function CompositionDistribution({site,zone,assignment,controls,registry,
     return()=>{active=false;clearTimeout(timer);};
   },[site,zone,assignment,controls,registry]);
   const {x,y,w,h}=bounds(zone.polygon),pad=.04*Math.max(w,h);
+  const visibleTerritories=plan?.territories.filter(t=>category==='all'||categoryByTypology[t.typology]===category)??[];
   return <><div className={styles.distribution}>{children}<figure className={styles.allocationPreview}>
     <figcaption>Allocation preview · {zone.name}</figcaption>
     {error?<small role="status">{error}</small>:<svg viewBox={[x-pad,y-pad,w+2*pad,h+2*pad].join(' ')} role="img" aria-label={'Allocation preview for '+zone.name}>
@@ -41,10 +43,10 @@ export function CompositionDistribution({site,zone,assignment,controls,registry,
       {plan?.territories.map(t=><path key={t.id} data-preview-type={t.typology} d={path(t.contours)} fill={colors[TYPOLOGIES.indexOf(t.typology)]} stroke="#16262a" vectorEffect="non-scaling-stroke"><title>{registry.items.find(r=>r.id===t.typology)?.name} · {t.achievedPercent.toFixed(1)}%</title></path>)}
     </svg>}
   </figure></div>
-    {plan&&<fieldset className={styles.inputs} disabled={disabled}>
+    {visibleTerritories.length>0&&<fieldset className={styles.inputs} disabled={disabled}>
       <legend>Letter density · {zone.name}</legend>
       <p className={styles.densityHint}>Set a target count per typology. Full-size letters are placed where they fit.</p>
-      <div className={styles.densityFields}>{plan.territories.map(t=>{
+      <div className={styles.densityFields}>{visibleTerritories.map(t=>{
         const id='letter-target-'+t.typology;
         const name=registry.items.find(item=>item.id===t.typology)!.name;
         const custom=letterTargets?.[t.typology];

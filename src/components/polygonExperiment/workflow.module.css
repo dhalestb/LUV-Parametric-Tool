@@ -48,6 +48,10 @@
 .method strong {font-size:16px;font-weight:650;line-height:1.27}.method em {font-style:normal;color:var(--muted);font-size:12px}
 .inputs {border:0;margin:0;padding:0;min-width:0}
 .inputs legend,.scorePanel>strong {font-size:14px;font-weight:600;margin:0 0 7px;color:var(--ink)}
+.categoryFilter {display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+.categoryFilter select {background:var(--field);border:1px solid #58787b;border-radius:4px;padding:6px;color:var(--ink);font:inherit}
+.categoryGroup {border:0;margin:14px 0 0;padding:0;min-width:0}
+.categoryGroup legend span {color:var(--cyan);font-weight:400}
 .fields {grid-template-columns:repeat(5,minmax(0,1fr))}
 @media(min-width:851px){.fields:has(>label:nth-child(6)){grid-template-columns:repeat(6,minmax(0,1fr))}}
 .fields label {display:flex;flex-direction:column;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:550;gap:4px}
