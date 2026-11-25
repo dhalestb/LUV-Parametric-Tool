@@ -34,7 +34,7 @@ export function projectMesh(api:ManifoldToplevel,mesh:Mesh,origin:Point){
   return new api.CrossSection(triangles,'NonZero');
 }
 
-function candidates(domain:CrossSection,label:Point):Point[]{
+export function candidates(domain:CrossSection,label:Point):Point[]{
   const {min,max}=domain.bounds(),points:Point[]=[label];
   const rings=domain.toPolygons();
   // Sample the buildable interior at a resolution proportional to the site.

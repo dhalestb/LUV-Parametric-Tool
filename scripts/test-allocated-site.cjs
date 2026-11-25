@@ -14,7 +14,7 @@ const root = path.resolve(__dirname, '..');
 const dir = root + '/src/components/polygonExperiment/';
 const model = require(dir+'model.ts');
 const territory = require(dir+'territories.ts');
-const registry = require(dir+'registry-data.json');
+const registry = require(dir+'polygonRegistry.ts').default;
 const {generateAllocatedSite} = require(dir+'allocatedDesign.ts');
 
 async function main() {
@@ -22,7 +22,7 @@ async function main() {
   territory.geometryKernel = async () => kernel;
   global.fetch = async url => {
     const name = new URL(url, 'http://localhost').pathname;
-    assert.match(name, /^\/allocated-studies\/[a-z-]+\.json\.gz$/);
+    assert.match(name, /^\/allocated-studies\/(?:[a-z-]+|vertical-void-lobby\/40-10)\.json\.gz$/);
     return new Response(fs.readFileSync(root+'/public'+name));
   };
   const project = require('../public/experiment-inputs/two-zone.json');
@@ -38,7 +38,7 @@ async function main() {
   const [first,second]=state.site.zones;
   for(const zone of state.site.zones)state.assignments[zone.id]=model.newAssignment();
   const shares=state.assignments[first.id].shares;
-  for(const t of model.TYPOLOGIES)shares[t]=20;
+  for(const t of registry.items.slice(0,5))shares[t.id]=20;
   state.assignments[second.id].shares={...shares,'inserted-plate':0,'linear-edge-gallery':40};
   const controls=territory.defaults();
   controls.reserved=[{id:'keep-clear',polygon:[[60,100],[80,100],[80,145],[60,145]]}];
@@ -89,6 +89,13 @@ async function main() {
   restricted.assignments[first.id]=model.newAssignment();
   const rules=()=>({regions:[{id:'high',heightFeet:40,polygon:first.polygon}]});
   assert.equal((await generate(restricted,rules)).records.length,1);
+  const lobbyState=structuredClone(restricted);
+  lobbyState.assignments[first.id].shares['linear-edge-gallery']=0;
+  lobbyState.assignments[first.id].shares['vertical-void-lobby']=100;
+  const [{orientation:lobby,architecture:lobbyForm}]=(await generate(lobbyState)).records;
+  assert.equal(lobby.components.length,10);
+  assert.equal(lobbyForm.provenance.members[0].source.engine,'bf7fc3c');
+  assert.equal(lobbyForm.provenance.members[0].scale,1);
   console.log('Passed native placement of all five studies, two-zone allocations, protection, height limits, repeatability, disabled zones and saved geometry hashes.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

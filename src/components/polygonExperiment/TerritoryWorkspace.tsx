@@ -3,7 +3,7 @@ import {useState} from 'react';
 import {newAssignment,validRing,type Assignment,type Experiment,type Registry} from './model';
 import {defaults,generateTerritories,geometryKernel,redistribute,signature,currentTerritoryResult,validateAllocation,type Controls,type Result,type Ring,type Territory} from './territories';
 import styles from './studio.module.css';
-const colors=['#e2ad59','#70b7b1','#a4a3df','#d98573','#a8be72'];
+const colors=['#e2ad59','#70b7b1','#a4a3df','#d98573','#a8be72','#bd89c7'];
 const path=(rings:Ring[])=>rings.map(r=>`M${r.map(p=>`${p[0]},${-p[1]}`).join('L')}Z`).join('');
 function Plan({result,zone,registry,select,selected}:{result:Result;zone:Ring;registry:Registry;select:(t:Territory)=>void;selected:string|null}){
  const xs=zone.map(p=>p[0]),ys=zone.map(p=>p[1]),x=Math.min(...xs),y=Math.min(...ys),w=Math.max(...xs)-x,h=Math.max(...ys)-y,pad=Math.max(w,h)*.14,size=Math.max(w,h);

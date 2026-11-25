@@ -49,6 +49,7 @@
 .inputs {border:0;margin:0;padding:0;min-width:0}
 .inputs legend,.scorePanel>strong {font-size:14px;font-weight:600;margin:0 0 7px;color:var(--ink)}
 .fields {grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(min-width:851px){.fields:has(>label:nth-child(6)){grid-template-columns:repeat(6,minmax(0,1fr))}}
 .fields label {display:flex;flex-direction:column;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:550;gap:4px}
 .fields label>span {display:flex;align-items:center;gap:8px;background:var(--field);border:1px solid #759399;border-radius:4px;padding-right:10px}
 .distribution{display:flex;align-items:center;gap:18px 36px;flex-wrap:wrap;margin:12px 0}.distribution .clustering{width:min(100%,440px)}

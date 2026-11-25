@@ -4,8 +4,8 @@ import {allocationAreaTolerance,compositionControls,currentTerritoryResult,gener
 import {siteHeightBands} from './compositionHeights';
 import type {HeightRecord} from './SiteRulePanel';
 import type {OrientationResult} from './orientationStore';
-import {studyFor} from './allocatedDesign';
-import hashes from './allocated-study-hashes.json';
+import {hashes,studyFor} from './allocatedDesign';
+import {formVerticalLobby} from './verticalLobbyFormation';
 import {formTerritory,projectMesh,siteMesh,type FormationPart,type PlanLayer} from './continuousFormation';
 
 const recipe='Continuous polygon composition';
@@ -33,14 +33,16 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
       const region=own(new api.CrossSection(relative(t.contours),'NonZero'));
       const bands=envelope.bands.filter(b=>own(region.intersect(b.section)).area()>1e-7);
       const cap=bands.length?Math.max(...bands.map(b=>b.cap)):envelope.zoneCap;
-      const result=formTerritory(api,region,origin,datum,rule,await studyFor(rule.id),
-        [t.label[0]-origin[0],t.label[1]-origin[1]],clustering,cap,bands,letterTargets[t.typology]);
+      const label:Point=[t.label[0]-origin[0],t.label[1]-origin[1]];
+      const result=rule.id==='vertical-void-lobby'
+        ? await formVerticalLobby(api,region,origin,datum,label,clustering,cap,bands,letterTargets[t.typology])
+        : formTerritory(api,region,origin,datum,rule,await studyFor(rule.id),label,clustering,cap,bands,letterTargets[t.typology]);
       formed.push(own(result.solid));
       if(result.height>cap+1e-5)throw Error(rule.name+' exceeds the site height limit.');
       sourceArea+=result.sourceArea;letters.push(...result.letters);components.push(...result.parts);planLayers.push(...result.layers);
       members.push({typology:t.typology,name:rule.name,territory:t.id,allocatedPercent:t.requestedPercent,
         achievedPercent:100*result.footprintArea/plan.allocatableArea,territoryAreaFeet2:t.area,footprintAreaFeet2:result.footprintArea,
-        missingFeet2:result.missing,outsideFeet2:result.outside,sourceStudyHash:hashes[t.typology],sourceCount:result.letters.length,letterTarget:result.letterTarget,
+        missingFeet2:result.missing,outsideFeet2:result.outside,...('stacks' in result?{stacks:result.stacks}:{sourceStudyHash:hashes[t.typology]}),sourceCount:result.letters.length,letterTarget:result.letterTarget,
         sourceEntry:rule.A.entry,formationDimensions:rule.B.parameters,heightFeet:result.height,heightCapFeet:Number.isFinite(cap)?cap:null});
     }
     // The common lower course joins matching floor edges across typology seams.

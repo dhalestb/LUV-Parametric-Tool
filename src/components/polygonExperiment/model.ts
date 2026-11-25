@@ -3,7 +3,7 @@ import { polygonArea, polygonSelfIntersects } from '../siteDevelopment/geometry'
 import type { SiteCoordinates, SiteDevelopmentProject } from '../siteDevelopment/types';
 
 export const STORAGE_KEY = 'luv-experiment-site-polygon-morphogenesis-v1';
-export const TYPOLOGIES = ['linear-edge-gallery','inserted-plate','vertical-walls','room-within-volume','void-field'] as const;
+export const TYPOLOGIES = ['linear-edge-gallery','inserted-plate','vertical-walls','room-within-volume','void-field','vertical-void-lobby'] as const;
 export type Typology = typeof TYPOLOGIES[number];
 export type Five<T> = [T,T,T,T,T];
 export const DESCRIPTORS = ['Open Volume','Visually Connected','Circulation Activated','Vertically Integrated','Centralized'] as const;
@@ -22,7 +22,7 @@ export type RegistryItem = { id:Typology; name:string; A:Rule; B:Rule; variants:
 export type Registry = { snapshot:string; boardCommit:string; siteCommit:string; counts:{boardFiles:number;siteFiles:number;savedStudies:number}; items:RegistryItem[] };
 const emptyFive = ():Five<null> => [null,null,null,null,null];
 export function initialState():Experiment { return {version:2,territoryByZone:{},descriptorAllocation:false,descriptorSpatialTargeting:false,site:null,selected:[],focus:null,unitsConfirmed:false,transform:'within',allocation:'territories',seedMethod:'letters',assignments:{},descriptorIds:[...DESCRIPTORS],profiles:Object.fromEntries(TYPOLOGIES.map(id=>[id,{scale:'percentage',values:emptyFive()}])) as Experiment['profiles']}; }
-export function newAssignment():Assignment { return {shares:{'linear-edge-gallery':100,'inserted-plate':0,'vertical-walls':0,'room-within-volume':0,'void-field':0},variants:{'linear-edge-gallery':'print-contour','inserted-plate':'edge-connected','vertical-walls':'vertical-walls','room-within-volume':'perimeter-room/fullProfiles/suspendedLLV/edgePlatforms','void-field':'face-normal/neighbor-taper/adjacent'},targets:emptyFive()}; }
+export function newAssignment():Assignment { return {shares:{'linear-edge-gallery':100,'inserted-plate':0,'vertical-walls':0,'room-within-volume':0,'void-field':0,'vertical-void-lobby':0},variants:{'linear-edge-gallery':'print-contour','inserted-plate':'edge-connected','vertical-walls':'vertical-walls','room-within-volume':'perimeter-room/fullProfiles/suspendedLLV/edgePlatforms','void-field':'face-normal/neighbor-taper/adjacent','vertical-void-lobby':'vertical-stack'},targets:emptyFive()}; }
 export async function fingerprint(value:unknown) { const bytes=new TextEncoder().encode(JSON.stringify(value)); const digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),n=>n.toString(16).padStart(2,'0')).join(''); }
 export function validRing(ring:unknown):ring is [number,number][] { return Array.isArray(ring)&&ring.length>=3&&ring.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))&&!polygonSelfIntersects(ring)&&polygonArea(ring)>0; }
 export async function importSite(raw:string,origin:SiteInput['origin']):Promise<SiteInput> {
@@ -75,8 +75,19 @@ export function provenance(state:Experiment,registry:Registry) {return {version:
 export function loadState(raw:string):Experiment {
  const parsed=JSON.parse(raw),state=parsed.settings??parsed;
  if(![1,2].includes(state.version)||!Array.isArray(state.selected)||!state.profiles||!state.assignments)throw Error('Unsupported experimental settings.');
- if(state.version===1){const migrated=initialState();return {...migrated,...state,version:2,descriptorIds:[...DESCRIPTORS],profiles:migrated.profiles,legacyDescriptorDrafts:{descriptorIds:state.descriptorIds,profiles:state.profiles},descriptorAllocation:false,descriptorSpatialTargeting:false,territoryByZone:{},site:state.site?{...state.site,protectionMetadataComplete:false,corridors:[],reservedAreas:[],zones:state.site.zones.map((z:Zone)=>({...z,holes:z.holes??[]}))}:null};}
+ if(state.version===1){const migrated=initialState();return loadState(JSON.stringify({...migrated,...state,version:2,descriptorIds:[...DESCRIPTORS],profiles:migrated.profiles,legacyDescriptorDrafts:{descriptorIds:state.descriptorIds,profiles:state.profiles},descriptorAllocation:false,descriptorSpatialTargeting:false,territoryByZone:{},site:state.site?{...state.site,protectionMetadataComplete:false,corridors:[],reservedAreas:[],zones:state.site.zones.map((z:Zone)=>({...z,holes:z.holes??[]}))}:null}));}
  if(!state.territoryByZone)throw Error('Missing territory state.');
+ const lobby='vertical-void-lobby';
+ state.profiles[lobby]??={scale:'percentage',values:emptyFive()};
+ for(const assignment of Object.values(state.assignments) as Assignment[]){
+   assignment.shares[lobby]??=0;
+   assignment.variants[lobby]??='vertical-stack';
+ }
+ for(const stored of Object.values(state.territoryByZone) as TerritoryState[]){
+   stored.controls.enabled[lobby]??=true;
+   stored.controls.locked[lobby]??=false;
+   stored.controls.minimumDiameter[lobby]??=20;
+ }
  for(const id of TYPOLOGIES){const p=state.profiles[id];if(!p||!['percentage','ordinal'].includes(p.scale)||!Array.isArray(p.values)||p.values.length!==5||p.values.some((v:number|null)=>v!==null&&(!Number.isFinite(v)||v<(p.scale==='ordinal'?1:0)||v>(p.scale==='ordinal'?15:100)||(p.scale==='ordinal'&&!Number.isInteger(v)))))throw Error('Invalid descriptor profile.');}
  return {...state,descriptorIds:[...DESCRIPTORS],descriptorAllocation:false,descriptorSpatialTargeting:false} as Experiment;
 }

@@ -3,7 +3,9 @@ import {fingerprint,newAssignment,type Experiment,type Registry,type SiteInput,t
 import {currentTerritoryResult,defaults,generateTerritories,geometryKernel,signedArea,type Ring,type Point,type Territory} from './territories';
 import type {OrientationResult} from './orientationStore';
 import type {HeightRecord} from './SiteRulePanel';
-import hashes from './allocated-study-hashes.json';
+import originalHashes from './allocated-study-hashes.json';
+import stackHashes from './vertical-lobby-stacks.json';
+export const hashes={...originalHashes,'vertical-void-lobby':stackHashes['40-10']};
 
 type Mesh={positions:number[];indices:number[]};
 type Letter=OrientationResult['components'][number];
@@ -12,14 +14,14 @@ type Study={type:Typology;datum:number;letters:Letter[];components:Part[];archit
   metrics:{sourceArea:number;footprintArea:number};provenance:Record<string,unknown>};
 type PreparedStudy=Study & {center:Point;height:number};
 type Placement={heightCheck:{requiredFeet:number;siteCapFeet:number|null;zoneCapFeet:number|null;eligibleRegionIds:string[]};study:PreparedStudy;center:Point;angle:number;boundary:Ring;territory:Territory};
-const cache=new Map<Typology,Promise<PreparedStudy>>();
+const cache=new Map<string,Promise<PreparedStudy>>();
 
-async function loadStudy(type:Typology):Promise<PreparedStudy>{
-  const response=await fetch('/allocated-studies/'+type+'.json.gz?v='+hashes[type]);
+async function loadStudy(type:Typology,file:string,hash:string):Promise<PreparedStudy>{
+  const response=await fetch('/allocated-studies/'+file+'.json.gz?v='+hash);
   if(!response.ok||!response.body)throw Error('Could not load the '+type+' architectural study.');
   const bytes=await new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
   const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
-  if(Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('')!==hashes[type])throw Error('Study integrity check failed for '+type);
+  if(Array.from(digest,b=>b.toString(16).padStart(2,'0')).join('')!==hash)throw Error('Study integrity check failed for '+type);
   const study:Study=JSON.parse(new TextDecoder().decode(bytes));
   const {center}=bounds(study.envelope);
   let height=0;
@@ -28,9 +30,18 @@ async function loadStudy(type:Typology):Promise<PreparedStudy>{
   }
   return {...study,center,height};
 }
+function cachedStudy(type:Typology,file:string,hash:string){
+  if(!cache.has(file))cache.set(file,loadStudy(type,file,hash).catch(e=>{cache.delete(file);throw e;}));
+  return cache.get(file)!;
+}
+export function lobbyStack(height:number,count:number){
+  const key=height+'-'+count;
+  const hash=(stackHashes as Record<string,string>)[key];
+  if(!hash)throw Error('Unregistered Vertical Void Lobby field or stack size.');
+  return cachedStudy('vertical-void-lobby','vertical-void-lobby/'+key,hash);
+}
 export function studyFor(type:Typology){
-  if(!cache.has(type))cache.set(type,loadStudy(type).catch(e=>{cache.delete(type);throw e;}));
-  return cache.get(type)!;
+  return type==='vertical-void-lobby'?lobbyStack(40,10):cachedStudy(type,type,hashes[type]);
 }
 function bounds(r:Ring){
   const xs=r.map(p=>p[0]),zs=r.map(p=>p[1]);

@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 require.extensions['.ts']=(m,p)=>m._compile(ts.transpileModule(fs.readFileSync(p,'utf8'),{
   compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS,esModuleInterop:true}}).outputText,p);
 const dir='../src/components/polygonExperiment/';
-const model=require(dir+'model.ts'),territory=require(dir+'territories.ts'),registry=require(dir+'registry-data.json');
+const model=require(dir+'model.ts'),territory=require(dir+'territories.ts'),registry=require(dir+'polygonRegistry.ts').default;
 const {generateContinuousSite}=require(dir+'continuousDesign.ts');
 // Independent audit of all rendered faces, including undersides. Production
 // measures the upper envelope of the triangulated solids.
@@ -28,7 +28,7 @@ async function main(){
   const [a,b]=state.site.zones;
   for(const z of [a,b]){
     const assignment=model.newAssignment();
-    for(const t of model.TYPOLOGIES)assignment.shares[t]=20;
+    for(const t of registry.items.slice(0,5))assignment.shares[t.id]=20;
     state.assignments[z.id]=assignment;
     state.territoryByZone[z.id]={controls:{...territory.defaults(),clustering:100},results:{}};
   }
@@ -141,7 +141,7 @@ async function main(){
   for(const [i,z] of state.site.zones.entries()){
     const controls=state.territoryByZone[z.id].controls;
     Object.assign(controls,{clustering:65,areaCutAngle:i===0?0:90,reserved:[]});
-    for(const t of model.TYPOLOGIES)state.assignments[z.id].shares[t]=t===(i===0?'void-field':'inserted-plate')?0:25;
+    for(const t of model.TYPOLOGIES)state.assignments[z.id].shares[t]=t==='vertical-void-lobby'||t===(i===0?'void-field':'inserted-plate')?0:25;
   }
   const {miamiParcelScale}=require('../src/components/siteDevelopment/siteImport.ts');
   // The native gold Site-layer extents distinguish the two saved Miami frames.
@@ -194,6 +194,37 @@ async function main(){
     }
   }
   console.log('Passed per-cluster letter targets, settings reload, area conservation and independent clustering.');
+  const lobby='vertical-void-lobby';
+  const lobbyState=structuredClone(restored);
+  for(const [index,z] of lobbyState.site.zones.entries()){
+    const shares=lobbyState.assignments[z.id].shares;
+    shares[lobby]=shares[gallery];shares[gallery]=0;
+    lobbyState.generation.zones[key(z)].letterTargets={[lobby]:index===0?6:16};
+  }
+  const runLobby=()=>generateContinuousSite(lobbyState,registry,()=>null,()=>{});
+  const lobbyBatch=await runLobby();
+  for(const [index,{architecture,orientation}] of lobbyBatch.records.entries()){
+    const m=architecture.provenance.members.find(m=>m.typology===lobby);
+    assert.equal(m.sourceCount,index===0?6:16);
+    assert.equal(m.stacks.reduce((n,s)=>n+s.count,0),m.sourceCount);
+    assert.equal(m.stacks.length,index===0?1:2);
+    assert(m.stacks.every(s=>s.sha256.length===64));
+    assert(Math.abs(m.achievedPercent-25)<.0001);
+    assert.equal(architecture.validation.connectedBodies,1);
+    assert(architecture.provenance.heightRegions.every(b=>b.builtFeet<=b.capFeet+.001));
+    assert.equal(orientation.components.filter(l=>l.id.startsWith(lobby+'/')).length,m.sourceCount);
+    console.log('Miami lobby:',m.stacks.map(s=>s.key),m.achievedPercent,m.sourceCount);
+  }
+  const oldState=structuredClone(restored);
+  delete oldState.profiles[lobby];
+  for(const a of Object.values(oldState.assignments)){delete a.shares[lobby];delete a.variants[lobby];}
+  for(const t of Object.values(oldState.territoryByZone))for(const k of ['enabled','locked','minimumDiameter'])delete t.controls[k][lobby];
+  const migrated=model.loadState(JSON.stringify(oldState));
+  for(const z of migrated.site.zones){
+    assert.equal(migrated.assignments[z.id].shares[lobby],0);
+    const t=migrated.territoryByZone[z.id];
+    assert(territory.currentTerritoryResult(migrated.site,z,migrated.assignments[z.id],t.controls,t.results.area));
+  }
   delete state.generation;
   state.site.zones[1].enabled=false;state.site.zones[0].inputParameters.maxHeightFeet=8;
   await assert.rejects(generate,/ft of height/);

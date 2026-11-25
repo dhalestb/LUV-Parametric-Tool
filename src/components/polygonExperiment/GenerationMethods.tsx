@@ -76,7 +76,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   }
   const handoff=useSiteHandoff();
   const rows=method==='descriptor'?Object.entries(descriptorNames).map(([id,name])=>({id,name,value:areas[id as Descriptor]??0,locked:false})):
-    registry.items.map(t=>({id:t.id,name:t.name,value:(method==='hybrid-rule'?rules:areaValues)[t.id],
+    registry.items.filter(t=>method!=='hybrid-rule'||t.id!=='vertical-void-lobby').map(t=>({id:t.id,name:t.name,value:(method==='hybrid-rule'?rules:areaValues)[t.id]??0,
       locked:method==='typology-area'&&(territory.locked[t.id]||!territory.enabled[t.id])}));
   const total=rows.reduce((sum,r)=>sum+r.value,0),positive=rows.filter(r=>r.value>0);
   const summary=positive.map(r=>r.name+' '+r.value+'%').join(' · ')||'No allocation selected';
