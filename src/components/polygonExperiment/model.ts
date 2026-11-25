@@ -9,7 +9,7 @@ export type Five<T> = [T,T,T,T,T];
 export const DESCRIPTORS = ['Open Volume','Visually Connected','Circulation Activated','Vertically Integrated','Centralized'] as const;
 export type RuleProfile = { scale:'percentage'|'ordinal'; values:Five<number|null>; archivedScales?:Partial<Record<'percentage'|'ordinal',Five<number|null>>> };
 export type Zone = { id:string; name:string; polygon:[number,number][]; holes:Ring[]; enabled:boolean; areaFeet2:number; inputParameters:Record<string,unknown> };
-export type SiteInput = { name:string; revision:string; fingerprint:string; coordinates:SiteCoordinates; zones:Zone[]; exclusions:{id:string;polygon:[number,number][]}[]; constraints:unknown; protectionMetadataComplete:boolean; corridors:{id:string;points:Ring;widthFeet:number}[]; reservedAreas:{id:string;polygon:Ring}[]; origin:'file'|'fixture' };
+export type SiteInput = { unitConfirmation?:{sourceFingerprint:string;sourceRevision:string}; name:string; revision:string; fingerprint:string; coordinates:SiteCoordinates; zones:Zone[]; exclusions:{id:string;polygon:[number,number][]}[]; constraints:unknown; protectionMetadataComplete:boolean; corridors:{id:string;points:Ring;widthFeet:number}[]; reservedAreas:{id:string;polygon:Ring}[]; origin:'file'|'fixture' };
 export type Assignment = { shares:Record<Typology,number>; variants:Record<Typology,string>; targets:Five<number|null> };
 export type GenerationMethod = 'typology-area'|'hybrid-rule'|'descriptor';
 export type MethodDrafts = {fullZone?:Partial<Record<'hybrid-rule'|'descriptor',string>>;rules?:Record<Typology,number>; descriptors?:Partial<Record<import('./descriptorInfluence').Descriptor,number>>};
@@ -38,6 +38,7 @@ export async function importSite(raw:string,origin:SiteInput['origin']):Promise<
 }
 export function withImportedSite(state:Experiment,site:SiteInput):Experiment {
   const previous=state.site;
+  if(site.coordinates.unitAssumption==='unresolved'&&previous?.unitConfirmation?.sourceFingerprint===site.fingerprint&&previous.unitConfirmation.sourceRevision===site.revision)return state;
   const sameSnapshot=previous?.fingerprint===site.fingerprint&&previous.revision===site.revision;
   const generation=state.generation?{...state.generation,zones:{...state.generation.zones}}:undefined;
   const assignments:Experiment['assignments']={};

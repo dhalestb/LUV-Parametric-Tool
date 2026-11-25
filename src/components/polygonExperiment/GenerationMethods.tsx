@@ -2,7 +2,7 @@
 
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {descriptorNames,descriptorRegions,influenceVersion,type AreaShares,type Descriptor} from './descriptorInfluence';
-import {newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
+import {fingerprint,withImportedSite,newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
 import {defaults as territoryDefaults,geometryKernel,generateTerritories,currentTerritoryResult} from './territories';
 import {requestSiteWorker} from './workerClient';
 import {readSiteRules} from './SiteRulePanel';
@@ -99,12 +99,40 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
     if(method==='typology-area'&&zoneId)patch({assignments:{...state.assignments,[zoneId]:{...assignment,shares:{...assignment.shares,[id]:n}}}});
     else patch({generation:{method,zones:{...zones,[draftKey]:method==='descriptor'?{...draft,descriptors:{...areas,[id]:n}}:{...draft,rules:{...rules,[id]:n}}}}});
   }
-  let reason='',fix:ReactNode=null;
+  const [confirming,setConfirming]=useState(false),[unitError,setUnitError]=useState('');
+  async function confirmStudyUnits(){
+    if(!site||confirming)return;
+    setConfirming(true);setUnitError('');
+    try{
+      if(site.coordinates.unitAssumption==='confirmed'){patch({unitsConfirmed:true});return;}
+      const coordinates={...site.coordinates,unitAssumption:'confirmed' as const};
+      const confirmed={...site,coordinates,unitConfirmation:{sourceFingerprint:site.fingerprint,sourceRevision:site.revision},revision:site.revision+':confirmed-units',
+        fingerprint:await fingerprint({source:site.fingerprint,coordinates})};
+      const next=withImportedSite(state,confirmed);
+      for(const z of site.zones){
+        const stored=state.territoryByZone[z.id];
+        if(!stored)continue;
+        const assignment=state.assignments[z.id]??newAssignment();
+        for(const strategy of ['area','geometry'] as const){
+          const old=stored.results[strategy];
+          if(!old||!currentTerritoryResult(site,z,assignment,stored.controls,old))continue;
+          const result=generateTerritories(await geometryKernel(),confirmed,z,assignment,stored.controls,strategy,registry);
+          if(!result.metrics.valid)throw Error('Could not revalidate the prepared territory for '+z.name+'.');
+          next.territoryByZone[z.id].results[strategy]=result;
+        }
+      }
+      if(latest.current!==state)throw Error('The study changed. Review the current units and confirm again.');
+      patch({...next,selected:state.selected,focus:state.focus});
+    }catch(e){setUnitError(e instanceof Error?e.message:String(e));}finally{setConfirming(false);}
+  }
+  let reason='',fix:ReactNode=null,setup=false;
   if(!site||!zone){reason='Select a site and polygon before generating.';fix=recovery;}
   else if(!zone.enabled){reason='This polygon is disabled in the site project.';fix=<button onClick={()=>reveal('select-site')}>Select another polygon</button>;}
   else if(!state.unitsConfirmed||site.coordinates.unitAssumption!=='confirmed'){
-    reason='Confirm the model units in Site Development, then refresh the polygons in Section 1.';
-    fix=site.coordinates.unitAssumption==='confirmed'?<button onClick={()=>reveal('select-site')}>Confirm declared units</button>:<a href="/site-development">Open Site Development</a>;
+    reason='Confirm the model units for this study before generating.';setup=true;
+    fix=<><p>Imported units are {site.coordinates.unit}. One model unit equals {Number(site.coordinates.feetPerModel.toPrecision(7))} ft. Prepared polygons use site feet.</p>
+      <button disabled={confirming} onClick={confirmStudyUnits}>{confirming?'Checking territories…':'Confirm '+site.coordinates.unit+' for this study'}</button>
+      <a href="/site-development">Change source units in Site Development</a>{unitError&&<p role="alert">{unitError}</p>}</>;
   }else if(!site.protectionMetadataComplete){
     reason='Refresh the site polygons to import their protection geometry.';
     fix=<button onClick={()=>reveal('select-site')}>Review site input</button>;
@@ -137,7 +165,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       setMessage('Saved alternative · '+result.orientation.components.length+' letters · '+result.architecture.components+' components · replay matched.');
     }catch(e){setMessage('Generation blocked. '+(e instanceof Error?e.message:String(e)));}finally{setBusy(false);}
   }
-  const action=(a:RunAction)=><WorkflowAction action={{...a,reason:reason||a.reason,fix:reason?fix:a.fix}}
+  const action=(a:RunAction)=><WorkflowAction action={{...a,reason:reason||a.reason,fix:reason?fix:a.fix,setup:reason?setup:a.setup}}
     site={zone?site!.name+' / '+zone.name:'No site selected'} method={meta.name} allocation={summary}/>;
   return <>
     <section className={styles.methods} id="site-generation-methods" aria-labelledby="method-heading">
