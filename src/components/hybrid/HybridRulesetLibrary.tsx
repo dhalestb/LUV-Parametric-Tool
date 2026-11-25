@@ -69,7 +69,7 @@ export default function HybridRulesetLibrary({ label, form, ready }: {
           : <>
             <RulesetExports key={label + form.mesh.id} label={label} form={form} />
             <p className="text-xs text-[var(--muted)]">ZIP includes the OBJ, text ruleset, and JSON ruleset. OBJ includes the form geometry with the ruleset in its comments.</p>
-            <RulesetDetails key={label + form.mesh.id} ruleset={form.ruleset} />
+            <RulesetDetails key={label + form.mesh.id + "-rules"} ruleset={form.ruleset} />
           </>}
       </>}
   </section>;

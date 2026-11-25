@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLatticeSource } from "@/components/lattice/latticeSource";
+import { parseObj } from "@/components/lattice/parseObj";
 import { resolvedUp } from "@/components/lattice/types";
 import { generatedHybridSources, type RepositoryForm } from "@/components/hybrid/repositorySources";
 import AppNav from "@/components/AppNav";
 import HybridViewer from "@/components/hybrid/HybridViewer";
 import HybridRulesetLibrary from "@/components/hybrid/HybridRulesetLibrary";
-import { UNIT_TO_FEET, type UnitName, type UpAxisMode } from "@/components/lattice/types";
+import { UNIT_TO_FEET, type UnitName, type UpAxis, type UpAxisMode } from "@/components/lattice/types";
 import type { Family } from "@/components/hybrid/analyzeHybrid";
 
 import type { HybridRequest, HybridReply, StoredForm } from "@/components/hybrid/hybrid.worker";
@@ -18,6 +19,27 @@ const slots = families.flatMap(family => [1,2,3].map(number => ({
 })));
 
 const control = "rounded border border-[var(--line)] bg-[var(--panel-soft)] px-3 py-1.5 text-sm";
+
+async function committedRepository() {
+  const response = await fetch("/hybrid-repository/manifest.json");
+  if (!response.ok) return { forms: [] as StoredForm[], slots: {} as Record<string, StoredForm> };
+  const manifest: { forms: { id: string; filename: string; file: string; unit: UnitName; up: UpAxis }[]; slots: Record<string, { id: string; fits: StoredForm["fits"]; ruleset?: StoredForm["ruleset"] }> } = await response.json();
+  const forms: StoredForm[] = [];
+  for (const item of manifest.forms) {
+    const file = await fetch("/hybrid-repository/" + encodeURIComponent(item.file));
+    if (!file.ok) continue;
+    const mesh = parseObj(await file.text(), item.filename);
+    mesh.id = item.id;
+    forms.push({ mesh, fits: null, unit: item.unit, up: item.up });
+  }
+  const byId = new Map(forms.map(form => [form.mesh.id, form]));
+  const slots: Record<string, StoredForm> = {};
+  for (const [slotId, slot] of Object.entries(manifest.slots)) {
+    const form = byId.get(slot.id);
+    if (form) slots[slotId] = { ...form, fits: slot.fits, ruleset: slot.ruleset };
+  }
+  return { forms, slots };
+}
 
 function openLibrary(): Promise<IDBDatabase> {
   return new Promise((resolve,reject)=>{
@@ -74,10 +96,14 @@ export default function HybridGeneration() {
           };
           repositoryRequest.onerror = () => reject(repositoryRequest.error);
         });
+        const committed = await committedRepository();
+        for (const form of committed.forms) library[form.mesh.id] ??= { ...form, fits: null, ruleset: undefined };
+        for (const [slotId, form] of Object.entries(committed.slots)) records[slotId] ??= form;
         // Retain uploads saved before the repository was introduced.
         for (const form of Object.values(records)) library[form.mesh.id] ??= { ...form, fits: null, ruleset: undefined };
         await new Promise<void>((resolve, reject) => {
-          const tx = db.transaction("repository", "readwrite");
+          const tx = db.transaction(["forms", "repository"], "readwrite");
+          for (const [slotId, form] of Object.entries(records)) tx.objectStore("forms").put(form, slotId);
           for (const [id, form] of Object.entries(library)) tx.objectStore("repository").put(form, id);
           tx.oncomplete = () => resolve();
           tx.onabort = tx.onerror = () => reject(tx.error);
@@ -147,7 +173,7 @@ export default function HybridGeneration() {
   }
 
   function run(request: HybridRequest) {
-    if (!ready || worker.current) return;
+    if (worker.current) return;
     const slotId = selected.id;
     setMessage("");
     const task = new Worker(new URL("../../components/hybrid/hybrid.worker.ts", import.meta.url));
@@ -175,16 +201,68 @@ export default function HybridGeneration() {
     task.postMessage(request);
   }
 
-  function storeFile(files: FileList | null) {
-    if (!files?.length) return;
-    if (files.length !== 1 || !/\.obj$/i.test(files[0].name)) {
-      setMessage("Choose one OBJ file for the selected slot.");
+  async function loadObjFiles(files: FileList | File[] | null) {
+    const list = [...(files ?? [])].filter(file => /\.obj$/i.test(file.name));
+    if (!list.length) {
+      setMessage("Choose one or more OBJ files.");
       return;
     }
-    run({ action: "store", file: files[0], unit, axis });
+    const start = Math.max(0, slots.findIndex(slot => slot.id === selected.id));
+    const targets = slots.slice(start).concat(slots.slice(0, start)).slice(0, list.length);
+    setBusy(true);
+    setMessage(list.length === 1 ? "Loading OBJ…" : "Loading OBJs…");
+    const loaded: { slotId: string; form: StoredForm }[] = [];
+    const errors: string[] = [];
+    try {
+      for (let index = 0; index < targets.length; index += 1) {
+        const file = list[index];
+        try {
+          const mesh = parseObj(await file.text(), file.name);
+          loaded.push({
+            slotId: targets[index].id,
+            form: { mesh, fits: null, unit, up: resolvedUp(mesh.upAxis, axis) },
+          });
+        } catch (error) {
+          errors.push(error instanceof Error ? error.message : file.name);
+        }
+      }
+      if (!loaded.length) {
+        setMessage(errors[0] ?? "Could not read the OBJ.");
+        return;
+      }
+      setForms(current => {
+        const next = { ...current };
+        for (const item of loaded) next[item.slotId] = item.form;
+        return next;
+      });
+      setRepository(current => {
+        const next = { ...current };
+        for (const item of loaded) next[item.form.mesh.id] = { ...item.form, fits: null, ruleset: undefined };
+        return next;
+      });
+      try {
+        const db = await openLibrary();
+        try {
+          await new Promise<void>((resolve, reject) => {
+            const tx = db.transaction(["forms", "repository"], "readwrite");
+            tx.oncomplete = () => resolve();
+            tx.onabort = tx.onerror = () => reject(tx.error);
+            for (const item of loaded) {
+              tx.objectStore("forms").put(item.form, item.slotId);
+              tx.objectStore("repository").put({ ...item.form, fits: null, ruleset: undefined }, item.form.mesh.id);
+            }
+          });
+        } finally { db.close(); }
+      } catch { errors.push("Browser storage could not save this load."); }
+      const names = loaded.map(item => item.form.mesh.filename).join(", ");
+      setMessage(errors.length ? names + " loaded. " + errors[0] : names + " loaded. Select Analyze Form.");
+    } finally { setBusy(false); }
   }
 
-  return <main className="min-h-screen space-y-4 p-4" style={{color:"var(--ink)",background:"var(--app-background)"}}>
+  return <main className="min-h-screen space-y-4 p-4" style={{color:"var(--ink)",background:"var(--app-background)"}}
+    onDragOver={event => { event.preventDefault(); setDrag(true); }}
+    onDragLeave={() => setDrag(false)}
+    onDrop={event => { event.preventDefault(); setDrag(false); void loadObjFiles(event.dataTransfer.files); }}>
     <header className="flex flex-wrap items-center gap-4"><h1 className="text-xl font-semibold">Hybrid Generation</h1><AppNav/><a href="#hybrid-rulesets" className={control}>Hybrid Rulesets</a></header>
     <div className="grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)_320px]">
       <aside aria-label="Hybrid slots">{families.map(f=><section key={f} className="mb-4">
@@ -210,18 +288,19 @@ export default function HybridGeneration() {
           </label>
         </div>)}
       </section>)}</aside>
-      <section className={"rounded border-2 border-dashed p-4 "+(drag?"border-amber-400":"border-[var(--line)]")}
-        onDragOver={e=>{e.preventDefault();setDrag(true);}} onDragLeave={()=>setDrag(false)}
-        onDrop={e=>{e.preventDefault();setDrag(false);storeFile(e.dataTransfer.files);}}>
+      <section className={"rounded border-2 border-dashed p-4 "+(drag?"border-amber-400":"border-[var(--line)]")}>
         <h2 className="mb-3 font-semibold">{selected.label}</h2>
         <div className="flex flex-wrap items-center gap-2">
           <label>Units <select className={control} value={unit} onChange={e=>setUnit(e.target.value as UnitName)}>{Object.keys(UNIT_TO_FEET).map(u=><option key={u}>{u}</option>)}</select></label>
           <label>Up axis <select className={control} value={axis} onChange={e=>setAxis(e.target.value as UpAxisMode)}>{["auto","y","z"].map(a=><option key={a}>{a}</option>)}</select></label>
-          <button disabled={busy||!ready} className={control} onClick={()=>fileInput.current?.click()}>{form?"Replace OBJ":"Upload OBJ"}</button>
-          <button disabled={busy || !ready || !form} className={control} onClick={()=>form && run({action:"analyze", form, family:selected.family})}>Analyze Form</button>
-          <input hidden ref={fileInput} type="file" accept=".obj" onChange={e=>{storeFile(e.target.files);e.target.value="";}}/>
+          <label className={control + (busy ? " pointer-events-none opacity-50" : " cursor-pointer")}>
+            {form ? "Replace OBJ" : "Load OBJ"}
+            <input ref={fileInput} className="sr-only" type="file" accept=".obj" multiple disabled={busy}
+              onChange={event => { void loadObjFiles(event.target.files); event.target.value = ""; }} />
+          </label>
+          <button disabled={busy || !form} className={control} onClick={()=>form && run({action:"analyze", form, family:selected.family})}>Analyze Form</button>
         </div>
-        <p role="status" className="my-3 text-sm">{message || (form ? (form.fits ? (form.ruleset ? "Analysis complete." : "Analyze Form again to generate a hybrid ruleset.") : "OBJ stored. Select Analyze Form to see its typology mix.") : "Drop one OBJ here to store it.")}</p>
+        <p role="status" className="my-3 text-sm">{message || (form ? (form.fits ? (form.ruleset ? "Analysis complete." : "Analyze Form again to generate a hybrid ruleset.") : "OBJ loaded. Select Analyze Form to see its typology mix.") : "Drop OBJ files here, or use Load OBJ. The first file fills this slot. Extra files fill the following slots.")}</p>
         {form && <><p className="text-sm">{form.mesh.filename} · {form.unit} · {form.up.toUpperCase()} up</p>
           <HybridViewer key={selected.id + ":" + form.mesh.id} form={form} /></>}
       </section>
