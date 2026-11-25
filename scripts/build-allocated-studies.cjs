@@ -138,4 +138,5 @@ async function main() {
   }
   fs.writeFileSync(path.join(root, 'src/components/polygonExperiment/allocated-study-hashes.json'), JSON.stringify(manifest, null, 2) + '\n');
 }
-main().catch(e => {console.error(e); process.exitCode = 1;});
+module.exports={project,siteAxes};
+if(require.main===module)main().catch(e => {console.error(e); process.exitCode = 1;});
