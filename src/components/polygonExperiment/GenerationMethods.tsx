@@ -1,6 +1,6 @@
 'use client';
 
-import {useState,type ReactNode} from 'react';
+import {useEffect,useState,type ReactNode} from 'react';
 import {descriptorNames,descriptorRegions,influenceVersion,type AreaShares,type Descriptor} from './descriptorInfluence';
 import {newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
 import {defaults as territoryDefaults} from './territories';
@@ -31,12 +31,18 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   const method=state.generation?.method??'typology-area',meta=methods.find(m=>m.id===method)!;
   const site=state.site,zone=site?.zones.find(z=>z.id===state.focus),zoneId=zone?.id;
   const draftKey=JSON.stringify([site?.fingerprint,zoneId]), zones=state.generation?.zones??{},draft=zones[draftKey]??{};
-  const rules=draft.rules??defaultRules, areas:AreaShares=draft.descriptors??{openVolume:100};
+  type DraftValues=Partial<Record<GenerationMethod,Record<string,number>>>;
+  const storageKey='luv-pending-generation-percentages-v1';
+  const [pending,setPending]=useState<DraftValues>({});
+  useEffect(()=>{try{setPending(JSON.parse(localStorage.getItem(storageKey)??'{}')??{});}catch{}},[]);
+  function storePending(next:DraftValues){setPending(next);try{localStorage.setItem(storageKey,JSON.stringify(next));}catch{}}
+  const rules=(!zone&&pending['hybrid-rule'])||draft.rules||defaultRules, areas:AreaShares=(!zone&&pending.descriptor)||draft.descriptors||{openVolume:100};
   const assignment=(zoneId&&state.assignments[zoneId])||newAssignment();
+  const areaValues=(!zone&&pending['typology-area'])||assignment.shares;
   const territory=(zoneId&&state.territoryByZone[zoneId]?.controls)||territoryDefaults();
   const handoff=useSiteHandoff();
   const rows=method==='descriptor'?Object.entries(descriptorNames).map(([id,name])=>({id,name,value:areas[id as Descriptor]??0,locked:false})):
-    registry.items.map(t=>({id:t.id,name:t.name,value:(method==='hybrid-rule'?rules:assignment.shares)[t.id],
+    registry.items.map(t=>({id:t.id,name:t.name,value:(method==='hybrid-rule'?rules:areaValues)[t.id],
       locked:method==='typology-area'&&(territory.locked[t.id]||!territory.enabled[t.id])}));
   const total=rows.reduce((sum,r)=>sum+r.value,0),positive=rows.filter(r=>r.value>0);
   const summary=positive.map(r=>r.name+' '+r.value+'%').join(' · ')||'No allocation selected';
@@ -59,6 +65,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   }
   function edit(id:string,n:number){
     setMessage('');
+    if(!zone){storePending({...pending,[method]:{...Object.fromEntries(rows.map(r=>[r.id,r.value])),[id]:n}});return;}
     if(method==='typology-area'&&zoneId)patch({assignments:{...state.assignments,[zoneId]:{...assignment,shares:{...assignment.shares,[id]:n}}}});
     else patch({generation:{method,zones:{...zones,[draftKey]:method==='descriptor'?{...draft,descriptors:{...areas,[id]:n}}:{...draft,rules:{...rules,[id]:n}}}}});
   }
@@ -104,10 +111,17 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       <h2 id="method-heading"><small>02</small> Choose Generation Method</h2>
       <div className={styles.methodGrid} role="group" aria-label="Generation method">{methods.map((m,i)=><button type="button" key={m.id} className={styles.method} disabled={busy} aria-pressed={method===m.id} onClick={()=>selectMethod(m.id)}>
         <span>Method {i+1}</span><strong>{m.name}</strong><em>{m.label}</em></button>)}</div>
-      <fieldset className={styles.inputs} id="allocation-inputs" disabled={busy||!zone}>
+      <fieldset className={styles.inputs} id="allocation-inputs" disabled={busy}>
         <legend>{method==='hybrid-rule'?'Architectural rule influence':method==='typology-area'?'Polygon area by typology':'Polygon area by descriptor'}</legend>
-        <div className={styles.fields}>{rows.map(r=><label key={r.id}>{r.name}<span><input aria-label={r.name+' percentage'} type="number" min="0" max="100" step="any" value={r.value} disabled={r.locked} onChange={e=>edit(r.id,Number(e.target.value))}/><b>%</b></span>{r.locked&&<em>Locked or disabled</em>}</label>)}</div>
+        <div className={styles.fields}>{rows.map(r=><label key={r.id}>{r.name}<span><input aria-label={r.name+' percentage'} type="number" min="0" max="100" step="any" onFocus={e=>e.currentTarget.select()} value={r.value} disabled={r.locked} onChange={e=>edit(r.id,Number(e.target.value))}/><b>%</b></span>{r.locked&&<em>Locked or disabled</em>}</label>)}</div>
       </fieldset>
+      {!zone&&<p>Set your percentages now. Select a polygon to apply them and generate.</p>}
+      {zone&&pending[method]&&<button className={styles.textButton} disabled={busy} onClick={()=>{
+        const values=Object.fromEntries(rows.map(r=>[r.id,r.locked?r.value:pending[method]?.[r.id]??r.value]));
+        if(method==='typology-area')patch({assignments:{...state.assignments,[zone.id]:{...assignment,shares:values as typeof assignment.shares}}});
+        else patch({generation:{method,zones:{...zones,[draftKey]:method==='descriptor'?{...draft,descriptors:values}:{...draft,rules:values as typeof assignment.shares}}}});
+        const next={...pending};delete next[method];storePending(next);setMessage('');
+      }}>Apply draft percentages to this polygon</button>}
       <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>Building footprint coverage is measured after generation.</span></div>
       {method==='typology-area'&&<button className={styles.textButton} onClick={openTerritories}>Territory allocation &amp; constraints ↗</button>}
       {method==='hybrid-rule'&&<p className={styles.note}>Verified pair · Inserted Horizontal Plate guides native Stepped Rule A placement. Stepped Rule B forms the architecture. Other rule connections await validation.</p>}
