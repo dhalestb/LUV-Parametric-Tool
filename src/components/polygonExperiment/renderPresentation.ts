@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {drawingCamera,formFinish,geometryFor,meshBox,stepDownDirection,studioLights,type DrawingView,type FormMesh} from './architectureViews';
 
 export const sheetWidth=4323, sheetHeight=847;
+const board = { background: '#000000', ink: '#F7F6F5', gold: '#D6AD4F', cyan: '#71BEDA', rule: '#E1E0DF', font: 'Arial, sans-serif' };
 const views:DrawingView[]=['Perspective','Plan','Side'];
 
 export async function renderPresentation(meshes:FormMesh[],labels:string[]):Promise<Blob>{
@@ -19,7 +20,7 @@ export async function renderPresentation(meshes:FormMesh[],labels:string[]):Prom
     renderer.setSize(width,height,false);
     renderer.toneMapping=THREE.ACESFilmicToneMapping;
     renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
-    scene.background=new THREE.Color('#080f18');
+    scene.background=new THREE.Color(board.background);
     for(const mesh of meshes){
       const geometry=geometryFor(mesh);geometries.push(geometry);
       const form=new THREE.Mesh(geometry,material);form.castShadow=true;form.receiveShadow=true;
@@ -27,7 +28,7 @@ export async function renderPresentation(meshes:FormMesh[],labels:string[]):Prom
     }
     const title=labels.join(' + ');
     const sides=meshes.map(stepDownDirection);
-    ctx.fillStyle='#080f18';ctx.fillRect(0,0,sheetWidth,sheetHeight);
+    ctx.fillStyle=board.background;ctx.fillRect(0,0,sheetWidth,sheetHeight);
     for(const [i,view] of views.entries()){
       const split=view==='Side'&&forms.length>1;
       const count=split?forms.length:1;
@@ -44,7 +45,9 @@ export async function renderPresentation(meshes:FormMesh[],labels:string[]):Prom
         if(split&&camera instanceof THREE.OrthographicCamera){
           camera.left=-sharedHeight*aspect;camera.right=sharedHeight*aspect;
           camera.top=sharedHeight;camera.bottom=-sharedHeight;camera.updateProjectionMatrix();
-          ctx.fillStyle='#cad4d7';ctx.font='20px system-ui';ctx.fillText(labels[j],x+35,y+24);
+          ctx.fillStyle=board.cyan;
+          ctx.font='20px '+board.font;
+          ctx.fillText(labels[j].toUpperCase(),x+35,y+24,cellWidth-70);
         }
         const rig=studioLights(split?meshBox(meshes[j]):box,true,view==='Side'?sides[j]:undefined);
         scene.add(rig.group);
@@ -54,9 +57,19 @@ export async function renderPresentation(meshes:FormMesh[],labels:string[]):Prom
         }finally{scene.remove(rig.group);rig.dispose();}
       }
       const left=i*width+35;
-      ctx.fillStyle='#f7f6f5';ctx.font='600 29px system-ui';ctx.fillText(view==='Side'?(split?'Side elevations':'Side elevation'):view,left,39);
-      ctx.fillStyle='#a8b5bc';ctx.font='19px system-ui';ctx.fillText(title,left,66,width-72);
-      if(i){ctx.fillStyle='#34424b';ctx.fillRect(i*width,22,2,sheetHeight-44);}
+      const heading=view==='Side'?(split?'Side elevations':'Side elevation'):view;
+      ctx.fillStyle=board.ink;
+      ctx.font='34px '+board.font;
+      ctx.fillText(heading.toUpperCase(),left,38);
+      ctx.fillStyle=board.rule;
+      ctx.fillRect(left,48,width-70,1);
+      ctx.fillStyle=board.gold;
+      ctx.font='19px '+board.font;
+      ctx.fillText(title.toUpperCase(),left,71,width-70);
+      if(i){
+        ctx.fillStyle=board.ink;
+        ctx.fillRect(i*width,22,2,sheetHeight-44);
+      }
     }
     return await new Promise<Blob>((resolve,reject)=>sheet.toBlob(blob=>blob?resolve(blob):reject(Error('PNG export failed.')),'image/png'));
   }finally{
