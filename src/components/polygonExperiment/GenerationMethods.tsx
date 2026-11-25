@@ -3,7 +3,7 @@
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {descriptorNames,descriptorRegions,influenceVersion,type AreaShares,type Descriptor} from './descriptorInfluence';
 import {newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
-import {defaults as territoryDefaults,geometryKernel,generateTerritories} from './territories';
+import {defaults as territoryDefaults,geometryKernel,generateTerritories,currentTerritoryResult} from './territories';
 import {requestSiteWorker} from './workerClient';
 import {readSiteRules} from './SiteRulePanel';
 import {saveBrowserDesign} from './browserDesigns';
@@ -44,14 +44,21 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   latest.current=state;
   const [preparing,setPreparing]=useState(false),[planNotice,setPlanNotice]=useState('');
   useEffect(()=>{setMessage('');setPlanNotice('');},[site?.fingerprint,zoneId,method]);
+  const enabledZones=site?.zones.filter(z=>z.enabled)??[];
+  const preparationBlocker=!site?.protectionMetadataComplete?'Refresh the site polygons in Section 1 to load their protection geometry.':
+    !enabledZones.length?'Enable a polygon in Site Development, then refresh the site polygons in Section 1.':'';
+  const preparedCount=enabledZones.filter(z=>{
+    const stored=state.territoryByZone[z.id],area=stored?.results.area;
+    return site&&area&&currentTerritoryResult(site,z,state.assignments[z.id]??newAssignment(),stored.controls,area);
+  }).length;
   async function prepareAreas(){
-    if(!site||!state.unitsConfirmed||site.coordinates.unitAssumption!=='confirmed'||!site.protectionMetadataComplete||preparing)return;
+    if(!site||preparationBlocker||busy||preparing)return;
     setPreparing(true);setPlanNotice('');
     try{
       const kernel=await geometryKernel();
       if(latest.current!==state)throw Error('Site settings changed. Prepare territories again.');
       const next={...state.territoryByZone};
-      for(const z of site.zones.filter(z=>z.enabled)){
+      for(const z of enabledZones){
         try{
           const c=next[z.id]?.controls??territoryDefaults();
           const area=generateTerritories(kernel,site,z,state.assignments[z.id]??newAssignment(),c,'area',registry);
@@ -59,7 +66,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
           next[z.id]={controls:c,results:{...next[z.id]?.results,area}};
         }catch(e){throw Error(z.name+' · '+(e instanceof Error?e.message:String(e)));}
       }
-      patch({territoryByZone:next});setPlanNotice('Territories prepared. Review the combined site plan in Section 4.');
+      patch({territoryByZone:next});
     }catch(e){setPlanNotice(e instanceof Error?e.message:String(e));}finally{setPreparing(false);}
   }
   const handoff=useSiteHandoff();
@@ -150,8 +157,12 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         const next={...pending};delete next[method];storePending(next);setMessage('');
       }}>Apply draft percentages to this polygon</button>}
       <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>Building footprint coverage is measured after generation.</span></div>
-      {method==='typology-area'&&site&&<div className={styles.zoneTabs}><button type="button" onClick={prepareAreas} disabled={busy||preparing||!state.unitsConfirmed||site.coordinates.unitAssumption!=='confirmed'||!site.protectionMetadataComplete||!site.zones.some(z=>z.enabled)}>{preparing?'Preparing territories…':'Prepare site territories'}</button><a href="#combined-site-plan">View site plan</a></div>}
-      {method==='typology-area'&&planNotice&&<p role="status">{planNotice}</p>}
+      {method==='typology-area'&&site&&<div className={styles.zoneTabs}><button type="button" onClick={prepareAreas} aria-describedby="territory-preparation-status" disabled={busy||preparing||!!preparationBlocker}>{preparing?'Preparing territories…':'Prepare site territories'}</button><a href="#combined-site-plan">View site plan</a></div>}
+      {method==='typology-area'&&site&&<p role="status" id="territory-preparation-status">{planNotice||preparationBlocker||(
+        preparedCount===enabledZones.length?'Territories prepared. View the site plan or prepare again after editing percentages.':
+        preparedCount>0?preparedCount+' of '+enabledZones.length+' polygons have current territories. Prepare again to update the site plan.':
+        'Prepare a 2D territory plan from the drawn polygons and their percentages.'
+      )}</p>}
       {method==='typology-area'&&<button className={styles.textButton} onClick={openTerritories}>Territory allocation &amp; constraints ↗</button>}
       {method==='hybrid-rule'&&<p className={styles.note}>Verified pair · Inserted Horizontal Plate guides native Stepped Rule A placement. Stepped Rule B forms the architecture. Other rule connections await validation.</p>}
       {method==='descriptor'&&<div className={styles.scorePanel}><strong>Verified typology contributions</strong>
