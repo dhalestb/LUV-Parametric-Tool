@@ -11,8 +11,7 @@ import {readOrientation,saveOrientation,writeSiteSelection,selectionDefault,type
 import cohort from './hybrid-cohort.json';
 import type {Experiment,Registry} from './model';
 import SitePlan from './SitePlan';
-import ArchitecturePresentation from './ArchitecturePresentation';
-import {renderPresentation} from './renderPresentation';
+import ArchitecturePresentation,{boardLabels,renderStudyBoard} from './ArchitecturePresentation';
 import styles from './workflow.module.css';
 
 const CombinedArchitecture=dynamic(()=>import('./CombinedArchitecture'),{ssr:false});
@@ -91,13 +90,14 @@ export default function ArchitectureReview({state,registry,results,selected,view
   }
   const [exporting,setExporting]=useState(false),[exportStatus,setExportStatus]=useState('');
   const [renderingBoard,setRenderingBoard]=useState(false),[boardStatus,setBoardStatus]=useState('');
+  const boardRecords=group.length?group:record&&result?[record]:[];
   async function downloadBoard(){
-    if(!record||!result||renderingBoard)return;
+    if(!boardRecords.length||renderingBoard)return;
     setRenderingBoard(true);setBoardStatus('');
     try{
-      const zone=record.site.zones.find(z=>z.id===record.zoneId)?.name??record.typologyName??'Selected study';
-      const png=await renderPresentation([result.architecture],[zone]);
-      downloadDesignFile(png,objName(zone)+'-presentation.png');
+      const labels=boardLabels(boardRecords);
+      const png=await renderStudyBoard(boardRecords,labels);
+      downloadDesignFile(png,objName(labels.join(' + '))+'-presentation.png');
       setBoardStatus('Presentation board download started.');
     }catch(e){setBoardStatus('PNG export failed. '+(e instanceof Error?e.message:String(e)));}
     finally{setRenderingBoard(false);}
@@ -120,8 +120,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
     finally{setExporting(false);}
   }
   const heightPassed=result?.validation.occupiedSiteEnvelope?.passed??result?.validation.allocatedHeightChecked;
-  const presentationRecords=record&&result?[record,...group.filter(r=>!reference&&r.zoneId!==record.zoneId)]:group;
-  return <>{renderMethods(<ArchitecturePresentation key={record?.id} exportOnly initialId={record?.id} records={presentationRecords}/>)}
+  return <>{renderMethods(<ArchitecturePresentation key={record?.id} exportOnly records={boardRecords}/>)}
   <section id="review-architecture" className={styles.review} aria-labelledby="review-heading">
     <h2 id="review-heading"><small>04</small> Review Generated Architecture</h2>
     {site&&site.zones.length>0&&<section id="combined-site-plan"><h3>Combined site plan</h3>
@@ -160,7 +159,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
         <tbody>{result.provenance.heightRegions.map(b=><tr key={b.id}><td>{b.role}</td><td>{b.capFeet.toFixed(1)} ft</td><td>{b.builtFeet.toFixed(1)} ft</td></tr>)}</tbody>
       </table> : result?.provenance.adapter==='polygon-composition/v1'&&<p>{result.provenance.heightPolicy==='uniform limit'?'This polygon used a uniform height limit.':'This saved study predates regional height measurements. Generate Design creates a new study with the current site rules.'}</p>}
       <div className={styles.viewer}><OrientationView result={record} view={reference?referenceView:view}/></div>
-      {result&&<ArchitecturePresentation initialId={record.id} records={presentationRecords} key={record.id}/>}
+      {result&&<ArchitecturePresentation records={reference?[record]:boardRecords} key={record.id}/>}
       <div className={styles.alternative}><label>Alternative name<input aria-label="Alternative name" value={name} onChange={e=>setName(e.target.value)}/></label>
         <button disabled={!result||saving||!name.trim()} onClick={save}>Save Alternative</button>
         {record.site.origin!=='fixture'&&saved?.status==='complete'&&result&&<button onClick={()=>{try{
@@ -183,7 +182,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
       <h3 id="obj-export-heading">Export architectural forms</h3>
       <p>{record||group.length?'OBJ files use site coordinates in feet, with Y up.':'Generate a design or select a saved study to export its form.'}</p>
       <div className={styles.zoneTabs}>
-        <button type="button" disabled={!record||!result||renderingBoard} onClick={downloadBoard}>Download Presentation Board PNG</button>
+        <button type="button" disabled={!boardRecords.length||renderingBoard} onClick={downloadBoard}>Download Presentation Board PNG{boardRecords.length>1&&' ('+boardRecords.length+' zones)'}</button>
         <button type="button" disabled={exporting||!result} onClick={()=>record&&exportForms([record],(saved?.name??title)+'-'+record.id.slice(0,8))}>Download selected form OBJ</button>
         {group.length>0&&<button type="button" disabled={exporting} onClick={()=>exportForms(group,(site?.name??'site')+'-forms')}>Download site plan OBJ ({group.length} {group.length===1?'zone':'zones'})</button>}
       </div>

@@ -7,13 +7,24 @@ import {renderPresentation,sheetHeight,sheetWidth} from './renderPresentation';
 
 function label(r:OrientationResult){return r.site.zones.find(z=>z.id===r.zoneId)?.name??r.typologyName??'Selected study';}
 
-export default function ArchitecturePresentation({records,initialId,exportOnly=false}:{records:OrientationResult[];initialId?:string;exportOnly?:boolean}){
-  const [open,setOpen]=useState(false),[choice,setChoice]=useState(initialId??'all'),[image,setImage]=useState({key:'',url:''}),[error,setError]=useState('');
+export async function renderStudyBoard(records:Pick<OrientationResult,'id'|'geometryHash'>[],labels:string[]){
+  const meshes=await Promise.all(records.map(async ({id,geometryHash})=>{
+    const saved=await loadSavedArchitecture(id);
+    if(saved.parentOrientationId!==id||saved.parentGeometryHash!==geometryHash)throw Error('The saved form differs from its source study.');
+    return saved.architecture;
+  }));
+  return renderPresentation(meshes,labels);
+}
+
+export const boardLabels=(records:OrientationResult[])=>records.map(label);
+
+export default function ArchitecturePresentation({records,exportOnly=false}:{records:OrientationResult[];exportOnly?:boolean}){
+  const [open,setOpen]=useState(false),[choice,setChoice]=useState('all'),[image,setImage]=useState({key:'',url:''}),[error,setError]=useState('');
   const dialog=useRef<HTMLDialogElement>(null);
   const selected=records.some(r=>r.id===choice)?records.filter(r=>r.id===choice):records;
-  const labelKey=JSON.stringify(selected.map(label));
+  const labelKey=JSON.stringify(boardLabels(selected));
   const title=selected.map(label).join(' + ');
-  const ids=JSON.stringify(selected.map(r=>[r.id,r.geometryHash]));
+  const ids=JSON.stringify(selected.map(({id,geometryHash})=>({id,geometryHash})));
   const key=JSON.stringify([ids,labelKey]);
   const url=image.key===key?image.url:'';
   useEffect(()=>{
@@ -27,14 +38,7 @@ export default function ArchitecturePresentation({records,initialId,exportOnly=f
     let active=true,imageUrl='';
     setImage({key:'',url:''});setError('');
     async function render(){
-      const sources=JSON.parse(ids) as [string,string][];
-      const meshes=await Promise.all(sources.map(async ([id,hash])=>{
-        const saved=await loadSavedArchitecture(id);
-        if(saved.parentOrientationId!==id||saved.parentGeometryHash!==hash)throw Error('The saved form differs from its source study.');
-        return saved.architecture;
-      }));
-      if(!active)return;
-      const blob=await renderPresentation(meshes,JSON.parse(labelKey) as string[]);
+      const blob=await renderStudyBoard(JSON.parse(ids),JSON.parse(labelKey));
       if(active){imageUrl=URL.createObjectURL(blob);setImage({key,url:imageUrl});}
     }
     render().catch(e=>{if(active)setError(String(e));});
@@ -51,7 +55,7 @@ export default function ArchitecturePresentation({records,initialId,exportOnly=f
   </details>;
   if(!records.length)return null;
   return <>
-    <button type="button" onClick={()=>{setChoice(initialId??'all');setImage({key:'',url:''});setError('');setOpen(true);}}>Presentation views</button>
+    <button type="button" onClick={()=>{setChoice('all');setImage({key:'',url:''});setError('');setOpen(true);}}>Presentation views</button>
     {open&&<dialog ref={dialog} aria-label="Architectural presentation" onCancel={()=>setOpen(false)}
       style={{margin:'auto',width:'min(96vw, 1720px)',maxWidth:'96vw',maxHeight:'94vh',padding:16,background:'#101b22',color:'#f7f6f5',border:'1px solid #51646b'}}>
       <div style={{display:'flex',alignItems:'center',flexWrap:'wrap',gap:16,marginBottom:14}}>
