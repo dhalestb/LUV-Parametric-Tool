@@ -185,7 +185,11 @@ export function formTerritory(api:ManifoldToplevel,domain:CrossSection,origin:Po
       const roomFloor=lifts===2?level:shell;
       build('outer hall enclosure',subtract(band(domain,shell),doors),shell,upperLevel);
       build('inner room supports',core,shell,roomFloor);
-      build('room floors and landings',unite([rooms,landing]),roomFloor-shell,roomFloor);
+      // A circulation strip may re-enter a concave territory on the far
+      // side of an indentation. Only its runs that reach a room are landings.
+      const roomLandings=landing.decompose().map(piece=>own(piece))
+        .filter(piece=>intersect(piece,rooms).area()>0);
+      build('room floors and landings',unite([rooms,...roomLandings]),roomFloor-shell,roomFloor);
       build('inner room enclosures',subtract(wall,doors),roomFloor,upperLevel-shell);
       build('door headers',wall,roomFloor+number('doorHeightFeet'),upperLevel-shell);
       build('room roofs and perimeter planks',unite([rooms,band(domain,3)]),upperLevel-shell,upperLevel);

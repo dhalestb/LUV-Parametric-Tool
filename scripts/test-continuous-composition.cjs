@@ -93,6 +93,37 @@ async function main(){
     const batch=await generate();
     for(const r of batch.records)assert.equal(r.architecture.validation.connectedBodies,1);
   }
+  // Both drawn Miami zones, in site feet. A clipped detail in the second
+  // zone previously aborted the entire batch at the default 65% clustering.
+  project.zones[0].polygon=[
+    [1323.2165483067392,-2487.697455981793],[1088.4479030753585,-2420.800970074578],
+    [1090.9723746455338,-2273.1238899661494],[1136.411476217358,-2202.440904707371],
+    [1231.0761787125698,-2202.440904707371],[1257.5823675191784,-2178.4591874709376],
+    [1316.9055773850007,-2212.5385136498057],[1247.4847585767434,-2319.825296657628],
+    [1338.3629617203917,-2417.0144707230147]
+  ];
+  project.zones[1].polygon=[
+    [1099.2033506426278,-2140.54308619018],[1201.8104501598311,-2142.1216182644334],
+    [1234.1711381032876,-2112.9180811829574],[1299.6818667408008,-2113.7073472200836],
+    [1305.9961684647615,-2058.4573372056384],[1219.964002581113,-1860.346705932319],
+    [1220.7532686182396,-1788.521762284319],[1103.939120292335,-1781.4181945232315]
+  ];
+  state.site=await model.importSite(JSON.stringify(project),'file');
+  for(const [i,z] of state.site.zones.entries()){
+    const controls=state.territoryByZone[z.id].controls;
+    Object.assign(controls,{clustering:65,areaCutAngle:i===0?0:90,reserved:[]});
+    for(const t of model.TYPOLOGIES)state.assignments[z.id].shares[t]=t===(i===0?'void-field':'inserted-plate')?0:25;
+  }
+  const miami=await generate();
+  for(const {architecture,orientation} of miami.records){
+    assert.equal(architecture.validation.connectedBodies,1);
+    assert.equal(architecture.provenance.members.length,4);
+    for(const m of architecture.provenance.members){
+      assert(m.sourceCount>1);
+      assert(Math.abs(m.achievedPercent-25)<.0001);
+    }
+    console.log(orientation.typologyName,orientation.components.length,'source letters');
+  }
   state.site.zones[1].enabled=false;state.site.zones[0].inputParameters.maxHeightFeet=8;
   await assert.rejects(generate,/ft of height/);
   console.log('Passed exact shares, finished-mesh coverage, protected area, connectivity, height, zero shares, per-polygon clustering and deterministic replay.');
