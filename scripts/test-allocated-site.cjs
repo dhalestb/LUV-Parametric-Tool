@@ -22,7 +22,7 @@ async function main() {
   territory.geometryKernel = async () => kernel;
   global.fetch = async url => {
     const name = new URL(url, 'http://localhost').pathname;
-    assert.match(name, /^\/allocated-studies\/(?:[a-z-]+|vertical-void-lobby\/40-10)\.json\.gz$/);
+    assert.match(name, /^\/allocated-studies\/(?:[a-z-]+|vertical-void-lobby\/40-10|compressed-sequential-lobby\/20-15)\.json\.gz$/);
     return new Response(fs.readFileSync(root+'/public'+name));
   };
   const project = require('../public/experiment-inputs/two-zone.json');
@@ -96,6 +96,12 @@ async function main() {
   assert.equal(lobby.components.length,10);
   assert.equal(lobbyForm.provenance.members[0].source.engine,'bf7fc3c');
   assert.equal(lobbyForm.provenance.members[0].scale,1);
+  lobbyState.assignments[first.id].shares['vertical-void-lobby']=0;
+  lobbyState.assignments[first.id].shares['compressed-sequential-lobby']=100;
+  const [compressed]=(await generate(lobbyState)).records;
+  assert.equal(compressed.orientation.components.length,15);
+  assert.equal(compressed.architecture.provenance.members[0].source.engine,'bfce854');
+  assert.equal(compressed.architecture.provenance.members[0].scale,1);
   console.log('Passed native placement of all five studies, two-zone allocations, protection, height limits, repeatability, disabled zones and saved geometry hashes.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

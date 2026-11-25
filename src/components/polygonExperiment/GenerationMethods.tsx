@@ -2,7 +2,7 @@
 
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {descriptorNames,descriptorRegions,influenceVersion,type AreaShares,type Descriptor} from './descriptorInfluence';
-import {newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
+import {isLobbyTypology,newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
 import {defaults as territoryDefaults,geometryKernel,generateTerritories,currentTerritoryResult} from './territories';
 import {applyStudyUnits} from './syncSiteFeet';
 import {requestSiteWorker,WorkerAccess} from './workerClient';
@@ -78,7 +78,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   }
   const handoff=useSiteHandoff();
   const rows=method==='descriptor'?Object.entries(descriptorNames).map(([id,name])=>({id,name,value:areas[id as Descriptor]??0,locked:false,category:undefined})):
-    registry.items.filter(t=>method!=='hybrid-rule'||t.id!=='vertical-void-lobby').map(t=>({id:t.id,name:t.name,category:categoryByTypology[t.id],value:(method==='hybrid-rule'?rules:areaValues)[t.id]??0,
+    registry.items.filter(t=>method!=='hybrid-rule'||!isLobbyTypology(t.id)).map(t=>({id:t.id,name:t.name,category:categoryByTypology[t.id],value:(method==='hybrid-rule'?rules:areaValues)[t.id]??0,
       locked:method==='typology-area'&&(territory.locked[t.id]||!territory.enabled[t.id])}));
   const total=rows.reduce((sum,r)=>sum+r.value,0),positive=rows.filter(r=>r.value>0);
   const summary=positive.map(r=>r.name+' '+r.value+'%').join(' · ')||'No allocation selected';

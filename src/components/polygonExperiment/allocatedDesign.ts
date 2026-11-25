@@ -1,11 +1,15 @@
 import type {CrossSection,ManifoldToplevel} from 'manifold-3d';
-import {fingerprint,newAssignment,type Experiment,type Registry,type SiteInput,type Typology,type Zone} from './model';
+import {fingerprint,isLobbyTypology,newAssignment,type LobbyTypology,type Experiment,type Registry,type SiteInput,type Typology,type Zone} from './model';
 import {currentTerritoryResult,defaults,generateTerritories,geometryKernel,signedArea,type Ring,type Point,type Territory} from './territories';
 import type {OrientationResult} from './orientationStore';
 import type {HeightRecord} from './SiteRulePanel';
 import originalHashes from './allocated-study-hashes.json';
 import stackHashes from './vertical-lobby-stacks.json';
-export const hashes={...originalHashes,'vertical-void-lobby':stackHashes['40-10']};
+import sequenceHashes from './compressed-lobby-sequences.json';
+export const lobbyStudyHashes:Record<LobbyTypology,Record<string,string>>={
+  'vertical-void-lobby':stackHashes,'compressed-sequential-lobby':sequenceHashes
+};
+export const hashes={...originalHashes,'vertical-void-lobby':stackHashes['40-10'],'compressed-sequential-lobby':sequenceHashes['20-15']};
 
 type Mesh={positions:number[];indices:number[]};
 type Letter=OrientationResult['components'][number];
@@ -34,14 +38,15 @@ function cachedStudy(type:Typology,file:string,hash:string){
   if(!cache.has(file))cache.set(file,loadStudy(type,file,hash).catch(e=>{cache.delete(file);throw e;}));
   return cache.get(file)!;
 }
-export function lobbyStack(height:number,count:number){
+export function lobbyStudy(type:LobbyTypology,height:number,count:number){
   const key=height+'-'+count;
-  const hash=(stackHashes as Record<string,string>)[key];
-  if(!hash)throw Error('Unregistered Vertical Void Lobby field or stack size.');
-  return cachedStudy('vertical-void-lobby','vertical-void-lobby/'+key,hash);
+  const hash=lobbyStudyHashes[type][key];
+  if(!hash)throw Error('Unregistered field or population for '+type);
+  return cachedStudy(type,type+'/'+key,hash);
 }
 export function studyFor(type:Typology){
-  return type==='vertical-void-lobby'?lobbyStack(40,10):cachedStudy(type,type,hashes[type]);
+  if(isLobbyTypology(type))return type==='vertical-void-lobby'?lobbyStudy(type,40,10):lobbyStudy(type,20,15);
+  return cachedStudy(type,type,hashes[type]);
 }
 function bounds(r:Ring){
   const xs=r.map(p=>p[0]),zs=r.map(p=>p[1]);

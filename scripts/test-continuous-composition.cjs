@@ -141,7 +141,7 @@ async function main(){
   for(const [i,z] of state.site.zones.entries()){
     const controls=state.territoryByZone[z.id].controls;
     Object.assign(controls,{clustering:65,areaCutAngle:i===0?0:90,reserved:[]});
-    for(const t of model.TYPOLOGIES)state.assignments[z.id].shares[t]=t==='vertical-void-lobby'||t===(i===0?'void-field':'inserted-plate')?0:25;
+    for(const t of model.TYPOLOGIES)state.assignments[z.id].shares[t]=model.isLobbyTypology(t)||t===(i===0?'void-field':'inserted-plate')?0:25;
   }
   const {miamiParcelScale}=require('../src/components/siteDevelopment/siteImport.ts');
   // The native gold Site-layer extents distinguish the two saved Miami frames.
@@ -215,7 +215,29 @@ async function main(){
     assert.equal(orientation.components.filter(l=>l.id.startsWith(lobby+'/')).length,m.sourceCount);
     console.log('Miami lobby:',m.stacks.map(s=>s.key),m.achievedPercent,m.sourceCount);
   }
+  const compressed='compressed-sequential-lobby';
+  for(const [i,z] of lobbyState.site.zones.entries()){
+    const shares=lobbyState.assignments[z.id].shares;
+    shares[compressed]=shares['room-within-volume'];shares['room-within-volume']=0;
+    lobbyState.generation.zones[key(z)].letterTargets[compressed]=i===0?15:18;
+  }
+  const combined=await runLobby();
+  for(const [i,{architecture,orientation}] of combined.records.entries()){
+    const member=architecture.provenance.members.find(m=>m.typology===compressed);
+    assert.equal(member.sourceCount,i===0?15:18);
+    assert.equal(member.sequences.reduce((n,p)=>n+p.count,0),member.sourceCount);
+    assert(member.sequences.every(p=>p.sha256.length===64));
+    assert.equal(orientation.components.filter(l=>l.id.startsWith(compressed+'/')).length,member.sourceCount);
+    assert(Math.abs(member.achievedPercent-25)<.0001);
+    assert(architecture.provenance.members.some(m=>m.typology===lobby&&m.stacks.length));
+    assert.equal(architecture.validation.connectedBodies,1);
+    assert(architecture.provenance.heightRegions.every(r=>r.builtFeet<=r.capFeet+.001));
+    console.log('Miami compressed lobby:',member.sequences.map(p=>p.key),member.achievedPercent,member.sourceCount);
+  }
   const oldState=structuredClone(restored);
+  delete oldState.profiles[compressed];
+  for(const a of Object.values(oldState.assignments)){delete a.shares[compressed];delete a.variants[compressed];}
+  for(const t of Object.values(oldState.territoryByZone))for(const k of ['enabled','locked','minimumDiameter'])delete t.controls[k][compressed];
   delete oldState.profiles[lobby];
   for(const a of Object.values(oldState.assignments)){delete a.shares[lobby];delete a.variants[lobby];}
   for(const t of Object.values(oldState.territoryByZone))for(const k of ['enabled','locked','minimumDiameter'])delete t.controls[k][lobby];

@@ -1,14 +1,14 @@
 'use client';
 
 import {useEffect,useRef,useState,type ReactNode} from 'react';
-import {TYPOLOGIES,newAssignment,automaticLetterTarget,maxLetterTarget,type LetterTargets,type Typology,type Assignment,type SiteInput,type Zone,type Experiment,type Registry} from './model';
+import {isLobbyTypology,TYPOLOGIES,newAssignment,automaticLetterTarget,maxLetterTarget,type LetterTargets,type Typology,type Assignment,type SiteInput,type Zone,type Experiment,type Registry} from './model';
 import {categoryByTypology,type SpaceCategory} from './typologyCategories';
 import {currentTerritoryResult,compositionControls,generateTerritories,geometryKernel,type Result,type Controls,type Ring} from './territories';
 import {useArchitecture} from './ArchitectureLayer';
 import type {OrientationResult} from './orientationStore';
 import styles from './workflow.module.css';
 
-const colors=['#e2ad59','#70b7b1','#a4a3df','#d98573','#a8be72','#bd89c7'];
+const colors=['#e2ad59','#70b7b1','#a4a3df','#d98573','#a8be72','#bd89c7','#77a9d6'];
 const path=(rings:Ring[])=>rings.map(r=>'M'+r.map(([x,z])=>x+','+(-z)).join('L')+'Z').join('');
 function bounds(ring:Ring){
   const xs=ring.map(p=>p[0]),zs=ring.map(p=>p[1]);
@@ -54,7 +54,7 @@ export function CompositionDistribution({site,zone,assignment,controls,registry,
         return <div key={id}>
           <label htmlFor={id}>{name}</label>
           <output htmlFor={id}>{count} {count===1?'letter':'letters'}{custom===undefined?' · Auto':''}</output>
-          <input id={id} type="range" min={t.typology==='vertical-void-lobby'?2:1} max={maxLetterTarget} step={1} value={count}
+          <input id={id} type="range" min={isLobbyTypology(t.typology)?2:1} max={maxLetterTarget} step={1} value={count}
             aria-valuetext={count+' source letters'} onChange={e=>onLetterTarget(t.typology,Number(e.currentTarget.value))}/>
           {custom!==undefined&&<button type="button" className={styles.textButton} aria-label={'Use automatic count for '+name}
             onClick={()=>onLetterTarget(t.typology)}>Use auto</button>}
