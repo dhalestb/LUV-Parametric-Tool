@@ -8,7 +8,7 @@ import {useArchitecture} from './ArchitectureLayer';
 import type {OrientationResult} from './orientationStore';
 import styles from './workflow.module.css';
 
-const colors=['#e2ad59','#70b7b1','#a4a3df','#d98573','#a8be72','#bd89c7','#77a9d6','#b49b72'];
+const colors=['#e2ad59','#70b7b1','#a4a3df','#d98573','#a8be72','#bd89c7','#77a9d6','#b49b72','#d397ac'];
 const path=(rings:Ring[])=>rings.map(r=>'M'+r.map(([x,z])=>x+','+(-z)).join('L')+'Z').join('');
 function bounds(ring:Ring){
   const xs=ring.map(p=>p[0]),zs=ring.map(p=>p[1]);

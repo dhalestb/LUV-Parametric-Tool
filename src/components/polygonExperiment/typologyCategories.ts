@@ -9,6 +9,7 @@ export const categoryByTypology: Record<Typology, SpaceCategory> = {
   'vertical-walls': 'Gathering Spaces',
   'room-within-volume': 'Gathering Spaces',
   'void-field': 'Gathering Spaces',
+  'linear-gallery-lobby': 'Lobby Spaces',
   'topographic-ground-field-lobby': 'Lobby Spaces',
   'compressed-sequential-lobby': 'Lobby Spaces',
   'vertical-void-lobby': 'Lobby Spaces',

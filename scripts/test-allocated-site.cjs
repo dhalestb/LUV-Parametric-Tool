@@ -22,7 +22,7 @@ async function main() {
   territory.geometryKernel = async () => kernel;
   global.fetch = async url => {
     const name = new URL(url, 'http://localhost').pathname;
-    assert.match(name, /^\/allocated-studies\/(?:[a-z-]+|vertical-void-lobby\/40-10|compressed-sequential-lobby\/20-15|topographic-ground-field-lobby\/60-15)\.json\.gz$/);
+    assert.match(name, /^\/allocated-studies\/(?:[a-z-]+|vertical-void-lobby\/40-10|compressed-sequential-lobby\/20-15|topographic-ground-field-lobby\/60-15|linear-gallery-lobby\/reference-77)\.json\.gz$/);
     return new Response(fs.readFileSync(root+'/public'+name));
   };
   const project = require('../public/experiment-inputs/two-zone.json');
@@ -115,6 +115,16 @@ async function main() {
   assert.deepEqual(groundField.orientation.components.map(l=>l.letter),Array.from({length:15},(_,i)=>['U','L','V'][i%3]));
   const ys=groundField.architecture.architecture.positions.filter((_,i)=>i%3===1);
   assert(Math.abs(Math.min(...ys)-lobbyState.site.coordinates.elevationDatum)<1e-5);
-  console.log('Passed native placement of all five studies, two-zone allocations, protection, height limits, repeatability, disabled zones and saved geometry hashes.');
+  const gallery='linear-gallery-lobby';
+  lobbyState.assignments[first.id].shares[topo]=0;
+  lobbyState.assignments[first.id].shares[gallery]=100;
+  const [linear]=(await generate(lobbyState)).records;
+  const galleryMember=linear.architecture.provenance.members[0];
+  assert.equal(galleryMember.typology,gallery);
+  assert.equal(galleryMember.source.referenceStudy,77);
+  assert.equal(galleryMember.source.engine,'bfce854');
+  assert.equal(galleryMember.scale,1);
+  assert.deepEqual(linear.orientation.components.map(l=>l.letter),Array.from({length:15},(_,i)=>i%2?'U':'L'));
+  console.log('Passed native placement of gathering and lobby studies, two-zone allocations, protection, height limits, repeatability, disabled zones and saved geometry hashes.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

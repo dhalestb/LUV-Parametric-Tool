@@ -8,13 +8,15 @@ import stackHashes from './vertical-lobby-stacks.json';
 import sequenceHashes from './compressed-lobby-sequences.json';
 import fieldHashes from './topographic-lobby-fields.json';
 
-const referenceStudy:Record<LobbyTypology,[number,number]>={
-  'vertical-void-lobby':[40,10],'compressed-sequential-lobby':[20,15],'topographic-ground-field-lobby':[60,15]
+import galleryHashes from './linear-lobby-galleries.json';
+
+const referenceStudy:Record<LobbyTypology,string>={
+  'vertical-void-lobby':'40-10','compressed-sequential-lobby':'20-15','topographic-ground-field-lobby':'60-15','linear-gallery-lobby':'reference-77'
 };
 export const lobbyStudyHashes:Record<LobbyTypology,Record<string,string>>={
-  'vertical-void-lobby':stackHashes,'compressed-sequential-lobby':sequenceHashes,'topographic-ground-field-lobby':fieldHashes
+  'vertical-void-lobby':stackHashes,'compressed-sequential-lobby':sequenceHashes,'topographic-ground-field-lobby':fieldHashes,'linear-gallery-lobby':galleryHashes
 };
-export const hashes={...originalHashes,'vertical-void-lobby':stackHashes['40-10'],'compressed-sequential-lobby':sequenceHashes['20-15'],'topographic-ground-field-lobby':fieldHashes['60-15']};
+export const hashes={...originalHashes,'vertical-void-lobby':stackHashes['40-10'],'compressed-sequential-lobby':sequenceHashes['20-15'],'topographic-ground-field-lobby':fieldHashes['60-15'],'linear-gallery-lobby':galleryHashes['reference-77']};
 
 type Mesh={positions:number[];indices:number[]};
 type Letter=OrientationResult['components'][number];
@@ -50,7 +52,7 @@ export function lobbyStudy(type:LobbyTypology,height:number,count:number){
   return cachedStudy(type,type+'/'+key,hash);
 }
 export function studyFor(type:Typology){
-  if(isLobbyTypology(type))return lobbyStudy(type,...referenceStudy[type]);
+  if(isLobbyTypology(type))return cachedStudy(type,type+'/'+referenceStudy[type],hashes[type]);
   return cachedStudy(type,type,hashes[type]);
 }
 function bounds(r:Ring){

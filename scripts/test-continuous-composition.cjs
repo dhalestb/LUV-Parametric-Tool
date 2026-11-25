@@ -293,6 +293,50 @@ async function main(){
     assert(architecture.provenance.heightRegions.every(r=>r.builtFeet<=r.capFeet+.001));
     console.log('Miami topographic lobby:',m.fields.map(f=>f.key),m.achievedPercent,m.sourceCount);
   }
+  const linear='linear-gallery-lobby';
+  const prior=structuredClone(upgrade);
+  prior.territoryByZone=topoBatch.territoryByZone;
+  delete prior.profiles[linear];
+  for(const a of Object.values(prior.assignments)){delete a.shares[linear];delete a.variants[linear];}
+  for(const t of Object.values(prior.territoryByZone))for(const k of ['enabled','locked','minimumDiameter'])delete t.controls[k][linear];
+  const allLobbies=model.loadState(JSON.stringify(prior));
+  for(const [i,z] of allLobbies.site.zones.entries()){
+    const a=allLobbies.assignments[z.id],t=allLobbies.territoryByZone[z.id];
+    assert.equal(a.shares[linear],0);
+    assert.equal(a.variants[linear],'linear-gallery');
+    assert(territory.currentTerritoryResult(allLobbies.site,z,a,t.controls,t.results.area));
+    const remaining=model.TYPOLOGIES.find(id=>!model.isLobbyTypology(id)&&a.shares[id]>0);
+    assert(remaining);
+    a.shares[linear]=a.shares[remaining];a.shares[remaining]=0;
+    allLobbies.generation.zones[key(z)].letterTargets[linear]=i===0?8:18;
+  }
+  const galleries=await generateContinuousSite(allLobbies,registry,()=>null,()=>{});
+  for(const [i,{architecture,orientation}] of galleries.records.entries()){
+    const m=architecture.provenance.members.find(m=>m.typology===linear);
+    assert.equal(m.sourceCount,i===0?8:18);
+    assert(Math.abs(m.achievedPercent-25)<.0001);
+    assert.equal(m.galleries.length,i===0?1:2);
+    assert.equal(architecture.validation.connectedBodies,1);
+    assert(architecture.provenance.heightRegions.every(r=>r.builtFeet<=r.capFeet+.001));
+    assert.equal(architecture.provenance.members.filter(p=>model.isLobbyTypology(p.typology)).length,4);
+    for(const [j,g] of m.galleries.entries()){
+      assert.equal(g.sha256,require(dir+'linear-lobby-galleries.json')[g.key]);
+      const group=orientation.components.filter(l=>l.id.startsWith(linear+'/gallery-'+(j+1)+'/'));
+      assert.equal(group.length,g.count);
+      // Project the placed meshes onto the rotated gallery axis, in site feet.
+      const angle=g.headingDegrees*Math.PI/180;
+      let lastMax;
+      for(const [k,l] of group.entries()){
+        assert.equal(l.letter,k%2?'U':'L');
+        const xs=[];
+        for(let v=0;v<l.mesh.positions.length;v+=3)
+          xs.push(l.mesh.positions[v]*Math.cos(angle)+l.mesh.positions[v+2]*Math.sin(angle));
+        if(k)assert(Math.abs(Math.min(...xs)-lastMax-(k%2?-.747:1.013))<1e-5);
+        lastMax=Math.max(...xs);
+      }
+    }
+    console.log('Miami linear gallery:',m.galleries.map(g=>g.key),m.achievedPercent,m.sourceCount);
+  }
   const oldState=structuredClone(restored);
   delete oldState.profiles[compressed];
   for(const a of Object.values(oldState.assignments)){delete a.shares[compressed];delete a.variants[compressed];}

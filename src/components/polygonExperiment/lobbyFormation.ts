@@ -8,6 +8,7 @@ import type {Point,Ring} from './territories';
 const layouts={
   'vertical-void-lobby':{name:'Vertical Void Lobby',unit:'stack',collection:'stacks',limit:10,heights:[60,40,20],headings:[0]},
   'compressed-sequential-lobby':{name:'Compressed Sequential Lobby',unit:'sequence',collection:'sequences',limit:15,heights:[20],headings:[0,90,45,135,30,60,120,150]},
+  'linear-gallery-lobby':{name:'Linear Gallery Lobby',unit:'gallery',collection:'galleries',limit:15,heights:[20],headings:[0,90,45,135,30,60,120,150]},
   'topographic-ground-field-lobby':{name:'Topographic Lobby',unit:'field',collection:'fields',limit:15,heights:[60,40,20],headings:[0,90,45,135,30,60,120,150]},
 } satisfies Record<LobbyTypology,{name:string;unit:string;collection:string;limit:number;heights:number[];headings:number[]}>;
 type Mesh=Letter['mesh'];
