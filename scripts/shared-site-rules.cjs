@@ -50,5 +50,5 @@ async function plan(options={},data){
  result.proofHash=hash(result);return result;
  }finally{owned.reverse().forEach(s=>s.delete());}
 }
-module.exports={plan,distanceFunction,segmentDistance,hash,generationGate,READINESS};
+module.exports={plan,scalarClip,distanceFunction,segmentDistance,hash,generationGate,READINESS};
 if(require.main===module){let raw='';process.stdin.on('data',b=>raw+=b);process.stdin.on('end',()=>plan(raw?JSON.parse(raw):{}).then(r=>process.stdout.write(JSON.stringify(r))).catch(e=>{console.error(e.stack);process.exitCode=1;}));}

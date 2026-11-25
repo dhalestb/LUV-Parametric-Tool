@@ -4,7 +4,7 @@ import {useEffect,useState} from 'react';
 import {importSite,type SiteInput} from './model';
 import type {SiteDevelopmentProject} from '../siteDevelopment/types';
 export const SITE_RULE_KEY='luv-experiment-site-rule-plans-v1';
-export type HeightRecord={source:{zoneId:string;polygon:number[][];coordinates:SiteInput['coordinates']};regions:{id:string;role:'street'|'intermediate'|'water';heightFeet:20|40|60;polygon:number[][]}[]};
+export type HeightRecord={source:{zoneId:string;polygon:number[][];coordinates:SiteInput['coordinates']};regions:{id:string;role:'street'|'intermediate'|'water';heightFeet:20|40|60;contours?:number[][][];polygon:number[][]}[]};
 export function readSiteRules(site:SiteInput,zoneId:string):HeightRecord|null {const zone=site.zones.find(z=>z.id===zoneId);if(!zone)return null;const source={zoneId,polygon:zone.polygon,coordinates:site.coordinates};const records=JSON.parse(localStorage.getItem(SITE_RULE_KEY)??'[]') as HeightRecord[];if(!Array.isArray(records))throw Error('Site-rule storage invalid; original record retained');return records.slice().reverse().find(r=>JSON.stringify(r.source)===JSON.stringify(source))??null;}
 type Plan={status:string;blockers:string[];siteRules:{requestedTerritoryAreaFeet2:number;actualDomainAreaFeet2:number;unassignedAreaFeet2:number;overlapAreaFeet2:number;legacyZoneMaxHeightFeet:number|null;regions:{id:string;heightFeet:number;areaFeet2:number;contours:number[][][]}[]}};
 export default function SiteRulePanel({site,zoneId,allocationPercent=100,territory,typologyId='linear-edge-gallery'}:{site:SiteInput|null;zoneId:string|null;allocationPercent?:number;territory?:unknown;typologyId?:string}){

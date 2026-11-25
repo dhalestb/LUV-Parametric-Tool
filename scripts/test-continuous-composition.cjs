@@ -36,6 +36,31 @@ async function main(){
   state.territoryByZone[a.id].controls.reserved=[{id:'reserved',polygon:protection[0]}];
   Object.assign(state.assignments[b.id].shares,{'linear-edge-gallery':25,'inserted-plate':0,'vertical-walls':25,'room-within-volume':25,'void-field':25});
   const generate=()=>generateContinuousSite(state,registry,()=>null,()=>{});
+  // One continuous gallery crosses two supplied envelopes. Measure the exported
+  // world-space vertices inside each region, independently of the height report.
+  const explicit=structuredClone(state);
+  explicit.site.zones[1].enabled=false;
+  explicit.site.zones[0].polygon=[[0,0],[150,0],[150,180],[0,180]];
+  explicit.territoryByZone[a.id].controls.reserved=[];
+  for(const t of model.TYPOLOGIES)explicit.assignments[a.id].shares[t]=t==='linear-edge-gallery'?100:0;
+  const rect=(left,right)=>[[left,0],[right,0],[right,180],[left,180]];
+  const supplied={regions:[
+    {id:'high',role:'street',heightFeet:60,polygon:rect(0,75)},
+    {id:'low',role:'water',heightFeet:20,polygon:rect(75,150)}
+  ]};
+  const fromRegions=()=>generateContinuousSite(explicit,registry,()=>supplied,()=>{});
+  const [{architecture:measured}]=(await fromRegions()).records;
+  const peaks=[0,0],points=measured.architecture.positions;
+  for(let i=0;i<points.length;i+=3){
+    if(Math.abs(points[i]-75)<.001)continue;
+    const side=Number(points[i]>75);
+    peaks[side]=Math.max(peaks[side],points[i+1]-explicit.site.coordinates.elevationDatum);
+  }
+  assert.deepEqual(peaks,[60,20]);
+  supplied.regions[1].polygon=rect(76,150);
+  await assert.rejects(fromRegions,/uncovered/);
+  supplied.regions[1].polygon=rect(74,150);
+  await assert.rejects(fromRegions,/overlap/);
   let old,compactInterface;
   for(const clustering of [100,0,65]){
     state.territoryByZone[a.id].controls.clustering=clustering;
@@ -108,6 +133,10 @@ async function main(){
     [1305.9961684647615,-2058.4573372056384],[1219.964002581113,-1860.346705932319],
     [1220.7532686182396,-1788.521762284319],[1103.939120292335,-1781.4181945232315]
   ];
+  project.name='Miami waterfront study';
+  project.import={filename:'miami-waterfront.glb',sampleId:'miami-waterfront',format:'glb',modelFeetPerUnit:3.280839895};
+  project.constraints.heightLimitFeet=80;
+  for(const zone of project.zones)zone.maxHeightFeet=80;
   state.site=await model.importSite(JSON.stringify(project),'file');
   for(const [i,z] of state.site.zones.entries()){
     const controls=state.territoryByZone[z.id].controls;
@@ -131,6 +160,11 @@ async function main(){
       assert(m.sourceCount>1);
       assert(Math.abs(m.achievedPercent-25)<.0001);
     }
+    const bands=architecture.provenance.heightRegions;
+    console.log(orientation.typologyName,bands.map(b=>[b.role,b.capFeet,b.builtFeet]));
+    assert.deepEqual(bands.map(b=>b.capFeet),[60,40,20]);
+    assert(bands.every(b=>b.areaFeet2>0 && b.builtFeet<=b.capFeet+.001));
+    assert(bands[0].builtFeet>bands[1].builtFeet+5 && bands[1].builtFeet>bands[2].builtFeet+5);
     console.log(orientation.typologyName,orientation.components.length,'source letters');
   }
   state.site.zones[1].enabled=false;state.site.zones[0].inputParameters.maxHeightFeet=8;

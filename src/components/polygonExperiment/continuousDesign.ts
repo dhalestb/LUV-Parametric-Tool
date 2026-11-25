@@ -1,6 +1,7 @@
 import type {CrossSection,Manifold,ManifoldToplevel} from 'manifold-3d';
 import {fingerprint,newAssignment,type Experiment,type Registry,type SiteInput,type Zone} from './model';
-import {allocationAreaTolerance,compositionControls,currentTerritoryResult,generateTerritories,geometryKernel,signedArea,type Point,type Ring} from './territories';
+import {allocationAreaTolerance,compositionControls,currentTerritoryResult,generateTerritories,geometryKernel,type Point,type Ring} from './territories';
+import {siteHeightBands} from './compositionHeights';
 import type {HeightRecord} from './SiteRulePanel';
 import type {OrientationResult} from './orientationStore';
 import {studyFor} from './allocatedDesign';
@@ -10,24 +11,6 @@ import {formTerritory,projectMesh,siteMesh,type FormationPart,type PlanLayer} fr
 const recipe='Continuous polygon composition';
 type Plan=ReturnType<typeof generateTerritories>;
 
-function heightLimit(api:ManifoldToplevel,site:SiteInput,zone:Zone,t:CrossSection,rules:HeightRecord|null,origin:Point){
-  const siteCap=Number((site.constraints as {heightLimitFeet?:number}|null)?.heightLimitFeet??Infinity);
-  if(!rules?.regions.length)return Math.min(siteCap,Number(zone.inputParameters.maxHeightFeet??Infinity));
-  const sections:CrossSection[]=[];
-  try{
-    let cap=siteCap;
-    for(const r of rules.regions){
-      const ring:Ring=r.polygon.map(([x,z])=>[x-origin[0],z-origin[1]]);
-      const s=new api.CrossSection([signedArea(ring)<0?ring.reverse():ring]);sections.push(s);
-      const overlap=s.intersect(t);sections.push(overlap);
-      if(overlap.area()>1e-6)cap=Math.min(cap,r.heightFeet);
-    }
-    const covered=api.CrossSection.union(sections),gap=t.subtract(covered);sections.push(covered,gap);
-    if(gap.area()>1e-6)throw Error('The supplied height regions leave part of a composition uncovered.');
-    return cap;
-  }finally{sections.forEach(s=>s.delete());}
-}
-
 async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Plan,registry:Registry,clustering:number,
   rules:HeightRecord|null,runId:string,progress:(s:string)=>void){
   const owned:{delete():void}[]=[];
@@ -35,20 +18,23 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
   const xs=zone.polygon.map(p=>p[0]),zs=zone.polygon.map(p=>p[1]);
   const origin:Point=[(Math.min(...xs)+Math.max(...xs))/2,(Math.min(...zs)+Math.max(...zs))/2];
   const relative=(rings:Ring[])=>rings.map(r=>r.map(([x,z]):Point=>[x-origin[0],z-origin[1]]));
-  const datum=site.coordinates.elevationDatum,letters:OrientationResult['components']=[],components:FormationPart[]=[],planLayers:PlanLayer[]=[];
+  const letters:OrientationResult['components']=[],components:FormationPart[]=[],planLayers:PlanLayer[]=[];
   const formed:Manifold[]=[],members=[];
   let sourceArea=0;
   try{
     const permitted=own(new api.CrossSection(relative(plan.permitted),'NonZero'));
+    const envelope=siteHeightBands(api,site,zone,rules,permitted,origin,own);
+    const datum=envelope.base;
     for(const t of plan.territories){
       const rule=registry.items.find(r=>r.id===t.typology)!;
       progress('Forming '+rule.name+' in '+zone.name+'…');
       await new Promise(resolve=>setTimeout(resolve,0));
       if(t.screen==='infeasible')throw Error(rule.name+' cannot meet its minimum planning diameter with this layout. Adjust its share or clustering.');
       const region=own(new api.CrossSection(relative(t.contours),'NonZero'));
-      const cap=heightLimit(api,site,zone,region,rules,origin);
+      const bands=envelope.bands.filter(b=>own(region.intersect(b.section)).area()>1e-7);
+      const cap=bands.length?Math.max(...bands.map(b=>b.cap)):envelope.zoneCap;
       const result=formTerritory(api,region,origin,datum,rule,await studyFor(rule.id),
-        [t.label[0]-origin[0],t.label[1]-origin[1]],clustering,cap);
+        [t.label[0]-origin[0],t.label[1]-origin[1]],clustering,cap,bands);
       formed.push(own(result.solid));
       if(result.height>cap+1e-5)throw Error(rule.name+' exceeds the site height limit.');
       sourceArea+=result.sourceArea;letters.push(...result.letters);components.push(...result.parts);planLayers.push(...result.layers);
@@ -75,7 +61,21 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
     const protectedArea=plan.protected.length?own(finished.intersect(own(new api.CrossSection(relative(plan.protected),'NonZero')))).area():0;
     const tolerance=Math.max(.01,plan.allocatableArea*1e-6);
     if(Math.max(outside,missing,protectedArea)>tolerance)throw Error('Finished architecture failed the measured site area or protection check.');
-    const provenance={entry:recipe,adapter:'polygon-composition/v1',runId,clustering,members,territorySignature:plan.signature,
+    const heightRegions=envelope.bands.map(b=>{
+      const prism=own(b.section.extrude(final.boundingBox().max[2]+1));
+      const occupied=own(final.intersect(prism));
+      const above=own(occupied.trimByPlane([0,0,1],b.cap+.0001));
+      const excessArea=above.isEmpty()?0:own(above.project()).area();
+      if(excessArea>Math.max(.001,b.section.area()*1e-8))
+        throw Error('Finished architecture exceeds the '+b.role+' envelope over '+excessArea.toFixed(4)+' ft².');
+      // Coincident faces at a stepped roof belong to both closed prisms.
+      // Measure the local peak inside the band and audit excess over its full area above.
+      const interior=own(b.section.offset(-.0001));
+      const measured=own(final.intersect(own(interior.extrude(final.boundingBox().max[2]+1))));
+      const builtFeet=measured.isEmpty()?0:measured.boundingBox().max[2];
+      return {id:b.id,role:b.role,capFeet:b.cap,builtFeet,excessAreaFeet2:excessArea,areaFeet2:b.section.area()};
+    });
+    const provenance={heightPolicy:envelope.reference,heightRegions,entry:recipe,adapter:'polygon-composition/v1',runId,clustering,members,territorySignature:plan.signature,
       buildableAreaFeet2:plan.allocatableArea,grossAreaFeet2:plan.grossArea,areaBasis:'Horizontal projection of the finished architecture, including open court floors and terraces, measured against buildable polygon area.'};
     const id=crypto.randomUUID(),height=final.boundingBox().max[2];
     const orientation:OrientationResult={id,version:1,kind:'orientation-only',typologyId:'continuous-site',typologyName:zone.name+' · continuous composition',

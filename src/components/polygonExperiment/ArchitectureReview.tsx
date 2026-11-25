@@ -118,6 +118,11 @@ export default function ArchitectureReview({state,registry,results,selected,view
         <thead><tr><th>Typology</th><th>Requested</th><th>Built share</th><th>Footprint</th><th>Source letters</th></tr></thead>
         <tbody>{result.provenance.members?.map(m=><tr key={m.typology}><td>{m.name}</td><td>{m.allocatedPercent}%</td><td>{m.achievedPercent.toFixed(2)}%</td><td>{m.footprintAreaFeet2.toLocaleString(undefined,{maximumFractionDigits:1})} ft²</td><td>{m.sourceCount??'—'}</td></tr>)}</tbody>
       </table>}
+      {result?.provenance.heightRegions?.length ? <table className={styles.areaReport}>
+        <caption>Site heights above base · {result.provenance.heightPolicy}</caption>
+        <thead><tr><th>Region</th><th>Height limit</th><th>Built height</th></tr></thead>
+        <tbody>{result.provenance.heightRegions.map(b=><tr key={b.id}><td>{b.role}</td><td>{b.capFeet.toFixed(1)} ft</td><td>{b.builtFeet.toFixed(1)} ft</td></tr>)}</tbody>
+      </table> : result?.provenance.adapter==='polygon-composition/v1'&&<p>{result.provenance.heightPolicy==='uniform limit'?'This polygon used a uniform height limit.':'This saved study predates regional height measurements. Generate Design creates a new study with the current site rules.'}</p>}
       <div className={styles.viewer}><OrientationView result={record} view={reference?referenceView:view}/></div>
       <div className={styles.alternative}><label>Alternative name<input aria-label="Alternative name" value={name} onChange={e=>setName(e.target.value)}/></label>
         <button disabled={!result||saving||!name.trim()} onClick={save}>Save Alternative</button>
