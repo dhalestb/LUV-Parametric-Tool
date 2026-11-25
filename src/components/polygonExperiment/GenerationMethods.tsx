@@ -1,9 +1,9 @@
 'use client';
 
-import {useEffect,useState,type ReactNode} from 'react';
+import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {descriptorNames,descriptorRegions,influenceVersion,type AreaShares,type Descriptor} from './descriptorInfluence';
 import {newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
-import {defaults as territoryDefaults} from './territories';
+import {defaults as territoryDefaults,geometryKernel,generateTerritories} from './territories';
 import {requestSiteWorker} from './workerClient';
 import {readSiteRules} from './SiteRulePanel';
 import {saveBrowserDesign} from './browserDesigns';
@@ -40,6 +40,28 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   const assignment=(zoneId&&state.assignments[zoneId])||newAssignment();
   const areaValues=(!zone&&pending['typology-area'])||assignment.shares;
   const territory=(zoneId&&state.territoryByZone[zoneId]?.controls)||territoryDefaults();
+  const latest=useRef(state);
+  latest.current=state;
+  const [preparing,setPreparing]=useState(false),[planNotice,setPlanNotice]=useState('');
+  useEffect(()=>{setMessage('');setPlanNotice('');},[site?.fingerprint,zoneId,method]);
+  async function prepareAreas(){
+    if(!site||!state.unitsConfirmed||site.coordinates.unitAssumption!=='confirmed'||!site.protectionMetadataComplete||preparing)return;
+    setPreparing(true);setPlanNotice('');
+    try{
+      const kernel=await geometryKernel();
+      if(latest.current!==state)throw Error('Site settings changed. Prepare territories again.');
+      const next={...state.territoryByZone};
+      for(const z of site.zones.filter(z=>z.enabled)){
+        try{
+          const c=next[z.id]?.controls??territoryDefaults();
+          const area=generateTerritories(kernel,site,z,state.assignments[z.id]??newAssignment(),c,'area',registry);
+          if(!area.metrics.valid)throw Error('Territory validation failed.');
+          next[z.id]={controls:c,results:{...next[z.id]?.results,area}};
+        }catch(e){throw Error(z.name+' · '+(e instanceof Error?e.message:String(e)));}
+      }
+      patch({territoryByZone:next});setPlanNotice('Territories prepared. Review the combined site plan in Section 4.');
+    }catch(e){setPlanNotice(e instanceof Error?e.message:String(e));}finally{setPreparing(false);}
+  }
   const handoff=useSiteHandoff();
   const rows=method==='descriptor'?Object.entries(descriptorNames).map(([id,name])=>({id,name,value:areas[id as Descriptor]??0,locked:false})):
     registry.items.map(t=>({id:t.id,name:t.name,value:(method==='hybrid-rule'?rules:areaValues)[t.id],
@@ -55,7 +77,8 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
     setMessage('');
     patch({generation:{method,zones:{...zones,[draftKey]:{...draft,fullZone:{...draft.fullZone,[method]:full?handoffId:undefined}}}}});
   }
-  const supportedSite=site?.fingerprint==='662e7000dd4f4982c7205c443e24fb3dc05aca1fa7a77d1e910933c9b38bb637'&&zoneId==='zone-1-1210';
+  const originalMiami=site?.fingerprint==='662e7000dd4f4982c7205c443e24fb3dc05aca1fa7a77d1e910933c9b38bb637';
+  const supportedSite=originalMiami&&zoneId==='zone-1-1210';
   const unsupported=method==='hybrid-rule'?positive.filter(r=>!supportedPair.includes(r.id as Typology)):[];
   let scoreError='',regions:ReturnType<typeof descriptorRegions>=[];
   if(method==='descriptor'&&!percentageError)try{regions=descriptorRegions(areas);}catch(e){scoreError=String(e);}
@@ -72,16 +95,19 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   let reason='',fix:ReactNode=null;
   if(!site||!zone){reason='Select a site and polygon before generating.';fix=recovery;}
   else if(!zone.enabled){reason='This polygon is disabled in the site project.';fix=<button onClick={()=>reveal('select-site')}>Select another polygon</button>;}
-  else if(!state.unitsConfirmed||site.coordinates.unitAssumption!=='confirmed'||!site.protectionMetadataComplete){
-    reason='Confirmed site units and complete protection geometry are required.';
+  else if(!state.unitsConfirmed||site.coordinates.unitAssumption!=='confirmed'){
+    reason='Confirm the model units in Site Development, then refresh the polygons in Section 1.';
+    fix=site.coordinates.unitAssumption==='confirmed'?<button onClick={()=>reveal('select-site')}>Confirm declared units</button>:<a href="/site-development">Open Site Development</a>;
+  }else if(!site.protectionMetadataComplete){
+    reason='Refresh the site polygons to import their protection geometry.';
     fix=<button onClick={()=>reveal('select-site')}>Review site input</button>;
   }else if(percentageError){reason=percentageError;fix=<button onClick={()=>reveal('allocation-inputs')}>Edit percentages</button>;}
   else if(unsupported.length||(method==='hybrid-rule'&&positive.length!==2)){
     reason=unsupported.length?'Rule connections are unverified for '+unsupported.map(r=>r.name).join(', ')+'.':'Both Plate and Stepped require positive influence.';
     fix=<button onClick={()=>{setMessage('');patch({generation:{method,zones:{...zones,[draftKey]:{...draft,rules:defaultRules}}}});}}>Use verified 50% Plate / 50% Stepped</button>;
   }else if(method!=='typology-area'&&!supportedSite){
-    reason='This rule relationship is verified in Miami Cluster Zone 1.';
-    fix=site.zones.some(z=>z.id==='zone-1-1210')?<button onClick={()=>patch({focus:'zone-1-1210'})}>Select Miami Cluster Zone 1</button>:recovery;
+    reason='This rule relationship is verified for the original Miami Cluster Zone 1 geometry. Use Typology Area Distribution on a newly drawn polygon.';
+    fix=originalMiami?<button onClick={()=>patch({focus:'zone-1-1210'})}>Select Miami Cluster Zone 1</button>:<button onClick={()=>selectMethod('typology-area')}>Use Typology Area Distribution</button>;
   }else if(method!=='typology-area'&&handoff.enabled&&!useFullZone){
     reason='An independent site handoff is applied. This method requires the full selected polygon.';
     fix=<button onClick={()=>chooseDomain(true)}>Use full polygon for this method</button>;
@@ -111,8 +137,9 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       <h2 id="method-heading"><small>02</small> Choose Generation Method</h2>
       <div className={styles.methodGrid} role="group" aria-label="Generation method">{methods.map((m,i)=><button type="button" key={m.id} className={styles.method} disabled={busy} aria-pressed={method===m.id} onClick={()=>selectMethod(m.id)}>
         <span>Method {i+1}</span><strong>{m.name}</strong><em>{m.label}</em></button>)}</div>
+      {site&&site.zones.length>1&&<div className={styles.zoneTabs} role="group" aria-label="Edit polygon allocation">{site.zones.map(z=><button key={z.id} disabled={busy||preparing} aria-pressed={z.id===zoneId} onClick={()=>patch({focus:z.id})}>{z.name}</button>)}</div>}
       <fieldset className={styles.inputs} id="allocation-inputs" disabled={busy}>
-        <legend>{method==='hybrid-rule'?'Architectural rule influence':method==='typology-area'?'Polygon area by typology':'Polygon area by descriptor'}</legend>
+        <legend>{method==='hybrid-rule'?'Architectural rule influence':method==='typology-area'?'Polygon area by typology':'Polygon area by descriptor'}{zone&&' · '+zone.name}</legend>
         <div className={styles.fields}>{rows.map(r=><label key={r.id}>{r.name}<span><input aria-label={r.name+' percentage'} type="number" min="0" max="100" step="any" onFocus={e=>e.currentTarget.select()} value={r.value} disabled={r.locked} onChange={e=>edit(r.id,Number(e.target.value))}/><b>%</b></span>{r.locked&&<em>Locked or disabled</em>}</label>)}</div>
       </fieldset>
       {!zone&&<p>Set your percentages now. Select a polygon to apply them and generate.</p>}
@@ -123,6 +150,8 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         const next={...pending};delete next[method];storePending(next);setMessage('');
       }}>Apply draft percentages to this polygon</button>}
       <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>Building footprint coverage is measured after generation.</span></div>
+      {method==='typology-area'&&site&&<div className={styles.zoneTabs}><button type="button" onClick={prepareAreas} disabled={busy||preparing||!state.unitsConfirmed||site.coordinates.unitAssumption!=='confirmed'||!site.protectionMetadataComplete||!site.zones.some(z=>z.enabled)}>{preparing?'Preparing territories…':'Prepare site territories'}</button><a href="#combined-site-plan">View site plan</a></div>}
+      {method==='typology-area'&&planNotice&&<p role="status">{planNotice}</p>}
       {method==='typology-area'&&<button className={styles.textButton} onClick={openTerritories}>Territory allocation &amp; constraints ↗</button>}
       {method==='hybrid-rule'&&<p className={styles.note}>Verified pair · Inserted Horizontal Plate guides native Stepped Rule A placement. Stepped Rule B forms the architecture. Other rule connections await validation.</p>}
       {method==='descriptor'&&<div className={styles.scorePanel}><strong>Verified typology contributions</strong>

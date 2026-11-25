@@ -36,6 +36,32 @@ export async function importSite(raw:string,origin:SiteInput['origin']):Promise<
  const project=json as SiteDevelopmentProject;
  return {protectionMetadataComplete:true,corridors:structuredClone(json.corridors??[]),reservedAreas:structuredClone(json.reservedAreas??[]),name:project.name,revision:`site-diagram:${encodeURIComponent(project.name)}:v${project.version}:${project.savedAt||'unsaved'}`,fingerprint:await fingerprint(json),coordinates:structuredClone(project.coordinates),origin,zones:project.zones.map(zone=>{const {polygon,...parameters}=zone;return {id:zone.id,name:zone.name,polygon:structuredClone(polygon),holes:structuredClone((zone as typeof zone & {holes?:Ring[]}).holes??[]),enabled:zone.enabled!==false,areaFeet2:polygonArea(polygon),inputParameters:parameters};}),exclusions:project.exclusions.map(z=>({id:z.id,polygon:structuredClone(z.polygon)})),constraints:structuredClone(project.constraints)};
 }
+export function withImportedSite(state:Experiment,site:SiteInput):Experiment {
+  const previous=state.site;
+  const sameSnapshot=previous?.fingerprint===site.fingerprint&&previous.revision===site.revision;
+  const generation=state.generation?{...state.generation,zones:{...state.generation.zones}}:undefined;
+  const assignments:Experiment['assignments']={};
+  const territoryByZone:Experiment['territoryByZone']=sameSnapshot?state.territoryByZone:{};
+  const sameFrame=previous&&JSON.stringify({...previous.coordinates,unitAssumption:'confirmed'})===JSON.stringify({...site.coordinates,unitAssumption:'confirmed'});
+  for(const zone of site.zones){
+    const old=previous?.zones.find(z=>z.id===zone.id);
+    const sameBoundary=previous?.name===site.name&&previous.origin===site.origin&&old&&
+      JSON.stringify([old.polygon,old.holes])===JSON.stringify([zone.polygon,zone.holes]);
+    assignments[zone.id]=sameBoundary&&state.assignments[zone.id]||newAssignment();
+    if(!sameSnapshot&&sameBoundary&&sameFrame&&state.territoryByZone[zone.id]){
+      territoryByZone[zone.id]={controls:state.territoryByZone[zone.id].controls,results:{}};
+    }
+    if(!sameSnapshot&&sameBoundary&&generation){
+      const prior=generation.zones[JSON.stringify([previous!.fingerprint,zone.id])];
+      if(prior)generation.zones[JSON.stringify([site.fingerprint,zone.id])]={rules:prior.rules,descriptors:prior.descriptors};
+    }
+  }
+  const enabled=site.zones.filter(z=>z.enabled).map(z=>z.id);
+  return {...state,site,generation,assignments,unitsConfirmed:site.coordinates.unitAssumption==='confirmed',
+    selected:sameSnapshot?state.selected:enabled,focus:state.focus&&enabled.includes(state.focus)?state.focus:enabled[0]??null,
+    territoryByZone};
+}
+
 /** Board X/Y plan, Z up -> Site X/Z plan, Y up. Both domains already use feet. */
 export function boardToSite(p:[number,number,number],origin:[number,number,number]):[number,number,number] {return [origin[0]+p[0],origin[1]+p[2],origin[2]+p[1]];}
 export function siteToBoard(p:[number,number,number],origin:[number,number,number]):[number,number,number] {return [p[0]-origin[0],p[2]-origin[2],p[1]-origin[1]];}

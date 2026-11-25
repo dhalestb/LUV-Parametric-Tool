@@ -3,6 +3,8 @@ import {useEffect,useRef,useState} from 'react';
 import view from './workflow.module.css';
 import {reveal} from './WorkflowAction';
 import {STORAGE_KEY,initialState,newAssignment,importSite,loadState,provenance,type Experiment,type Registry,type Typology} from './model';
+import SitePlan from './SitePlan';
+import {withImportedSite} from './model';
 import TerritoryWorkspace from './TerritoryWorkspace';
 import DescriptorProfiles from './DescriptorProfiles';
 import OrientationPanel from './OrientationPanel';
@@ -23,7 +25,7 @@ export default function Studio({registry}:{registry:Registry}){
  const rules=registry.items.find(t=>t.id===ruleType)!;
  const patch=(value:Partial<Experiment>)=>setState(s=>({...s,...value}));
  function updateAssignment(id:Typology,share:number){if(!focus||!assignment||state.territoryByZone[focus.id]?.controls.locked[id])return;patch({assignments:{...state.assignments,[focus.id]:{...assignment,shares:{...assignment.shares,[id]:Math.max(0,Math.min(100,share))}}}});}
- async function read(raw:string,origin:'file'|'fixture'){try{const parsed=JSON.parse(raw);if(parsed.settings){setState(loadState(raw));setNotice('Restored experimental settings and derived territory polygons.');return;}const site=await importSite(raw,origin);setState(s=>({...s,site,selected:site.zones.filter(z=>z.enabled).map(z=>z.id),focus:site.zones.find(z=>z.enabled)?.id??null,unitsConfirmed:site.coordinates.unitAssumption==='confirmed',territoryByZone:s.site?.fingerprint===site.fingerprint?s.territoryByZone:{},assignments:s.site?.fingerprint===site.fingerprint?s.assignments:Object.fromEntries(site.zones.map(z=>[z.id,newAssignment()]))}));setNotice(`${site.name} copied as an immutable input. ${site.zones.length} polygons · ${site.exclusions.length} exclusions.`);}catch(error){setNotice(error instanceof Error?error.message:'Import failed');}}
+ async function read(raw:string,origin:'file'|'fixture'){try{const parsed=JSON.parse(raw);if(parsed.settings){setState(loadState(raw));setNotice('Restored experimental settings and derived territory polygons.');return;}const site=await importSite(raw,origin);setState(s=>withImportedSite(s,site));setNotice(`${site.name} copied as an immutable input. ${site.zones.length} polygons · ${site.exclusions.length} exclusions.`);}catch(error){setNotice(error instanceof Error?error.message:'Import failed');}}
  function download(){const file={settings:state,provenance:provenance(state,registry)};const url=URL.createObjectURL(new Blob([JSON.stringify(file,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='polygon-architecture-experiment.json';a.click();URL.revokeObjectURL(url);}
  const allPoints=state.site?[...state.site.zones,...state.site.exclusions].flatMap(z=>z.polygon):[];
  const minX=Math.min(0,...allPoints.map(p=>p[0])),minZ=Math.min(0,...allPoints.map(p=>p[1])),width=Math.max(100,...allPoints.map(p=>p[0]))-minX,depth=Math.max(100,...allPoints.map(p=>p[1]))-minZ,pad=Math.max(width,depth)*.09;
@@ -32,13 +34,13 @@ export default function Studio({registry}:{registry:Registry}){
   <header className={view.masthead}><div><span className={view.brand}>LUV <i/> FIELD LAB</span><h1>Polygon-Driven Architecture</h1></div><a href="#review-architecture">Review architecture ↓</a></header>
   <section className={view.site} id="select-site" aria-labelledby="site-heading">
    <div><h2 id="site-heading"><small>01</small> Select Site</h2><strong className={view.siteName}>{state.site?.name??'Choose a site to begin'}</strong>
-    {state.site?<label className={view.inline}>Polygon <select aria-label="Selected site polygon" value={focus?.id??''} onChange={e=>patch({focus:e.target.value})}>{state.site.zones.map(z=><option key={z.id} value={z.id}>{z.name}</option>)}</select>{focus&&<span>{Math.round(focus.areaFeet2).toLocaleString()} ft²</span>}</label>:<p>Restore the Miami study or import a Site Development project.</p>}
+    {state.site?<label className={view.inline}>{state.site.zones.length} {state.site.zones.length===1?'polygon':'polygons'} · Editing <select aria-label="Selected site polygon" value={focus?.id??''} onChange={e=>patch({focus:e.target.value})}>{state.site.zones.map(z=><option key={z.id} value={z.id}>{z.name}</option>)}</select>{focus&&<span>{Math.round(focus.areaFeet2).toLocaleString()} ft²</span>}</label>:<p>Restore the Miami study or import a Site Development project.</p>}
     {state.site&&!state.unitsConfirmed&&state.site.coordinates.unitAssumption==='confirmed'&&<label><input type="checkbox" checked={false} onChange={()=>patch({unitsConfirmed:true})}/> Confirm the declared site units</label>}
-    {state.site&&state.site.coordinates.unitAssumption!=='confirmed'&&<a href="/site-development">Review model units in Site Development</a>}
+    {state.site&&state.site.coordinates.unitAssumption!=='confirmed'&&<p>In <a href="/site-development">Site Development</a>, open <b>1. Site Model</b>, check Units and choose <b>Confirm site units</b>. Then return and select <b>Use Site Development polygons</b>.</p>}
     <div className={view.siteActions}>{!state.site&&<a className={view.goldLink} href="/experiment-recovery/index.html">Restore Miami Checkpoint</a>}<button onClick={()=>input.current?.click()}>Import Site JSON</button><button onClick={async()=>{try{const raw=localStorage.getItem('vul-site-development-v1');if(!raw)throw Error('No local Site Development project. Restore the Miami checkpoint or import a project.');await read(raw,'file');}catch(e){setNotice(String(e));}}}>Use Site Development polygons</button>{state.site&&<a href="/experiment-recovery/index.html">Restore Miami Checkpoint</a>}</div>
     <input ref={input} type="file" accept=".json" hidden aria-label="Import Site Development JSON" onChange={async e=>{const file=e.target.files?.[0];e.target.value='';if(file)await read(await file.text(),'file');}}/>{notice&&<p role="status">{notice}</p>}
    </div>
-   {focus&&<div className={view.miniPlan}><svg viewBox={(()=>{const x=focus.polygon.map(p=>p[0]),y=focus.polygon.map(p=>p[1]),w=Math.max(...x)-Math.min(...x),h=Math.max(...y)-Math.min(...y),p=Math.max(w,h)*.15;return [Math.min(...x)-p,-Math.max(...y)-p,w+2*p,h+2*p].join(' ');})()} role="img" aria-label="Selected polygon boundary"><path d={[focus.polygon,...focus.holes].map(r=>'M'+pts(r)+'Z').join(' ')} fillRule="evenodd" vectorEffect="non-scaling-stroke"/></svg><span>{focus.name}</span></div>}
+   {state.site&&<SitePlan state={state} site={state.site} focusZone={id=>patch({focus:id})}/>}
   </section>
   {ready&&<OrientationPanel state={state} registry={registry} patch={patch} openTerritories={()=>{setTab('territories');requestAnimationFrame(()=>reveal('territory-allocation'));}}/>}
   <details className={view.advanced} id="advanced-workspace" onToggle={e=>setAdvancedOpen(e.currentTarget.open)}><summary>Advanced Settings &amp; Technical Details</summary>

@@ -7,18 +7,21 @@ import {DisplayModeSelector} from './architecturalDisplay';
 import {readLibrary,writeLibrary,saveDesignReference,publishDesign,type DesignReference} from './alternatives';
 import {readOrientation,saveOrientation,selectionDefault,type OrientationResult,type OrientationSelection} from './orientationStore';
 import cohort from './hybrid-cohort.json';
+import type {Experiment,Registry} from './model';
+import SitePlan from './SitePlan';
 import styles from './workflow.module.css';
 
+const CombinedArchitecture=dynamic(()=>import('./CombinedArchitecture'),{ssr:false});
 const OrientationView=dynamic(()=>import('./OrientationView'),{ssr:false});
 const references=[
   {id:'miami-plate-stepped-v1',name:'Plate-influenced Stepped Amphitheater · 50% Plate / 50% Stepped'},
   {id:cohort.forms[0].study,name:'Independent Stepped Amphitheater'},
   {id:cohort.forms[1].study,name:'Independent Inserted Horizontal Plate'}
 ];
-type Props={results:OrientationResult[];selected?:OrientationResult;view:OrientationSelection;reference:string;
+type Props={state:Experiment;registry:Registry;results:OrientationResult[];selected?:OrientationResult;view:OrientationSelection;reference:string;
   setReference:(id:string)=>void;select:(id:string|null)=>void;onSaved:(r:OrientationResult)=>void;children:ReactNode};
 
-export default function ArchitectureReview({results,selected,view,reference,setReference,select,onSaved,children}:Props){
+export default function ArchitectureReview({state,registry,results,selected,view,reference,setReference,select,onSaved,children}:Props){
   const [referenceView,setReferenceView]=useState(selectionDefault);
   const [loaded,setLoaded]=useState<{id:string;record:OrientationResult}>(),[notice,setNotice]=useState('');
   const [library,setLibrary]=useState<DesignReference[]>([]),[name,setName]=useState(''),[saving,setSaving]=useState(false);
@@ -56,9 +59,31 @@ export default function ArchitectureReview({results,selected,view,reference,setR
       onSaved(record);setNotice('Alternative saved in this browser.');
     }catch(e){setNotice(String(e));}finally{setSaving(false);}
   }
+  const [zoneChoices,setZoneChoices]=useState<Record<string,string>>({});
+  const [showSite3D,setShowSite3D]=useState(false);
+  const site=state.site;
+  const matches=(site?.zones??[]).map(zone=>{
+    const options=library.filter(d=>d.status==='complete'&&d.zoneId===zone.id&&d.site.fingerprint===site!.fingerprint&&d.site.revision===site!.revision)
+      .flatMap(d=>{const r=results.find(r=>r.id===d.id&&r.geometryHash===d.orientationHash&&r.zoneId===zone.id&&r.site.fingerprint===site!.fingerprint&&r.site.revision===site!.revision);return r?[{d,r}]:[];})
+      .sort((a,b)=>b.d.createdAt.localeCompare(a.d.createdAt));
+    const key=JSON.stringify([site!.fingerprint,zone.id]);
+    const choice=zoneChoices[key];
+    const shown=choice===''?undefined:options.find(o=>o.d.id===choice)??options[0];
+    return {zone,options,key,shown};
+  });
   const local=result?.validation.occupiedSiteEnvelope;
   return <section id="review-architecture" className={styles.review} aria-labelledby="review-heading">
     <h2 id="review-heading"><small>04</small> Review Generated Architecture</h2>
+    {site&&site.zones.length>0&&<section id="combined-site-plan"><h3>Combined site plan</h3>
+      <SitePlan state={state} site={site} registry={registry} records={Object.fromEntries(matches.map(m=>[m.zone.id,m.shown?.r]))}/>
+      <p>Territory colors show prepared area allocations. Light footprints show completed architecture in site coordinates.</p>
+      <div className={styles.zoneChoices}>{matches.map(({zone,options,key,shown})=><label key={key}>{zone.name}
+        {options.length?<select aria-label={zone.name+' plan design'} value={shown?.d.id??''} onChange={e=>setZoneChoices({...zoneChoices,[key]:e.target.value})}>
+          <option value="">Hide architecture</option>{options.map(o=><option key={o.d.id} value={o.d.id}>{o.d.name}</option>)}</select>:<small>No completed design for this site revision</small>}
+      </label>)}</div>
+      {matches.some(m=>m.shown)&&<><button className={styles.textButton} aria-expanded={showSite3D} onClick={()=>setShowSite3D(!showSite3D)}>{showSite3D?'Close combined 3D view':'View combined architecture in 3D'}</button>
+        {showSite3D&&<CombinedArchitecture site={site} records={matches.flatMap(m=>m.shown?[m.shown.r]:[])}/>}</>}
+    </section>}
     <div className={styles.reviewBar}><label>Saved alternatives &amp; reference studies
       <select aria-label="Saved orientation result" value={reference?'ref/'+reference:selected?.id??''} onChange={e=>choose(e.target.value)}>
         <option value="">Choose a study</option>
