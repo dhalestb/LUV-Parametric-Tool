@@ -23,7 +23,7 @@ export function classifyMaterialName(name: string): SiteLayerKind | null {
 
 export const LAYER_COLORS: Record<SiteLayerKind, string> = {
   terrain: "#6b5a3c",
-  buildings: "#F7F6F5",
+  buildings: "#7E838A",
   roads: "#b9bec6",
   property: "#d6ad4f",
   waterfront: "#1288b8",
