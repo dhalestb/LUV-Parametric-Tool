@@ -2,6 +2,7 @@
 
 import {Canvas} from '@react-three/fiber';
 import {Bounds,Line,OrbitControls} from '@react-three/drei';
+import {ArchitectureLighting} from './ArchitectureLighting';
 import {SavedArchitectureMesh,useArchitecture} from './ArchitectureLayer';
 import type {OrientationResult} from './orientationStore';
 import type {SiteInput} from './model';
@@ -13,8 +14,8 @@ function Building({record}:{record:OrientationResult}){
 
 export default function CombinedArchitecture({site,records}:{site:SiteInput;records:OrientationResult[]}){
   return <div style={{height:440}} aria-label="Combined site architecture in 3D">
-    <Canvas camera={{position:[100,100,100],near:.05,far:100000}}>
-      <color attach="background" args={['#101d22']}/><ambientLight intensity={1.5}/><directionalLight position={[80,200,80]} intensity={2}/>
+    <Canvas shadows camera={{position:[100,100,100],near:.05,far:100000}}>
+      <color attach="background" args={['#101d22']}/><ArchitectureLighting studies={records}/>
       <OrbitControls makeDefault/>
       <Bounds key={site.fingerprint+records.map(r=>r.id).join('/')} fit clip observe margin={1.25}>
         {site.zones.map(z=>[z.polygon,...(z.holes??[])].map((ring,i)=><Line key={z.id+'-'+i} color="#83c6c2"
