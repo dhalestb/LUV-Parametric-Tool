@@ -1,111 +1,124 @@
 'use client';
 
-import {useEffect,useState,type ReactNode} from 'react';
-import dynamic from 'next/dynamic';
-import {descriptorNames,descriptorRegions,influenceVersion,type Descriptor,type AreaShares} from './descriptorInfluence';
-import {type Experiment} from './model';
+import {useState,type ReactNode} from 'react';
+import {descriptorNames,descriptorRegions,influenceVersion,type AreaShares,type Descriptor} from './descriptorInfluence';
+import {newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
 import {defaults as territoryDefaults} from './territories';
 import {requestSiteWorker} from './workerClient';
 import {readSiteRules} from './SiteRulePanel';
 import {saveBrowserDesign} from './browserDesigns';
 import {saveDesignReference} from './alternatives';
-import {ensureSiteSelection,saveOrientation,selectionDefault,type OrientationResult} from './orientationStore';
+import {ensureSiteSelection,saveOrientation,type OrientationResult} from './orientationStore';
 import {useSiteHandoff} from './siteHandoffStore';
-import {ArchitectureControls} from './ArchitectureLayer';
+import DesignPanel from './DesignPanel';
+import WorkflowAction,{reveal,type RunAction} from './WorkflowAction';
 import cohort from './hybrid-cohort.json';
+import styles from './workflow.module.css';
 
-const OrientationView=dynamic(()=>import('./OrientationView'),{ssr:false});
-const studies=[
-  {name:'Independent Stepped Amphitheater',dir:cohort.forms[0].study},
-  {name:'Independent Inserted Horizontal Plate',dir:cohort.forms[1].study},
-  {name:'50% Plate / 50% Stepped proof',dir:'miami-plate-stepped-v1'}
-];
+const methods = [
+  {id:'typology-area',name:'Typology Area Distribution',label:'Allocate ground to typologies'},
+  {id:'hybrid-rule',name:'Hybrid Rule Distribution',label:'Weight architectural rules'},
+  {id:'descriptor',name:'Descriptor-Based Distribution',label:'Allocate ground to descriptors'},
+] as const;
+const supportedPair:Typology[]=['inserted-plate','vertical-walls'];
+const defaultRules={...newAssignment().shares,'linear-edge-gallery':0,'inserted-plate':50,'vertical-walls':50};
+const recovery=<a href="/experiment-recovery/index.html">Restore Miami Checkpoint</a>;
+type Props={state:Experiment;registry:Registry;patch:(p:Partial<Experiment>)=>void;onSaved:(r:OrientationResult)=>void;
+  controls:{seed:number;rotationSeed:number;spacing:number;heading:number;datum:number};openTerritories:()=>void;advanced:ReactNode};
 
-function Comparison() {
-  const [index,setIndex]=useState(2),[result,setResult]=useState<OrientationResult>(),[error,setError]=useState('');
-  useEffect(()=>{
-    const abort=new AbortController();
-    setResult(undefined);setError('');
-    fetch('/experiment-designs/'+studies[index].dir+'/rule-a.json',{signal:abort.signal})
-      .then(r=>{if(!r.ok) throw Error('Study geometry unavailable');return r.json();})
-      .then(data=>{if(!abort.signal.aborted)setResult(data);})
-      .catch(e=>{if(!abort.signal.aborted)setError(String(e));});
-    return ()=>abort.abort();
-  },[index]);
-  return <section aria-label="Miami comparison"><label>Compare Miami studies
-    <select value={index} onChange={e=>setIndex(Number(e.target.value))}>{studies.map((s,i)=><option key={s.dir} value={i}>{s.name}</option>)}</select>
-  </label>{error&&<p role="status">{error}</p>}{result&&<>
-    <ArchitectureControls orientation={result}/><OrientationView result={result} view={selectionDefault}/>
-    <details><summary>Source relationships and validation</summary><pre>{JSON.stringify(result.provenance.ruleInfluence??{entry:result.provenance.entry,sourceHash:result.geometryHash},null,2)}</pre></details>
-  </>}</section>;
-}
-
-export default function GenerationMethods({state,children,onSaved}:{state:Experiment;children:ReactNode;onSaved:(result:OrientationResult)=>void}) {
-  const [method,setMethod]=useState('typology-area'),[plate,setPlate]=useState(50);
-  const [shares,setShares]=useState<AreaShares>({openVolume:100});
-  const [busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[compare,setCompare]=useState(false);
-  useEffect(()=>{
-    const query=new URLSearchParams(window.location.search), requested=query.get('method');
-    if(requested==='hybrid-rule'||requested==='descriptor')setMethod(requested);
-    setCompare(query.get('compare')==='1');
-  },[]);
-  const handoff=useSiteHandoff(),site=state.site,zoneId=state.focus;
-  const controls=(zoneId&&state.territoryByZone[zoneId]?.controls)||territoryDefaults();
-  const clearance=Math.max(controls.minimumDiameter['vertical-walls'],controls.minimumDiameter['inserted-plate']);
-  const compatible=site?.fingerprint==='662e7000dd4f4982c7205c443e24fb3dc05aca1fa7a77d1e910933c9b38bb637'&&zoneId==='zone-1-1210';
+export default function GenerationMethods({state,registry,patch,onSaved,controls,openTerritories,advanced}:Props) {
+  const [busy,setBusy]=useState(false),[message,setMessage]=useState('');
+  const method=state.generation?.method??'typology-area',meta=methods.find(m=>m.id===method)!;
+  const site=state.site,zone=site?.zones.find(z=>z.id===state.focus),zoneId=zone?.id;
+  const draftKey=JSON.stringify([site?.fingerprint,zoneId]), zones=state.generation?.zones??{},draft=zones[draftKey]??{};
+  const rules=draft.rules??defaultRules, areas:AreaShares=draft.descriptors??{openVolume:100};
+  const assignment=(zoneId&&state.assignments[zoneId])||newAssignment();
+  const territory=(zoneId&&state.territoryByZone[zoneId]?.controls)||territoryDefaults();
+  const handoff=useSiteHandoff();
+  const rows=method==='descriptor'?Object.entries(descriptorNames).map(([id,name])=>({id,name,value:areas[id as Descriptor]??0,locked:false})):
+    registry.items.map(t=>({id:t.id,name:t.name,value:(method==='hybrid-rule'?rules:assignment.shares)[t.id],
+      locked:method==='typology-area'&&(territory.locked[t.id]||!territory.enabled[t.id])}));
+  const total=rows.reduce((sum,r)=>sum+r.value,0),positive=rows.filter(r=>r.value>0);
+  const summary=positive.map(r=>r.name+' '+r.value+'%').join(' · ')||'No allocation selected';
+  const percentageError=rows.some(r=>!Number.isFinite(r.value)||r.value<0||r.value>100)?'Use a value from 0 to 100 for every percentage.':
+    Math.abs(total-100)>1e-8?'Percentages total '+Number(total.toFixed(6))+'%. Adjust the allocation to reach 100%.':'';
+  const handoffId=handoff.active?.id??'unavailable';
+  const useFullZone=method!=='typology-area'&&draft.fullZone?.[method]===handoffId;
+  function chooseDomain(full:boolean){
+    if(method==='typology-area')return;
+    setMessage('');
+    patch({generation:{method,zones:{...zones,[draftKey]:{...draft,fullZone:{...draft.fullZone,[method]:full?handoffId:undefined}}}}});
+  }
+  const supportedSite=site?.fingerprint==='662e7000dd4f4982c7205c443e24fb3dc05aca1fa7a77d1e910933c9b38bb637'&&zoneId==='zone-1-1210';
+  const unsupported=method==='hybrid-rule'?positive.filter(r=>!supportedPair.includes(r.id as Typology)):[];
   let scoreError='',regions:ReturnType<typeof descriptorRegions>=[];
-  if(method==='descriptor')try{regions=descriptorRegions(shares);}catch(e){scoreError=e instanceof Error?e.message:String(e);}
-
+  if(method==='descriptor'&&!percentageError)try{regions=descriptorRegions(areas);}catch(e){scoreError=String(e);}
+  function selectMethod(next:GenerationMethod){
+    setMessage('');patch({generation:{method:next,zones}});
+    const url=new URL(location.href);url.searchParams.set('method',next);history.replaceState(history.state,'',url);
+  }
+  function edit(id:string,n:number){
+    setMessage('');
+    if(method==='typology-area'&&zoneId)patch({assignments:{...state.assignments,[zoneId]:{...assignment,shares:{...assignment.shares,[id]:n}}}});
+    else patch({generation:{method,zones:{...zones,[draftKey]:method==='descriptor'?{...draft,descriptors:{...areas,[id]:n}}:{...draft,rules:{...rules,[id]:n}}}}});
+  }
+  let reason='',fix:ReactNode=null;
+  if(!site||!zone){reason='Select a site and polygon before generating.';fix=recovery;}
+  else if(!zone.enabled){reason='This polygon is disabled in the site project.';fix=<button onClick={()=>reveal('select-site')}>Select another polygon</button>;}
+  else if(!state.unitsConfirmed||site.coordinates.unitAssumption!=='confirmed'||!site.protectionMetadataComplete){
+    reason='Confirmed site units and complete protection geometry are required.';
+    fix=<button onClick={()=>reveal('select-site')}>Review site input</button>;
+  }else if(percentageError){reason=percentageError;fix=<button onClick={()=>reveal('allocation-inputs')}>Edit percentages</button>;}
+  else if(unsupported.length||(method==='hybrid-rule'&&positive.length!==2)){
+    reason=unsupported.length?'Rule connections are unverified for '+unsupported.map(r=>r.name).join(', ')+'.':'Both Plate and Stepped require positive influence.';
+    fix=<button onClick={()=>{setMessage('');patch({generation:{method,zones:{...zones,[draftKey]:{...draft,rules:defaultRules}}}});}}>Use verified 50% Plate / 50% Stepped</button>;
+  }else if(method!=='typology-area'&&!supportedSite){
+    reason='This rule relationship is verified in Miami Cluster Zone 1.';
+    fix=site.zones.some(z=>z.id==='zone-1-1210')?<button onClick={()=>patch({focus:'zone-1-1210'})}>Select Miami Cluster Zone 1</button>:recovery;
+  }else if(method!=='typology-area'&&handoff.enabled&&!useFullZone){
+    reason='An independent site handoff is applied. This method requires the full selected polygon.';
+    fix=<button onClick={()=>chooseDomain(true)}>Use full polygon for this method</button>;
+  }else if(scoreError){reason=scoreError;fix=<button onClick={()=>reveal('allocation-inputs')}>Review descriptor shares</button>;}
+  else if(method==='typology-area'&&positive.some(r=>!territory.enabled[r.id as Typology])){
+    reason='A disabled typology has a positive territory share.';fix=<button onClick={openTerritories}>Edit territory constraints</button>;
+  }
   async function generate(){
-    if(!site||!zoneId||busy)return;
-    setBusy(true);setNotice('Generating and replaying authentic geometry…');
+    if(!site||!zoneId||busy||reason)return;
+    setBusy(true);setMessage('Generating and replaying architectural geometry…');
     try{
-      const request={generationMethod:method,domain:'selected-zone',site,zoneId,siteRulePlan:readSiteRules(site,zoneId),
-        reserved:controls.reserved,planningDiameterFeet:clearance,...(method==='descriptor'?{descriptorAreas:shares}:
-        {ruleInfluence:{version:influenceVersion,platePercent:plate,steppedPercent:100-plate}})};
-      const response=await requestSiteWorker('/experiment/site-polygon-morphogenesis/design',{
-        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(request)});
+      const clearance=Math.max(territory.minimumDiameter['vertical-walls'],territory.minimumDiameter['inserted-plate']);
+      const request={generationMethod:method,domain:'selected-zone',site,zoneId,siteRulePlan:readSiteRules(site,zoneId),reserved:territory.reserved,planningDiameterFeet:clearance,
+        ...(method==='descriptor'?{descriptorAreas:areas}:{ruleInfluence:{version:influenceVersion,platePercent:rules['inserted-plate'],steppedPercent:rules['vertical-walls']}})};
+      const response=await requestSiteWorker('/experiment/site-polygon-morphogenesis/design',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(request)});
       const result=await response.json();
       if(!response.ok||result.status!=='complete'||!result.replay?.matched)throw Error(result.error||'Replay or formation failed');
-      ensureSiteSelection();
-      await saveBrowserDesign(result.orientation,result.architecture,result.payload);
-      await saveOrientation(result.orientation);
-      saveDesignReference(result);
-      onSaved(result.orientation);
-      setNotice('Saved '+result.orientation.id.slice(0,8)+' · '+result.orientation.components.length+' letters · '+
-        result.architecture.components+' components · '+result.architecture.measurements.buildingCoveragePercent.toFixed(3)+'% footprint coverage · replay matched.');
-    }catch(e){setNotice(e instanceof Error?e.message:String(e));}finally{setBusy(false);}
+      ensureSiteSelection();await saveBrowserDesign(result.orientation,result.architecture,result.payload);
+      await saveOrientation(result.orientation);saveDesignReference(result);onSaved(result.orientation);
+      setMessage('Saved alternative · '+result.orientation.components.length+' letters · '+result.architecture.components+' components · replay matched.');
+    }catch(e){setMessage('Generation blocked. '+(e instanceof Error?e.message:String(e)));}finally{setBusy(false);}
   }
-
-  return <section id="site-generation-methods" aria-label="Site generation methods"><label>Generation method
-    <select disabled={busy} value={method} onChange={e=>{setMethod(e.target.value);setNotice('');}}>
-      <option value="typology-area">Typology Area Distribution</option><option value="hybrid-rule">Hybrid Rule Distribution</option>
-      <option value="descriptor">Descriptor-Based Distribution</option>
-    </select></label>
-    <div hidden={method!=='typology-area'}>{children}</div>
-    {method!=='typology-area'&&<fieldset disabled={busy}>
-      <legend>{method==='descriptor'?'Descriptor area shares':'Typology rule influence'}</legend>
-      <p>Miami Cluster Zone 1 · full permitted polygon · Roadways/Water 60/40/20-ft local caps · {clearance} ft planning diameter.
-        Plate seed 39 guides the horizontal position of three Stepped lifts from seed 69. Each lift keeps its original letter spacing and orientation. Native Stepped Rule B forms the walls, terraces and openings.</p>
-      {method==='hybrid-rule'?<label>Inserted Horizontal Plate influence %
-        <input aria-label="Plate rule influence" type="number" min="1" max="99" value={plate} onChange={e=>setPlate(Number(e.target.value))}/>
-        Stepped Amphitheater influence {100-plate}%</label>:<>
-        <p>Measured independent Miami Rule B studies · Evaluations {cohort.version} · {cohort.forms[0].cellFeet}-ft voxels.
-          Area shares divide the permitted polygon along the site X axis. Each lift takes its rule weights from the area of its source letters within each descriptor region. Every selected region requires source geometry.</p>
-        {Object.entries(descriptorNames).map(([id,name])=><label key={id} style={{display:'inline-block',margin:6}}>{name} area %
-          <input aria-label={name+' area percentage'} type="number" min="0" max="100" value={shares[id as Descriptor]??0}
-            onChange={e=>setShares({...shares,[id]:Number(e.target.value)})}/></label>)}
-        {scoreError?<p role="status">{scoreError}</p>:<table><thead><tr><th>Descriptor</th><th>Site area</th><th>Stepped score</th><th>Plate score</th><th>Stepped influence</th><th>Plate influence</th></tr></thead>
-          <tbody>{regions.map(r=><tr key={r.descriptor}><td>{descriptorNames[r.descriptor]}</td><td>{r.areaPercent}%</td>
-            {r.ratings.map(v=><td key={v.typology}>{v.score.toFixed(2)}</td>)}<td>{r.steppedPercent.toFixed(2)}%</td><td>{r.platePercent.toFixed(2)}%</td></tr>)}</tbody></table>}
-      </>}
-      {handoff.active&&<label><input type="checkbox" checked={handoff.enabled} onChange={e=>handoff.setEnabled(e.target.checked)}/>Use applied single-typology site handoff</label>}
-      {handoff.enabled&&<p>Clear the applied handoff to select the full-zone hybrid domain. The saved handoff remains available.</p>}
-      {!compatible&&<p>Load the Miami checkpoint and focus Cluster Zone 1 to use the verified pair.</p>}
-      <button disabled={!compatible||handoff.enabled||!!scoreError||(method==='hybrid-rule'&&!(plate>0&&plate<100))} onClick={generate}>Generate and validate design</button>
-      <p role="status">{notice}</p>
-      <button aria-expanded={compare} onClick={()=>setCompare(!compare)}>{compare?'Close study comparison':'Compare independent and hybrid studies'}</button>
-    </fieldset>}
-    {method!=='typology-area'&&compare&&<Comparison/>}
-  </section>;
+  const action=(a:RunAction)=><WorkflowAction action={{...a,reason:reason||a.reason,fix:reason?fix:a.fix}}
+    site={zone?site!.name+' / '+zone.name:'No site selected'} method={meta.name} allocation={summary}/>;
+  return <>
+    <section className={styles.methods} id="site-generation-methods" aria-labelledby="method-heading">
+      <h2 id="method-heading"><small>02</small> Choose Generation Method</h2>
+      <div className={styles.methodGrid} role="group" aria-label="Generation method">{methods.map((m,i)=><button type="button" key={m.id} className={styles.method} disabled={busy} aria-pressed={method===m.id} onClick={()=>selectMethod(m.id)}>
+        <span>Method {i+1}</span><strong>{m.name}</strong><em>{m.label}</em></button>)}</div>
+      <fieldset className={styles.inputs} id="allocation-inputs" disabled={busy||!zone}>
+        <legend>{method==='hybrid-rule'?'Architectural rule influence':method==='typology-area'?'Polygon area by typology':'Polygon area by descriptor'}</legend>
+        <div className={styles.fields}>{rows.map(r=><label key={r.id}>{r.name}<span><input aria-label={r.name+' percentage'} type="number" min="0" max="100" step="any" value={r.value} disabled={r.locked} onChange={e=>edit(r.id,Number(e.target.value))}/><b>%</b></span>{r.locked&&<em>Locked or disabled</em>}</label>)}</div>
+      </fieldset>
+      <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>Building footprint coverage is measured after generation.</span></div>
+      {method==='typology-area'&&<button className={styles.textButton} onClick={openTerritories}>Territory allocation &amp; constraints ↗</button>}
+      {method==='hybrid-rule'&&<p className={styles.note}>Verified pair · Inserted Horizontal Plate guides native Stepped Rule A placement. Stepped Rule B forms the architecture. Other rule connections await validation.</p>}
+      {method==='descriptor'&&<div className={styles.scorePanel}><strong>Verified typology contributions</strong>
+        {regions.map(r=><p key={r.descriptor}>{descriptorNames[r.descriptor]} <b>Plate {r.platePercent.toFixed(2)}%</b> · Stepped {r.steppedPercent.toFixed(2)}%</p>)}
+        {!regions.length&&<p>{scoreError||'Complete a 100% allocation to calculate contributions.'}</p>}
+        <details><summary>Evaluations scores and eligibility</summary>{regions.map(r=><p key={r.descriptor}>{descriptorNames[r.descriptor]} · {r.evaluationVersion} · {r.ratings.map(x=>(x.typology==='vertical-walls'?'Stepped':'Plate')+' '+x.score.toFixed(2)).join(' / ')}</p>)}</details><p>Comparable scores are unavailable for Gallery, Room Within Volume and Void Field.</p></div>}
+    </section>
+    {method==='typology-area'?<DesignPanel state={state} controls={controls} onSaved={onSaved} onBusy={setBusy} renderAction={action} commonBlocked={!!reason} openTerritories={openTerritories}/>:action({run:generate,busy,message,eligible:method==='descriptor'?'Inserted Horizontal Plate and Stepped Amphitheater':undefined,correction:<button onClick={()=>reveal('allocation-inputs')}>Edit percentages</button>})}
+    <details className={styles.advanced}><summary>Advanced generation settings</summary>{advanced}
+      {method!=='typology-area'&&<p>Miami Cluster Zone 1 uses the Roadways/Water 60/40/20-ft height regions. Plate seed 39 supplies stations for the three native lifts of Stepped seed 69. Within-lift spacing and orientation are preserved. The planning clearance is {Math.max(territory.minimumDiameter['vertical-walls'],territory.minimumDiameter['inserted-plate'])} ft in diameter.</p>}
+      {method==='descriptor'&&<p>Evaluations {cohort.version} measures the two independent Rule B studies with {cohort.forms[0].cellFeet}-ft voxels. A sweep along the site X axis allocates the requested areas. A lift receives its rule weights from its source-letter footprint in each region. Every selected region requires native source geometry.</p>}{method!=='typology-area'&&handoff.enabled&&<label><input type="checkbox" checked={useFullZone} onChange={e=>chooseDomain(e.target.checked)}/> Use the full polygon for {meta.name}</label>}</details>
+  </>;
 }
