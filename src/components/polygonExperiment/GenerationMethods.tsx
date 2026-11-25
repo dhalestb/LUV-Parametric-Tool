@@ -30,9 +30,9 @@ const supportedPair:Typology[]=['inserted-plate','vertical-walls'];
 const defaultRules={...newAssignment().shares,'linear-edge-gallery':0,'inserted-plate':50,'vertical-walls':50};
 const recovery=<a href="/experiment-recovery/index.html">Restore Miami Checkpoint</a>;
 type Props={state:Experiment;registry:Registry;patch:(p:Partial<Experiment>)=>void;onSaved:(r:OrientationResult)=>void;
-  controls:{seed:number;rotationSeed:number;spacing:number;heading:number;datum:number};openTerritories:()=>void;advanced:ReactNode};
+  controls:{seed:number;rotationSeed:number;spacing:number;heading:number;datum:number};openTerritories:()=>void;advanced:ReactNode;presentationExport:ReactNode};
 
-export default function GenerationMethods({state,registry,patch,onSaved,controls,openTerritories,advanced}:Props) {
+export default function GenerationMethods({state,registry,patch,onSaved,controls,openTerritories,advanced,presentationExport}:Props) {
   const [busy,setBusy]=useState(false),[message,setMessage]=useState('');
   const method=state.generation?.method??'typology-area',meta=methods.find(m=>m.id===method)!;
   const site=state.site,zone=site?.zones.find(z=>z.id===state.focus),zoneId=zone?.id;
@@ -264,6 +264,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         {regions.map(r=><p key={r.descriptor}>{descriptorNames[r.descriptor]} <b>Plate {r.platePercent.toFixed(2)}%</b> · Stepped {r.steppedPercent.toFixed(2)}%</p>)}
         {!regions.length&&<p>{scoreError||'Complete a 100% allocation to calculate contributions.'}</p>}
         <details><summary>Evaluations scores and eligibility</summary>{regions.map(r=><p key={r.descriptor}>{descriptorNames[r.descriptor]} · {r.evaluationVersion} · {r.ratings.map(x=>(x.typology==='vertical-walls'?'Stepped':'Plate')+' '+x.score.toFixed(2)).join(' / ')}</p>)}</details><p>Comparable scores are unavailable for Gallery, Room Within Volume and Void Field.</p></div>}
+      {presentationExport}
     </section>
     {method==='typology-area'?<>
       <WorkflowAction local site={site?.name??'No site selected'} method="Continuous typology composition"

@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import {drawingCamera,formFinish,geometryFor,meshBox,stepDownDirection,studioLights,type DrawingView,type FormMesh} from './architectureViews';
 
-export const sheetWidth=4323, sheetHeight=847;
+export const sheetWidth=4323, layoutHeight=1780.5;
+export const sheetHeight=Math.round(layoutHeight);
 const board = { background: '#000000', ink: '#F7F6F5', gold: '#D6AD4F', cyan: '#71BEDA', rule: '#E1E0DF', font: 'Arial, sans-serif' };
 const views:DrawingView[]=['Perspective','Plan','Side'];
 
@@ -11,7 +12,7 @@ export async function renderPresentation(meshes:FormMesh[],labels:string[]):Prom
   sheet.width=sheetWidth;sheet.height=sheetHeight;
   const ctx=sheet.getContext('2d');
   if(!ctx)throw Error('The browser could not create the presentation image.');
-  const width=sheetWidth/3, top=76, height=sheetHeight-top-22;
+  const width=sheetWidth/3, top=76, height=layoutHeight-top-22;
   const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
   const scene=new THREE.Scene(),box=new THREE.Box3(),geometries:THREE.BufferGeometry[]=[];
   const material=new THREE.MeshStandardMaterial(formFinish);

@@ -22,9 +22,9 @@ const references=[
   {id:cohort.forms[1].study,name:'Independent Inserted Horizontal Plate'}
 ];
 type Props={state:Experiment;registry:Registry;results:OrientationResult[];selected?:OrientationResult;view:OrientationSelection;reference:string;
-  setReference:(id:string)=>void;select:(id:string|null)=>void;onSaved:(r:OrientationResult)=>void;children:ReactNode};
+  setReference:(id:string)=>void;select:(id:string|null)=>void;onSaved:(r:OrientationResult)=>void;children:ReactNode;renderMethods:(presentationExport:ReactNode)=>ReactNode};
 
-export default function ArchitectureReview({state,registry,results,selected,view,reference,setReference,select,onSaved,children}:Props){
+export default function ArchitectureReview({state,registry,results,selected,view,reference,setReference,select,onSaved,children,renderMethods}:Props){
   const [referenceView,setReferenceView]=useState(selectionDefault);
   const [loaded,setLoaded]=useState<{id:string;record:OrientationResult}>(),[notice,setNotice]=useState('');
   const [library,setLibrary]=useState<DesignReference[]>([]),[name,setName]=useState(''),[saving,setSaving]=useState(false);
@@ -107,7 +107,9 @@ export default function ArchitectureReview({state,registry,results,selected,view
     finally{setExporting(false);}
   }
   const heightPassed=result?.validation.occupiedSiteEnvelope?.passed??result?.validation.allocatedHeightChecked;
-  return <section id="review-architecture" className={styles.review} aria-labelledby="review-heading">
+  const presentationRecords=record&&result?[record,...group.filter(r=>!reference&&r.zoneId!==record.zoneId)]:group;
+  return <>{renderMethods(<ArchitecturePresentation key={record?.id} exportOnly initialId={record?.id} records={presentationRecords}/>)}
+  <section id="review-architecture" className={styles.review} aria-labelledby="review-heading">
     <h2 id="review-heading"><small>04</small> Review Generated Architecture</h2>
     {site&&site.zones.length>0&&<section id="combined-site-plan"><h3>Combined site plan</h3>
       <SitePlan state={state} site={site} registry={registry} records={Object.fromEntries(matches.map(m=>[m.zone.id,m.shown?.r]))}/>
@@ -145,7 +147,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
         <tbody>{result.provenance.heightRegions.map(b=><tr key={b.id}><td>{b.role}</td><td>{b.capFeet.toFixed(1)} ft</td><td>{b.builtFeet.toFixed(1)} ft</td></tr>)}</tbody>
       </table> : result?.provenance.adapter==='polygon-composition/v1'&&<p>{result.provenance.heightPolicy==='uniform limit'?'This polygon used a uniform height limit.':'This saved study predates regional height measurements. Generate Design creates a new study with the current site rules.'}</p>}
       <div className={styles.viewer}><OrientationView result={record} view={reference?referenceView:view}/></div>
-      {result&&<ArchitecturePresentation initialId={record.id} records={[record,...group.filter(r=>!reference&&r.zoneId!==record.zoneId)]}/>}
+      {result&&<ArchitecturePresentation initialId={record.id} records={presentationRecords} key={record.id}/>}
       <div className={styles.alternative}><label>Alternative name<input aria-label="Alternative name" value={name} onChange={e=>setName(e.target.value)}/></label>
         <button disabled={!result||saving||!name.trim()} onClick={save}>Save Alternative</button>
         {record.site.origin!=='fixture'&&saved?.status==='complete'&&result&&<button onClick={()=>{try{
@@ -173,5 +175,5 @@ export default function ArchitectureReview({state,registry,results,selected,view
       </div>
       {(exporting||exportStatus)&&<p role="status">{exporting?'Preparing OBJ…':exportStatus}</p>}
     </section>
-  </section>;
+  </section></>;
 }
