@@ -34,7 +34,7 @@ import {
 import { resolveParticipatingZones } from "./generationScope";
 import { parseProject, readProjectSession, serializeProject, writeProjectSession } from "./projectStore";
 import { readSiteGeometryCache, writeSiteGeometryCache } from "./siteGeometryCache";
-import { applySiteCoordinates, coordinatesForUnit, loadSiteFromArrayBuffer, suggestedOverlayNote, type LoadedSite } from "./siteImport";
+import { applySiteCoordinates, coordinatesForUnit, miamiParcelScale, loadSiteFromArrayBuffer, suggestedOverlayNote, type LoadedSite } from "./siteImport";
 import { createSiteSurfaceSampler } from "./siteSurface";
 import { evaluateAlternative, programNote } from "./evaluation";
 import { combinedBoundsSpec } from "../lattice/objFidelity";
@@ -142,7 +142,7 @@ export default function SiteDevelopmentStudio() {
   const lastSourceFingerprint = useRef<string>("");
   const projectRef = useRef(project);
   projectRef.current = project;
-  const siteGeometryRestored = useRef(false);
+
   const persistenceReady = useRef(false);
 
   useEffect(() => {
@@ -256,10 +256,11 @@ export default function SiteDevelopmentStudio() {
     lastSourceFingerprint.current = fingerprint;
   }, [project.protoFormSource, displayMeshes, typologyBindings, project.alternatives.length]);
 
-  const siteInfo = loadedSite ? applySiteCoordinates(loadedSite.info, project.coordinates) : null;
+  const modelScale = project.import.modelFeetPerUnit ?? project.coordinates.feetPerModel;
+  const siteInfo = loadedSite ? applySiteCoordinates(loadedSite.info, { ...project.coordinates, feetPerModel: modelScale }) : null;
   const surfaceSampler = useMemo(
-    () => createSiteSurfaceSampler(loadedSite?.root ?? null, project.coordinates.feetPerModel, loadedSite?.info.layers ?? []),
-    [loadedSite, project.coordinates.feetPerModel],
+    () => createSiteSurfaceSampler(loadedSite?.root ?? null, modelScale, loadedSite?.info.layers ?? []),
+    [loadedSite, modelScale],
   );
   const selected = [...project.zones, ...project.exclusions].find((zone) => zone.id === selectedZoneId) ?? null;
   const active = project.alternatives.find((item) => item.id === project.activeAlternativeId) ?? project.alternatives[0] ?? null;
@@ -346,24 +347,30 @@ export default function SiteDevelopmentStudio() {
     setStatus(`Imported ${parsed.length} OBJ proto form(s) into the project Imported OBJ Library.`);
   };
 
-  const loadBuffer = async (buffer: ArrayBuffer, filename: string, sampleId: string | null = null, options?: { quiet?: boolean }) => {
+  const loadBuffer = async (buffer: ArrayBuffer, filename: string, sampleId: string | null = null, options?: { quiet?: boolean; signal?: AbortSignal; verifyParcel?: boolean }) => {
     setSiteLoading(true);
     if (!options?.quiet) setStatus(`Loading ${filename}…`);
     try {
       const loaded = await loadSiteFromArrayBuffer(buffer, filename);
+      if (options?.signal?.aborted) return;
+      const current = projectRef.current;
+      const matched = sampleId === "miami-waterfront"
+        ? miamiParcelScale(loaded.info, current.zones, current.coordinates.feetPerModel) : null;
+      if (options?.verifyParcel && matched === null) return;
+      const scale = sampleId === "miami-waterfront"
+        ? (current.import.sampleId === sampleId ? current.import.modelFeetPerUnit : undefined) ?? matched
+        : null;
       setLoadedSite(loaded);
       const format = filename.toLowerCase().endsWith(".obj") ? "obj" as const : "glb" as const;
-      const coordinates = {
-        ...(options?.quiet ? projectRef.current.coordinates : coordinatesForUnit(projectRef.current.coordinates.unit, true)),
-        northDeg: projectRef.current.coordinates.northDeg,
-        origin: projectRef.current.coordinates.origin,
-        elevationDatum: projectRef.current.coordinates.elevationDatum,
+      const coordinates = options?.quiet || sampleId === "miami-waterfront" ? current.coordinates : {
+        ...coordinatesForUnit(current.coordinates.unit, true),
+        origin: current.coordinates.origin, elevationDatum: current.coordinates.elevationDatum, northDeg: current.coordinates.northDeg,
       };
-      const info = applySiteCoordinates(loaded.info, coordinates);
+      const info = applySiteCoordinates(loaded.info, { ...coordinates, feetPerModel: scale ?? coordinates.feetPerModel });
       setProject((current) => ({
         ...current,
         coordinates,
-        import: { filename, format, sampleId },
+        import: { filename, format, sampleId, ...(scale != null ? { modelFeetPerUnit: scale } : {}) },
         layers: info.layers.map((layer) => ({ id: layer.id, visible: layer.visible, kind: layer.kind })),
       }));
       try {
@@ -378,14 +385,15 @@ export default function SiteDevelopmentStudio() {
         /* geometry cache is best-effort; project JSON still persists zones */
       }
       setStatus(`${filename} loaded · ${info.meshCount} meshes · ${info.layers.map((layer) => layer.name).join(", ")}. ${info.notes[0] ?? ""}`.trim());
-      setView("iso");
+      if (!options?.quiet) setView("iso");
       setOpenPanels((current) => ({ ...current, site: true }));
     } catch (error) {
+      if (options?.signal?.aborted) return;
       setLoadedSite(null);
       setStatus(error instanceof Error ? `Site load failed: ${error.message}` : `Site load failed for ${filename}.`);
       throw error;
     } finally {
-      setSiteLoading(false);
+      if (!options?.signal?.aborted) setSiteLoading(false);
     }
   };
 
@@ -423,38 +431,38 @@ export default function SiteDevelopmentStudio() {
   };
 
   useEffect(() => {
-    if (!sessionHydrated || siteGeometryRestored.current || loadedSite) return;
-    siteGeometryRestored.current = true;
-    let cancelled = false;
-    void (async () => {
+    if (!sessionHydrated) return;
+    const controller = new AbortController();
+    const signal = controller.signal;
+    async function restore() {
+      setSiteLoading(true);
       try {
-        const cached = await readSiteGeometryCache();
-        if (cancelled) return;
         const current = projectRef.current;
-        if (cached?.buffer?.byteLength) {
-          const matchesImport = !current.import.filename
-            || cached.filename === current.import.filename
-            || (current.import.sampleId != null && cached.sampleId === current.import.sampleId);
-          if (matchesImport) {
-            await loadBuffer(cached.buffer, cached.filename, cached.sampleId ?? current.import.sampleId, { quiet: true });
-            if (!cancelled) setStatus(`Restored site model “${cached.filename}” with saved zones and clusters.`);
+        const ref = current.import;
+        const miami = ref.sampleId === "miami-waterfront" || ref.filename === "miami-waterfront.glb";
+        const cached = await readSiteGeometryCache().catch(() => null);
+        if (signal.aborted) return;
+        if (cached?.buffer.byteLength && (ref.filename === cached.filename ||
+            (ref.sampleId && ref.sampleId === cached.sampleId) || (!ref.filename && !ref.sampleId))) {
+          try {
+            await loadBuffer(cached.buffer, cached.filename, miami ? "miami-waterfront" : cached.sampleId, { quiet: true, signal });
             return;
-          }
+          } catch (error) { if (!miami) throw error; }
         }
-        if (current.import.sampleId === "miami-waterfront") {
-          const response = await fetch(SAMPLE_GLB, { cache: "force-cache" });
-          if (!response.ok || cancelled) return;
-          const buffer = await response.arrayBuffer();
-          if (!buffer.byteLength || cancelled) return;
-          await loadBuffer(buffer, "miami-waterfront.glb", "miami-waterfront", { quiet: true });
-          if (!cancelled) setStatus("Restored Miami waterfront sample with saved zones and clusters.");
-        }
-      } catch {
-        /* keep empty site model; zones already restored from session JSON */
+        const checkLegacy = !ref.filename && !ref.sampleId && current.name === "Miami waterfront study" && current.zones.length > 0;
+        if (!miami && !checkLegacy) return;
+        const response = await fetch(SAMPLE_GLB, { cache: "force-cache", signal });
+        if (!response.ok) throw Error("Miami sample could not be restored (HTTP " + response.status + ").");
+        await loadBuffer(await response.arrayBuffer(), "miami-waterfront.glb", "miami-waterfront", { quiet: true, signal, verifyParcel: checkLegacy });
+      } catch (error) {
+        if (!signal.aborted) setStatus("Site model restore failed. " + String(error));
+      } finally {
+        if (!signal.aborted) setSiteLoading(false);
       }
-    })();
-    return () => { cancelled = true; };
-  }, [sessionHydrated, loadedSite]);
+    }
+    void restore();
+    return () => controller.abort();
+  }, [sessionHydrated]);
 
   const commitPolygon = (points: Point[], asExclusion: boolean) => {
     const issues = validatePolygon(points, {
@@ -709,7 +717,7 @@ export default function SiteDevelopmentStudio() {
       });
       const surfaceSampler = createSiteSurfaceSampler(
         loadedSite?.root ?? null,
-        project.coordinates.feetPerModel,
+        modelScale,
         loadedSite?.info.layers ?? [],
       );
       // Multi-objective alternatives share the project seed so differences reflect objective bias,
@@ -970,7 +978,7 @@ export default function SiteDevelopmentStudio() {
                 <select className="ml-1 bg-transparent" value={project.coordinates.unit} onChange={(event) => {
                   const unit = event.target.value as typeof project.coordinates.unit;
                   setProject(current => ({
-                    ...current, coordinates: { ...current.coordinates, unit, feetPerModel: UNIT_TO_FEET[unit], unitAssumption: unit === "feet" ? "confirmed" : "unresolved" },
+                    ...current, import: { ...current.import, modelFeetPerUnit: current.import.sampleId === "miami-waterfront" ? UNIT_TO_FEET[unit] : undefined }, coordinates: { ...current.coordinates, unit, feetPerModel: UNIT_TO_FEET[unit], unitAssumption: unit === "feet" ? "confirmed" : "unresolved" },
                   }));
                 }}>
                   <option value="meters">meters → feet</option>
@@ -985,7 +993,7 @@ export default function SiteDevelopmentStudio() {
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px]">
               <span style={{ color: project.coordinates.unitAssumption === "confirmed" ? "#8ff2f4" : "#ffd58b" }}>
-                Unit assumption: {project.coordinates.unitAssumption} · feetPerModel={project.coordinates.feetPerModel}
+                Site units: {project.coordinates.unit} · {project.coordinates.unitAssumption} · {modelScale.toFixed(5)} ft per model unit
               </span>
               {project.coordinates.unitAssumption !== "confirmed" && <button
                 type="button"
@@ -1652,7 +1660,7 @@ export default function SiteDevelopmentStudio() {
             )}
             <SiteViewport orientationSource={project}
               siteRoot={loadedSite?.root ?? null}
-              feetPerModel={project.coordinates.feetPerModel}
+              feetPerModel={modelScale}
               siteSurfaceDatumY={surfaceSampler.datumY}
               layers={layerRows.map((layer) => ({ id: layer.id, name: layer.name, visible: project.layers.find((item) => item.id === layer.id)?.visible ?? true }))}
               zones={project.zones}

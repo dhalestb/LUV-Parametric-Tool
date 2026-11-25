@@ -7,7 +7,7 @@ import SharedAlternatives,{useSceneLayers,usePublished} from "../polygonExperime
 import { Html, Line, OrbitControls, OrthographicCamera, PerspectiveCamera } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import { BoardCanvas as Canvas } from "@/components/BoardCanvas";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { buildFileSpaceGeometries, IDENTITY_PLACEMENT, tileRootMatrix } from "../lattice/objFidelity";
 import { typologyColor } from "../lattice/slots";
@@ -379,83 +379,26 @@ function SiteOrbitControls({ view, drawing }: { view: SiteViewMode; drawing: boo
   );
 }
 
+function SiteModel({root,scale,layers,drawing}:{root:THREE.Group;scale:number;layers:Props['layers'];drawing:boolean}) {
+  const model = useMemo(() => root.clone(true), [root]);
+  useLayoutEffect(() => {
+    const visibility = new Map(layers.map(layer => [layer.name, layer.visible]));
+    model.children.forEach(child => { child.visible = visibility.get(child.name) ?? true; });
+    model.traverse(child => {
+      if (drawing) child.raycast = () => {};
+      else Reflect.deleteProperty(child, "raycast");
+    });
+  }, [model,layers,drawing]);
+  return <primitive object={model} scale={scale} dispose={null}/>;
+}
+
 export default function SiteViewport(props: Props) {
   const scene=useSceneLayers();
   const orientation=useSiteOrientation(props.zones, JSON.stringify(props.orientationSource));
   const published=usePublished();
-  const siteRef = useRef<THREE.Group>(null);
-  const attachedRoot = useRef<THREE.Object3D | null>(null);
   const drawing = drawingToolsActive(props.tool);
   const unitScale = UNIT_TO_FEET[props.latticeUnit];
-  /** Stable visibility key — avoid clearing the site mesh on every parent re-render. */
-  const layerVisibilityKey = useMemo(
-    () => props.layers.map((layer) => `${layer.name}:${layer.visible ? 1 : 0}`).join("|"),
-    [props.layers],
-  );
 
-  useEffect(() => {
-    let cancelled = false;
-    let attempts = 0;
-
-    const attach = () => {
-      if (cancelled) return;
-      const group = siteRef.current;
-      if (!group) {
-        // R3F may not have committed the group ref on the first paint after load.
-        if (attempts < 30) {
-          attempts += 1;
-          requestAnimationFrame(attach);
-        }
-        return;
-      }
-      if (!props.siteRoot) {
-        group.clear();
-        attachedRoot.current = null;
-        return;
-      }
-      if (attachedRoot.current === props.siteRoot && group.children.length > 0) {
-        // Same root already attached — only refresh scale / visibility / picking.
-        const clone = group.children[0];
-        clone.scale.setScalar(props.feetPerModel);
-        const visibility = new Map(props.layers.map((layer) => [layer.name, layer.visible]));
-        clone.traverse((child) => {
-          if (drawing) child.raycast = () => {};
-          else if (Object.prototype.hasOwnProperty.call(child, "raycast")) {
-            Reflect.deleteProperty(child, "raycast");
-          }
-        });
-        clone.children.forEach((child) => {
-          child.visible = visibility.get(child.name) ?? true;
-        });
-        return;
-      }
-      group.clear();
-      const clone = props.siteRoot.clone(true);
-      clone.scale.setScalar(props.feetPerModel);
-      const visibility = new Map(props.layers.map((layer) => [layer.name, layer.visible]));
-      clone.traverse((child) => {
-        if (drawing) child.raycast = () => {};
-      });
-      clone.children.forEach((child) => {
-        child.visible = visibility.get(child.name) ?? true;
-      });
-      group.add(clone);
-      attachedRoot.current = props.siteRoot;
-    };
-
-    attach();
-    return () => {
-      cancelled = true;
-      // Do not clear here on dep-only updates — clearing in cleanup races with
-      // rapid re-renders (selection clicks) and leaves an empty viewport.
-    };
-  }, [props.siteRoot, props.feetPerModel, layerVisibilityKey, drawing, props.layers]);
-
-  useEffect(() => () => {
-    const group = siteRef.current;
-    if (group) group.clear();
-    attachedRoot.current = null;
-  }, []);
 
   const meshById = useMemo(() => new Map(props.meshes.map((mesh) => [mesh.id, mesh])), [props.meshes]);
   const preview = props.cursor && props.draft.length ? [...props.draft, props.cursor] : props.draft;
@@ -477,7 +420,7 @@ export default function SiteViewport(props: Props) {
       <Cameras view={props.view} span={props.span} />
       <Aim view={props.view} aim={props.aim} span={props.span} />
       <DrawingCapture enabled={drawing} onPointer={props.onPointer} />
-      <group ref={siteRef} visible={scene.layers.model} />
+      <group visible={scene.layers.model}>{props.siteRoot&&<SiteModel root={props.siteRoot} scale={props.feetPerModel} layers={props.layers} drawing={drawing}/>}</group>
       <SharedAlternatives datum={props.siteSurfaceDatumY??0} zones={props.zones}/>{orientation.records.map(r=><OrientationGeometry key={r.id} result={r} view={orientation.view}/>)}
       {props.zones.filter((zone) => scene.layers.polygons && zone.visible !== false).map((zone) => {
         const geometry = shapeGeometry(zone.polygon);

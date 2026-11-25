@@ -114,6 +114,15 @@ async function main(){
     Object.assign(controls,{clustering:65,areaCutAngle:i===0?0:90,reserved:[]});
     for(const t of model.TYPOLOGIES)state.assignments[z.id].shares[t]=t===(i===0?'void-field':'inserted-plate')?0:25;
   }
+  const {miamiParcelScale}=require('../src/components/siteDevelopment/siteImport.ts');
+  // The native gold Site-layer extents distinguish the two saved Miami frames.
+  const parcel={suggestedZone:[[310.797,-781.746],[424.698,-781.746],[424.698,-523.821],[310.797,-523.821]]};
+  const modelScale=3.280839895;
+  assert.equal(miamiParcelScale(parcel,project.zones,1),modelScale);
+  const nativeZones=project.zones.map(z=>({polygon:z.polygon.map(([x,y])=>[x/modelScale,y/modelScale])}));
+  assert.equal(miamiParcelScale(parcel,nativeZones,1),1);
+  assert.equal(miamiParcelScale(parcel,[nativeZones[0],project.zones[1]],1),null);
+  assert.equal(miamiParcelScale(parcel,[],1),null);
   const miami=await generate();
   for(const {architecture,orientation} of miami.records){
     assert.equal(architecture.validation.connectedBodies,1);

@@ -3,7 +3,7 @@ import { GLTFLoader, type GLTF } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { classifyLayerName, classifyMaterialName, LAYER_COLORS } from "./classify";
 import type { Point, Polygon } from "./geometry";
-import { convexHull, polygonArea, polygonBounds, rectanglePolygon } from "./geometry";
+import { convexHull, pointInPolygon, polygonCentroid, polygonArea, polygonBounds, rectanglePolygon } from "./geometry";
 import { LATTICE_FEET, UNIT_TO_FEET } from "../lattice/types";
 import type { SiteCoordinates, SiteLayerInfo, SiteLayerKind, SiteModelInfo } from "./types";
 import { SITE_COORDINATE_POLICY } from "./types";
@@ -244,6 +244,19 @@ export async function loadSiteFromArrayBuffer(buffer: ArrayBuffer, filename: str
   const info = inspectObject3D(root, filename, lower.endsWith(".obj") ? "obj" : "glb");
   applyDisplayMaterials(root, info.layers);
   return { info, root };
+}
+
+// The Miami GLB has been used in two historical model frames. Polygon and
+// design coordinates are already in feet. Resolve only the background mesh.
+export function miamiParcelScale(info: SiteModelInfo, zones: {polygon: Polygon}[], declared: number) {
+  if (!info.suggestedZone || !zones.length) return null;
+  const matches = (scale: number) => {
+    const parcel: Polygon = info.suggestedZone!.map(([x,z]) => [x * scale, z * scale]);
+    return zones.every(zone => zone.polygon.length >= 3 && pointInPolygon(polygonCentroid(zone.polygon), parcel) && zone.polygon.some(point=>pointInPolygon(point, parcel)));
+  };
+  if (matches(declared)) return declared;
+  if (declared === 1 && matches(UNIT_TO_FEET.meters)) return UNIT_TO_FEET.meters;
+  return null;
 }
 
 export function scaleRootToFeet(root: THREE.Group, feetPerModel: number) {

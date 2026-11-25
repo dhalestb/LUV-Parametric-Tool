@@ -456,6 +456,7 @@ export type SiteDevelopmentProject = {
     filename: string | null;
     format: "glb" | "obj" | null;
     sampleId: string | null;
+    modelFeetPerUnit?: number;
   };
   generationMode: GenerationMode;
   protoFormSource: ProtoFormSourceMode;
