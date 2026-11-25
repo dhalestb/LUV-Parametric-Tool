@@ -97,10 +97,13 @@ export default function HybridGeneration() {
           repositoryRequest.onerror = () => reject(repositoryRequest.error);
         });
         const committed = await committedRepository();
-        for (const form of committed.forms) library[form.mesh.id] ??= { ...form, fits: null, ruleset: undefined };
+        for (const form of committed.forms) library[form.mesh.id] ??= form;
         for (const [slotId, form] of Object.entries(committed.slots)) records[slotId] ??= form;
-        // Retain uploads saved before the repository was introduced.
-        for (const form of Object.values(records)) library[form.mesh.id] ??= { ...form, fits: null, ruleset: undefined };
+        // Keep a saved ruleset with the repository form. Slot records are the source when the repository copy was stored without one.
+        for (const form of Object.values(records)) {
+          const saved = library[form.mesh.id];
+          if (!saved || (form.ruleset && !saved.ruleset)) library[form.mesh.id] = { ...saved, ...form };
+        }
         await new Promise<void>((resolve, reject) => {
           const tx = db.transaction(["forms", "repository"], "readwrite");
           for (const [slotId, form] of Object.entries(records)) tx.objectStore("forms").put(form, slotId);
@@ -144,7 +147,7 @@ export default function HybridGeneration() {
       else delete next[slotId];
       return next;
     });
-    if (result) setRepository(current => ({ ...current, [result.mesh.id]: { ...result, fits: null, ruleset: undefined } }));
+    if (result) setRepository(current => ({ ...current, [result.mesh.id]: result }));
     const db = await openLibrary();
     try {
       await new Promise<void>((resolve, reject) => {
@@ -154,7 +157,7 @@ export default function HybridGeneration() {
         const slotStore = tx.objectStore("forms");
         if (result) {
           slotStore.put(result, slotId);
-          tx.objectStore("repository").put({ ...result, fits: null, ruleset: undefined }, result.mesh.id);
+          tx.objectStore("repository").put(result, result.mesh.id);
         } else slotStore.delete(slotId);
       });
     } finally { db.close(); }
@@ -167,7 +170,7 @@ export default function HybridGeneration() {
     setBusy(true);
     setMessage("");
     try {
-      await persist(slot.id, choice ? { ...choice.form, fits: null, ruleset: undefined } : null);
+      await persist(slot.id, choice ? choice.form : null);
     } catch { setMessage("Loaded for this session. Browser storage could not save this form."); }
     finally { setBusy(false); }
   }
@@ -237,7 +240,7 @@ export default function HybridGeneration() {
       });
       setRepository(current => {
         const next = { ...current };
-        for (const item of loaded) next[item.form.mesh.id] = { ...item.form, fits: null, ruleset: undefined };
+        for (const item of loaded) next[item.form.mesh.id] = item.form;
         return next;
       });
       try {
@@ -249,7 +252,7 @@ export default function HybridGeneration() {
             tx.onabort = tx.onerror = () => reject(tx.error);
             for (const item of loaded) {
               tx.objectStore("forms").put(item.form, item.slotId);
-              tx.objectStore("repository").put({ ...item.form, fits: null, ruleset: undefined }, item.form.mesh.id);
+              tx.objectStore("repository").put(item.form, item.form.mesh.id);
             }
           });
         } finally { db.close(); }
