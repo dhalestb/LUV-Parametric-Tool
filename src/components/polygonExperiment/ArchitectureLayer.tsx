@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 import * as THREE from 'three';
+import {formFinish,geometryFor} from './architectureViews';
 import {readBrowserDesign,downloadDesignRecord} from './browserDesigns';
 import {DesignPublication} from './DesignPublication';
 import {DisplayModeSelector,useArchitecturalDisplay} from './architecturalDisplay';
@@ -19,7 +20,7 @@ function ObjDownload({contents,filename}:{contents:string;filename:string}){
   },[contents]);
   return <a href={url||undefined} download={filename}>Download {filename}</a>;
 }
-export function SavedArchitectureMesh({result,combined,sectionPlane}:{result:Architecture;combined:boolean;sectionPlane?:THREE.Plane}){const geometry=useMemo(()=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(result.architecture.positions,3));g.setIndex(result.architecture.indices);g.computeVertexNormals();return g;},[result]);useEffect(()=>()=>geometry.dispose(),[geometry]);return <mesh name={'Rule-B-'+result.id} geometry={geometry} castShadow={!combined && !sectionPlane} receiveShadow={!combined && !sectionPlane}><meshStandardMaterial flatShading roughness={0.94} clippingPlanes={sectionPlane?[sectionPlane]:[]} side={sectionPlane?THREE.DoubleSide:THREE.FrontSide} color='#F7F6F5' transparent={combined} opacity={combined?.45:1} depthWrite={!combined}/></mesh>;}
+export function SavedArchitectureMesh({result,combined,sectionPlane}:{result:Architecture;combined:boolean;sectionPlane?:THREE.Plane}){const geometry=useMemo(()=>geometryFor(result.architecture),[result]);useEffect(()=>()=>geometry.dispose(),[geometry]);return <mesh name={'Rule-B-'+result.id} geometry={geometry} castShadow={!combined && !sectionPlane} receiveShadow={!combined && !sectionPlane}><meshStandardMaterial {...formFinish} clippingPlanes={sectionPlane?[sectionPlane]:[]} side={sectionPlane?THREE.DoubleSide:THREE.FrontSide} transparent={combined} opacity={combined?.45:1} depthWrite={!combined}/></mesh>;}
 export function ArchitectureGeometry({orientation,sectionPlane}:{orientation:OrientationResult;sectionPlane?:THREE.Plane}){const {result,visible,mode}=useArchitecture(orientation);return result&&visible?<SavedArchitectureMesh result={result} sectionPlane={sectionPlane} combined={mode==='combined'}/>:null;}
 
 

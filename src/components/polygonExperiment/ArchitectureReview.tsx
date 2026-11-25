@@ -9,6 +9,7 @@ import {readOrientation,saveOrientation,writeSiteSelection,selectionDefault,type
 import cohort from './hybrid-cohort.json';
 import type {Experiment,Registry} from './model';
 import SitePlan from './SitePlan';
+import ArchitecturePresentation from './ArchitecturePresentation';
 import styles from './workflow.module.css';
 
 const CombinedArchitecture=dynamic(()=>import('./CombinedArchitecture'),{ssr:false});
@@ -124,6 +125,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
         <tbody>{result.provenance.heightRegions.map(b=><tr key={b.id}><td>{b.role}</td><td>{b.capFeet.toFixed(1)} ft</td><td>{b.builtFeet.toFixed(1)} ft</td></tr>)}</tbody>
       </table> : result?.provenance.adapter==='polygon-composition/v1'&&<p>{result.provenance.heightPolicy==='uniform limit'?'This polygon used a uniform height limit.':'This saved study predates regional height measurements. Generate Design creates a new study with the current site rules.'}</p>}
       <div className={styles.viewer}><OrientationView result={record} view={reference?referenceView:view}/></div>
+      {result&&<ArchitecturePresentation initialId={record.id} records={[record,...group.filter(r=>!reference&&r.zoneId!==record.zoneId)]}/>}
       <div className={styles.alternative}><label>Alternative name<input aria-label="Alternative name" value={name} onChange={e=>setName(e.target.value)}/></label>
         <button disabled={!result||saving||!name.trim()} onClick={save}>Save Alternative</button>
         {record.site.origin!=='fixture'&&saved?.status==='complete'&&result&&<button onClick={()=>{try{
