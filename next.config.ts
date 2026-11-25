@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const siteWorkers = [
   "./scripts/*.cjs",
+  "./public/experiment-designs/0aef1f14-66a5-45b3-a2ba-a31248841e7f/{input,rule-a}.json",
+  "./public/experiment-designs/17cb9692-eb78-4a54-9314-7e3de823daa7/rule-a.json",
   "./vendor/architectural-board/**/*",
   "./vendor/typology-proof-20261121/**/*",
   "./fixtures/inserted-plate/**/*",
@@ -9,6 +11,10 @@ const siteWorkers = [
   "./public/samples/miami-waterfront.glb",
   "./src/components/polygonExperiment/*.json",
   "./src/components/polygonExperiment/*.ts",
+  "./src/components/siteDevelopment/hybridization.ts",
+  "./src/components/siteDevelopment/types.ts",
+  "./src/components/lattice/types.ts",
+  "./src/components/evaluations/descriptorV2.ts",
   "./reports/multi-typology-first-proof-20261121/dependencies.json",
   "./node_modules/{manifold-3d,three,three-mesh-bvh,typescript,sharp,@img,detect-libc,semver}/**/*",
 ];

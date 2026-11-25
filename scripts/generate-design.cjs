@@ -1,5 +1,11 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto'),{execute}=require('./adaptive-orientation.cjs'),{buildArchitecture}=require('./design-rule-b.cjs'),{hash}=require('./polygon-orientation.cjs');
 async function generateDesign(input,{outputRoot}={}){
+ if(['hybrid-rule','descriptor'].includes(input.generationMethod)){
+  return require('./site-rule-influence.cjs').generateInfluencedDesign(input,outputRoot);
+ }
+ if(input.generationMethod && input.generationMethod !== 'typology-area')throw Error('Unsupported generation method');
+ if(input.ruleInfluence)throw Error('Select the hybrid rule distribution method');
+ if(Object.hasOwn(input,'descriptorAreas'))throw Error('Select the descriptor distribution method');
  if(input.siteHandoff&&!input.siteHandoffSelection)throw Error('Site handoff must be resolved by the server from an explicit selection');
  if(input.siteHandoffSelection)input=await require('./site-typology-handoff.cjs').prepareTypologyInput(input);
  if(input.adaptive?.typologyId==='vertical-walls')return require('./stepped-design.cjs').generateSteppedDesign(input,{outputRoot});

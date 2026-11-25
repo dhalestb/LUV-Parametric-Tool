@@ -1262,6 +1262,7 @@ export default function SiteDevelopmentStudio() {
                 Represent all selected typologies
               </label>
               <p className="mt-1 text-[10px]" style={{ color: "var(--muted)" }}>{hybridizationCapability(selected.hybridization).description}</p>
+              <a className="text-[10px] underline" href="/experiment/site-polygon-morphogenesis?method=hybrid-rule#site-generation-methods">Open architectural rule distribution</a>
               <p className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>
                 {selected.quantityMode === "automatic"
                   ? `Estimate ${estimateForms(selected)} forms at ${selected.targetCoveragePercent}% coverage (authentic OBJ footprints).`

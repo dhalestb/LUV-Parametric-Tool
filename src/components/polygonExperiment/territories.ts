@@ -1,4 +1,5 @@
 import type {CrossSection,ManifoldToplevel} from 'manifold-3d';
+import {cutArea} from './cutArea';
 import {TYPOLOGIES,type Assignment,type Registry,type SiteInput,type Typology,type Zone} from './model';
 import {adapterForVariant} from './adapters';
 import tolerancePolicy from './geometryTolerances.json';
@@ -51,17 +52,11 @@ export function generateTerritories(api:ManifoldToplevel,site:SiteInput,zone:Zon
  // Seed rotates deterministic typology order; canonical order at seed 2041.
  const shift=((c.seed-2041)%ids.length+ids.length)%ids.length,order=[...ids.slice(shift),...ids.slice(0,shift)];
  let remaining=permitted;const sections:CrossSection[]=[],territories:Territory[]=[],cutDirections:Point[]=[];
- const all=zone.polygon;const maxRadius=Math.max(1,...all.map(p=>Math.hypot(p[0]-all[0][0],p[1]-all[0][1])))*4;
- function cut(region:CrossSection,n:Point,target:number){const dots=region.toPolygons().flat().map(p=>p[0]*n[0]+p[1]*n[1]);let lo=Math.min(...dots)-1,hi=Math.max(...dots)+1;const tangent:Point=[-n[1],n[0]],td=all.map(p=>p[0]*tangent[0]+p[1]*tangent[1]),tl=Math.min(...td)-maxRadius,th=Math.max(...td)+maxRadius,low=lo-maxRadius;
- const point=(u:number,v:number):Point=>[n[0]*u+tangent[0]*v,n[1]*u+tangent[1]*v];
- let best:CrossSection|undefined,bestError=Infinity;
- for(let j=0;j<60;j++){const mid=(lo+hi)/2,mask=new api.CrossSection([positive([point(low,tl),point(mid,tl),point(mid,th),point(low,th)])]),clipped=region.intersect(mask);mask.delete();const measured=clipped.area(),error=Math.abs(measured-target);if(error<bestError){best?.delete();best=clipped;bestError=error;}else clipped.delete();if(error<allocationTolerance*.05)break;if(measured<target)lo=mid;else hi=mid;}
- return own(best!);
- }
+
  for(let index=0;index<order.length;index++){
  const id=order[index],requested=area*a.shares[id]/100;let n:Point=[1,0];
  if(strategy==='geometry'){let length=-1;for(const r of remaining.toPolygons()){if(signedArea(r as Ring)<=0)continue;for(let i=0;i<r.length;i++){const p=r[i],q=r[(i+1)%r.length],dx=q[0]-p[0],dy=q[1]-p[1],d=Math.hypot(dx,dy);if(d>length+1e-8){length=d;n=[-dy/d,dx/d];}}}}
- cutDirections.push(n);const piece=index===order.length-1?remaining:cut(remaining,n,requested);sections.push(piece);const contours=piece.toPolygons() as Ring[],measured=piece.area(),parts=piece.decompose();
+ cutDirections.push(n);const piece=index===order.length-1?remaining:own(cutArea(api,remaining,zone.polygon,n,requested,allocationTolerance));sections.push(piece);const contours=piece.toPolygons() as Ring[],measured=piece.area(),parts=piece.decompose();
  let label:Point=[0,0],bestArea=-1,screen:Territory['screen']='passes-planning-screen';const findings:string[]=[];
  for(const part of parts){const erosion=part.offset(-c.minimumDiameter[id]/2,'Round',2,32);if(erosion.isEmpty()){screen='infeasible';findings.push(`A component cannot contain the ${c.minimumDiameter[id]} ft planning-clearance disk.`);}if(part.area()>bestArea){bestArea=part.area();label=interiorLabel(part.toPolygons() as Ring[]);}erosion.delete();part.delete();}
  if(parts.length>1)findings.push(`${parts.length} disconnected components: future letter connectivity requires review.`);
