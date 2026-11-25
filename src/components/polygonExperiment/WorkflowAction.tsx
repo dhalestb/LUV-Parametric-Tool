@@ -21,7 +21,7 @@ export default function WorkflowAction({action,site,method,allocation,local=fals
   return <section className={styles.run} id="generate-design" aria-labelledby="generate-heading">
     <div><h2 id="generate-heading"><small>03</small> Generate Design</h2>
       <p className={styles.summary}>{site} · {method}</p><p>{allocation}{target&&<> · Independent typology {target}</>}{eligible&&<> · Eligible typologies {eligible}</>}</p>
-      <div className={reason?styles.blocked:styles.ready} role="status">{busy?'Generation in progress':reason||'Ready to generate'}</div>
+      {(busy||reason||!message)&&<div className={reason?styles.blocked:styles.ready} role="status">{busy?'Generation in progress':reason||'Ready to generate'}</div>}
       {reason&&fix&&(action.setup?<details ref={setup} className={styles.fix}><summary>Review generation setup</summary>{fix}</details>:<div className={styles.fix}>{fix}</div>)}
       {message&&<p role="status" className={styles.feedback}>{message}</p>}
       {correction&&/^(Generation blocked|Error:)/.test(message)&&!/access key/i.test(message)&&<div className={styles.fix}>{correction}</div>}

@@ -188,7 +188,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       const count=batch.records.reduce((n,r)=>n+r.architecture.provenance.members.length,0);
       setMessage('Generated '+count+(nativeStudies?' typology placements across ':' typology compositions across ')+ids.length+' polygon'+(ids.length===1?'':'s')+'.');
       document.getElementById('combined-site-plan')?.scrollIntoView({block:'start'});
-    }catch(e){setMessage('Generation blocked. '+(e instanceof Error?e.message:String(e)));}
+    }catch(e){setMessage('Generation blocked. '+(e instanceof Error?e.message:String(e))+' This run produced no new saved design.');}
     finally{inFlight.current=false;setBusy(false);}
   }
   const action=(a:RunAction)=><WorkflowAction action={{...a,reason:reason||a.reason,fix:reason?fix:a.fix,setup:reason?setup:a.setup}}

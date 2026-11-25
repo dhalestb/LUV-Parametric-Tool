@@ -88,7 +88,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
     <h2 id="review-heading"><small>04</small> Review Generated Architecture</h2>
     {site&&site.zones.length>0&&<section id="combined-site-plan"><h3>Combined site plan</h3>
       <SitePlan state={state} site={site} registry={registry} records={Object.fromEntries(matches.map(m=>[m.zone.id,m.shown?.r]))}/>
-      <p>Territory colors identify typologies. Floor, wall and roof outlines show the generated composition in plan.</p>
+      <p>Territory colors show the prepared allocations. Architectural outlines show the saved design selected for each polygon.</p>
       <div className={styles.zoneChoices}>{matches.map(({zone,options,key,shown})=><label key={key}>{zone.name}
         {options.length?<select aria-label={zone.name+' plan design'} value={shown?.d.id??''} onChange={e=>setZoneChoices({...zoneChoices,[key]:e.target.value})}>
           <option value="">Hide architecture</option>{options.map(o=><option key={o.d.id} value={o.d.id}>{o.d.name}</option>)}</select>:<small>No completed design for this site revision</small>}
@@ -113,8 +113,8 @@ export default function ArchitectureReview({state,registry,results,selected,view
         <div><span>Site height check</span><strong>{heightPassed===undefined?'Unrecorded':heightPassed?'Passed':'Review'}</strong></div>
       </div>:<p role="status">{loading?'Loading architectural geometry…':error||'Only source-letter geometry is available.'}</p>}
       {result?.provenance.adapter==='polygon-composition/v1'&&<table className={styles.areaReport}><caption>Measured composition · {result.provenance.clustering}% clustering · {result.provenance.buildableAreaFeet2?.toLocaleString(undefined,{maximumFractionDigits:1})} ft² buildable ground</caption>
-        <thead><tr><th>Typology</th><th>Requested</th><th>Built share</th><th>Footprint</th></tr></thead>
-        <tbody>{result.provenance.members?.map(m=><tr key={m.typology}><td>{m.name}</td><td>{m.allocatedPercent}%</td><td>{m.achievedPercent.toFixed(2)}%</td><td>{m.footprintAreaFeet2.toLocaleString(undefined,{maximumFractionDigits:1})} ft²</td></tr>)}</tbody>
+        <thead><tr><th>Typology</th><th>Requested</th><th>Built share</th><th>Footprint</th><th>Source letters</th></tr></thead>
+        <tbody>{result.provenance.members?.map(m=><tr key={m.typology}><td>{m.name}</td><td>{m.allocatedPercent}%</td><td>{m.achievedPercent.toFixed(2)}%</td><td>{m.footprintAreaFeet2.toLocaleString(undefined,{maximumFractionDigits:1})} ft²</td><td>{m.sourceCount??'—'}</td></tr>)}</tbody>
       </table>}
       <div className={styles.viewer}><OrientationView result={record} view={reference?referenceView:view}/></div>
       <div className={styles.alternative}><label>Alternative name<input aria-label="Alternative name" value={name} onChange={e=>setName(e.target.value)}/></label>
