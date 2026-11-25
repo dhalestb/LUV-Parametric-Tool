@@ -1,6 +1,7 @@
 "use client";
 
-import {DisplayModeSelector} from '../polygonExperiment/architecturalDisplay';
+import {ArchitectureLighting} from '../polygonExperiment/ArchitectureLighting';
+import {DisplayModeSelector,useArchitecturalDisplay} from '../polygonExperiment/architecturalDisplay';
 import {writeSiteSelection,selectionDefault} from '../polygonExperiment/orientationStore';
 import {OrientationGeometry,useSiteOrientation} from '../polygonExperiment/OrientationScene';
 import SharedAlternatives,{useSceneLayers,usePublished} from "../polygonExperiment/SharedAlternatives";
@@ -408,6 +409,8 @@ export default function SiteViewport(props: Props) {
   const scene=useSceneLayers();
   const orientation=useSiteOrientation(props.zones, JSON.stringify(props.orientationSource));
   const published=usePublished();
+  const {mode}=useArchitecturalDisplay();
+  const shadeForms=orientation.records.length>0 && mode==='architecture';
   const groupBounds=new THREE.Box3();
   if(orientation.grouped && props.tool==='orbit'){
     for(const record of orientation.records){
@@ -435,11 +438,11 @@ export default function SiteViewport(props: Props) {
   const formOpacity = overlayMode === "compare" ? 0.35 : 1;
 
   return (
-    <><div style={{position:'absolute',top:8,right:8,zIndex:20,background:'var(--panel-background)',padding:8,fontSize:11}}>{(['model','polygons','clusters'] as const).map(key=><label key={key} style={{marginRight:10}}><input type='checkbox' aria-label={'Shared viewport '+key} checked={scene.layers[key]} onChange={()=>scene.toggle(key)}/>{key}</label>)}<span>One world-space camera · territories are previews</span><DisplayModeSelector/><p role="status" aria-label="C1 shared visibility" style={{maxWidth:480,marginBottom:0}}>{orientation.message}</p>{orientation.grouped&&<button onClick={()=>writeSiteSelection(selectionDefault)}>Hide combined designs</button>}</div><Canvas gl={{ antialias: true, alpha: false }} style={{ width: "100%", height: "100%", background: "#000", cursor: drawing ? "crosshair" : "default" }} onPointerMissed={() => { if (!drawing) { props.onSelectZone(null); props.onSelectCluster(null); } }}>
+    <><div style={{position:'absolute',top:8,right:8,zIndex:20,background:'var(--panel-background)',padding:8,fontSize:11}}>{(['model','polygons','clusters'] as const).map(key=><label key={key} style={{marginRight:10}}><input type='checkbox' aria-label={'Shared viewport '+key} checked={scene.layers[key]} onChange={()=>scene.toggle(key)}/>{key}</label>)}<span>One world-space camera · territories are previews</span><DisplayModeSelector/><p role="status" aria-label="C1 shared visibility" style={{maxWidth:480,marginBottom:0}}>{orientation.message}</p>{orientation.grouped&&<button onClick={()=>writeSiteSelection(selectionDefault)}>Hide combined designs</button>}</div><Canvas shadows={shadeForms} gl={{ antialias: true, alpha: false }} style={{ width: "100%", height: "100%", background: "#000", cursor: drawing ? "crosshair" : "default" }} onPointerMissed={() => { if (!drawing) { props.onSelectZone(null); props.onSelectCluster(null); } }}>
       <color attach="background" args={["#000000"]} />
-      <ambientLight intensity={0.55} />
+      {shadeForms ? <ArchitectureLighting studies={orientation.records}/> : <><ambientLight intensity={0.55} />
       <directionalLight position={[80, 140, 40]} intensity={1.1} />
-      <directionalLight position={[-40, 60, -80]} intensity={0.25} />
+      <directionalLight position={[-40, 60, -80]} intensity={0.25} /></>}
       <Cameras view={props.view} span={props.span} />
       <Aim view={props.view} aim={groupFrame?groupFrame.center.toArray():props.aim} span={groupFrame?groupFrame.radius*2:props.span} groupRadius={groupFrame?.radius}/>
       <DrawingCapture enabled={drawing} onPointer={props.onPointer} />
@@ -583,4 +586,3 @@ export default function SiteViewport(props: Props) {
     </Canvas></>
   );
 }
-
