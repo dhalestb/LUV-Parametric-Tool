@@ -3,10 +3,10 @@ import { polygonArea, polygonSelfIntersects } from '../siteDevelopment/geometry'
 import type { SiteCoordinates, SiteDevelopmentProject } from '../siteDevelopment/types';
 
 export const STORAGE_KEY = 'luv-experiment-site-polygon-morphogenesis-v1';
-export const TYPOLOGIES = ['linear-edge-gallery','inserted-plate','vertical-walls','room-within-volume','void-field','vertical-void-lobby','compressed-sequential-lobby'] as const;
+export const TYPOLOGIES = ['linear-edge-gallery','inserted-plate','vertical-walls','room-within-volume','void-field','vertical-void-lobby','compressed-sequential-lobby','topographic-ground-field-lobby'] as const;
 export type Typology = typeof TYPOLOGIES[number];
-export type LobbyTypology = 'vertical-void-lobby'|'compressed-sequential-lobby';
-export function isLobbyTypology(id:string):id is LobbyTypology {return id==='vertical-void-lobby'||id==='compressed-sequential-lobby';}
+export type LobbyTypology = Extract<Typology, `${string}-lobby`>;
+export function isLobbyTypology(id:string):id is LobbyTypology {return id.endsWith('-lobby')&&TYPOLOGIES.some(type=>type===id);}
 export type Five<T> = [T,T,T,T,T];
 export const DESCRIPTORS = ['Open Volume','Visually Connected','Circulation Activated','Vertically Integrated','Centralized'] as const;
 export type RuleProfile = { scale:'percentage'|'ordinal'; values:Five<number|null>; archivedScales?:Partial<Record<'percentage'|'ordinal',Five<number|null>>> };
@@ -24,7 +24,7 @@ export type RegistryItem = { id:Typology; name:string; A:Rule; B:Rule; variants:
 export type Registry = { snapshot:string; boardCommit:string; siteCommit:string; counts:{boardFiles:number;siteFiles:number;savedStudies:number}; items:RegistryItem[] };
 const emptyFive = ():Five<null> => [null,null,null,null,null];
 export function initialState():Experiment { return {version:2,territoryByZone:{},descriptorAllocation:false,descriptorSpatialTargeting:false,site:null,selected:[],focus:null,unitsConfirmed:false,transform:'within',allocation:'territories',seedMethod:'letters',assignments:{},descriptorIds:[...DESCRIPTORS],profiles:Object.fromEntries(TYPOLOGIES.map(id=>[id,{scale:'percentage',values:emptyFive()}])) as Experiment['profiles']}; }
-export function newAssignment():Assignment { return {shares:{'linear-edge-gallery':100,'inserted-plate':0,'vertical-walls':0,'room-within-volume':0,'void-field':0,'vertical-void-lobby':0,'compressed-sequential-lobby':0},variants:{'linear-edge-gallery':'print-contour','inserted-plate':'edge-connected','vertical-walls':'vertical-walls','room-within-volume':'perimeter-room/fullProfiles/suspendedLLV/edgePlatforms','void-field':'face-normal/neighbor-taper/adjacent','vertical-void-lobby':'vertical-stack','compressed-sequential-lobby':'sequential-shell'},targets:emptyFive()}; }
+export function newAssignment():Assignment { return {shares:{'linear-edge-gallery':100,'inserted-plate':0,'vertical-walls':0,'room-within-volume':0,'void-field':0,'vertical-void-lobby':0,'compressed-sequential-lobby':0,'topographic-ground-field-lobby':0},variants:{'linear-edge-gallery':'print-contour','inserted-plate':'edge-connected','vertical-walls':'vertical-walls','room-within-volume':'perimeter-room/fullProfiles/suspendedLLV/edgePlatforms','void-field':'face-normal/neighbor-taper/adjacent','vertical-void-lobby':'vertical-stack','compressed-sequential-lobby':'sequential-shell','topographic-ground-field-lobby':'spiral-ground-field'},targets:emptyFive()}; }
 export async function fingerprint(value:unknown) { const bytes=new TextEncoder().encode(JSON.stringify(value)); const digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),n=>n.toString(16).padStart(2,'0')).join(''); }
 export function validRing(ring:unknown):ring is [number,number][] { return Array.isArray(ring)&&ring.length>=3&&ring.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))&&!polygonSelfIntersects(ring)&&polygonArea(ring)>0; }
 export async function importSite(raw:string,origin:SiteInput['origin']):Promise<SiteInput> {

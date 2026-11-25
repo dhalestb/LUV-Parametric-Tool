@@ -5,6 +5,11 @@ import {candidates,projectMesh,siteMesh,type FormationPart,type Letter,type Plan
 import type {HeightBand} from './compositionHeights';
 import type {Point,Ring} from './territories';
 
+const layouts={
+  'vertical-void-lobby':{name:'Vertical Void Lobby',unit:'stack',collection:'stacks',limit:10,heights:[60,40,20],headings:[0]},
+  'compressed-sequential-lobby':{name:'Compressed Sequential Lobby',unit:'sequence',collection:'sequences',limit:15,heights:[20],headings:[0,90,45,135,30,60,120,150]},
+  'topographic-ground-field-lobby':{name:'Topographic Lobby',unit:'field',collection:'fields',limit:15,heights:[60,40,20],headings:[0,90,45,135,30,60,120,150]},
+} satisfies Record<LobbyTypology,{name:string;unit:string;collection:string;limit:number;heights:number[];headings:number[]}>;
 type Mesh=Letter['mesh'];
 type Station={point:Point;radius:number};
 
@@ -24,9 +29,7 @@ function toSolid(api:ManifoldToplevel,mesh:Mesh){
 
 export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,domain:CrossSection,origin:Point,datum:number,
   label:Point,clustering:number,cap:number,bands:HeightBand[],target?:number){
-  const sequential=typology==='compressed-sequential-lobby';
-  const name=sequential?'Compressed Sequential Lobby':'Vertical Void Lobby';
-  const groupLimit=sequential?15:10;
+  const {name,unit,collection,limit:groupLimit,heights,headings}=layouts[typology];
   const letterTarget=target??automaticLetterTarget(domain.area());
   if(!Number.isInteger(letterTarget)||letterTarget<2||letterTarget>maxLetterTarget)
     throw Error(name+' needs a target between 2 and '+maxLetterTarget+' letters.');
@@ -61,16 +64,16 @@ export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,doma
       };
       const ranked=pool.map(p=>({p,score:score(p)})).sort((a,b)=>b.score-a.score).map(v=>v.p);
       const variants=[];
-      for(const fieldHeight of sequential?[20]:[60,40,20]){
+      for(const fieldHeight of heights){
         if(fieldHeight>Math.max(20,cap))continue;
         const study=await lobbyStudy(typology,fieldHeight,count);
         const native=own(toSolid(api,study.architecture));
         if(native.status()!=='NoError'||native.isEmpty())throw Error('Invalid native '+name+' solid.');
-        const bottom=native.boundingBox().min[2],height=study.height-bottom;
+        const bottom=native.boundingBox().min[2],height=study.height+study.datum-bottom;
         if(height>cap+.00001)continue;
         const outline=own(new api.CrossSection([study.envelope],'NonZero'));
         const radius=Math.max(...study.envelope.map(([x,y])=>Math.hypot(x-study.center[0],y-study.center[1])));
-        for(const angle of sequential?[0,90,45,135,30,60,120,150]:[0]){
+        for(const angle of headings){
           const radians=angle*Math.PI/180,cos=Math.cos(radians),sin=Math.sin(radians);
           const [x,z]=study.center;
           const center:Point=[cos*x-sin*z,sin*x+cos*z];
@@ -89,7 +92,7 @@ export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,doma
         const at={point,radius,dx:point[0]-center[0],dz:point[1]-center[1]};
         const oriented=angle?own(native.rotate([0,0,angle])):native;
         const placed=own(oriented.translate([at.dx,at.dz,-bottom]));
-        const prefix=typology+(sequential?'/sequence-':'/stack-')+(stations.length+1)+'/';
+        const prefix=typology+'/'+unit+'-'+(stations.length+1)+'/';
         const translation=[origin[0]+at.dx,datum-bottom,origin[1]+at.dz];
         const sources=study.letters.map(l=>{
           const positions=l.mesh.positions.map((v,i)=>v+translation[i%3]);
@@ -109,7 +112,7 @@ export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,doma
           layers.push({name:prefix+'section',typology,top,contours:contours(own(placed.slice(top)))});
         }
         const key=fieldHeight+'-'+count;
-        placements.push({key,...(sequential?{headingDegrees:angle}:{}),sha256:lobbyStudyHashes[typology][key],center:[origin[0]+at.point[0],origin[1]+at.point[1]],fieldHeight,count});
+        placements.push({key,...(headings.length>1?{headingDegrees:angle}:{}),sha256:lobbyStudyHashes[typology][key],center:[origin[0]+at.point[0],origin[1]+at.point[1]],fieldHeight,count});
         added=true;break;
       }
       if(!added)break;
@@ -121,7 +124,7 @@ export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,doma
     const plan=own(projectMesh(api,siteMesh(solid,origin,datum),origin));
     const outside=own(plan.subtract(domain)).area(),missing=own(domain.subtract(plan)).area();
     if(Math.max(outside,missing)>Math.max(.01,domain.area()*1e-6))throw Error(name+' footprint differs from its allocation.');
-    return {solid:solid.translate([0,0,0]),letters,parts,layers,placements,letterTarget,sourceArea:own(api.CrossSection.union(projections)).area(),
+    return {solid:solid.translate([0,0,0]),letters,parts,layers,placements,collection,letterTarget,sourceArea:own(api.CrossSection.union(projections)).area(),
       footprintArea:plan.area(),outside,missing,height:solid.boundingBox().max[2]};
   }finally{for(const s of owned.reverse())s.delete();}
 }

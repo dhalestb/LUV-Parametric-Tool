@@ -34,15 +34,16 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
       const bands=envelope.bands.filter(b=>own(region.intersect(b.section)).area()>1e-7);
       const cap=bands.length?Math.max(...bands.map(b=>b.cap)):envelope.zoneCap;
       const label:Point=[t.label[0]-origin[0],t.label[1]-origin[1]];
-      const result=isLobbyTypology(rule.id)
+      const lobbyResult=isLobbyTypology(rule.id)
         ? await formLobby(rule.id,api,region,origin,datum,label,clustering,cap,bands,letterTargets[t.typology])
-        : formTerritory(api,region,origin,datum,rule,await studyFor(rule.id),label,clustering,cap,bands,letterTargets[t.typology]);
+        : undefined;
+      const result=lobbyResult??formTerritory(api,region,origin,datum,rule,await studyFor(rule.id),label,clustering,cap,bands,letterTargets[t.typology]);
       formed.push(own(result.solid));
       if(result.height>cap+1e-5)throw Error(rule.name+' exceeds the site height limit.');
       sourceArea+=result.sourceArea;letters.push(...result.letters);components.push(...result.parts);planLayers.push(...result.layers);
       members.push({typology:t.typology,name:rule.name,territory:t.id,allocatedPercent:t.requestedPercent,
         achievedPercent:100*result.footprintArea/plan.allocatableArea,territoryAreaFeet2:t.area,footprintAreaFeet2:result.footprintArea,
-        missingFeet2:result.missing,outsideFeet2:result.outside,...('placements' in result?{[rule.id==='vertical-void-lobby'?'stacks':'sequences']:result.placements}:{sourceStudyHash:hashes[t.typology]}),sourceCount:result.letters.length,letterTarget:result.letterTarget,
+        missingFeet2:result.missing,outsideFeet2:result.outside,...(lobbyResult?{[lobbyResult.collection]:lobbyResult.placements}:{sourceStudyHash:hashes[t.typology]}),sourceCount:result.letters.length,letterTarget:result.letterTarget,
         sourceEntry:rule.A.entry,formationDimensions:rule.B.parameters,heightFeet:result.height,heightCapFeet:Number.isFinite(cap)?cap:null});
     }
     // The common lower course joins matching floor edges across typology seams.

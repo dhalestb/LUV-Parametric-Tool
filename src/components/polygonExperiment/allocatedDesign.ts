@@ -6,10 +6,15 @@ import type {HeightRecord} from './SiteRulePanel';
 import originalHashes from './allocated-study-hashes.json';
 import stackHashes from './vertical-lobby-stacks.json';
 import sequenceHashes from './compressed-lobby-sequences.json';
-export const lobbyStudyHashes:Record<LobbyTypology,Record<string,string>>={
-  'vertical-void-lobby':stackHashes,'compressed-sequential-lobby':sequenceHashes
+import fieldHashes from './topographic-lobby-fields.json';
+
+const referenceStudy:Record<LobbyTypology,[number,number]>={
+  'vertical-void-lobby':[40,10],'compressed-sequential-lobby':[20,15],'topographic-ground-field-lobby':[60,15]
 };
-export const hashes={...originalHashes,'vertical-void-lobby':stackHashes['40-10'],'compressed-sequential-lobby':sequenceHashes['20-15']};
+export const lobbyStudyHashes:Record<LobbyTypology,Record<string,string>>={
+  'vertical-void-lobby':stackHashes,'compressed-sequential-lobby':sequenceHashes,'topographic-ground-field-lobby':fieldHashes
+};
+export const hashes={...originalHashes,'vertical-void-lobby':stackHashes['40-10'],'compressed-sequential-lobby':sequenceHashes['20-15'],'topographic-ground-field-lobby':fieldHashes['60-15']};
 
 type Mesh={positions:number[];indices:number[]};
 type Letter=OrientationResult['components'][number];
@@ -45,7 +50,7 @@ export function lobbyStudy(type:LobbyTypology,height:number,count:number){
   return cachedStudy(type,type+'/'+key,hash);
 }
 export function studyFor(type:Typology){
-  if(isLobbyTypology(type))return type==='vertical-void-lobby'?lobbyStudy(type,40,10):lobbyStudy(type,20,15);
+  if(isLobbyTypology(type))return lobbyStudy(type,...referenceStudy[type]);
   return cachedStudy(type,type,hashes[type]);
 }
 function bounds(r:Ring){

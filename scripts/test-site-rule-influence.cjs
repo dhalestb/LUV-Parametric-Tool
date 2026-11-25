@@ -33,7 +33,7 @@ async function main() {
     const {generateTerritories,defaults}=require('../src/components/polygonExperiment/territories.ts');
     const {newAssignment}=require('../src/components/polygonExperiment/model.ts');
     const assignment=newAssignment();
-    assignment.shares={'linear-edge-gallery':40,'inserted-plate':30,'vertical-walls':30,'room-within-volume':0,'void-field':0};
+    Object.assign(assignment.shares,{'linear-edge-gallery':40,'inserted-plate':30,'vertical-walls':30});
     for(const strategy of ['area','geometry']){
       const result=generateTerritories(kernel,base.site,base.site.zones.find(z=>z.id===base.zoneId),assignment,
         defaults(),strategy,require('../src/components/polygonExperiment/registry-data.json'));

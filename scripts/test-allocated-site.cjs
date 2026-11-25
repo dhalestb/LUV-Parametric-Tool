@@ -22,7 +22,7 @@ async function main() {
   territory.geometryKernel = async () => kernel;
   global.fetch = async url => {
     const name = new URL(url, 'http://localhost').pathname;
-    assert.match(name, /^\/allocated-studies\/(?:[a-z-]+|vertical-void-lobby\/40-10|compressed-sequential-lobby\/20-15)\.json\.gz$/);
+    assert.match(name, /^\/allocated-studies\/(?:[a-z-]+|vertical-void-lobby\/40-10|compressed-sequential-lobby\/20-15|topographic-ground-field-lobby\/60-15)\.json\.gz$/);
     return new Response(fs.readFileSync(root+'/public'+name));
   };
   const project = require('../public/experiment-inputs/two-zone.json');
@@ -102,6 +102,19 @@ async function main() {
   assert.equal(compressed.orientation.components.length,15);
   assert.equal(compressed.architecture.provenance.members[0].source.engine,'bfce854');
   assert.equal(compressed.architecture.provenance.members[0].scale,1);
+  const topo='topographic-ground-field-lobby';
+  lobbyState.assignments[first.id].shares['compressed-sequential-lobby']=0;
+  lobbyState.assignments[first.id].shares[topo]=100;
+  lobbyState.site.zones[0].inputParameters.maxHeightFeet=60;
+  const [groundField]=(await generate(lobbyState)).records;
+  const member=groundField.architecture.provenance.members[0];
+  assert.equal(member.typology,topo);
+  assert.equal(member.source.variant,'spiral-ground-field');
+  assert.equal(member.source.engine,'bfce854');
+  assert.equal(member.scale,1);
+  assert.deepEqual(groundField.orientation.components.map(l=>l.letter),Array.from({length:15},(_,i)=>['U','L','V'][i%3]));
+  const ys=groundField.architecture.architecture.positions.filter((_,i)=>i%3===1);
+  assert(Math.abs(Math.min(...ys)-lobbyState.site.coordinates.elevationDatum)<1e-5);
   console.log('Passed native placement of all five studies, two-zone allocations, protection, height limits, repeatability, disabled zones and saved geometry hashes.');
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

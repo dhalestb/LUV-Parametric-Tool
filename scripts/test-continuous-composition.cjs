@@ -234,6 +234,39 @@ async function main(){
     assert(architecture.provenance.heightRegions.every(r=>r.builtFeet<=r.capFeet+.001));
     console.log('Miami compressed lobby:',member.sequences.map(p=>p.key),member.achievedPercent,member.sourceCount);
   }
+  const topo='topographic-ground-field-lobby';
+  // Reopen a pre-topographic study with both previously integrated lobbies active.
+  const beforeTopo=structuredClone(lobbyState);
+  beforeTopo.territoryByZone=combined.territoryByZone;
+  delete beforeTopo.profiles[topo];
+  for(const a of Object.values(beforeTopo.assignments)){delete a.shares[topo];delete a.variants[topo];}
+  for(const t of Object.values(beforeTopo.territoryByZone)){
+    for(const k of ['enabled','locked','minimumDiameter'])delete t.controls[k][topo];
+  }
+  const upgrade=model.loadState(JSON.stringify(beforeTopo));
+  for(const [i,z] of upgrade.site.zones.entries()){
+    const a=upgrade.assignments[z.id],t=upgrade.territoryByZone[z.id];
+    assert.equal(a.shares[topo],0);
+    assert.equal(a.variants[topo],'spiral-ground-field');
+    assert(territory.currentTerritoryResult(upgrade.site,z,a,t.controls,t.results.area));
+    a.shares[topo]=a.shares['vertical-walls'];
+    a.shares['vertical-walls']=0;
+    upgrade.generation.zones[key(z)].letterTargets[topo]=i===0?7:21;
+  }
+  const topoBatch=await generateContinuousSite(upgrade,registry,()=>null,()=>{});
+  for(const [i,{orientation,architecture}] of topoBatch.records.entries()){
+    const m=architecture.provenance.members.find(m=>m.typology===topo);
+    assert(Math.abs(m.achievedPercent-25)<.0001);
+    assert.equal(m.sourceCount,i===0?7:21);
+    assert.equal(m.fields.reduce((n,f)=>n+f.count,0),m.sourceCount);
+    assert(m.fields.every(f=>f.sha256===require(dir+'topographic-lobby-fields.json')[f.key]));
+    assert.equal(orientation.components.filter(l=>l.id.startsWith(topo+'/')).length,m.sourceCount);
+    assert(architecture.provenance.members.some(m=>m.typology===lobby&&m.stacks.length));
+    assert(architecture.provenance.members.some(m=>m.typology===compressed&&m.sequences.length));
+    assert.equal(architecture.validation.connectedBodies,1);
+    assert(architecture.provenance.heightRegions.every(r=>r.builtFeet<=r.capFeet+.001));
+    console.log('Miami topographic lobby:',m.fields.map(f=>f.key),m.achievedPercent,m.sourceCount);
+  }
   const oldState=structuredClone(restored);
   delete oldState.profiles[compressed];
   for(const a of Object.values(oldState.assignments)){delete a.shares[compressed];delete a.variants[compressed];}

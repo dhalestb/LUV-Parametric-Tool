@@ -1,5 +1,4 @@
-import {verticalLobby} from './verticalLobbyRule';
-import {compressedLobby} from './compressedLobbyRule';
+import {lobbyRules} from './lobbyRules';
 import {isLobbyTypology} from './model';
 import type { Registry, Typology } from './model';
 export type RuleBinding={category:'A'|'B';sourceFile:string;sha256:string};
@@ -7,7 +6,7 @@ export type GeneratorAdapter={typology:Typology;variant:string;orientation:RuleB
 /** Preparation is deliberately pure: it does not import worker code or original persistence. */
 export function prepareAdapter(adapter:GeneratorAdapter){
  if(adapter.execution!=='gated-setup-phase'||!adapter.orientation.length||!adapter.generation.length)throw Error('Both authentic rule categories must be bound.');
- const lobby=[verticalLobby,compressedLobby].find(item=>item.id===adapter.typology);
+ const lobby=lobbyRules.find(item=>item.id===adapter.typology);
  for(const binding of [...adapter.orientation,...adapter.generation])if(!/^[a-f0-9]{64}$/.test(binding.sha256)||!(binding.sourceFile.startsWith('vendor/architectural-board/')||lobby&&lobby[binding.category].bindings.some(b=>b.sourceFile===binding.sourceFile&&b.sha256===binding.sha256)))throw Error('Unverified generator source.');
  return structuredClone(adapter);
 }
