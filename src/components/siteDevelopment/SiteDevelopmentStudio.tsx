@@ -145,6 +145,13 @@ export default function SiteDevelopmentStudio() {
   const siteGeometryRestored = useRef(false);
   const persistenceReady = useRef(false);
 
+  useEffect(() => {
+    if (!sessionHydrated || project.coordinates.unit !== "feet" || project.coordinates.feetPerModel !== 1 || project.coordinates.unitAssumption === "confirmed") return;
+    setProject(current => current.coordinates.unit === "feet" && current.coordinates.feetPerModel === 1
+      ? { ...current, coordinates: { ...current.coordinates, unitAssumption: "confirmed" } }
+      : current);
+  }, [sessionHydrated, project.coordinates]);
+
   const pushHistory = useCallback((next: SiteDevelopmentProject) => {
     history.current = [...history.current.slice(-24), project];
     future.current = [];
@@ -960,7 +967,12 @@ export default function SiteDevelopmentStudio() {
             <p className="mt-1 text-[10px]" style={{ color: "#ffd58b" }}>{suggestedOverlayNote(siteInfo?.suggestedZone ?? null)}</p>
             <div className="mt-2 grid grid-cols-2 gap-2 text-[10px]">
               <label>Units
-                <select className="ml-1 bg-transparent" value={project.coordinates.unit} onChange={(event) => setProject((current) => ({ ...current, coordinates: { ...coordinatesForUnit(event.target.value as typeof current.coordinates.unit, current.coordinates.rhinoZToGltfY), unitAssumption: "unresolved" } }))}>
+                <select className="ml-1 bg-transparent" value={project.coordinates.unit} onChange={(event) => {
+                  const unit = event.target.value as typeof project.coordinates.unit;
+                  setProject(current => ({
+                    ...current, coordinates: { ...current.coordinates, unit, feetPerModel: UNIT_TO_FEET[unit], unitAssumption: unit === "feet" ? "confirmed" : "unresolved" },
+                  }));
+                }}>
                   <option value="meters">meters → feet</option>
                   <option value="feet">feet</option>
                   <option value="millimeters">mm → feet</option>
@@ -975,7 +987,7 @@ export default function SiteDevelopmentStudio() {
               <span style={{ color: project.coordinates.unitAssumption === "confirmed" ? "#8ff2f4" : "#ffd58b" }}>
                 Unit assumption: {project.coordinates.unitAssumption} · feetPerModel={project.coordinates.feetPerModel}
               </span>
-              <button
+              {project.coordinates.unitAssumption !== "confirmed" && <button
                 type="button"
                 className={buttonClass}
                 style={actionStyle}
@@ -988,7 +1000,7 @@ export default function SiteDevelopmentStudio() {
                 }}
               >
                 Confirm site units
-              </button>
+              </button>}
             </div>
             <div className="mt-2 text-[10px]" style={{ color: "var(--muted)" }}>
               Proto-form vertical axis (shared with Lattice)

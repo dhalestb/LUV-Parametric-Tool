@@ -2,8 +2,9 @@
 
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {descriptorNames,descriptorRegions,influenceVersion,type AreaShares,type Descriptor} from './descriptorInfluence';
-import {fingerprint,withImportedSite,newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
+import {newAssignment,type Experiment,type GenerationMethod,type Registry,type Typology} from './model';
 import {defaults as territoryDefaults,geometryKernel,generateTerritories,currentTerritoryResult} from './territories';
+import {applyStudyUnits} from './syncSiteFeet';
 import {requestSiteWorker} from './workerClient';
 import {readSiteRules} from './SiteRulePanel';
 import {saveBrowserDesign} from './browserDesigns';
@@ -104,25 +105,9 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
     if(!site||confirming)return;
     setConfirming(true);setUnitError('');
     try{
-      if(site.coordinates.unitAssumption==='confirmed'){patch({unitsConfirmed:true});return;}
-      const coordinates={...site.coordinates,unitAssumption:'confirmed' as const};
-      const confirmed={...site,coordinates,unitConfirmation:{sourceFingerprint:site.fingerprint,sourceRevision:site.revision},revision:site.revision+':confirmed-units',
-        fingerprint:await fingerprint({source:site.fingerprint,coordinates})};
-      const next=withImportedSite(state,confirmed);
-      for(const z of site.zones){
-        const stored=state.territoryByZone[z.id];
-        if(!stored)continue;
-        const assignment=state.assignments[z.id]??newAssignment();
-        for(const strategy of ['area','geometry'] as const){
-          const old=stored.results[strategy];
-          if(!old||!currentTerritoryResult(site,z,assignment,stored.controls,old))continue;
-          const result=generateTerritories(await geometryKernel(),confirmed,z,assignment,stored.controls,strategy,registry);
-          if(!result.metrics.valid)throw Error('Could not revalidate the prepared territory for '+z.name+'.');
-          next.territoryByZone[z.id].results[strategy]=result;
-        }
-      }
+      const next=await applyStudyUnits(state,registry,site);
       if(latest.current!==state)throw Error('The study changed. Review the current units and confirm again.');
-      patch({...next,selected:state.selected,focus:state.focus});
+      patch(next);
     }catch(e){setUnitError(e instanceof Error?e.message:String(e));}finally{setConfirming(false);}
   }
   let reason='',fix:ReactNode=null,setup=false;
