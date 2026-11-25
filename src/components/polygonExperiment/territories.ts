@@ -1,4 +1,5 @@
 import type {CrossSection,ManifoldToplevel} from 'manifold-3d';
+import {clusteredCut} from './clusteredCut';
 import {cutArea} from './cutArea';
 import {TYPOLOGIES,type Assignment,type Registry,type SiteInput,type Typology,type Zone} from './model';
 import {adapterForVariant} from './adapters';
@@ -7,11 +8,12 @@ export const allocationAreaTolerance=(area:number)=>Math.max(tolerancePolicy.all
 export type Point=[number,number];
 export type Ring=Point[];
 export type Strategy='area'|'geometry';
-export type Controls={areaCutAngle?:number;enabled:Record<Typology,boolean>;locked:Record<Typology,boolean>;minimumDiameter:Record<Typology,number>;seed:number;reserved:{id:string;polygon:Ring}[]};
+export type Controls={clustering?:number;areaCutAngle?:number;enabled:Record<Typology,boolean>;locked:Record<Typology,boolean>;minimumDiameter:Record<Typology,number>;seed:number;reserved:{id:string;polygon:Ring}[]};
 export type Territory={id:string;typology:Typology;contours:Ring[];area:number;requestedPercent:number;achievedPercent:number;label:Point;components:number;screen:'passes-planning-screen'|'infeasible';findings:string[];rules:ReturnType<typeof adapterForVariant>;parameters:{A:Record<string,unknown>;B:Record<string,unknown>}};
 export type Result={strategy:Strategy;seed:number;signature:string;source:{id:string;revision:string;fingerprint:string};permitted:Ring[];protected:Ring[];grossArea:number;protectedArea:number;allocatableArea:number;territories:Territory[];metrics:{outside:number;overlap:number;omitted:number;maxAreaError:number;tolerance:number;allocationTolerance?:number;valid:boolean;milliseconds:number};cutDirections:Point[]};
 export type TerritoryState={controls:Controls;results:Partial<Record<Strategy,Result>>};
 export const defaults=():Controls=>({enabled:Object.fromEntries(TYPOLOGIES.map(t=>[t,true])) as Controls['enabled'],locked:Object.fromEntries(TYPOLOGIES.map(t=>[t,false])) as Controls['locked'],minimumDiameter:Object.fromEntries(TYPOLOGIES.map(t=>[t,20])) as Controls['minimumDiameter'],seed:2041,reserved:[]});
+export const compositionControls=(controls:Controls=defaults()):Controls=>({...controls,clustering:controls.clustering??65});
 export function redistribute(shares:Assignment['shares'],c:Controls):Assignment['shares'] {
  const next={...shares};let locked=0;const free:Typology[]=[];
  for(const t of TYPOLOGIES){if(!c.enabled[t]){if(c.locked[t]&&shares[t]!==0)throw Error('Unlock a nonzero allocation before disabling it.');next[t]=0;}else if(c.locked[t])locked+=shares[t];else free.push(t);}
@@ -34,6 +36,7 @@ function interiorLabel(rings:Ring[]):Point {
 }
 export function generateTerritories(api:ManifoldToplevel,site:SiteInput,zone:Zone,a:Assignment,c:Controls,strategy:Strategy,registry:Registry):Result {
  const start=performance.now();validateAllocation(a,c);
+ if(c.clustering!==undefined&&(!Number.isFinite(c.clustering)||c.clustering<0||c.clustering>100))throw Error('Clustering must be between 0 and 100.');
  if(!site.protectionMetadataComplete)throw Error('Reimport the source Site JSON to recover corridor and protected-area metadata omitted by the foundation.');
  const owned:CrossSection[]=[];const own=(v:CrossSection)=>{owned.push(v);return v;};
  const section=(rings:Ring[])=>own(new api.CrossSection(rings,'NonZero'));
@@ -55,10 +58,12 @@ export function generateTerritories(api:ManifoldToplevel,site:SiteInput,zone:Zon
 
  for(let index=0;index<order.length;index++){
  const id=order[index],requested=area*a.shares[id]/100;
- const radians=(c.areaCutAngle??0)*Math.PI/180;
+ const xs=zone.polygon.map(p=>p[0]),zs=zone.polygon.map(p=>p[1]);
+ const alongDepth=c.clustering!==undefined&&Math.max(...zs)-Math.min(...zs)>Math.max(...xs)-Math.min(...xs);
+ const radians=(c.areaCutAngle??(alongDepth?90:0))*Math.PI/180;
  let n:Point=[Math.cos(radians),Math.sin(radians)];
  if(strategy==='geometry'){let length=-1;for(const r of remaining.toPolygons()){if(signedArea(r as Ring)<=0)continue;for(let i=0;i<r.length;i++){const p=r[i],q=r[(i+1)%r.length],dx=q[0]-p[0],dy=q[1]-p[1],d=Math.hypot(dx,dy);if(d>length+1e-8){length=d;n=[-dy/d,dx/d];}}}}
- cutDirections.push(n);const piece=index===order.length-1?remaining:own(cutArea(api,remaining,zone.polygon,n,requested,allocationTolerance));sections.push(piece);const contours=piece.toPolygons() as Ring[],measured=piece.area(),parts=piece.decompose();
+ cutDirections.push(n);const piece=index===order.length-1?remaining:own(strategy==='area'&&c.clustering!==undefined&&c.clustering<100?clusteredCut(api,remaining,zone.polygon,n,requested,allocationTolerance,c.clustering):cutArea(api,remaining,zone.polygon,n,requested,allocationTolerance));sections.push(piece);const contours=piece.toPolygons() as Ring[],measured=piece.area(),parts=piece.decompose();
  let label:Point=[0,0],bestArea=-1,screen:Territory['screen']='passes-planning-screen';const findings:string[]=[];
  for(const part of parts){const erosion=part.offset(-c.minimumDiameter[id]/2,'Round',2,32);if(erosion.isEmpty()){screen='infeasible';findings.push(`A component cannot contain the ${c.minimumDiameter[id]} ft planning-clearance disk.`);}if(part.area()>bestArea){bestArea=part.area();label=interiorLabel(part.toPolygons() as Ring[]);}erosion.delete();part.delete();}
  if(parts.length>1)findings.push(`${parts.length} disconnected components: future letter connectivity requires review.`);
