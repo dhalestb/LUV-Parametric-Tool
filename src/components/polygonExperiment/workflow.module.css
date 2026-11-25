@@ -91,6 +91,7 @@
 .advanced[open] {border:1px solid var(--line);border-radius:5px;padding:12px;overflow:auto}.advanced :where(pre){white-space:pre-wrap;overflow-wrap:anywhere}
 .advanced :where(button),.viewer button,.runActions form button {padding:5px 9px;background:#233b41;color:var(--ink);border:1px solid #506c72;border-radius:3px}
 .technical label {display:grid!important;max-width:260px}
+.objExport {border-top:1px solid var(--line);margin-top:16px}.objExport .zoneTabs {margin-bottom:0}
 .review {margin:17px 0 12px}.reviewBar {align-items:flex-end;gap:15px 24px}.reviewBar label,.alternative label{display:grid!important;gap:4px;color:var(--muted);font-size:13px;margin:0!important}
 .reviewBar label>span {display:none!important}
 .reviewBar select {min-width:175px}.reviewBar label:first-child{flex:1 1 340px;max-width:740px}

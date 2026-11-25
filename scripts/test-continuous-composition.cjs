@@ -153,6 +153,32 @@ async function main(){
   assert.equal(miamiParcelScale(parcel,[nativeZones[0],project.zones[1]],1),null);
   assert.equal(miamiParcelScale(parcel,[],1),null);
   const miami=await generate();
+  const {architectureObj}=require(dir+'architectureObj.ts');
+  const forms=miami.records.map(({architecture,orientation})=>({name:orientation.zoneId,...architecture.architecture}));
+  for(const selection of [[forms[0]],forms]){
+    const obj=await architectureObj(selection).text();
+    const objects=obj.split(/^o /m).slice(1);
+    assert.equal(objects.length,selection.length);
+    let offset=1;
+    for(const [i,object] of objects.entries()){
+      const [name,...lines]=object.trimEnd().split('\n');
+      const orig=selection[i],vertices=orig.positions.length/3;
+      assert.equal(name,orig.name);
+      assert.equal(lines.length,vertices+orig.indices.length/3);
+      for(const [j,line] of lines.entries()){
+        const [kind,...coords]=line.split(' ');
+        const values=coords.map(Number);
+        if(j<vertices){
+          assert.equal(kind,'v');assert.deepEqual(values,orig.positions.slice(3*j,3*j+3));
+        }else{
+          const k=3*(j-vertices);
+          assert.equal(kind,'f');assert.deepEqual(values,orig.indices.slice(k,k+3).map(v=>v+offset));
+        }
+      }
+      offset+=vertices;
+    }
+  }
+  console.log('OBJ round trip passed for one Miami form and both zones with exact site coordinates and face winding.');
   for(const {architecture,orientation} of miami.records){
     assert.equal(architecture.validation.connectedBodies,1);
     assert.equal(architecture.provenance.members.length,4);

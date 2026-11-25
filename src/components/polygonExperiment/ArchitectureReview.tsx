@@ -2,7 +2,9 @@
 
 import dynamic from 'next/dynamic';
 import {useEffect,useState,type ReactNode} from 'react';
-import {ArchitectureControls,useArchitecture} from './ArchitectureLayer';
+import {architectureObj,objName} from './architectureObj';
+import {downloadDesignFile} from './browserDesigns';
+import {ArchitectureControls,loadSavedArchitecture,useArchitecture} from './ArchitectureLayer';
 import {DISPLAY_MODE_KEY,DisplayModeSelector,setDisplayMode,readDisplayMode} from './architecturalDisplay';
 import {readLibrary,writeLibrary,saveDesignReference,publishDesign,type DesignReference} from './alternatives';
 import {readOrientation,saveOrientation,writeSiteSelection,selectionDefault,type OrientationResult,type OrientationSelection} from './orientationStore';
@@ -86,6 +88,24 @@ export default function ArchitectureReview({state,registry,results,selected,view
       return true;
     }catch(e){setNotice(String(e));return false;}
   }
+  const [exporting,setExporting]=useState(false),[exportStatus,setExportStatus]=useState('');
+  async function exportForms(records:OrientationResult[],filename:string){
+    if(exporting||!records.length)return;
+    setExporting(true);setExportStatus('');
+    try{
+      const forms=await Promise.all(records.map(async r=>{
+        const design=await loadSavedArchitecture(r.id);
+        if(design.parentOrientationId!==r.id||design.parentGeometryHash!==r.geometryHash)
+          throw Error('The saved form does not match the selected study.');
+        const zoneName=r.site.zones.find(z=>z.id===r.zoneId)?.name??r.zoneId;
+        return {name:zoneName+' '+(design.typologyName??r.parameters.recipe),...design.architecture};
+      }));
+      const file=objName(filename)+'.obj';
+      downloadDesignFile(architectureObj(forms),file);
+      setExportStatus('Download started for '+file+'.');
+    }catch(e){setExportStatus('OBJ export failed. '+(e instanceof Error?e.message:String(e)));}
+    finally{setExporting(false);}
+  }
   const heightPassed=result?.validation.occupiedSiteEnvelope?.passed??result?.validation.allocatedHeightChecked;
   return <section id="review-architecture" className={styles.review} aria-labelledby="review-heading">
     <h2 id="review-heading"><small>04</small> Review Generated Architecture</h2>
@@ -144,5 +164,14 @@ export default function ArchitectureReview({state,registry,results,selected,view
       {record&&<><p>{record.components.length} source letters · L {record.counts.L} / U {record.counts.U} / V {record.counts.V} · native nominal sizes {[...new Set(record.components.map(c=>Number(c.nominalSizeFeet.toFixed(6))))].join(', ')} ft</p><ArchitectureControls orientation={record} technical/>
         <details><summary>Rule A geometry, provenance and validation</summary><pre>{JSON.stringify({id:record.id,counts:record.counts,parameters:record.parameters,frame:record.frame,geometryHash:record.geometryHash,validation:record.validation,provenance:record.provenance,limitations:record.limitations},null,2)}</pre></details></>}
     </details>
+    <section className={styles.objExport} aria-labelledby="obj-export-heading">
+      <h3 id="obj-export-heading">Export architectural forms</h3>
+      <p>{record||group.length?'OBJ files use site coordinates in feet, with Y up.':'Generate a design or select a saved study to export its form.'}</p>
+      <div className={styles.zoneTabs}>
+        <button type="button" disabled={exporting||!result} onClick={()=>record&&exportForms([record],(saved?.name??title)+'-'+record.id.slice(0,8))}>Download selected form OBJ</button>
+        {group.length>0&&<button type="button" disabled={exporting} onClick={()=>exportForms(group,(site?.name??'site')+'-forms')}>Download site plan OBJ ({group.length} {group.length===1?'zone':'zones'})</button>}
+      </div>
+      {(exporting||exportStatus)&&<p role="status">{exporting?'Preparing OBJ…':exportStatus}</p>}
+    </section>
   </section>;
 }

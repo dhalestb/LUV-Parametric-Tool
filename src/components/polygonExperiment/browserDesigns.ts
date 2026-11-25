@@ -68,7 +68,11 @@ export async function removeAllocatedArchitectures(ids:string[]){
 }
 
 export function downloadDesignRecord(data: unknown, filename: string) {
-  const url = URL.createObjectURL(new Blob([JSON.stringify(data)], {type: 'application/json'}));
+  downloadDesignFile(new Blob([JSON.stringify(data)], {type: 'application/json'}),filename);
+}
+
+export function downloadDesignFile(file:Blob, filename:string) {
+  const url = URL.createObjectURL(file);
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;
