@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import {useEffect,useState,type ReactNode} from 'react';
 import {ArchitectureControls,useArchitecture} from './ArchitectureLayer';
-import {DisplayModeSelector} from './architecturalDisplay';
+import {DISPLAY_MODE_KEY,DisplayModeSelector,setDisplayMode,readDisplayMode} from './architecturalDisplay';
 import {readLibrary,writeLibrary,saveDesignReference,publishDesign,type DesignReference} from './alternatives';
 import {readOrientation,saveOrientation,writeSiteSelection,selectionDefault,type OrientationResult,type OrientationSelection} from './orientationStore';
 import cohort from './hybrid-cohort.json';
@@ -74,14 +74,16 @@ export default function ArchitectureReview({state,registry,results,selected,view
     return {zone,options,key,shown};
   });
   const group=matches.flatMap(m=>m.shown?[m.shown.r]:[]);
-  function showGroupOnSite(){
-    if(group.length<2||site?.origin==='fixture')return;
+  function showGroupOnSite(designs=group){
+    if(!designs.length||site?.origin==='fixture')return false;
     try{
-      const ids=new Set(group.map(r=>r.id)),time=new Date().toISOString();
+      const ids=new Set(designs.map(r=>r.id)),time=new Date().toISOString();
       writeLibrary(l=>({...l,activeDesignId:'',designs:l.designs?.map(d=>ids.has(d.id)?{...d,publishedAt:d.publishedAt??time}:d)}));
-      writeSiteSelection({...selectionDefault,siteVisible:true,organizing:false,siteGroup:group.map(r=>({id:r.id,hash:r.geometryHash,zoneId:r.zoneId}))});
+      if(!localStorage.getItem(DISPLAY_MODE_KEY)&&readDisplayMode()==='letters')setDisplayMode('architecture');
+      writeSiteSelection({...selectionDefault,siteVisible:true,organizing:false,siteGroup:designs.map(r=>({id:r.id,hash:r.geometryHash,zoneId:r.zoneId}))});
       setNotice('The selected designs are ready together in Site Development. Choose Architecture Only to see their buildings.');
-    }catch(e){setNotice(String(e));}
+      return true;
+    }catch(e){setNotice(String(e));return false;}
   }
   const heightPassed=result?.validation.occupiedSiteEnvelope?.passed??result?.validation.allocatedHeightChecked;
   return <section id="review-architecture" className={styles.review} aria-labelledby="review-heading">
@@ -94,7 +96,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
           <option value="">Hide architecture</option>{options.map(o=><option key={o.d.id} value={o.d.id}>{o.d.name}</option>)}</select>:<small>No completed design for this site revision</small>}
       </label>)}</div>
       {matches.some(m=>m.shown)&&<><button className={styles.textButton} aria-expanded={showSite3D} onClick={()=>setShowSite3D(!showSite3D)}>{showSite3D?'Close combined 3D view':'View combined architecture in 3D'}</button>
-        {group.length>1&&site.origin!=='fixture'&&<div className={styles.zoneTabs}><button onClick={showGroupOnSite}>Show selected designs together in Site Development</button><a href="/site-development">Open Site Development</a></div>}
+        {group.length>0&&site.origin!=='fixture'&&<div className={styles.zoneTabs}><button onClick={()=>showGroupOnSite()}>Show selected designs together in Site Development</button><a href="/site-development" onClick={e=>{if(!showGroupOnSite())e.preventDefault();}}>Open Site Development</a></div>}
         {showSite3D&&<CombinedArchitecture site={site} records={group}/>}</>}
     </section>}
     <div className={styles.reviewBar}><label>Saved alternatives &amp; reference studies
@@ -119,7 +121,14 @@ export default function ArchitectureReview({state,registry,results,selected,view
       <div className={styles.viewer}><OrientationView result={record} view={reference?referenceView:view}/></div>
       <div className={styles.alternative}><label>Alternative name<input aria-label="Alternative name" value={name} onChange={e=>setName(e.target.value)}/></label>
         <button disabled={!result||saving||!name.trim()} onClick={save}>Save Alternative</button>
-        {record.site.origin!=='fixture'&&saved?.status==='complete'&&result&&<button onClick={()=>{try{publishDesign(record.id);setNotice('Published. Choose this design in Site Development.');}catch(e){setNotice(String(e));}}}>{saved.publishedAt?'Published to Site Development':'Publish to Site Development'}</button>}
+        {record.site.origin!=='fixture'&&saved?.status==='complete'&&result&&<button onClick={()=>{try{
+          if(record.typologyId==='continuous-site'){
+            const run=(record.provenance as {runId?:string}).runId;
+            const publishedSiblings=results.filter(r=>r.zoneId!==record.zoneId&&run&&
+              (r.provenance as {runId?:string}).runId===run&&library.some(d=>d.id===r.id&&d.publishedAt));
+            showGroupOnSite([record,...publishedSiblings]);
+          }else{publishDesign(record.id);setNotice('Published. Choose this design in Site Development.');}
+        }catch(e){setNotice(String(e));}}}>{saved.publishedAt?'Published to Site Development':'Publish to Site Development'}</button>}
       </div>
     </>}
     {notice&&<p role="status">{notice}</p>}

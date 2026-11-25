@@ -215,11 +215,12 @@ function Cameras({ view, span }: { view: SiteViewMode; span: number }) {
   return <PerspectiveCamera key="perspective" makeDefault fov={42} near={1} far={far} />;
 }
 
-function Aim({ view, aim, span }: { view: SiteViewMode; aim: [number, number, number]; span: number }) {
+function Aim({ view, aim, span, groupRadius }: { view: SiteViewMode; aim: [number, number, number]; span: number; groupRadius?: number }) {
+  const size = useThree(state=>state.size);
   const get = useThree((state) => state.get);
   const controls = useThree((state) => state.controls);
   // Value-stable key — parent often rebuilds the aim tuple each render.
-  const aimKey = `${view}|${span.toFixed(2)}|${aim[0].toFixed(2)},${aim[1].toFixed(2)},${aim[2].toFixed(2)}`;
+  const aimKey = `${groupRadius ? `group-${size.width}x${size.height}|` : ""}${view}|${span.toFixed(2)}|${aim[0].toFixed(2)},${aim[1].toFixed(2)},${aim[2].toFixed(2)}`;
   useEffect(() => {
     const { camera } = get();
     const fit = Math.max(80, span * 0.7);
@@ -235,6 +236,17 @@ function Aim({ view, aim, span }: { view: SiteViewMode; aim: [number, number, nu
     } else {
       camera.up.set(0, 1, 0);
       camera.position.set(aim[0], aim[1] + fit * 0.35, aim[2] + fit * 1.4);
+    }
+    if (groupRadius && size.width && size.height) {
+      const diameter = 2.2 * groupRadius;
+      if (camera instanceof THREE.OrthographicCamera) {
+        camera.zoom = Math.min(size.width, size.height) / diameter;
+      } else if (camera instanceof THREE.PerspectiveCamera) {
+        const halfFov = THREE.MathUtils.degToRad(camera.fov / 2);
+        const angle = Math.min(halfFov, Math.atan(Math.tan(halfFov) * size.width / size.height));
+        const target = new THREE.Vector3(...aim);
+        camera.position.sub(target).setLength(diameter / (2 * Math.sin(angle))).add(target);
+      }
     }
     camera.userData.siteViewKey = aimKey;
     camera.lookAt(aim[0], aim[1], aim[2]);
@@ -396,6 +408,17 @@ export default function SiteViewport(props: Props) {
   const scene=useSceneLayers();
   const orientation=useSiteOrientation(props.zones, JSON.stringify(props.orientationSource));
   const published=usePublished();
+  const groupBounds=new THREE.Box3();
+  if(orientation.grouped && props.tool==='orbit'){
+    for(const record of orientation.records){
+      const zone=record.site.zones.find(z=>z.id===record.zoneId);
+      for(const [x,z] of zone?.polygon??[]){
+        groupBounds.expandByPoint(new THREE.Vector3(x,record.parameters.datum,z));
+        groupBounds.expandByPoint(new THREE.Vector3(x,record.parameters.datum+record.parameters.field.height,z));
+      }
+    }
+  }
+  const groupFrame=groupBounds.isEmpty()?null:groupBounds.getBoundingSphere(new THREE.Sphere());
   const drawing = drawingToolsActive(props.tool);
   const unitScale = UNIT_TO_FEET[props.latticeUnit];
 
@@ -418,7 +441,7 @@ export default function SiteViewport(props: Props) {
       <directionalLight position={[80, 140, 40]} intensity={1.1} />
       <directionalLight position={[-40, 60, -80]} intensity={0.25} />
       <Cameras view={props.view} span={props.span} />
-      <Aim view={props.view} aim={props.aim} span={props.span} />
+      <Aim view={props.view} aim={groupFrame?groupFrame.center.toArray():props.aim} span={groupFrame?groupFrame.radius*2:props.span} groupRadius={groupFrame?.radius}/>
       <DrawingCapture enabled={drawing} onPointer={props.onPointer} />
       <group visible={scene.layers.model}>{props.siteRoot&&<SiteModel root={props.siteRoot} scale={props.feetPerModel} layers={props.layers} drawing={drawing}/>}</group>
       <SharedAlternatives datum={props.siteSurfaceDatumY??0} zones={props.zones}/>{orientation.records.map(r=><OrientationGeometry key={r.id} result={r} view={orientation.view}/>)}
