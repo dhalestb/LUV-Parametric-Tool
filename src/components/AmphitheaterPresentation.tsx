@@ -60,8 +60,9 @@ export default function AmphitheaterPresentation({result,disabled=false,context}
   const blocked=disabled||exporting;
   return <section id="amphitheater-presentation" className="space-y-3" style={{border:'1px solid var(--line)',borderRadius:10,padding:16,background:'var(--panel-background)'}}>
     <h2>Presentation &amp; Export</h2>
-    {!resolved.gathering&&<p>Proposed presentation adaptation — camera, section and detail layout require review.</p>}
+    {!resolved.gathering&&<p>Proposed typology illustrations — rule content, camera and sections require review. The presentation layout is locked.</p>}
     <p className="text-sm">Exports use the displayed saved study. The four-view board follows a 2 × 2 layout for placement in InDesign.</p>
+    <p className="text-sm">Presentation formatting locked: fixed fonts, colors and illustration frames. PNG exports use the approved resolution presets.</p>
     <div className="flex flex-wrap gap-3">
       <label>Presentation view<select aria-label="Presentation view" value={view} disabled={blocked} onChange={e=>setView(e.target.value as ExportView)}>
         {(Object.keys(PLATE_LABELS) as ExportView[]).map(key=><option key={key} value={key}>{PLATE_LABELS[key]}</option>)}

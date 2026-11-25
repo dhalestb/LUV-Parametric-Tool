@@ -5,6 +5,7 @@ import {pngWithDpi} from './approved/amphitheaterPresentationExport';
 import {resolvePresentationRules,SHARED_BOARD_RULES as shared,type PresentationOverrides} from './rules';
 import {focusedRuleDetails,type RuleDetail} from './ruleIllustrations';
 import type {MeshData,PresentationOptions,PresentationStudy} from './types';
+import {assertLockedLine,lockedTextLines,assertLockedTextBottom,assertRuleContent} from './formatGuards';
 
 function bounds(mesh:MeshData){
  const box=new THREE.Box3();for(let i=0;i<mesh.positions.length;i+=3)box.expandByPoint(new THREE.Vector3(mesh.positions[i],mesh.positions[i+1],mesh.positions[i+2]));return box;
@@ -28,8 +29,8 @@ export async function renderAdaptedPresentation(study:PresentationStudy,options:
  const resources:{dispose:()=>void}[]=[];
  if(!options.transparent){ctx.fillStyle=shared.background;ctx.fillRect(0,0,canvas.width,canvas.height);}
  const text=(s:string,x:number,y:number,size:number,color:string=shared.colors.form)=>{ctx.fillStyle=color;ctx.font=size+'px '+shared.font;ctx.fillText(s,x,y);};
- function wrapped(s:string,x:number,y:number,size:number,maxWidth:number,lineHeight:number){
-  ctx.font=size+'px '+shared.font;let line='',row=0;for(const word of s.split(/\s+/)){const trial=line?line+' '+word:word;if(line&&ctx.measureText(trial).width>maxWidth){text(line,x,y+row++*lineHeight,size);line=word;}else line=trial;}if(line)text(line,x,y+row++*lineHeight,size);return y+row*lineHeight;
+ function wrapped(s:string,x:number,y:number,size:number,maxWidth:number,lineHeight:number,bottom:number){
+  ctx.font=size+'px '+shared.font;const lines=lockedTextLines(ctx,s,maxWidth);assertLockedTextBottom(ctx,lines,y,lineHeight,bottom);lines.forEach((line,row)=>text(line,x,y+row*lineHeight,size));return y+lines.length*lineHeight;
  }
  function add(scene:THREE.Scene,mesh:MeshData,color:string,opacity=1,plane?:THREE.Plane,overlay=false){
   if(!mesh.indices.length)return;
@@ -84,7 +85,7 @@ export async function renderAdaptedPresentation(study:PresentationStudy,options:
   if(Math.max(w,h)>limit)throw Error('This GPU cannot render this resolution. Choose 2048 pixels.');
   renderer.setSize(Math.max(1,Math.round(w)),Math.max(1,Math.round(h)),false);renderer.setClearColor(shared.background,options.transparent?0:1);renderer.render(s,camera);ctx.drawImage(renderer.domElement,x,y,w,h);s.clear();
  }
- function ruleDetail(spec:RuleDetail,x:number,y:number,w:number){
+ function ruleDetail(spec:RuleDetail,x:number,y:number,w:number,bottom:number){
   const compact=options.view==='generation',imageHeight=compact?.24:.34;
   const s=scene();
   for(const layer of spec.layers)add(s,layer.mesh,shared.colors[layer.color],layer.opacity??1,undefined,layer.overlay);
@@ -99,12 +100,14 @@ export async function renderAdaptedPresentation(study:PresentationStudy,options:
    renderDetailScene(s,x+imageW*.34,y,imageW*.66,w*(compact?.23:.32),spec.view);
    const letters=scene();spec.insetIndices.forEach(i=>add(letters,record.letters[i].mesh,shared.colors.letters));
    renderDetailScene(letters,x,y+w*.015,imageW*.32,w*(compact?.15:.21));
+   ctx.font=w*.019+'px '+shared.font;assertLockedLine(ctx,spec.insetLabel??'Letter guide',imageW,'Letter-guide caption');
    text(spec.insetLabel??'Letter guide',x,y+w*(compact?.20:.26),w*.019,shared.colors.rules);
   }else renderDetailScene(s,x,y,imageW,w*imageHeight,spec.view,spec.normal);
   const left=x+w*shared.detail.textLeft,rail=w*(1-shared.detail.textLeft);
+  ctx.font=w*shared.detail.headingSize*(compact?.9:1)+'px '+shared.font;assertLockedLine(ctx,spec.heading,rail,'Rule heading');
   text(spec.heading,left,y+w*.03,w*shared.detail.headingSize*(compact?.9:1),shared.colors.rules);
   let cursor=y+w*(shared.detail.firstLine+.03)*(compact?.8:1);
-  for(const line of spec.bullets)cursor=wrapped('• '+line,left,cursor,w*shared.detail.bodySize*(compact?.85:1),rail,w*shared.detail.lineSpacing*(compact?.8:1))+w*.015;
+  for(const line of spec.bullets)cursor=wrapped('• '+line,left,cursor,w*shared.detail.bodySize*(compact?.85:1),rail,w*shared.detail.lineSpacing*(compact?.8:1),bottom)+w*.015;
  }
  function panel(view:'letters'|'form'|'orientation'|'generation'|'visibility',x:number,y:number,w:number){
   const title={letters:'Original Letters',form:'Architectural Form',orientation:'Orientation Rules',generation:'Generation Rules',visibility:'Section / Visibility'}[view];
@@ -115,12 +118,13 @@ export async function renderAdaptedPresentation(study:PresentationStudy,options:
   }
   if(view==='visibility'){drawing('section',x,y+w*.08,w,w*.84);return;}
   const items=view==='orientation'?details.orientation:details.generation,rows=view==='orientation'?[.10,.65]:options.view==='generation'?[.10,.40,.70]:[.10,.55,1.00];
-  items.forEach((spec,i)=>ruleDetail(spec,x,y+w*rows[i],w));
+  items.forEach((spec,i)=>ruleDetail(spec,x,y+w*rows[i],w,Math.min(i+1<items.length?y+w*rows[i+1]:Infinity,canvas.height-(options.view==='board'?canvas.width*shared.layout.margin:0))));
  }
  try{
+  assertRuleContent(details);
   if(options.view==='board'){
    const m=canvas.width*shared.layout.margin,gap=canvas.width*shared.layout.columnGap,w=(canvas.width-2*m-gap)/2;
-   const title=study.title.toUpperCase();let font=canvas.width*shared.layout.titleSize;ctx.font=font+'px '+shared.font;while(ctx.measureText(title).width>canvas.width-2*m)ctx.font=(font-=1)+'px '+shared.font;
+   const title=study.title.toUpperCase(),font=canvas.width*shared.layout.titleSize;ctx.font=font+'px '+shared.font;assertLockedLine(ctx,title,canvas.width-2*m,'Board title');
    text(title,m,canvas.width*shared.layout.titleBaseline,font);ctx.strokeStyle=shared.colors.form;ctx.lineWidth=canvas.width*shared.layout.separatorWeight;ctx.beginPath();ctx.moveTo(m,canvas.width*shared.layout.separatorY);ctx.lineTo(canvas.width-m,canvas.width*shared.layout.separatorY);ctx.stroke();
    (['letters','form','orientation','generation'] as const).forEach((view,i)=>panel(view,m+(i%2)*(w+gap),canvas.width*shared.layout.contentTop+Math.floor(i/2)*w*shared.layout.rowPitch,w));
   }else panel(options.view,canvas.width*.04,canvas.width*.09,canvas.width*.89);

@@ -1,14 +1,6 @@
 import type {Iso,PresentationStudy} from './types';
-/** Values extracted verbatim from the corrected Gathering renderer. */
-export const SHARED_BOARD_RULES=Object.freeze({
- version:'gathering-presentation-2026-11-21',width:4096,height:5156,dpi:300,
- background:'#000000',font:'Arial, sans-serif',
- colors:Object.freeze({letters:'#D6AD4F',form:'#F7F6F5',rules:'#71BEDA'}),
- layout:Object.freeze({margin:.04,columnGap:.03,titleBaseline:.075,titleSize:.045,separatorY:.105,separatorWeight:.0007,contentTop:.12,rowPitch:1.05,panelHeadingY:.045,panelHeadingSize:.036}),
- camera:Object.freeze({occupancy:.86,elevation:.85,near:.01,farSpan:12}),
- material:Object.freeze({roughness:.85,creaseAngle:Math.PI/6,sourceContextOpacity:.105}),
- detail:Object.freeze({imageWidth:.36,textLeft:.38,headingSize:.03,bodySize:.026,firstLine:.052,lineSpacing:.044}),
-});
+import {SHARED_BOARD_RULES} from './formatContract';
+export {SHARED_BOARD_RULES} from './formatContract';
 export const GATHERING_BOARD_RULES=Object.freeze({
  'vertical-walls':Object.freeze({strategy:'steppedRules',iso:'SE' as Iso,orientationRows:[.10,.54],generationRows:[.10,.54],section:'saved cutter / physical wall profiles',annotations:'saved source pose and terrace dimensions'}),
  'linear-edge-gallery':Object.freeze({strategy:'galleryPanel + galleryJoint',iso:'SE' as Iso,sectionPlanY:.03125,formImageTop:.025,section:'saved footprint surfaces; base / transition / roof elevations',annotations:'saved perimeter loops, receiving edge stations and source-derived clearance'}),
