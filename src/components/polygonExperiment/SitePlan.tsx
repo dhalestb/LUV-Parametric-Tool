@@ -1,14 +1,14 @@
 'use client';
 
 import {useEffect,useRef,useState,type ReactNode} from 'react';
-import {isLobbyTypology,TYPOLOGIES,newAssignment,automaticLetterTarget,maxLetterTarget,type LetterTargets,type Typology,type Assignment,type SiteInput,type Zone,type Experiment,type Registry} from './model';
+import {isLobbyTypology,newAssignment,automaticLetterTarget,maxLetterTarget,type LetterTargets,type Typology,type Assignment,type SiteInput,type Zone,type Experiment,type Registry} from './model';
 import {categoryByTypology,type SpaceCategory} from './typologyCategories';
 import {currentTerritoryResult,compositionControls,generateTerritories,geometryKernel,type Result,type Controls,type Ring} from './territories';
 import {useArchitecture} from './ArchitectureLayer';
 import type {OrientationResult} from './orientationStore';
 import styles from './workflow.module.css';
 
-const colors=['#e2ad59','#70b7b1','#a4a3df','#d98573','#a8be72','#bd89c7','#77a9d6','#b49b72','#d397ac'];
+import {territoryColor,territoryInk} from './territoryPalette';
 const path=(rings:Ring[])=>rings.map(r=>'M'+r.map(([x,z])=>x+','+(-z)).join('L')+'Z').join('');
 function bounds(ring:Ring){
   const xs=ring.map(p=>p[0]),zs=ring.map(p=>p[1]);
@@ -40,7 +40,7 @@ export function CompositionDistribution({site,zone,assignment,controls,registry,
     <figcaption>Allocation preview · {zone.name}</figcaption>
     {error?<small role="status">{error}</small>:<svg viewBox={[x-pad,y-pad,w+2*pad,h+2*pad].join(' ')} role="img" aria-label={'Allocation preview for '+zone.name}>
       <path d={path([zone.polygon,...zone.holes])} fill="#233e44" fillRule="evenodd"/>
-      {plan?.territories.map(t=><path key={t.id} data-preview-type={t.typology} d={path(t.contours)} fill={colors[TYPOLOGIES.indexOf(t.typology)]} stroke="#16262a" vectorEffect="non-scaling-stroke"><title>{registry.items.find(r=>r.id===t.typology)?.name} · {t.achievedPercent.toFixed(1)}%</title></path>)}
+      {plan?.territories.map(t=><path key={t.id} data-preview-type={t.typology} d={path(t.contours)} fill={territoryColor(t.typology)} stroke={territoryInk(territoryColor(t.typology))} vectorEffect="non-scaling-stroke"><title>{registry.items.find(r=>r.id===t.typology)?.name} · {t.achievedPercent.toFixed(1)}%</title></path>)}
     </svg>}
   </figure></div>
     {visibleTerritories.length>0&&<fieldset className={styles.inputs} disabled={disabled}>
@@ -79,7 +79,7 @@ function ArchitecturePlan({zone,record}:{zone:Zone;record:OrientationResult}){
       ctx.lineWidth=Math.max(w/el.width,h/el.height)*1.4;
       ctx.lineJoin='round';
       for(const layer of [...result.planLayers].sort((a,b)=>a.top-b.top)){
-        const index=TYPOLOGIES.findIndex(t=>t===layer.typology);
+        const fill=territoryColor(layer.typology);
         ctx.beginPath();
         for(const ring of layer.contours){
           if(!ring.length)continue;
@@ -87,14 +87,13 @@ function ArchitecturePlan({zone,record}:{zone:Zone;record:OrientationResult}){
           for(const [px,pz] of ring.slice(1))ctx.lineTo(px,-pz);
           ctx.closePath();
         }
-        ctx.globalAlpha=layer.top<1?.45:.82;
-        ctx.fillStyle=colors[index]??'#c1ae85';ctx.fill('evenodd');
-        ctx.globalAlpha=1;ctx.strokeStyle=layer.top<1?'#304348':'#f9eac9';ctx.stroke();
+        ctx.fillStyle=fill;ctx.fill('evenodd');
+        ctx.strokeStyle=territoryInk(fill);ctx.stroke();
       }
       return;
     }
     const {positions,indices}=result.architecture;
-    ctx.fillStyle='#fcf2d3';ctx.beginPath();
+    ctx.fillStyle='#F7F6F5';ctx.shadowColor='#073C52';ctx.shadowBlur=2;ctx.beginPath();
     for(let i=0;i<indices.length;i+=3){
       const a=indices[i]*3,b=indices[i+1]*3,c=indices[i+2]*3;
       const ax=positions[a],ay=-positions[a+2],bx=positions[b],by=-positions[b+2],cx=positions[c],cy=-positions[c+2];
@@ -121,12 +120,12 @@ export default function SitePlan({state,site,focusZone,records,registry}:{regist
       if(current)for(const t of area.territories)shownTypes.add(t.typology);
       const outline=path([z.polygon,...(z.holes??[])]);
       return <g key={z.id}><path d={outline} fill="#233e44" fillRule="evenodd"/>
-        {current&&area.territories.map(t=><path key={t.id} data-territory={t.id} d={path(t.contours)} fill={colors[TYPOLOGIES.indexOf(t.typology)]} fillOpacity=".6" fillRule="nonzero"><title>{z.name} · {t.typology} · {t.achievedPercent.toFixed(1)}%</title></path>)}
+        {current&&area.territories.map(t=><path key={t.id} data-territory={t.id} d={path(t.contours)} fill={territoryColor(t.typology)} stroke={territoryInk(territoryColor(t.typology))} strokeWidth="0.7" vectorEffect="non-scaling-stroke" fillRule="nonzero"><title>{z.name} · {t.typology} · {t.achievedPercent.toFixed(1)}%</title></path>)}
         {records?.[z.id]&&<ArchitecturePlan zone={z} record={records[z.id]!}/>}
-        <path d={outline} fill="transparent" fillRule="evenodd" pointerEvents={focusZone?'visiblePainted':'none'} stroke={state.focus===z.id?'#e7bc70':'#83c6c2'} strokeWidth={state.focus===z.id?2.5:1.5} vectorEffect="non-scaling-stroke"
+        <path d={outline} fill="transparent" fillRule="evenodd" pointerEvents={focusZone?'visiblePainted':'none'} stroke={state.focus===z.id?'#F7F6F5':'#B9BEC6'} strokeWidth={state.focus===z.id?2.5:1.5} vectorEffect="non-scaling-stroke"
           role={focusZone?'button':undefined} tabIndex={focusZone?0:undefined} aria-label={focusZone?'Edit '+z.name:undefined} aria-pressed={focusZone?state.focus===z.id:undefined}
           onClick={focusZone?()=>focusZone(z.id):undefined} onKeyDown={e=>{if(focusZone&&(e.key==='Enter'||e.key===' ')){e.preventDefault();focusZone(z.id);}}}><title>{z.name}</title></path>
       </g>;
     })}
-  </svg>{registry&&shownTypes.size>0&&<div className={styles.planKey} aria-label="Territory colors">{registry.items.filter(t=>shownTypes.has(t.id)).map(t=><span key={t.id}><i style={{background:colors[TYPOLOGIES.indexOf(t.id)]}}/>{t.name}</span>)}</div>}</>;
+  </svg>{registry&&shownTypes.size>0&&<div className={styles.planKey} aria-label="Territory colors">{registry.items.filter(t=>shownTypes.has(t.id)).map(t=><span key={t.id}><i style={{background:territoryColor(t.id)}}/>{t.name}</span>)}</div>}</>;
 }

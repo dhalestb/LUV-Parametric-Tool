@@ -119,5 +119,5 @@
 .zoneChoices small {color:var(--muted)}
 .planKey,.planKey span {display:flex;align-items:center;gap:6px}
 .planKey {flex-wrap:wrap;gap:4px 14px;margin:8px 0;font-size:13px}
-.planKey i {width:10px;height:10px;border-radius:2px}
+.planKey i {width:18px;height:14px;flex:none;border:1px solid #B9BEC6;border-radius:2px}
 @media(max-width:600px){.site{align-items:stretch;flex-direction:column}.zonePlan{width:100%}}
