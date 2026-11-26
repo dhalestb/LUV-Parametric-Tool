@@ -221,7 +221,7 @@ describe("office reference ruleset", () => {
       assert.equal(grid?.status, "pass", grid?.detail);
       assert.equal(walls?.status, "pass", walls?.detail);
       assert.match(width?.detail ?? "", /≥10 ft/);
-      assert.match(opening?.detail ?? "", /25–40%/);
+      assert.match(opening?.detail ?? "", /20\.0–40%/);
       assert.ok(plan.plates.filter((p) => p.role === "wall").length >= 3);
       assert.ok(plan.plates.filter((p) => p.role === "support").length >= 3);
       assert.ok(plan.voids.some((v) => v.id.startsWith("skylight")));
@@ -246,8 +246,8 @@ describe("office reference ruleset", () => {
     }
   });
 
-  it("Open Hall default field is 60 × 60 × 20", () => {
-    assert.deepEqual(WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"], { width: 60, depth: 60, height: 20 });
+  it("Open Hall default field is 40 × 40 × 20", () => {
+    assert.deepEqual(WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"], { width: 40, depth: 40, height: 20 });
   });
 
   it("Open Hall always generates perimeter wall plates for viewer toggle", () => {
@@ -262,7 +262,7 @@ describe("office reference ruleset", () => {
     assert.ok(on.plates.some((p) => p.role === "wall"));
     assert.ok(offPref.plates.some((p) => p.role === "wall"), "viewer preference must not omit wall geometry");
     assert.ok(officePlanReady(offPref), offPref.checks.filter((c) => c.status !== "pass").map((c) => `${c.label}:${c.status}`).join("; "));
-    assert.match(offPref.checks.find((c) => c.label === "Perimeter walls and entry")?.detail ?? "", /viewer may hide/i);
+    assert.match(offPref.checks.find((c) => c.label === "Perimeter walls and entry")?.detail ?? "", /viewer visibility does not change this generation rule/i);
   });
 
   it("every typology roof and plan track the selected field bounds", () => {

@@ -24,8 +24,6 @@ import { collectCompositionSources,mergeCompositionSources,compositionRefreshMes
 
 import type { AmphitheaterRequest,AmphitheaterResult,AmphitheaterSummary,ProofMesh } from './amphitheaterInteractiveTypes';
 import {
-  ARCHITECTURAL_GENERATION_RULESET_VERSION,
-  LETTER_ARRANGEMENT_RULESET_VERSION,
   WORKSPACE_DEFAULT_FIELDS,
   WORKSPACE_TYPOLOGIES,
   workspaceTypologyName,
@@ -42,9 +40,15 @@ import {
   OPEN_HALL_FLOOR_MEZZ_GUIDE_SIZES,
   OPEN_HALL_ROOF_GUIDE_SIZES,
   OPEN_HALL_WALL_GUIDE_SIZES,
-  buildOpenHallGuideLetters,
   normalizeOpenHallGuideSize,
 } from "./officeWorkspaceRules";
+import { buildOpenHallGuideLetters, openHallRequestGeometry } from './workspace-rules/open-hall-workspace';
+import { flatPlateDimensions } from './workspace-rules/flat-deep-plan-plate.plan';
+import { buildVoidEdgeGuides, voidEdgeFittingRotations } from './workspace-rules/void-edge-plate';
+import { voidEdgeAutoRotation, voidEdgeRules } from './workspace-rules/void-edge-workspace.rules';
+
+type GenerationRequest = AmphitheaterRequest & { guideSource?: 'ruleset' };
+
 function readCompositionSources(){
  return collectCompositionSources(JSON.parse(localStorage.getItem(OPTIMIZER_SESSION_KEY)??'null'),JSON.parse(localStorage.getItem('vul-optimizer-designs')??'[]'));
 }
@@ -169,7 +173,7 @@ export default function AmphitheaterStudio(){
   return()=>{active=false;};
  },[displayStudy]);
  const workspaceMode=Boolean(workspaceTypology);
- const currentRequest=useMemo(()=>source?{roomWithinVolume:!workspaceMode&&envelopeVersion==='room-within-volume'?{version:roomVersion,...(roomVersion==='perimeter-room'&&fullProfiles?{fullProfiles:true}:{}),...(roomOrder==='platforms'?{suspendedLLV:true,edgePlatforms:true}:roomOrder==='suspended'?{suspendedLLV:true}:{})}:undefined,insertedPlate:!workspaceMode&&envelopeVersion==='inserted-plate'?{version:plateMode}:undefined,typologyName:workspaceTypology?workspaceTypologyName(workspaceTypology):envelopeVersion==='room-within-volume'?'Room Within Volume':envelopeVersion==='inserted-plate'?'Inserted Horizontal Plate':envelopeVersion==='void-field'?'Void Field Gathering':'Stepped Amphitheater',workspaceTypology:workspaceTypology||undefined,openHall:workspaceTypology==='open-hall-workspace'?{mezzanineFaces,perimeterWalls,columnSize,columnGridSpacing,floorMezzGuideSize,wallGuideSize,roofGuideSize}:undefined,letterArrangementRulesetId:workspaceTypology?workspaceRulesetIds(workspaceTypology!).letter:undefined,letterArrangementRulesetVersion:workspaceTypology?LETTER_ARRANGEMENT_RULESET_VERSION:undefined,architecturalGenerationRulesetId:workspaceTypology?workspaceRulesetIds(workspaceTypology!).architecture:undefined,architecturalGenerationRulesetVersion:workspaceTypology?ARCHITECTURAL_GENERATION_RULESET_VERSION:undefined,rulesetId:workspaceTypology?`${workspaceRulesetIds(workspaceTypology!).letter}+${workspaceRulesetIds(workspaceTypology!).architecture}`:undefined,rulesetVersion:workspaceTypology?`${LETTER_ARRANGEMENT_RULESET_VERSION}/${ARCHITECTURAL_GENERATION_RULESET_VERSION}`:undefined,voidField:!workspaceMode&&envelopeVersion==='void-field'?{...(levelCount===4?{levelCount}:{}),facadeMode,atriumBoundary,taper:voidTaper,profileMode:voidMode,connectivity:voidConnectivity}:undefined,generator:workspaceTypology?'workspace-ten-rule' as const:generator,envelopeVersion:workspaceTypology?'workspace-ten-rule' as const:envelopeVersion,articulationElevation:elevationMode,articulation,organization,field,preferredFeet:workspaceTypology==='open-hall-workspace'?floorMezzGuideSize:preferred,population:population==='auto'?'auto' as const:Number(population),sourceId:source.id,sourceName:source.name,source:source.source,sourceSnapshot:source.snapshot}:null,[source,field,preferred,population,generator,organization,articulation,elevationMode,envelopeVersion,workspaceTypology,mezzanineFaces,perimeterWalls,columnSize,columnGridSpacing,floorMezzGuideSize,wallGuideSize,roofGuideSize,voidTaper,voidMode,voidConnectivity,atriumBoundary,facadeMode,levelCount,plateMode,roomVersion,fullProfiles,roomOrder,workspaceMode]);
+ const currentRequest=useMemo(()=>source?{roomWithinVolume:!workspaceMode&&envelopeVersion==='room-within-volume'?{version:roomVersion,...(roomVersion==='perimeter-room'&&fullProfiles?{fullProfiles:true}:{}),...(roomOrder==='platforms'?{suspendedLLV:true,edgePlatforms:true}:roomOrder==='suspended'?{suspendedLLV:true}:{})}:undefined,insertedPlate:!workspaceMode&&envelopeVersion==='inserted-plate'?{version:plateMode}:undefined,typologyName:workspaceTypology?workspaceTypologyName(workspaceTypology):envelopeVersion==='room-within-volume'?'Room Within Volume':envelopeVersion==='inserted-plate'?'Inserted Horizontal Plate':envelopeVersion==='void-field'?'Void Field Gathering':'Stepped Amphitheater',workspaceTypology:workspaceTypology||undefined,openHall:workspaceTypology==='open-hall-workspace'?{mezzanineFaces,perimeterWalls,columnSize,columnGridSpacing,floorMezzGuideSize,wallGuideSize,roofGuideSize}:undefined,letterArrangementRulesetId:workspaceTypology?workspaceRulesetIds(workspaceTypology!).letter:undefined,letterArrangementRulesetVersion:workspaceTypology?workspaceRulesetIds(workspaceTypology).version:undefined,architecturalGenerationRulesetId:workspaceTypology?workspaceRulesetIds(workspaceTypology!).architecture:undefined,architecturalGenerationRulesetVersion:workspaceTypology?workspaceRulesetIds(workspaceTypology).version:undefined,rulesetId:workspaceTypology?`${workspaceRulesetIds(workspaceTypology!).letter}+${workspaceRulesetIds(workspaceTypology!).architecture}`:undefined,rulesetVersion:workspaceTypology?`${workspaceRulesetIds(workspaceTypology).version}/${workspaceRulesetIds(workspaceTypology).version}`:undefined,voidField:!workspaceMode&&envelopeVersion==='void-field'?{...(levelCount===4?{levelCount}:{}),facadeMode,atriumBoundary,taper:voidTaper,profileMode:voidMode,connectivity:voidConnectivity}:undefined,generator:workspaceTypology?'workspace-ten-rule' as const:generator,envelopeVersion:workspaceTypology?'workspace-ten-rule' as const:envelopeVersion,articulationElevation:elevationMode,articulation,organization,field,preferredFeet:workspaceTypology==='open-hall-workspace'?floorMezzGuideSize:preferred,population:population==='auto'?'auto' as const:Number(population),sourceId:source.id,sourceName:source.name,source:source.source,sourceSnapshot:source.snapshot}:null,[source,field,preferred,population,generator,organization,articulation,elevationMode,envelopeVersion,workspaceTypology,mezzanineFaces,perimeterWalls,columnSize,columnGridSpacing,floorMezzGuideSize,wallGuideSize,roofGuideSize,voidTaper,voidMode,voidConnectivity,atriumBoundary,facadeMode,levelCount,plateMode,roomVersion,fullProfiles,roomOrder,workspaceMode]);
  const changedPlateInputs=envelopeVersion==='inserted-plate' && !!result && (preferred!==result.request.preferredFeet || (population!=='auto' && Number(population)!==result.sourceCount && sourceId!=='custom'));
  const stale=Boolean(result && currentRequest && (
   (Boolean(result.request.roomWithinVolume?.fullProfiles)!==Boolean(currentRequest.roomWithinVolume?.fullProfiles)) || (envelopeVersion==='room-within-volume'&&(result.request.roomWithinVolume?.version??'hull-pilot')!==roomVersion) || (envelopeVersion==='inserted-plate'&&(result.request.insertedPlate?.version??'legacy')!==plateMode) || voidSettingsKey(result.request.voidField)!==voidSettingsKey(currentRequest.voidField) || result.generator!==currentRequest.generator || result.request.envelopeVersion!==currentRequest.envelopeVersion ||
@@ -179,9 +183,37 @@ export default function AmphitheaterStudio(){
   (result.request.articulation??0)!==currentRequest.articulation ||
   result.request.sourceId!==currentRequest.sourceId || JSON.stringify(result.request.source)!==JSON.stringify(currentRequest.source)
  ));
- async function generate(request:AmphitheaterRequest|null=currentRequest,candidate=1){if(!request)return;setBusy(true);setError('');setMessage(candidate===1?'Generating architecture and checking the exported mesh…':'Checking new composition candidate '+candidate+' with the selected dimensions and letter quantity…');
-  try{const response=await fetch('/api/amphitheater',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(request)});const payload=await response.json();if(!response.ok){if(payload.geometryRejected){setError(payload.error);setMessage('Geometry rejected. Previous study retained.');return 'geometry-rejected';}throw Error(payload.error??'Generation failed');}setMessage('Loading validated, saved architecture…');const data:AmphitheaterResult=payload.architecture?payload:await fetch('/api/amphitheater?id='+payload.id).then(async r=>{if(!r.ok)throw Error('Saved result could not be loaded. Retry opening study '+payload.id);return r.json();});displayStudy(data);setStudies(s=>[{id:data.id,created:data.created,request:data.request,sourceCount:data.sourceCount,volume:data.volume},...s]);setSelected('');setComparison(undefined);setMessage('New study generated. Mesh checks passed.'+(candidate>1?' Accepted composition candidate '+candidate+'.':''));return 'accepted';}
+ async function generate(request:GenerationRequest|null=currentRequest,candidate=1){if(!request)return;setBusy(true);setError('');setMessage(candidate===1?'Generating architecture and checking the exported mesh…':'Checking new composition candidate '+candidate+' with the selected dimensions and letter quantity…');
+  const previous = result?.request;
+  const sameSource = previous && previous.sourceId === request.sourceId && previous.workspaceTypology === request.workspaceTypology;
+  const outgoing = request.workspaceTypology === 'open-hall-workspace' && sameSource
+    ? { ...request, openHall: { ...previous.openHall, ...request.openHall } }
+    : request.workspaceTypology === 'flat-deep-plan-plate'
+      ? { ...request, flatPlate: { ...(sameSource ? previous.flatPlate : undefined), floorMezzGuideSize: request.preferredFeet } }
+      : request.workspaceTypology === 'void-edge-workspace' && sameSource
+        ? { ...request, voidEdgeRotation: previous.voidEdgeRotation, voidEdgeSourceHeight: previous.field.height,
+            voidEdgeCore: previous.voidEdgeCore, voidEdgeOuterWallThickness: previous.voidEdgeOuterWallThickness,
+            voidEdgeWallGuide: previous.voidEdgeWallGuide, voidEdgeColumnSize: previous.voidEdgeColumnSize,
+            voidEdgeJoinShell: previous.voidEdgeJoinShell ?? true }
+        : request;
+  try{const response=await fetch('/api/amphitheater',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(outgoing)});const payload=await response.json();if(!response.ok){if(payload.geometryRejected){setError(payload.error);setMessage('Geometry rejected. Previous study retained.');return 'geometry-rejected';}throw Error(payload.error??'Generation failed');}setMessage('Loading validated, saved architecture…');const data:AmphitheaterResult=payload.architecture?payload:await fetch('/api/amphitheater?id='+payload.id).then(async r=>{if(!r.ok)throw Error('Saved result could not be loaded. Retry opening study '+payload.id);return r.json();});displayStudy(data);setStudies(s=>[{id:data.id,created:data.created,request:data.request,sourceCount:data.sourceCount,volume:data.volume},...s]);setSelected('');setComparison(undefined);setMessage('New study generated. Mesh checks passed.'+(candidate>1?' Accepted composition candidate '+candidate+'.':''));return 'accepted';}
   catch(e){setError(e instanceof Error?e.message:String(e));setMessage('Generation rejected. Previous study retained.');}finally{setBusy(false);}
+ }
+ async function regenerateArchitecture() {
+  if (currentRequest?.workspaceTypology === 'open-hall-workspace' && result?.request.sourceId === currentRequest.sourceId) {
+   try {
+    const settings = openHallRequestGeometry({ ...result.request.openHall, ...currentRequest.openHall }, currentRequest.preferredFeet);
+    const guides = buildOpenHallGuideLetters({ ...currentRequest.field, ...settings });
+    if (guides.length !== currentRequest.source.length) {
+     await generate({ ...currentRequest, openHall: settings, source: [], population: 'auto', guideSource: 'ruleset' });
+     return;
+    }
+   } catch (e) {
+    setError(e instanceof Error ? e.message : String(e));
+    return;
+   }
+  }
+  await generate();
  }
  async function newDesign(){
   if(workspaceMode){
@@ -190,17 +222,39 @@ export default function AmphitheaterStudio(){
     const arrangementSeed=seed??crypto.getRandomValues(new Uint32Array(1))[0];
     const openHall=workspaceTypology==='open-hall-workspace';
     const openHallOpts=openHall?{mezzanineFaces,perimeterWalls,columnSize,columnGridSpacing,floorMezzGuideSize,wallGuideSize,roofGuideSize}:undefined;
-    // Open Hall invents the full role-grouped L guide set; other typologies still use preferred-size populate.
-    const poses=openHall
-      ? buildOpenHallGuideLetters({...field,preferredFeet:floorMezzGuideSize,mezzanineFaces,columnSize,columnGridSpacing,floorMezzGuideSize,wallGuideSize,roofGuideSize},[0,0,0])
-      : (()=>{
-        const count=population==='auto'?Math.max(4,currentRequest?.source.length??8):Number(population);
-        if(!Number.isSafeInteger(count)||count<2)throw Error('Enter Automatic or a whole letter quantity of at least 2.');
-        return populate([],count,field,preferred,arrangementSeed,{spread:true});
-      })();
-    const id=crypto.randomUUID(),name=`${workspaceTypologyName(workspaceTypology)} · ${poses.length} letters · seed ${arrangementSeed}`;
-    setSources(items=>[...items.filter(s=>s.id!==id&&s.id!=='custom'),{id,name,source:poses}]);setSourceId(id);
-    await generate({field,preferredFeet:openHall?floorMezzGuideSize:preferred,population:poses.length,source:poses,sourceId:id,sourceName:name,generator:'workspace-ten-rule',envelopeVersion:'workspace-ten-rule',workspaceTypology,typologyName:workspaceTypologyName(workspaceTypology),openHall:openHallOpts,letterArrangementRulesetId:workspaceRulesetIds(workspaceTypology!).letter,letterArrangementRulesetVersion:LETTER_ARRANGEMENT_RULESET_VERSION,architecturalGenerationRulesetId:workspaceRulesetIds(workspaceTypology!).architecture,architecturalGenerationRulesetVersion:ARCHITECTURAL_GENERATION_RULESET_VERSION,insertedPlate:undefined,voidField:undefined,roomWithinVolume:undefined});
+    const useRuleGuides = openHall || workspaceTypology === 'flat-deep-plan-plate';
+    const voidEdge = workspaceTypology === 'void-edge-workspace';
+    const rules = workspaceRulesetIds(workspaceTypology);
+    let poses: AmphitheaterRequest['source'] = [];
+    let voidEdgeRotation: number | undefined;
+    if (voidEdge) {
+      const sideSize = voidEdgeRules.guides.mainSide.defaultSize;
+      const fitting = voidEdgeFittingRotations(field, preferred, sideSize);
+      voidEdgeRotation = voidEdgeAutoRotation(fitting, arrangementSeed);
+      if (voidEdgeRotation === undefined) throw Error('No Void-Edge guide rotation fits the field. Change the preferred letter size or field.');
+      poses = buildVoidEdgeGuides(field, preferred, sideSize, voidEdgeRotation);
+    } else if (!useRuleGuides) {
+      const count = population === 'auto' ? Math.max(4, currentRequest?.source.length ?? 8) : Number(population);
+      if (!Number.isSafeInteger(count) || count < 2) throw Error('Enter Automatic or a whole letter quantity of at least 2.');
+      poses = populate([], count, field, preferred, arrangementSeed, {spread:true});
+    }
+    const id = crypto.randomUUID();
+    const typologyName = workspaceTypologyName(workspaceTypology);
+    const name = useRuleGuides ? typologyName : `${typologyName} · ${poses.length} letters · seed ${arrangementSeed}`;
+    if (!useRuleGuides && !voidEdge) {
+      setSources(items=>[...items.filter(s=>s.id!==id&&s.id!=='custom'),{id,name,source:poses}]);
+      setSourceId(id);
+    }
+    await generate({
+      field, preferredFeet:openHall?floorMezzGuideSize:preferred, population:useRuleGuides?'auto':poses.length,
+      source:poses, sourceId:id, sourceName:name, generator:'workspace-ten-rule', envelopeVersion:'workspace-ten-rule',
+      workspaceTypology, typologyName, openHall:openHallOpts, letterArrangementRulesetId:rules.letter,
+      letterArrangementRulesetVersion:rules.version, architecturalGenerationRulesetId:rules.architecture,
+      architecturalGenerationRulesetVersion:rules.version,
+      ...(useRuleGuides ? {guideSource:'ruleset'} : {}),
+      // The existing Form OBJ export expects a single complete architecture mesh.
+      ...(voidEdge ? {voidEdgeRotation,voidEdgeJoinShell:true} : {}),
+    });
    }catch(e){setError(e instanceof Error?e.message:String(e));setMessage('Adjust preferred letter size or field, then Generate Design again.');}
    return;
   }
@@ -243,7 +297,7 @@ export default function AmphitheaterStudio(){
  return <main className="p-4 space-y-4" style={{color:'var(--ink)'}}><AppNav/><header><h1 className="text-2xl font-semibold">Proto-Form Generation</h1><p>Existing LUV application · Z-up geometry in feet · isolated comparison workspace</p></header>
  <style jsx>{`.proof-layout {display:grid;grid-template-columns:minmax(270px,340px) minmax(0,1fr);gap:20px} @media(max-width:900px){.proof-layout{grid-template-columns:1fr}}`}</style><div className="proof-layout">
  <aside className="space-y-4"><section style={panel} className="space-y-3"><h2>Generation controls</h2>
- <label className="block">Typology<UnifiedTypologySelect family="workspace" aria-label="Typology" className="block w-full" value={workspaceTypology||(envelopeVersion==='room-within-volume'?'room-within-volume':envelopeVersion==='inserted-plate'?'inserted-plate':envelopeVersion==='void-field'?'void-field':'stepped')} disabled={busy} onChange={e=>{const value=e.target.value;if(WORKSPACE_TYPOLOGIES.some(([id])=>id===value)){const id=value as WorkspaceTypology;setWorkspaceTypology(id);setEnvelopeVersion('workspace-ten-rule');setGenerator('workspace-ten-rule');setField(WORKSPACE_DEFAULT_FIELDS[id]);setError('');return;}setWorkspaceTypology('');if(value==='room-within-volume'){setRoomVersion('perimeter-room');chooseOrder('platforms');setError('');}setEnvelopeVersion(value==='room-within-volume'?'room-within-volume':value==='inserted-plate'?'inserted-plate':value==='void-field'?'void-field':'vertical-walls');setGenerator('source-preserving');if(value==='stepped'||value==='void-field'||value==='inserted-plate'){setField({width:40,depth:40,height:60});setPreferred(LETTER_SIZE_PRESETS[60].preferredFeet);}else if(value==='room-within-volume'){setField({width:40,depth:40,height:60});setPreferred(LETTER_SIZE_PRESETS[60].preferredFeet);}}}>
+ <label className="block">Typology<UnifiedTypologySelect family="workspace" aria-label="Typology" className="block w-full" value={workspaceTypology||(envelopeVersion==='room-within-volume'?'room-within-volume':envelopeVersion==='inserted-plate'?'inserted-plate':envelopeVersion==='void-field'?'void-field':'stepped')} disabled={busy} onChange={e=>{const value=e.target.value;if(WORKSPACE_TYPOLOGIES.some(([id])=>id===value)){const id=value as WorkspaceTypology;setWorkspaceTypology(id);setEnvelopeVersion('workspace-ten-rule');setGenerator('workspace-ten-rule');setField(WORKSPACE_DEFAULT_FIELDS[id]);if(id==='flat-deep-plan-plate')setPreferred(flatPlateDimensions(undefined).floorMezzGuideSize);if(id==='void-edge-workspace')setPreferred(voidEdgeRules.guides.mainEnd.defaultSize);setError('');return;}setWorkspaceTypology('');if(value==='room-within-volume'){setRoomVersion('perimeter-room');chooseOrder('platforms');setError('');}setEnvelopeVersion(value==='room-within-volume'?'room-within-volume':value==='inserted-plate'?'inserted-plate':value==='void-field'?'void-field':'vertical-walls');setGenerator('source-preserving');if(value==='stepped'||value==='void-field'||value==='inserted-plate'){setField({width:40,depth:40,height:60});setPreferred(LETTER_SIZE_PRESETS[60].preferredFeet);}else if(value==='room-within-volume'){setField({width:40,depth:40,height:60});setPreferred(LETTER_SIZE_PRESETS[60].preferredFeet);}}}>
  <optgroup label="Gathering proofs"><option value="stepped">Stepped Amphitheater</option><option value="inserted-plate">Inserted Horizontal Plate</option><option value="void-field">Void-Field</option><option value="room-within-volume">Room Within Volume</option></optgroup><optgroup label="Workspace typologies · dual rulesets">{WORKSPACE_TYPOLOGIES.map(([id,name])=><option key={id} value={id}>{name}</option>)}</optgroup></UnifiedTypologySelect></label>
  {workspaceMode&&<p className="text-xs">Two-stage workspace path: letter arrangement ruleset, then architectural generation. {workspaceTypology==='open-hall-workspace'?'Open Hall invents oriented L letters by role, then fills architecture as L footprints: corner pads from floor/mezz letters, L piers from column letters, L wall fills, L skylights from roof letters.':'Generate Design / New Design builds a fresh letter set sized to the preferred footprint inside the field.'} Regenerate Architecture keeps the current letters and only rearranges poses. Defaults apply for field size; change X/Y/Z below and regenerate to revalidate. Geometric proof only.</p>}
  {workspaceTypology==='open-hall-workspace'&&<div className="space-y-2"><label className="block">Mezzanine plate option<select aria-label="Mezzanine plate option" className="block w-full" value={mezzanineFaces} disabled={busy} onChange={e=>setMezzanineFaces(Number(e.target.value) as 2|3|4)}><option value={2}>2-channel · L plate</option><option value={3}>3-channel · U plate</option><option value={4}>4-channel · ring plate</option></select></label>
@@ -271,7 +325,7 @@ export default function AmphitheaterStudio(){
  {envelopeVersion==='room-within-volume'&&<label>Room derivation<select aria-label="Room derivation" value={roomVersion} onChange={e=>setRoomVersion(e.target.value as typeof roomVersion)} disabled={busy} className="block w-full"><option value="perimeter-room">{roomOrder==='platforms'||roomOrder==='suspended'?'Terraced perimeter walls and suspended room':'Terraced perimeter walls and U alcove'}</option><option value="anchored-room">U room · L floor · folded V roof</option><option value="contour-walls">Native U/L/V contour walls</option><option value="hull-pilot">Original hull pilot — comparison</option></select><p className="text-xs">{roomVersion==='perimeter-room'?fixedPattern?'Generate Design applies the selected order. Regenerate Architecture preserves your current letters.':'Automatic uses '+perimeterLayout(field,preferred,roomLevels).total+' letters for the selected perimeter. Generate Design creates new letters. Regenerate Architecture uses the current letters.':'Generate a separate room study from the current source letters.'}</p></label>}
  <button className="border rounded p-3 w-full" disabled={busy} onClick={newDesign}>{busy?'Generating and validating…':envelopeVersion==='room-within-volume'&&roomVersion!=='perimeter-room'?'Generate Room From Current Letters':'Generate Design'}</button>
  {changedPlateInputs&&<p>Choose Generate Design to apply the selected letter size and quantity.</p>}
- {result&&<div className="flex flex-wrap gap-2"><button disabled={busy||(envelopeVersion==='room-within-volume'&&roomVersion!=='perimeter-room')} onClick={newDesign}>New Design</button><button disabled={busy} onClick={()=>{setEditing(true);setMode('A');}}>Edit Letters</button><button disabled={busy||!source||changedPlateInputs} onClick={()=>void generate()}>Regenerate Architecture</button></div>}
+ {result&&<div className="flex flex-wrap gap-2"><button disabled={busy||(envelopeVersion==='room-within-volume'&&roomVersion!=='perimeter-room')} onClick={newDesign}>New Design</button><button disabled={busy} onClick={()=>{setEditing(true);setMode('A');}}>Edit Letters</button><button disabled={busy||!source||changedPlateInputs} onClick={()=>void regenerateArchitecture()}>Regenerate Architecture</button></div>}
  <p role="status">{message}</p>{error&&<p role="alert" style={{color:'#ed8989',whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{error}</p>}
  {editing&&generator==='source-preserving'&&<fieldset disabled={busy}><SourcePopulationEditor voidField={envelopeVersion==='void-field'} envelopeRoles={envelopeVersion==='vertical-walls'} showPopulation={false} source={source?.source??[]} field={field} preferred={preferred} onApply={updateDraft} onRestore={s=>{setField(s.field);setPreferred(s.preferred);updateDraft(s.source,s.name);}}/></fieldset>}
  <details><summary>Advanced Settings</summary>{envelopeVersion==='inserted-plate'&&<label>Plate generation<select aria-label="Plate generation" value={plateMode} onChange={e=>setPlateMode(e.target.value as typeof plateMode)} disabled={busy}><option value="edge-connected">Flush plates with edge connection</option><option value="merged-walls">Merged exterior walls and U interiors</option><option value="two-u">Two U plates · four L/U/V groups</option><option value="suspended">Single plate in a large void</option><option value="spanning-v2">Source-driven spanning plates</option><option value="legacy">Legacy nine-letter ledges · comparison</option></select></label>}<label>Envelope operation<select aria-label="Envelope operation" value={envelopeVersion} disabled={busy} onChange={e=>setEnvelopeVersion(e.target.value as typeof envelopeVersion)}><option value="inserted-plate">Inserted Plate · horizontal floors and letter-derived boundaries</option><option value="void-field">Void Field · plan concavities developed along Z</option><option value="room-within-volume">Room Within Volume · independent room pilot</option><option value="profiles">Preserved profile envelope</option><option value="vertical-walls">Vertical walls, through openings and recessed alcoves</option></select></label><p className="text-xs">The experimental operation validates explicit source roles and may reject disconnected cuts or export degeneracies. It never falls back silently. Use the supplied wall studies for geometric evaluation.</p>

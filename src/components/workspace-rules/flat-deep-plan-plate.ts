@@ -1,5 +1,6 @@
 // Architectural rules owned exclusively by flat-deep-plan-plate.
 import * as THREE from "three";
+import { flatPlateDimensions, flatPlateFootprint, flatPlatePlan as flatDeep } from './flat-deep-plan-plate.plan';
 import type { IntersectionPlacement } from "../architecturalConnections";
 import { getLetterVolumeGeometry } from "../letterGeometry3d";
 
@@ -189,7 +190,7 @@ function addEnvelopeChecks(plan: OfficePlan, rotation: number, center: [number, 
   check(plan.checks, "No uniform rescale", true, "The arrangement was generated inside the selected field. Completed geometry is not scaled to force a fit.");
 }
 
-function flatDeep(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "rotation"> {
+function legacyFlatDeep(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "rotation"> {
   const checks: OfficeCheck[] = [];
   const { maxW, maxD } = usablePlan(field);
   // Long axis follows the longer field side; keep longer-to-shorter in 3:2–5:2.
@@ -390,7 +391,52 @@ function placementAtSlot(
   };
 }
 
+function flatPlatePlacement(slot: OfficeSlot): IntersectionPlacement {
+  return {letter:'L',x:slot.x,y:slot.y,z:slot.z,rx:slot.rx,ry:slot.ry,rz:slot.rz,scale:slot.scale,scaleX:1,scaleY:1,scaleZ:1};
+}
+
+function flatPlateGuideFieldError(placement: IntersectionPlacement, field: OfficeField, setting: string) {
+  const bounds = letterFieldOverflow(placement, field);
+  const axes = [];
+  if (bounds.dx > 1e-6) axes.push('Width X');
+  if (bounds.dy > 1e-6) axes.push('Depth Y');
+  if (bounds.dzLo > 1e-6 || bounds.dzHi > 1e-6) axes.push('Height Z');
+  if (!axes.length) return;
+  const dimensions = axes.join(', ');
+  return `Flat Deep Plan Plate guide at ${placement.scale} ft extends outside the field along ${dimensions}. Reduce ${setting} or increase ${dimensions}.`;
+}
+
+export function flatPlateFloorGuideError(field: OfficeField) {
+  const {slabThickness, floorMezzGuideSize} = flatPlateDimensions(field.flatPlate);
+  const {slots} = flatPlateFootprint(field, slabThickness, floorMezzGuideSize);
+  for (const slot of slots) {
+    const placement = flatPlatePlacement({...slot, z: slot.z - field.height / 2});
+    const error = flatPlateGuideFieldError(placement, field, 'Floor and mezzanine L size');
+    if (error) return error;
+  }
+}
+
 export function arrangeOfficeLetters(
+  _source: IntersectionPlacement[], typology: string, _thicknessPercent = 12,
+  centerOverride?: [number,number,number], field: OfficeField = DEFAULT_OFFICE_FIELD,
+) {
+  requireTypology(typology);
+  const officePlan=planOfficeWorkspace(typology,0,centerOverride??[0,0,0],field);
+  const placements=officePlan.slots.map(flatPlatePlacement);
+  const cornerGuideCount=officePlan.plates
+    .filter(plate=>plate.role==='ground'||plate.role==='mezzanine')
+    .reduce((count,plate)=>count+plate.polygon.length,0);
+  for(const [index,placement] of placements.entries()){
+    const setting=index<cornerGuideCount?'Floor and mezzanine L size'
+      : Math.abs(placement.rx)>1||Math.abs(placement.ry)>1?'Wall L size':'Column L size';
+    const error=flatPlateGuideFieldError(placement,field,setting);
+    if(error)throw Error(error);
+  }
+  check(officePlan.checks, "Flat plate guides inside field", true,
+    `All ${placements.length} arranged L guide meshes fit inside the ${field.width} × ${field.depth} × ${field.height} ft field at their selected sizes.`);
+  return {placements,sequence:placements.map((_,i)=>i),preservedPairs:[] as number[][],overlapFractions:[] as number[],riseFractions:[] as number[],officePlan,operations:officePlan.operations,supported:true,sourcePolicy:'Flat Deep Plan Plate invents L corner guides and column-grid guides; no Open Hall metadata is used.'};
+}
+function legacyArrangeOfficeLetters(
   source: IntersectionPlacement[],
   typology: string,
   thicknessPercent = 12,

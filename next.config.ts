@@ -29,6 +29,7 @@ const sharedWorkerSources = [
   "./scripts/{experimental-opening-profile,anchored-room,live-perimeter-room,room-contour-plan,seal-curved-walls,join-v-flanks,full-corner-joints,corner-pier,join-curved-neighbors,perimeter-letter-panels,join-level-plates,suspended-polygon-room,full-perimeter-lofts,upright-opening-profile,room-edge-platforms}.cjs",
   "./src/components/{officeWorkspaceGeometry,letterGeometry3d,architecturalLetterSizing,letterVolumeLayout}.ts",
   "./src/components/workspace-rules/*.geometry.ts",
+  "./src/components/workspace-rules/{open-hall-workspace,void-edge-workspace.rules,void-edge-planar}.ts",
 ];
 
 const nextConfig: NextConfig = {

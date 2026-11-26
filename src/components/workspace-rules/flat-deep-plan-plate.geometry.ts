@@ -34,7 +34,7 @@ export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, o
     if (plate.role === "support") continue;
     const polygon = plate.id.startsWith("sill-") ? extendSill(plate) : plate.polygon;
     let solid = extrude(polygon, plate.zTop, plate.thickness);
-    if (!solid) continue;
+    if (!solid) throw assemblyError(`could not build planned element ${plate.id}`);
     // Role-scoped voids (e.g. roof skylights) punch only matching plates.
     const scoped = plan.voids.filter((hole) => hole.cut && hole.polygon.length >= 3 && hole.roles?.includes(plate.role));
     for (const hole of scoped) {
@@ -45,7 +45,7 @@ export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, o
     else bodyPlates.push(solid);
   }
 
-  let field = union(Manifold, bodyPlates, own);
+  let field = union(Manifold, bodyPlates, own, "slabs");
   // Legacy full-height cuts: voids without roles still shaft through the whole assembly.
   const cuts = plan.voids.filter((hole) => hole.cut && hole.polygon.length >= 3 && !hole.roles?.length);
   if (field && cuts.length) {
@@ -55,7 +55,7 @@ export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, o
       const shaft = extrude(hole.polygon, high, high - low);
       return shaft ? [shaft] : [];
     });
-    const cutter = union(Manifold, shafts, own);
+    const cutter = union(Manifold, shafts, own, "opening cutters");
     if (cutter) field = subtract(field, cutter, own);
   }
 
@@ -68,7 +68,8 @@ export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, o
       roofTied = true;
     }
     const solid = extrude(plate.polygon, zTop, zTop - bottom);
-    if (solid) connectors.push(solid);
+    if (!solid) throw assemblyError(`could not build planned pier ${plate.id}`);
+    connectors.push(solid);
   }
 
   if (!roofTied && roofs.length) {
@@ -92,9 +93,9 @@ export function buildOfficeWorkspace(wasm: ManifoldToplevel, plan: OfficePlan, o
   const sillJoin = joinSills(Manifold, plan, own);
   if (sillJoin) connectors.push(sillJoin);
 
-  const form = union(Manifold, [field, ...connectors].filter((solid): solid is Manifold => Boolean(solid)), own);
-  const walls = union(Manifold, wallPlates, own);
-  const combined = union(Manifold, [form, walls].filter((solid): solid is Manifold => Boolean(solid)), own);
+  const form = union(Manifold, [field, ...connectors].filter((solid): solid is Manifold => Boolean(solid)), own, "slabs and piers");
+  const walls = union(Manifold, wallPlates, own, "walls");
+  const combined = union(Manifold, [form, walls].filter((solid): solid is Manifold => Boolean(solid)), own, "slabs, piers and walls");
   return { form, walls, combined };
 }
 
@@ -115,13 +116,33 @@ function extrudeLink(Manifold: ManifoldToplevel["Manifold"], link: OfficePlan["l
   return own(turned);
 }
 
-function union(Manifold: ManifoldToplevel["Manifold"], solids: Manifold[], own: (solid: Manifold) => Manifold) {
-  const items = solids.filter((solid) => solid && !solid.isEmpty());
+function assemblyError(detail: string) {
+  return Error(`Final workspace geometry failed the architectural generation ruleset. AG-10 Flat Deep Plan Plate ${detail}.`);
+}
+
+function union(Manifold: ManifoldToplevel["Manifold"], items: Manifold[], own: (solid: Manifold) => Manifold, label: string) {
   if (!items.length) return null;
+  if (items.some(item=>item.status()!=="NoError"||item.isEmpty()||item.volume()<=0)) {
+    throw assemblyError(`has an invalid solid in the ${label} assembly`);
+  }
   if (items.length === 1) return items[0];
-  const merged = Manifold.union(items);
-  if (merged.status() !== "NoError" || merged.isEmpty()) { try { merged.delete(); } catch { /* already released */ } return items[0]; }
-  return own(merged);
+  const merged = own(Manifold.union(items));
+  if (merged.status() !== "NoError" || merged.isEmpty() || merged.volume()<=0) {
+    throw assemblyError(`could not join all ${label}`);
+  }
+  // A valid mesh can still omit an input. Check coverage at each assembly stage.
+  for (const item of items) {
+    const missing = item.subtract(merged);
+    try {
+      const tolerance = Math.max(0.0001, item.volume()*0.000001);
+      if (missing.status()!=="NoError" || (!missing.isEmpty() && Math.abs(missing.volume())>tolerance)) {
+        throw assemblyError(`has missing material in the ${label} assembly`);
+      }
+    } finally {
+      missing.delete();
+    }
+  }
+  return merged;
 }
 
 function subtract(body: Manifold, cutter: Manifold, own: (solid: Manifold) => Manifold) {

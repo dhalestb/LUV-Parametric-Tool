@@ -41,6 +41,14 @@ describe("workspace dual rulesets", () => {
     assert.equal(dual.architecturalGeneration.rules.length, 10);
   });
 
+  const expectedVersions = {
+    "open-hall-workspace": "1.6.0",
+    "flat-deep-plan-plate": "2.2.0",
+    "cascaded-terraced-plates": "1.2.0",
+    "void-edge-workspace": "2.21.0",
+    "folded-undulating-work-surface": "1.2.0",
+  };
+
   for (const [typology] of WORKSPACE_TYPOLOGIES) {
     it(`builds dual reports for ${typology} inside its default field`, () => {
       const field = WORKSPACE_DEFAULT_FIELDS[typology];
@@ -51,8 +59,8 @@ describe("workspace dual rulesets", () => {
       assert.equal(dual.architecturalGeneration.stage, "architectural-generation");
       assert.equal(dual.letterArrangement.typology, typology);
       assert.equal(dual.architecturalGeneration.typology, typology);
-      assert.equal(dual.letterArrangement.rulesetVersion, LETTER_ARRANGEMENT_RULESET_VERSION);
-      assert.equal(dual.architecturalGeneration.rulesetVersion, ARCHITECTURAL_GENERATION_RULESET_VERSION);
+      assert.equal(dual.letterArrangement.rulesetVersion, expectedVersions[typology]);
+      assert.equal(dual.architecturalGeneration.rulesetVersion, expectedVersions[typology]);
       assert.notEqual(dual.letterArrangement.overall, "fail");
       assert.notEqual(dual.architecturalGeneration.overall, "fail");
     });
@@ -68,7 +76,7 @@ describe("workspace dual rulesets", () => {
   });
 
   it("fails field containment when the selected field is too small", () => {
-    // Open Hall needs ≥10 ft mezzanine bands with 25–40% opening; default 60×60 fits, 20³ cannot.
+    // Open Hall needs ≥10 ft mezzanine bands with 20–40% opening; default 40×40 fits, 20³ cannot.
     const plan = planOfficeWorkspace("open-hall-workspace", 0, [0, 0, 0], WORKSPACE_DEFAULT_FIELDS["open-hall-workspace"]);
     assert.ok(officePlanReady(plan));
     const crampedHall = planOfficeWorkspace("open-hall-workspace", 0, [0, 0, 0], { width: 20, depth: 20, height: 20 });

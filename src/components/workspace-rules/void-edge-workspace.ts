@@ -1,5 +1,7 @@
 // Architectural rules owned exclusively by void-edge-workspace.
 import * as THREE from "three";
+import {voidEdgePlate} from './void-edge-plate';
+import {halfPlane, intersectFootprints} from './void-edge-planar';
 import type { IntersectionPlacement } from "../architecturalConnections";
 import { getLetterVolumeGeometry } from "../letterGeometry3d";
 import type { Letter } from "../letterTypes";
@@ -62,34 +64,8 @@ function pointInPoly(p: Pt, poly: Pt[]) {
   return inside;
 }
 
-function halfPlane(poly: Pt[], nx: number, ny: number, limit: number, keepBelow: boolean): Pt[] {
-  if (poly.length < 3) return [];
-  const side = (p: Pt) => nx * p[0] + ny * p[1];
-  const inside = (p: Pt) => keepBelow ? side(p) <= limit + 1e-7 : side(p) >= limit - 1e-7;
-  const out: Pt[] = [];
-  for (let i = 0; i < poly.length; i++) {
-    const cur = poly[i], prev = poly[(i + poly.length - 1) % poly.length];
-    const cin = inside(cur), pin = inside(prev);
-    if (cin !== pin) {
-      const sa = side(prev), sb = side(cur), t = (limit - sa) / ((sb - sa) || 1e-12);
-      out.push([prev[0] + (cur[0] - prev[0]) * t, prev[1] + (cur[1] - prev[1]) * t]);
-    }
-    if (cin) out.push(cur);
-  }
-  return out;
-}
-
 function intersectionArea(subject: Pt[], clipPoly: Pt[]) {
-  let poly = subject;
-  const clip = ccw(clipPoly);
-  for (let i = 0; i < clip.length; i++) {
-    const c = clip[i], d = clip[(i + 1) % clip.length];
-    const dx = d[0] - c[0], dy = d[1] - c[1];
-    const nx = -dy, ny = dx;
-    poly = halfPlane(poly, nx, ny, nx * c[0] + ny * c[1], false);
-    if (poly.length < 3) return 0;
-  }
-  return area(poly);
+  return area(intersectFootprints(subject, ccw(clipPoly)));
 }
 
 function rect(cx: number, cy: number, w: number, h: number): Pt[] {
@@ -450,6 +426,7 @@ export function arrangeOfficeLetters(
   field: OfficeField = DEFAULT_OFFICE_FIELD,
 ) {
   requireTypology(typology);
+  return voidEdgePlate(source,field);
   const n = source.length;
   const sequence = source.map((_, i) => i);
   if (!n) return { placements: [], sequence, preservedPairs: [] as number[][], overlapFractions: [] as number[], riseFractions: [] as number[], officePlan: null as OfficePlan | null, operations: [] as string[], supported: true, sourcePolicy: "No source letters were provided." };

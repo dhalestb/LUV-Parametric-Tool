@@ -4,6 +4,7 @@ import * as rules1 from "./workspace-rules/flat-deep-plan-plate";
 import * as rules2 from "./workspace-rules/cascaded-terraced-plates";
 import * as rules3 from "./workspace-rules/void-edge-workspace";
 import * as rules4 from "./workspace-rules/folded-undulating-work-surface";
+export { OPEN_HALL_DEFAULT_SLAB_THICKNESS } from "./workspace-rules/open-hall-workspace";
 export type { Pt, MezzanineWrapFaces, OpenHallCorner, OpenHallGuideRole, OpenHallGuideCandidate, OfficeField, OfficeCheck, OfficePlate, OfficeVoid, OfficeLink, OfficeSlot, OfficePlan } from "./workspace-rules/contracts";
 export { DEFAULT_OFFICE_FIELD, MEZZANINE_MIN_WIDTH, OPEN_HALL_OPENING_MIN, OPEN_HALL_OPENING_MAX, OPEN_HALL_OPENING_TARGET, OPEN_HALL_WALL_THICKNESS, OPEN_HALL_ENTRY_WIDTH, OPEN_HALL_COLUMN_SIZES, OPEN_HALL_COLUMN_GRID_SPACINGS, OPEN_HALL_FLOOR_MEZZ_GUIDE_SIZES, OPEN_HALL_WALL_GUIDE_SIZES, OPEN_HALL_ROOF_GUIDE_SIZES, OPEN_HALL_DEFAULT_COLUMN_SIZE, OPEN_HALL_DEFAULT_COLUMN_GRID_SPACING, OPEN_HALL_DEFAULT_FLOOR_MEZZ_GUIDE_SIZE, OPEN_HALL_DEFAULT_WALL_GUIDE_SIZE, OPEN_HALL_DEFAULT_ROOF_GUIDE_SIZE, OPEN_HALL_ROOF_GUIDE_COUNT, normalizeOpenHallGuideSize, normalizeOpenHallColumnSize, normalizeOpenHallColumnGridSpacing, normalizeOpenHallFloorMezzGuideSize, normalizeOpenHallWallGuideSize, normalizeOpenHallRoofGuideSize, nudgePlacementIntoField, buildOpenHallGuideLetters } from "./workspace-rules/open-hall-workspace";
 const modules: Record<string, Pick<typeof rules0, "planOfficeWorkspace" | "resolveOfficePlan" | "arrangeOfficeLetters" | "officePlanReady">> = {

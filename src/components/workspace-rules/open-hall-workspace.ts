@@ -17,13 +17,14 @@ export const DEFAULT_OFFICE_FIELD: OfficeField = { width: 20, depth: 20, height:
 
 export const MEZZANINE_MIN_WIDTH = 10;
 
-export const OPEN_HALL_OPENING_MIN = 0.25;
+export const OPEN_HALL_OPENING_MIN = 0.2;
 
 export const OPEN_HALL_OPENING_MAX = 0.4;
 
 export const OPEN_HALL_OPENING_TARGET = (OPEN_HALL_OPENING_MIN + OPEN_HALL_OPENING_MAX) / 2;
 
 export const OPEN_HALL_WALL_THICKNESS = 1.5;
+export const OPEN_HALL_DEFAULT_SLAB_THICKNESS = 0.75;
 
 export const OPEN_HALL_ENTRY_WIDTH = 10;
 
@@ -48,6 +49,74 @@ export const OPEN_HALL_DEFAULT_WALL_GUIDE_SIZE = 9;
 export const OPEN_HALL_DEFAULT_ROOF_GUIDE_SIZE = 6;
 
 export const OPEN_HALL_ROOF_GUIDE_COUNT = 4;
+
+export const OPEN_HALL_MEZZANINE_OPTIONS = [
+  {value: 2, label: "2-channel · L plate"},
+  {value: 3, label: "3-channel · U plate"},
+  {value: 4, label: "4-channel · ring plate"},
+] as const;
+export const OPEN_HALL_ROOF_SIZING_OPTIONS = [
+  {value: "fixed", label: "Fixed size"},
+  {value: "pillar", label: "Fit between pillar edges"},
+] as const;
+export const OPEN_HALL_DEFAULT_MEZZANINE = OPEN_HALL_MEZZANINE_OPTIONS[0].value;
+export const OPEN_HALL_DEFAULT_ROOF_SIZING = OPEN_HALL_ROOF_SIZING_OPTIONS[0].value;
+export const OPEN_HALL_DEFAULT_ROOF_INSET = 0;
+
+type OpenHallOptions = Pick<OfficeField,
+  "mezzanineFaces" | "columnSize" | "columnGridSpacing" | "floorMezzGuideSize" | "wallGuideSize" |
+  "roofGuideSize" | "roofSizing" | "roofInset" | "wallThickness" | "slabThickness" | "perimeterWalls"
+> & { joinWalls?: boolean };
+
+export function openHallSettingsError(settings: OpenHallOptions | undefined) {
+  const faces = settings?.mezzanineFaces;
+  if (faces !== undefined && !OPEN_HALL_MEZZANINE_OPTIONS.some(option => option.value === faces)) {
+    return 'Open Hall mezzanine wrap must be 2, 3 or 4 faces.';
+  }
+  for (const name of ['perimeterWalls', 'joinWalls'] as const) {
+    if (settings?.[name] !== undefined && typeof settings[name] !== 'boolean') return `Open Hall ${name} must be a boolean.`;
+  }
+  const dimensions = [
+    ['wall thickness', settings?.wallThickness], ['slab thickness', settings?.slabThickness],
+    ['column size', settings?.columnSize], ['column grid size', settings?.columnGridSpacing],
+    ['floor/mezz size', settings?.floorMezzGuideSize], ['wall size', settings?.wallGuideSize],
+    ['roof size', settings?.roofGuideSize],
+  ] as const;
+  const invalid = dimensions.find(([, value]) => value !== undefined && (!Number.isFinite(value) || value <= 0));
+  if (invalid) return `Open Hall ${invalid[0]} must be a positive number (ft).`;
+}
+
+export function openHallRequestGeometry(settings: OpenHallOptions | undefined, preferredFeet: number) {
+  // Older requests recorded some guide presets only in preferredFeet.
+  const legacyFloorSize = OPEN_HALL_FLOOR_MEZZ_GUIDE_SIZES.find(size => size === preferredFeet);
+  return {
+    mezzanineFaces: settings?.mezzanineFaces ?? OPEN_HALL_DEFAULT_MEZZANINE,
+    wallThickness: settings?.wallThickness ?? OPEN_HALL_WALL_THICKNESS,
+    slabThickness: settings?.slabThickness ?? OPEN_HALL_DEFAULT_SLAB_THICKNESS,
+    columnSize: settings?.columnSize ?? OPEN_HALL_DEFAULT_COLUMN_SIZE,
+    columnGridSpacing: settings?.columnGridSpacing ?? OPEN_HALL_DEFAULT_COLUMN_GRID_SPACING,
+    floorMezzGuideSize: settings?.floorMezzGuideSize ?? legacyFloorSize ?? OPEN_HALL_DEFAULT_FLOOR_MEZZ_GUIDE_SIZE,
+    wallGuideSize: settings?.wallGuideSize ?? OPEN_HALL_DEFAULT_WALL_GUIDE_SIZE,
+    roofGuideSize: settings?.roofGuideSize ?? OPEN_HALL_DEFAULT_ROOF_GUIDE_SIZE,
+    roofSizing: OPEN_HALL_ROOF_SIZING_OPTIONS.find(option => option.value === settings?.roofSizing)?.value ?? OPEN_HALL_DEFAULT_ROOF_SIZING,
+    roofInset: settings?.roofInset ?? OPEN_HALL_DEFAULT_ROOF_INSET,
+  };
+}
+
+export function openHallFieldPresetError(field: Pick<OfficeField, "width" | "depth">) {
+  if (field.width === 20 || field.depth === 20) {
+    return `Set Width X and Depth Y to 40 ft or 60 ft. A 20 ft plan dimension leaves too little room for the ${MEZZANINE_MIN_WIDTH} ft mezzanine bands. Height Z can stay at 20 ft.`;
+  }
+}
+
+export function openHallColumnGridError(settings: Pick<OfficeField, "columnSize" | "columnGridSpacing">) {
+  const size = normalizeOpenHallColumnSize(settings.columnSize);
+  const spacing = normalizeOpenHallColumnGridSpacing(settings.columnGridSpacing);
+  const minimum = Math.max(1, 5 - size);
+  if (spacing < minimum) {
+    return `Open Hall needs column grid spacing of at least ${Number(minimum.toFixed(6))} ft with the selected ${size} ft column L size. Increase Column grid spacing or choose a preset.`;
+  }
+}
 
 export function normalizeOpenHallGuideSize(value: number | undefined, fallback: number) {
   return Number.isFinite(value) && (value as number) > 0 ? value as number : fallback;
@@ -297,7 +366,7 @@ function addEnvelopeChecks(plan: OfficePlan, rotation: number, center: [number, 
   } else {
     check(plan.checks, "15° footprint rotation", snapped15(rotation), `Measured rotation ${rotation}°; threshold 15° increments; units degrees. Working surfaces stay horizontal.`);
   }
-  check(plan.checks, "No uniform rescale", true, "The arrangement was generated inside the selected field. Completed geometry is not scaled to force a fit.");
+  // No post-generation rescale is a policy; actual guide placement is checked after arrangement.
 }
 
 function mezzanineShapeName(faces: MezzanineWrapFaces) {
@@ -495,6 +564,9 @@ function openHallPerimeterWalls(
   entryWidth: number,
   groundTop: number,
   roofUnderside: number,
+  faces: MezzanineWrapFaces,
+  jambX: number,
+  jambY: number,
 ): OfficePlate[] {
   const hx = length / 2, hy = depth / 2;
   const wallH = Math.max(roofUnderside - groundTop, 0.05);
@@ -505,14 +577,16 @@ function openHallPerimeterWalls(
     walls.push({ id, polygon, zTop, thickness: wallH, role: "wall" });
   };
   push("wall-north", rect(0, hy - wallT / 2, length, wallT));
-  push("wall-west", rect(-hx + wallT / 2, 0, wallT, depth - 2 * wallT));
-  push("wall-east", rect(hx - wallT / 2, 0, wallT, depth - 2 * wallT));
-  const entryHalf = Math.min(entryWidth, length - 2 * wallT) / 2;
-  const southSpan = hx - entryHalf;
-  if (southSpan > wallT) {
-    push("wall-south-west", rect((-hx - entryHalf) / 2, -hy + wallT / 2, southSpan, wallT));
-    push("wall-south-east", rect((entryHalf + hx) / 2, -hy + wallT / 2, southSpan, wallT));
+  // Two channels expose the southwest hall on two adjacent facades.
+  // Other channels expose only the south facade between the mezzanine jambs.
+  if (faces === 2) {
+    push("wall-west", rect(-hx + wallT / 2, (jambY + hy - wallT) / 2, wallT, hy - wallT - jambY));
+  } else {
+    push("wall-west", rect(-hx + wallT / 2, 0, wallT, depth - 2 * wallT));
   }
+  push("wall-east", rect(hx - wallT / 2, 0, wallT, depth - 2 * wallT));
+  if (faces !== 2) push("wall-south-west", rect((-hx - jambX) / 2, -hy + wallT / 2, hx - jambX, wallT));
+  push("wall-south-east", rect((jambX + hx) / 2, -hy + wallT / 2, hx - jambX, wallT));
   return walls;
 }
 
@@ -529,19 +603,27 @@ function openHallGuideSlotsFrom(candidates: OpenHallGuideCandidate[]) {
   return candidates.map((c) => openHallGuideSlot(c.p[0], c.p[1], c.z, c.scale, c.role, c.rx, c.ry, c.rz));
 }
 
+/**
+ * Open Hall two-stage pipeline (no prior parametric massing):
+ * 1) Letter arrangement — generate plan-matched oriented L sets (floor / mezz / column / wall / roof).
+ * 2) Architectural generation — extrude plates, piers, walls, roof, skylights only from those letters.
+ */
 function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "rotation"> {
   const checks: OfficeCheck[] = [];
-  const faces: MezzanineWrapFaces = field.mezzanineFaces === 3 || field.mezzanineFaces === 4 ? field.mezzanineFaces : 2;
+  const faces = OPEN_HALL_MEZZANINE_OPTIONS.find(option => option.value === field.mezzanineFaces)?.value ?? OPEN_HALL_DEFAULT_MEZZANINE;
   const columnSize = normalizeOpenHallColumnSize(field.columnSize);
   const columnGridSpacing = normalizeOpenHallColumnGridSpacing(field.columnGridSpacing);
+  const gridError = openHallColumnGridError({ columnSize, columnGridSpacing });
+  if (gridError) throw Error(gridError);
   const floorMezzGuide = normalizeOpenHallFloorMezzGuideSize(field.floorMezzGuideSize ?? field.preferredFeet);
   const wallGuide = normalizeOpenHallWallGuideSize(field.wallGuideSize);
-  const roofGuide = normalizeOpenHallRoofGuideSize(field.roofGuideSize);
-  const wallT = OPEN_HALL_WALL_THICKNESS;
-  const groundTop = SLAB;
+  let roofGuide = normalizeOpenHallRoofGuideSize(field.roofGuideSize);
+  const wallT = normalizeOpenHallGuideSize(field.wallThickness, OPEN_HALL_WALL_THICKNESS);
+  const slabT = normalizeOpenHallGuideSize(field.slabThickness, OPEN_HALL_DEFAULT_SLAB_THICKNESS);
+  const groundTop = slabT;
   const mezzTop = field.height / 2;
-  const roofUnderside = roofUndersideForField(field);
-  const roofTop = roofUnderside + SLAB;
+  const roofUnderside = roofUndersideForField(field, slabT);
+  const roofTop = roofUnderside + slabT;
   const shape = mezzanineShapeName(faces);
   const expectedMezzCount = faces === 2 ? 6 : 8;
 
@@ -550,22 +632,12 @@ function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "
   const tipPad = Math.max(0.5, wallT * 0.25);
   let tipHx = Math.max(6, field.width / 2 - tipPad);
   let tipHy = Math.max(6, field.depth / 2 - tipPad);
-  // Letter-arrangement ratio rule on the tip composition (1:1–5:3).
-  let tipLength = tipHx * 2, tipDepth = tipHy * 2;
-  if (faces >= 3) {
-    if (tipLength / tipDepth > 5 / 3) tipDepth = tipLength / (5 / 3);
-    if (tipDepth / tipLength > 5 / 3) tipLength = tipDepth / (5 / 3);
-    if (tipLength / tipDepth < 1) { const t = tipLength; tipLength = tipDepth; tipDepth = t; }
-  } else {
-    tipLength = Math.min(tipLength, tipDepth * (5 / 3));
-    tipDepth = Math.min(tipDepth, tipLength / (4 / 3));
-    tipLength = Math.min(tipLength, tipDepth * (4 / 3));
-    if (tipLength / tipDepth > 5 / 3) tipDepth = tipLength / (5 / 3);
-    if (tipLength / tipDepth < 1) tipLength = tipDepth;
-  }
+  // Fit a square footprint within the available field for every channel option.
+  const tipLength = Math.min(tipHx, tipHy) * 2;
+  const tipDepth = tipLength;
   tipHx = tipLength / 2;
   tipHy = tipDepth / 2;
-  const floorLetters = openHallOuterCornerLetters(tipHx, tipHy, floorMezzGuide, groundTop - SLAB / 2, "floor");
+  const floorLetters = openHallOuterCornerLetters(tipHx, tipHy, floorMezzGuide, groundTop - slabT / 2, "floor");
 
   // Mezz band first (opening target), then seat Ls on the platform's exterior + interior corners.
   const maxBand = Math.min(tipLength, tipDepth) / 2 - 1;
@@ -585,13 +657,21 @@ function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "
     pocketBand = nextBand;
     trial = next;
   }
-  let mezzCornerSet = openHallMezzanineCornerLetters(faces, tipHx, tipHy, pocketBand, floorMezzGuide, mezzTop - SLAB / 2);
+  let mezzCornerSet = openHallMezzanineCornerLetters(faces, tipHx, tipHy, pocketBand, floorMezzGuide, mezzTop - slabT / 2);
   let mezzOuterLetters = mezzCornerSet.exterior;
   let mezzPocketLetters = mezzCornerSet.interior;
   let mezzLetters = mezzCornerSet.all;
 
   // Columns: equal XY grid (15/20/25 ft) bounded by the floor-plate perimeter — every grid node, including centre.
   const columnGrid = openHallColumnGrid(tipLength, tipDepth, columnGridSpacing, false);
+  if (field.roofSizing === "pillar") {
+    const inset = field.roofInset ?? 0;
+    if (!Number.isFinite(inset) || inset < 0) throw Error("Roof inset must be a non-negative number.");
+    // 0.9 is the largest pillar footprint dimension and roof L span per unit.
+    const clear = Math.min(columnGrid.spacingX, columnGrid.spacingY) - columnSize * 0.9 - 2 * inset;
+    if (clear <= 0.1) throw Error("Roof inset leaves no space between pillar edges; reduce the inset or pillar size.");
+    roofGuide = clear / 0.9;
+  }
   const columnLetters: OpenHallGuideCandidate[] = columnGrid.anchors.map((anchor, index) => ({
     p: anchor,
     z: groundTop + columnSize * 0.15,
@@ -600,25 +680,37 @@ function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "
     rx: 0, ry: 0, rz: (index % 4) * 90,
   }));
 
-  // Walls: vertical Ls along the letter-tip perimeter.
-  const wallZ = groundTop + Math.max(2, wallGuide * 0.2);
-  const wallLetters: OpenHallGuideCandidate[] = [
-    { p: [-tipHx * 0.55, tipHy - wallT], z: wallZ, scale: wallGuide, role: "wall", rx: 90, ry: 0, rz: 0 },
-    { p: [tipHx * 0.55, tipHy - wallT], z: wallZ, scale: wallGuide, role: "wall", rx: 90, ry: 0, rz: 0 },
-    { p: [-tipHx + wallT, -tipHy * 0.45], z: wallZ, scale: wallGuide, role: "wall", rx: 90, ry: 0, rz: 90 },
-    { p: [-tipHx + wallT, tipHy * 0.45], z: wallZ, scale: wallGuide, role: "wall", rx: 90, ry: 0, rz: 90 },
-    { p: [tipHx - wallT, -tipHy * 0.45], z: wallZ, scale: wallGuide, role: "wall", rx: 90, ry: 0, rz: 90 },
-    { p: [tipHx - wallT, tipHy * 0.45], z: wallZ, scale: wallGuide, role: "wall", rx: 90, ry: 0, rz: 90 },
-    { p: [-tipHx * 0.55, -tipHy + wallT], z: wallZ, scale: wallGuide, role: "wall", rx: 90, ry: 0, rz: 0 },
-    { p: [tipHx * 0.55, -tipHy + wallT], z: wallZ, scale: wallGuide, role: "wall", rx: 90, ry: 0, rz: 0 },
-  ];
+  // Four L guides per elevation panel; local XY is rotated into XZ or YZ.
+  // Open 2/3-channel mezzanines supply exterior tips at their facade ends.
+  // A closed ring supplies its inner crooks, projected onto the south facade.
+  const jambLetters = faces === 4 ? mezzPocketLetters : mezzOuterLetters;
+  const jambPoints = jambLetters.map(g => openHallEdgePointFromLetter(g.p, g.scale, g.rz, faces === 4 ? "inner" : "outer"));
+  const jambX = Math.min(...jambPoints.filter(p => p[0] > 1e-6).map(p => p[0]));
+  const jambY = Math.min(...jambPoints.filter(p => p[1] > 1e-6).map(p => p[1]));
+  const wallGroups = openHallPerimeterWalls(tipLength, tipDepth, wallT, OPEN_HALL_ENTRY_WIDTH, groundTop, roofUnderside, faces, jambX, jambY).map(panel => {
+    const axis = panel.id === "wall-east" || panel.id === "wall-west" ? 1 : 0;
+    const us = panel.polygon.map(p => p[axis]), ns = panel.polygon.map(p => p[1-axis]);
+    const lo = Math.min(...us), hi = Math.max(...us), n = (Math.min(...ns)+Math.max(...ns))/2;
+    const guides = OPEN_HALL_CORNERS.map((corner, i): OpenHallGuideCandidate => {
+      const matrix = new THREE.Matrix4().makeRotationZ(axis ? Math.PI/2 : 0)
+        .multiply(new THREE.Matrix4().makeRotationX(Math.PI/2))
+        .multiply(new THREE.Matrix4().makeRotationZ(OPEN_HALL_CORNER_RZ[corner]*Math.PI/180));
+      const e = new THREE.Euler().setFromRotationMatrix(matrix, "XYZ");
+      const u = i===0||i===3 ? lo : hi, z = i<2 ? groundTop : roofUnderside;
+      const p = axis ? new THREE.Vector3(n,u,z) : new THREE.Vector3(u,n,z);
+      p.sub(new THREE.Vector3(L_UNIT_OUTER[0]*wallGuide,L_UNIT_OUTER[1]*wallGuide,0).applyMatrix4(matrix));
+      return {p:[p.x,p.y],z:p.z,scale:wallGuide,role:"wall",rx:e.x*180/Math.PI,ry:e.y*180/Math.PI,rz:e.z*180/Math.PI};
+    });
+    return {id:panel.id,axis,guides};
+  });
+  const wallLetters = wallGroups.flatMap(g => g.guides);
 
-  // Roof: four quadrant Ls inside the floor-tip rectangle.
-  const roofLetters: OpenHallGuideCandidate[] = [
-    [-tipHx * 0.42, -tipHy * 0.42], [tipHx * 0.42, tipHy * 0.42],
-    [tipHx * 0.42, -tipHy * 0.42], [-tipHx * 0.42, tipHy * 0.42],
-  ].slice(0, OPEN_HALL_ROOF_GUIDE_COUNT).map((p, i) => ({
-    p: p as Pt, z: roofTop - SLAB / 2, scale: roofGuide, role: "roof" as const,
+  // Every pocket between adjacent column rows and columns gets a roof guide.
+  const bayXs = Array.from({length: columnGrid.nCols - 1}, (_, i) => -columnGrid.spanX / 2 + (i + 0.5) * columnGrid.spacingX);
+  const bayYs = Array.from({length: columnGrid.nRows - 1}, (_, i) => -columnGrid.spanY / 2 + (i + 0.5) * columnGrid.spacingY);
+  const bays = bayXs.flatMap(x => bayYs.map(y => [x, y] as Pt));
+  const roofLetters: OpenHallGuideCandidate[] = bays.map((p, i) => ({
+    p: p as Pt, z: roofTop - slabT / 2, scale: roofGuide, role: "roof" as const,
     rx: 0, ry: 0, rz: (i % 4) * 90,
   }));
 
@@ -644,7 +736,7 @@ function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "
     const measured = Math.min(Math.min(length, depth) / 2 - 1, Math.min(insetX, insetY));
     if (Number.isFinite(measured) && measured >= 1) band = measured;
   }
-  mezzCornerSet = openHallMezzanineCornerLetters(faces, hx, hy, band, floorMezzGuide, mezzTop - SLAB / 2);
+  mezzCornerSet = openHallMezzanineCornerLetters(faces, hx, hy, band, floorMezzGuide, mezzTop - slabT / 2);
   mezzOuterLetters = mezzCornerSet.exterior;
   mezzPocketLetters = mezzCornerSet.interior;
   mezzLetters = mezzCornerSet.all;
@@ -654,21 +746,7 @@ function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "
   const { polygons: mezzPolys, opening } = built;
   const mezzUnion = mezzPolys[0];
 
-  // Filled architecture = letter footprints (L polygons), not independent rectangles.
-  const floorPads: OfficePlate[] = floorLetters.map((letter, index) => ({
-    id: `floor-letter-fill-${index + 1}`,
-    polygon: openHallCenteredLPolygon(letter.p, letter.scale, letter.rz),
-    zTop: groundTop + 0.35,
-    thickness: SLAB + 0.35,
-    role: "working" as const,
-  }));
-  const mezzPads: OfficePlate[] = mezzLetters.map((letter, index) => ({
-    id: `mezz-letter-fill-${index + 1}`,
-    polygon: openHallCenteredLPolygon(letter.p, letter.scale, letter.rz),
-    zTop: mezzTop + 0.35,
-    thickness: SLAB + 0.35,
-    role: "working" as const,
-  }));
+  // Floor and mezzanine letters define plate edges; they do not create raised pads.
   const supports: OfficePlate[] = columnLetters.map((letter, index) => ({
     id: `column-${index + 1}`,
     polygon: openHallFilledLPocketPolygon(letter.p, letter.scale, letter.rz),
@@ -676,45 +754,35 @@ function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "
     thickness: mezzTop + 0.05 - 0.2,
     role: "support" as const,
   }));
-  // Continuous shell for enclosure + L wall masses at each wall letter.
-  const shellWalls = openHallPerimeterWalls(length, depth, wallT, OPEN_HALL_ENTRY_WIDTH, groundTop, roofUnderside);
-  // Wall L fills sit on the shell; keep footprint ≤ letter scale but inset so envelope passes.
-  const wallLetterFills: OfficePlate[] = wallLetters.map((letter, index) => ({
-    id: `wall-letter-fill-${index + 1}`,
-    polygon: openHallCenteredLPolygon(letter.p, Math.min(letter.scale, Math.max(wallT * 2.5, 4)), letter.rz),
-    zTop: roofUnderside,
-    thickness: Math.max(roofUnderside - groundTop, 0.05),
-    role: "wall" as const,
-  }));
-  const walls = [...shellWalls, ...wallLetterFills];
+  // Final panels span the measured outer tips of the vertical corner letters.
+  const shellWalls: OfficePlate[] = wallGroups.map(({id,axis,guides}) => {
+    const tips = guides.map(g => new THREE.Vector3(L_UNIT_OUTER[0]*g.scale,L_UNIT_OUTER[1]*g.scale,0)
+      .applyEuler(new THREE.Euler(g.rx*Math.PI/180,g.ry*Math.PI/180,g.rz*Math.PI/180,"XYZ"))
+      .add(new THREE.Vector3(g.p[0],g.p[1],g.z)));
+    const us = tips.map(p => axis ? p.y : p.x), zs = tips.map(p => p.z);
+    const lo=Math.min(...us),hi=Math.max(...us),bottom=Math.min(...zs),top=Math.max(...zs);
+    const n=tips.reduce((sum,p)=>sum+(axis?p.x:p.y),0)/tips.length;
+    return {id,polygon:axis?rect(n,(lo+hi)/2,wallT,hi-lo):rect((lo+hi)/2,n,hi-lo,wallT),zTop:top,thickness:top-bottom,role:"wall"};
+  });
+  const walls = shellWalls;
   // Skylights cut as L voids matching each roof letter.
-  const skylightPolys = roofLetters.map((letter) => openHallCenteredLPolygon(letter.p, Math.max(2, letter.scale * 0.95), letter.rz));
+  const skylightPolys = roofLetters.map((letter) => openHallFilledLPocketPolygon(letter.p, letter.scale, letter.rz));
   const voids: OfficeVoid[] = skylightPolys.map((polygon, index) => ({
     id: `skylight-${index + 1}`,
     polygon,
     cut: true,
     roles: ["roof"],
   }));
-  const baffles: OfficePlate[] = roofLetters.map((letter, index) => ({
-    id: `baffle-${index + 1}`,
-    polygon: openHallCenteredLPolygon(letter.p, Math.max(1.5, letter.scale * 0.7), letter.rz),
-    zTop: Math.max(mezzTop + 8.2, roofUnderside - 1.5),
-    thickness: 0.2,
-    role: "working" as const,
-  })).filter((plate) => plate.zTop - plate.thickness > mezzTop + 8);
   const links: OfficeLink[] = [];
   const plates: OfficePlate[] = [
-    { id: "ground-hall", polygon: ground, zTop: groundTop, thickness: SLAB, role: "ground" },
-    ...floorPads,
+    { id: "ground-hall", polygon: ground, zTop: groundTop, thickness: slabT, role: "ground" },
     ...mezzPolys.map((polygon, index) => ({
       id: mezzPolys.length === 1 ? "mezzanine" : `mezzanine-${index + 1}`,
-      polygon, zTop: mezzTop, thickness: SLAB, role: "mezzanine" as const,
+      polygon, zTop: mezzTop, thickness: slabT, role: "mezzanine" as const,
     })),
-    ...mezzPads,
-    { id: "roof", polygon: ground, zTop: roofTop, thickness: SLAB, role: "roof" },
+    { id: "roof", polygon: ground, zTop: roofTop, thickness: slabT, role: "roof" },
     ...walls,
     ...supports,
-    ...baffles,
   ];
 
   const head = overheadClearance(plates, ["ground", "mezzanine"]);
@@ -726,18 +794,25 @@ function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "
       || columnGrid.spacingX + 1e-6 >= Math.min(length, depth));
   const gridInsideFloor = columnGrid.anchors.every((p) =>
     Math.abs(p[0]) <= hx + 1e-6 && Math.abs(p[1]) <= hy + 1e-6);
-  const nearestGap = supports.length >= 2
-    ? Math.min(...supports.flatMap((a, i) => supports.slice(i + 1).map((b) => {
-      const ca = centroid(a.polygon), cb = centroid(b.polygon);
-      return Math.hypot(ca[0] - cb[0], ca[1] - cb[1]);
-    })))
-    : 0;
+  const nearestGap = Math.min(columnGrid.spacingX, columnGrid.spacingY);
+  const spacingFits = nearestGap + 1e-6 >= 5 - columnSize;
   const widthPatch = fitsSquare(mezzUnion, Math.min(MEZZANINE_MIN_WIDTH, band), [0])
     || mezzPolys.some((poly) => fitsSquare(poly, Math.min(MEZZANINE_MIN_WIDTH, band), [0]));
-  const wallOk = shellWalls.length >= 3
-    && shellWalls.every((w) => w.thickness > 0)
-    && Math.abs(wallT - OPEN_HALL_WALL_THICKNESS) < 1e-9;
+  const wallOk = shellWalls.length >= 3 && wallT > 0 && slabT > 0
+    && shellWalls.every((w) => w.thickness > 0);
   const entryClear = !shellWalls.some((w) => pointInPoly([0, -hy + wallT / 2], w.polygon));
+  // Check planned panel extents directly against the selected mezzanine jamb coordinates.
+  const expectedWallBounds:Record<string,number[]>={
+    'wall-north':[-hx,hy-wallT,hx,hy],
+    'wall-east':[hx-wallT,-hy+wallT,hx,hy-wallT],
+    'wall-west':faces===2?[-hx,jambY,-hx+wallT,hy-wallT]:[-hx,-hy+wallT,-hx+wallT,hy-wallT],
+    'wall-south-east':[jambX,-hy,hx,-hy+wallT],
+    ...(faces===2?{}:{'wall-south-west':[-hx,-hy,-jambX,-hy+wallT]}),
+  };
+  const wallEdgesMatch=shellWalls.length===Object.keys(expectedWallBounds).length&&shellWalls.every(w=>{
+    const b=boundsOf([w.polygon]),expected=expectedWallBounds[w.id];
+    return !!expected&&[b.minX,b.minY,b.maxX,b.maxY].every((v,i)=>Math.abs(v-expected[i])<1e-5);
+  });
   const floorTips = floorLetters.map((letter) => openHallEdgePointFromLetter(letter.p, letter.scale, letter.rz, "outer"));
   const letterDerivedGround =
     Math.abs(Math.max(...floorTips.map((t) => t[0])) - Math.min(...floorTips.map((t) => t[0])) - length) < 0.05
@@ -752,28 +827,36 @@ function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "
         && plate.polygon.length === 4
         && Math.abs(area(plate.polygon) - area(filled)) < 1e-6;
     });
-  const letterFillsVisible = floorPads.length === 4 && mezzPads.length === mezzLetters.length && wallLetterFills.length === wallLetters.length;
-  const skylightsMatchRoofLetters = voids.length === roofLetters.length && voids.every((v) => v.polygon.length === 6);
+  const letterFillsVisible = wallLetters.length === shellWalls.length * 4;
+  const skylightsMatchRoofLetters = voids.length === roofLetters.length && voids.every((v) => v.polygon.length === 4);
+  const compactRingOpeningMinimum = OPEN_HALL_OPENING_MIN;
 
-  check(checks, "Ground plate filled", ratio >= 1 - 1e-6 && ratio <= 5 / 3 + 1e-6 && letterDerivedGround, `Architecture fills ground from outer edges of four floor L corner letters to ${length.toFixed(2)} × ${depth.toFixed(2)} ft (ratio ${ratio.toFixed(3)}, threshold 1:1–5:3), with L corner fills matching those letters.`);
+  check(checks, "Ground plate filled", Math.abs(ratio - 1) <= 1e-6 && letterDerivedGround, `Continuous ground plate spans the outer edges of four floor L corner letters to ${length.toFixed(2)} × ${depth.toFixed(2)} ft (ratio ${ratio.toFixed(3)}, required 1:1).`);
   check(checks, "Central hall", centerOpen && pointInPoly([0, 0], ground), "The ground plate is continuous through the centre. The mezzanine opening sits over that centre. The equal column grid may place a pier on the centre grid node.");
-  check(checks, "Mezzanine opening", opening >= OPEN_HALL_OPENING_MIN - 1e-6 && opening <= OPEN_HALL_OPENING_MAX + 1e-6, `The ${shape} mezzanine leaves a ${(opening * 100).toFixed(1)}% opening (threshold ${(OPEN_HALL_OPENING_MIN * 100).toFixed(0)}–${(OPEN_HALL_OPENING_MAX * 100).toFixed(0)}%). Band ${band.toFixed(2)} ft measured from pocket L inner edges.`);
-  check(checks, "Mezzanine platform width", band >= MEZZANINE_MIN_WIDTH - 1e-3 && widthPatch, `Mezzanine usable width is ${band.toFixed(2)} ft (threshold ≥${MEZZANINE_MIN_WIDTH} ft) on ${shape}, from pocket L inner edges.`);
+  const bandFits = band >= MEZZANINE_MIN_WIDTH - 1e-3 && widthPatch;
+  const openingFits = opening >= compactRingOpeningMinimum - 1e-6 && opening <= OPEN_HALL_OPENING_MAX + 1e-6;
+  const increasePlanSpace = " Increase the smaller plan dimension or reduce wall thickness.";
+  check(checks, "Mezzanine opening", openingFits, `The ${shape} mezzanine leaves a ${(opening * 100).toFixed(1)}% opening (threshold ${(compactRingOpeningMinimum * 100).toFixed(1)}–${(OPEN_HALL_OPENING_MAX * 100).toFixed(0)}% for this footprint). Band ${band.toFixed(2)} ft measured from pocket L inner edges.`
+    + (bandFits && opening < compactRingOpeningMinimum - 1e-6 ? increasePlanSpace : ""));
+  check(checks, "Mezzanine platform width", bandFits, `Mezzanine geometric band width is ${band.toFixed(2)} ft (threshold ≥${MEZZANINE_MIN_WIDTH} ft) on ${shape}, from pocket L inner edges.`
+    + (bandFits ? "" : increasePlanSpace));
   check(checks, "Mezzanine elevation", Math.abs(mezzTop - field.height / 2) < 1e-6, `Measured mezzanine finished surface ${mezzTop.toFixed(2)} ft above field bottom; threshold half of field height (${(field.height / 2).toFixed(2)} ft).`);
-  check(checks, "Column grid", supports.length >= 3 && equalGrid && gridInsideFloor && nearestGap >= 5 - columnSize && piersMatchLetters && columnGrid.anchors.length === columnGrid.nCols * columnGrid.nRows, `Equal XY column grid ${columnGrid.nCols}×${columnGrid.nRows} at ${columnGridSpacing} ft spacing (measured ${columnGrid.spacingX.toFixed(2)}×${columnGrid.spacingY.toFixed(2)} ft) bounded by the floor-plate perimeter${columnGrid.onPerimeter ? " (outer columns on perimeter)" : " (largest fit centered inside)"}; ${supports.length} filled-pocket piers from column L letters including every grid node${centreColumn ? " (centre occupied)" : ""}.`);
-  check(checks, "Supports and movement", supports.length >= 2 && nearestGap >= 5 - columnSize, `${supports.length} column piers (L envelope with crook filled) on the ${columnGridSpacing} ft grid preserve movement (nearest gap ${nearestGap.toFixed(1)} ft).`);
-  check(checks, "Perimeter walls and entry", wallOk && entryClear && wallLetterFills.length >= 4, `${shellWalls.length} shell walls at ${wallT.toFixed(1)} ft plus ${wallLetterFills.length} L wall fills at wall letters; south entry ~${OPEN_HALL_ENTRY_WIDTH} ft clear. Viewer may hide walls without regenerating.`);
+  check(checks, "Column grid", supports.length >= 3 && equalGrid && gridInsideFloor && spacingFits && piersMatchLetters && columnGrid.anchors.length === columnGrid.nCols * columnGrid.nRows, `Equal XY column grid ${columnGrid.nCols}×${columnGrid.nRows} at ${columnGridSpacing} ft spacing (measured ${columnGrid.spacingX.toFixed(2)}×${columnGrid.spacingY.toFixed(2)} ft) bounded by the floor-plate perimeter${columnGrid.onPerimeter ? " (outer columns on perimeter)" : " (largest fit centered inside)"}; ${supports.length} filled-pocket piers from column L letters including every grid node${centreColumn ? " (centre occupied)" : ""}.`);
+  check(checks, "Supports and movement", supports.length >= 2 && spacingFits, `${supports.length} solid piers use each column L's full outer envelope with its concave pocket filled. Their bases start 0.20 ft above the field bottom, embedded in the ground slab at default thickness. During mesh assembly, piers overlapping the roof footprint extend to its finished top at ${roofTop.toFixed(2)} ft, connecting the plate levels. Equal XY grid ${columnGridSpacing} ft; nearest centre-to-centre pitch ${nearestGap.toFixed(1)} ft. This does not verify clear circulation width or structural capacity.`);
+  check(checks, "Perimeter walls and entry", wallOk && entryClear && wallEdgesMatch && wallLetters.length === shellWalls.length * 4, `${faces}-channel wall opening rule: ${faces === 2 ? "two adjacent open sides (south and west)" : "one open side (south)"}; jambs reference ${faces === 4 ? "the closed mezzanine’s inner L corners" : "the mezzanine L outer corners"}. Planned panel bounds ${wallEdgesMatch?'match':'do not match'} those jambs and perimeter; ${shellWalls.length} panels span ${wallLetters.length} vertical corner L guides in XZ/YZ at ${wallT.toFixed(2)} ft wall thickness. This measures the plan, not final openings. Viewer visibility does not change this generation rule.`);
   check(checks, "Roof plate filled", plates.some((p) => p.role === "roof"), `Roof plate filled to the letter-derived ground footprint at finished top ${roofTop.toFixed(2)} ft.`);
-  check(checks, "Skylight bays", voids.length >= 1 && skylightsMatchRoofLetters, `${voids.length} L-shaped skylight voids cut from roof L letter footprints. Daylight/structure unverified.`);
-  check(checks, "Headroom", head.min > 8, `Clear height is ${head.min.toFixed(2)} ft at ${head.pair}; threshold >8 ft.`);
-  check(checks, "Column L guides", columnSlots.length === columnLetters.length && columnSlots.length >= 3, `${columnSlots.length} column L letters invent the pier locations (arrangement stage).`);
+  check(checks, "Skylight bays", voids.length >= 1 && skylightsMatchRoofLetters, `${voids.length} skylight openings, one in every column bay (${columnGrid.nCols - 1} × ${columnGrid.nRows - 1}), with no four-opening cap. Each uses the roof L's filled outer envelope, including its concave pocket, to cut only the roof slab. ${field.roofSizing === "pillar" ? `Pillar-edge mode: minimum XY grid spacing ${Math.min(columnGrid.spacingX,columnGrid.spacingY).toFixed(2)} ft minus largest pillar span ${(columnSize*.9).toFixed(2)} ft minus twice the inward offset ${(field.roofInset??0).toFixed(2)} ft gives clear span ${(roofGuide*.9).toFixed(2)} ft; divide by 0.90 to set the roof L size ${roofGuide.toFixed(2)} ft. Increasing the offset shrinks the opening.` : `Fixed mode: roof L size ${roofGuide.toFixed(2)} ft follows the independent roof guide setting.`}`);
+  const headroomFits = head.min > 8;
+  check(checks, "Headroom", headroomFits, `Plan-level vertical separation is ${head.min.toFixed(2)} ft at ${head.pair}; threshold >8 ft. This compares overlapping slab polygons and does not account for columns, walls, other obstructions or actual occupiable clearance.`
+    + (headroomFits ? "" : ` At ${slabT.toFixed(2)} ft slab thickness, reduce slab thickness or increase Height Z.`));
+  check(checks, "Column L guides", columnSlots.length === columnLetters.length && columnSlots.length >= 3, `${columnSlots.length} column L guides mark pier locations in the settings-generated plan.`);
   check(checks, "Column guide size", columnSize > 0 && columnGridSpacing > 0, `Column L letter size is ${columnSize.toFixed(2)} ft (presets 1 / 2 / 3 ft); equal XY grid spacing is ${columnGridSpacing.toFixed(0)} ft (presets 15 / 20 / 25 ft).`);
   check(checks, "Floor mezz L guides", floorSlotsGuides.length === 4 && mezzSlotsGuides.length === expectedMezzCount && mezzOuterLetters.length + mezzPocketLetters.length === mezzLetters.length, `${floorSlotsGuides.length} floor + ${mezzSlotsGuides.length} mezzanine L letters on platform corners (${shape}: ${mezzOuterLetters.length} exterior + ${mezzPocketLetters.length} interior).`);
   check(checks, "Floor mezz guide size", floorMezzGuide > 0, `Floor/mezzanine L letter size is ${floorMezzGuide.toFixed(2)} ft (presets 9 / 11 / 13 ft, or custom).`);
-  check(checks, "Wall L guides", wallGuides.length >= 4 && wallGuides.every((s) => Math.abs(s.rx - 90) < 1e-6 && Math.abs(s.scale - wallGuide) < 1e-6), `${wallGuides.length} vertical wall L letters at ${wallGuide.toFixed(2)} ft along the letter-tip perimeter (fill stays ${wallT.toFixed(1)} ft).`);
-  check(checks, "Roof L guides", roofSlotsGuides.length === OPEN_HALL_ROOF_GUIDE_COUNT && roofGuide > 0, `${roofSlotsGuides.length} roof L letters at ${roofGuide.toFixed(2)} ft (hard count ${OPEN_HALL_ROOF_GUIDE_COUNT}).`);
-  check(checks, "Letter-derived plates", letterDerivedGround && mezzLetters.length === expectedMezzCount && piersMatchLetters && skylightsMatchRoofLetters && letterFillsVisible, `Architecture is letter-shaped: ground from floor L outer edges + L corner fills; mezz pads from mezz letters; filled-pocket piers from column letters; L skylights from roof letters; L wall fills from wall letters.`);
-  check(checks, "Letter variations", true, "Open Hall letter-arrangement ruleset: L only, role-grouped (column / floor / mezzanine / wall / roof). Architectural generation fills L footprints from those letters.");
+  check(checks, "Wall L guides", wallGuides.length === shellWalls.length * 4 && wallGuides.every((s) => Math.abs(new THREE.Vector3(0, 0, 1).applyEuler(new THREE.Euler(s.rx * Math.PI / 180, s.ry * Math.PI / 180, s.rz * Math.PI / 180, "XYZ")).z) < 1e-6 && Math.abs(s.scale - wallGuide) < 1e-6), `${wallGuides.length} vertical wall L letters at ${wallGuide.toFixed(2)} ft at panel elevation corners in XZ/YZ (thickness ${wallT.toFixed(1)} ft).`);
+  check(checks, "Roof L guides", roofSlotsGuides.length === bays.length && roofGuide > 0, `${roofSlotsGuides.length} roof L letters at ${roofGuide.toFixed(2)} ft; one per column bay (${columnGrid.nCols - 1} × ${columnGrid.nRows - 1}).`);
+  check(checks, "Letter-derived plates", letterDerivedGround && mezzLetters.length === expectedMezzCount && piersMatchLetters && skylightsMatchRoofLetters && letterFillsVisible, `Plan consistency: continuous ground/mezzanine polygons agree with generated L guide boundaries; piers, bay skylights and elevation panels match the generated guide groups. This checks the generated plan, not free edits to source poses.`);
+  check(checks, "Letter variations", true, "Open Hall uses L-only, role-grouped guides matched to the generated plan (column / floor / mezzanine / wall / roof). Plan polygons are extruded into architecture.");
   check(checks, "Letters inside field", true, "Letter poses are invented inside the selected field; arrangement validates fit without uniform rescale.");
 
   return {
@@ -781,8 +864,8 @@ function openHall(field: OfficeField = DEFAULT_OFFICE_FIELD): Omit<OfficePlan, "
     operations: [
       `Letter arrangement: 4 floor corner Ls → tip composition ${length.toFixed(1)}×${depth.toFixed(1)} ft (ratio ${ratio.toFixed(2)}).`,
       `Letter arrangement: ${shape} mezz = ${mezzOuterLetters.length} exterior-corner + ${mezzPocketLetters.length} interior-corner Ls on the platform; band ${band.toFixed(1)} ft; opening ${(opening * 100).toFixed(1)}%.`,
-      `Letter arrangement: ${columnLetters.length} column Ls on equal ${columnGridSpacing} ft XY grid (${columnGrid.nCols}×${columnGrid.nRows}) bounded by floor-plate perimeter; ${wallLetters.length} wall Ls; ${roofLetters.length} roof Ls.`,
-      `Architectural generation: L corner fills + ground from floor tips; L mezz pads; filled-pocket piers from column letters; L skylights from roof letters; L wall fills + shell.`,
+      `Letter arrangement: ${columnLetters.length} column guide slots on equal ${columnGridSpacing} ft XY grid (${columnGrid.nCols}×${columnGrid.nRows}) bounded by floor-plate perimeter; ${wallLetters.length} wall Ls; ${roofLetters.length} roof Ls.`,
+      `Architectural generation: continuous plates from floor and mezzanine guides; filled-pocket piers from column letters; filled-pocket skylights from roof letters; wall panels spanning corner L tips in XZ/YZ.`,
       `Mezzanine at mid-height (${mezzTop.toFixed(1)} ft of ${field.height} ft). Headroom >8 ft on occupied levels.`,
     ],
   };
@@ -942,6 +1025,29 @@ export function buildOpenHallGuideLetters(
   }));
 }
 
+/** Validate actual poses against independently generated plan slots, including field-safe Z seating. */
+export function validateOpenHallGuidePlacement(plan:OfficePlan,placements:IntersectionPlacement[],field:OfficeField):OfficeCheck {
+  const remaining=new Set(plan.slots);
+  let matched=0,maxPosition=0,maxAngle=0,maxSize=0;
+  const quaternion=(p:{rx:number;ry:number;rz:number;rotationOrder?:string})=>new THREE.Quaternion().setFromEuler(new THREE.Euler(p.rx*Math.PI/180,p.ry*Math.PI/180,p.rz*Math.PI/180,(p.rotationOrder??'XYZ') as THREE.EulerOrder));
+  for(const p of placements){
+    const candidates=[...remaining].filter(s=>s.openHallRole===p.openHallRole);
+    candidates.sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y,a.z-p.z)-Math.hypot(b.x-p.x,b.y-p.y,b.z-p.z));
+    const slot=candidates[0];
+    if(!slot)continue;
+    remaining.delete(slot);
+    const reference:IntersectionPlacement={letter:'L',x:slot.x,y:slot.y,z:slot.z,rx:slot.rx,ry:slot.ry,rz:slot.rz,scale:slot.scale,scaleX:1,scaleY:1,scaleZ:1,openHallRole:slot.openHallRole};
+    const seated=nudgePlacementIntoField(reference,field);
+    const position=Math.hypot(p.x-slot.x,p.y-slot.y,p.z-(seated?.z??slot.z));
+    const angle=quaternion(p).angleTo(quaternion(reference))*180/Math.PI;
+    const size=Math.max(Math.abs(p.scale-slot.scale),Math.abs((p.scaleX??1)-1)*slot.scale,Math.abs((p.scaleY??1)-1)*slot.scale,Math.abs((p.scaleZ??1)-1)*slot.scale);
+    maxPosition=Math.max(maxPosition,position);maxAngle=Math.max(maxAngle,angle);maxSize=Math.max(maxSize,size);
+    if(seated&&p.letter==='L'&&position<=1e-4&&angle<=1e-4&&size<=1e-6)matched++;
+  }
+  const ok=placements.length===plan.slots.length&&matched===plan.slots.length&&remaining.size===0;
+  return {label:'Guide placement matches plan',status:ok?'pass':'fail',detail:`${matched}/${plan.slots.length} plan slots matched one-to-one by actual L guides (${placements.length} supplied): floor/mezzanine corner references, column grid nodes, wall panel corners and roof bay centers. Maximum position error ${maxPosition.toFixed(6)} ft (tolerance 0.0001 ft), orientation error ${maxAngle.toFixed(6)}° (tolerance 0.0001°), size error ${maxSize.toFixed(6)} ft (tolerance 0.000001 ft). Only independently calculated field-safe Z seating is allowed; XY shifts, missing/duplicate guides, role changes and scale distortions fail.`};
+}
+
 export function arrangeOfficeLetters(
   source: IntersectionPlacement[],
   typology: string,
@@ -1034,7 +1140,7 @@ export function arrangeOfficeLetters(
     placements[id] = fitted;
   });
   const permitted = openHall
-    ? "Open Hall uses L guides only, grouped as column / floor / mezzanine / wall / roof. Filled layers follow the guide groups."
+    ? "Open Hall uses L guides only, grouped as column / floor / mezzanine / wall / roof. Settings determine the plan and guide slots before geometry assembly."
     : typology === "void-edge-workspace"
       ? "U variations form the band; vertical L supports stand outside the void."
       : "L and V variations form the plates; vertical L extrusions are the supports.";
@@ -1060,10 +1166,12 @@ export function arrangeOfficeLetters(
       ? `All ${source.length} letters fit the ${field.width} × ${field.depth} × ${field.height} ft field after insetting letters ${nudgedIn.join(", ")}.`
       : `All ${source.length} letters fit the ${field.width} × ${field.depth} × ${field.height} ft field at their plate slots.`,
   });
+  officePlan.checks.push(validateOpenHallGuidePlacement(officePlan,placements,field));
+  officePlan.operations.push('No uniform post-generation scaling is performed; this is a generation policy, not a measured pass.');
   officePlan.operations.push(permitted);
-  officePlan.operations.push("Horizontal letter forms rise above their supporting surfaces while retaining a solid overlap with the floor.");
+  officePlan.operations.push("Guide elevations follow their assigned floor, mezzanine, column, wall or roof role; these are placement references, not occupiable surfaces.");
   officePlan.operations.push(openHall
-    ? "Source policy: Open Hall invents the full role-grouped L guide set on Generate Design; Regenerate keeps those guides and rebuilds filled layers."
+    ? "New Design creates plan-matched L guides. Regeneration rebuilds the plan from settings and reseats the existing guides when the slot count matches. A changed slot count requires a new set of guides."
     : "Source policy: every provided letter is kept; quantity is not invented; slots may be reused when sources exceed preferred positions.");
   officePlan.operations.push("Letter meshes are inset when a rim slot would put a vertex outside the selected field.");
   return {

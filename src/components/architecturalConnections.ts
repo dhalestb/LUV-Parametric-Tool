@@ -4,6 +4,10 @@ import { getLetterShape } from "./letterGeometry3d";
 import type { Letter } from "./letterTypes";
 
 export type IntersectionPlacement = {
+  voidEdgeRole?: 'core' | 'wall' | 'column';
+  voidEdgeWallId?: string;
+  voidEdgeRotation?: number;
+  voidEdgePlateDatum?: number | 'roof';
   letterRules?: LetterPlacementRules;
   letter: Letter;
   x: number;

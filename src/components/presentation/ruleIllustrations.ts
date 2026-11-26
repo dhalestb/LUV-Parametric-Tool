@@ -145,6 +145,11 @@ function workspaceDetails(study:PresentationStudy,chosen?:number){
   'folded-undulating-work-surface':['WORK-SURFACE GUIDES','NEIGHBORING LETTER ORIENTATION'],
  };
  const headings=names[study.typology]?.slice()??['LETTER FACE ORIENTATION','NEIGHBORING LETTERS'];
+ const version=record.request.letterArrangementRulesetVersion;
+ if(study.typology==='flat-deep-plan-plate'&&version==='2.2.0'){
+  headings[0]='HORIZONTAL L GUIDES';
+  headings[1]='L GUIDE ALIGNMENT';
+ }
  if(study.typology==='cascaded-terraced-plates'||study.typology==='folded-undulating-work-surface'){
   headings[0]=vocabulary(study,first)+' PLATE GUIDES';headings[1]=vocabulary(study,other)+' LETTER ORIENTATION';
  }
@@ -159,7 +164,12 @@ function workspaceDetails(study:PresentationStudy,chosen?:number){
   const hosts=plan!.plates.filter(plate=>!['support','roof','wall'].includes(plate.role)&&insidePolygon(p,plate.polygon));
   const host=hosts.sort((a,b)=>Math.abs(a.zTop-support.zTop)-Math.abs(b.zTop-support.zTop))[0];
   const crop=around([p[0],p[1],(host?.zTop??support.zTop)+offset],[r,r,Math.max(2.5,r)]),inset=letterL===undefined?first.slice(0,1):[letterL];
-  supportDetail={heading:'L SUPPORT / PLATE JOINT',sourceIndices:inset,insetIndices:inset,insetLabel:'L guide',layers:localForm(study,crop),crop,bullets:['An L-shaped support rises into the plate above.','The local joint preserves the two arms of the L section.']};
+  const updatedHall=study.typology==='open-hall-workspace'&&version==='1.6.0';
+  const updatedVoid=study.typology==='void-edge-workspace'&&version==='2.21.0';
+  const bullets=updatedHall?['A filled pier rises from the column L guide.','The pier meets the receiving plate.']
+   :updatedVoid?['The drop column seats on the solid slab.','Its upper and lower ends follow the plate turns.']
+   :['An L-shaped support rises into the plate above.','The local joint preserves the two arms of the L section.'];
+  supportDetail={heading:'L SUPPORT / PLATE JOINT',sourceIndices:inset,insetIndices:inset,insetLabel:'L guide',layers:localForm(study,crop),crop,bullets};
  }else supportDetail={...contact,heading:'LOCAL PLATE EDGE'};
  let feature:RuleDetail={...contact,heading:'ADJACENT PLATE DETAIL'};
  const link=plan?.links.find(l=>Math.abs(l.z1-l.z0)>.01);
