@@ -1,0 +1,68 @@
+[
+  {
+    "case": "publication-plate-12ft-seed3126538088",
+    "passed": true,
+    "id": "a287b6c5-dc38-4648-99fa-1480e67197ff",
+    "regenerated": "833c2951-ea8d-430c-8414-7dd06675f283",
+    "exactGeometryAndSourceParity": true,
+    "closedTerminalLevels": [
+      {
+        "level": 0,
+        "joints": 3
+      },
+      {
+        "level": 3,
+        "joints": 3
+      }
+    ],
+    "saveReopenRegenerationExact": true,
+    "architectureSHA256": "68b18faaf99abf9b758f99329b05204428cca58bce563dc37a167686f2fafbf7"
+  },
+  {
+    "case": "publication-plate-13ft-seed0",
+    "passed": true,
+    "id": "dee22de2-5946-49f2-97d7-ef3d5a8ebcf5",
+    "regenerated": "b11b16c4-5e89-4ea0-8ac1-6c0ee7405c31",
+    "exactGeometryAndSourceParity": true,
+    "closedTerminalLevels": [
+      {
+        "level": 0,
+        "joints": 3
+      },
+      {
+        "level": 3,
+        "joints": 3
+      }
+    ],
+    "saveReopenRegenerationExact": true,
+    "architectureSHA256": "1bf9fa51773f1b2ef3a01d5f2bdb204b865c5ee029e8ef90cc173477992abe93"
+  },
+  {
+    "case": "publication-gallery",
+    "passed": true,
+    "id": "6bda7d28-4db5-4875-be1f-0070eb8739c9",
+    "exactGeometryAndSourceParity": true,
+    "architectureSHA256": "99061026fd13003b3e98826b7ab70732968ee2c982e51ad3373161397d225ed8"
+  },
+  {
+    "case": "publication-stepped",
+    "passed": true,
+    "id": "11c18bfa-a34a-4a13-ace2-1edb2d644f74",
+    "exactGeometryAndSourceParity": true,
+    "architectureSHA256": "b56c9db0097c1f69848bf4b2e798b793aa9cdf9e2a443d9544a47202f3df9503"
+  },
+  {
+    "case": "publication-room-custom",
+    "passed": true,
+    "id": "9491c893-3741-44d6-9dfb-07a2d9d3cffe",
+    "exactGeometryAndSourceParity": true,
+    "architectureSHA256": "007e1a1fbcc5d6043fd3484eea004fe9b8e1bb9a3070b01b362aecc9ace929b9"
+  },
+  {
+    "case": "publication-void",
+    "passed": true,
+    "id": "ba0c7e96-4acb-4abc-a4a7-8e36d6679873",
+    "exactGeometryAndSourceParity": true,
+    "architectureSHA256": "2ad5f6b64ed898b7de06ef675e6be3e80c708ba0ca767455d67dcce0c2c81132"
+  }
+]

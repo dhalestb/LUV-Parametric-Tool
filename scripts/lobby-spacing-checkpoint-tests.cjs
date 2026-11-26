@@ -6,7 +6,7 @@ const {recordedLobbySpacingRevision}=require('../src/components/lobbySpacingRule
 const root=path.resolve(__dirname,'..');process.chdir(root);
 const rows=require('../reports/lobby-spacing-rules-2026-11-25/tests.json').newDesigns;
 for(const row of rows){
- const record=JSON.parse(fs.readFileSync('data/lobby-generated/v1/'+row.id+'.json')),source=populateVersionedLobby(row.type,row.preferred,row.count,row.field,row.type==='linear-gallery-lobby'?['L','U']:['L','U','V']).source;
+ const record=JSON.parse(fs.readFileSync('data/lobby-generated/v1/'+row.id+'.json')),source=populateVersionedLobby(row.type,row.preferred,row.count,row.field,row.type==='linear-gallery-lobby'?['L','U']:['L','U','V'],undefined,'legacy').source;
  assert(record.sourceSpacingValidation.passed);assert.equal(recordedLobbySpacingRevision(record),'lobby-spacing-2026-11-25');
  const engine=recordedLobbyEngine(record);assert.equal(engine,row.engine);
  const edges=record.letters.map(l=>{let min=Infinity,max=-Infinity;for(let i=0;i<l.mesh.positions.length;i+=3){min=Math.min(min,l.mesh.positions[i]);max=Math.max(max,l.mesh.positions[i]);}return{min,max};});

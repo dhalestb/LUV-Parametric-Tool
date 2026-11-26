@@ -1,0 +1,15 @@
+{
+  "revision": "study135-closed-cell-placement-v3",
+  "baseRevision": "gathering-nov22-v1",
+  "files": [
+    {
+      "file": "scripts/gathering-plate-closure-validator.cjs",
+      "sha256": "3d20d68317ad521c1fa9f48cd57aa785a01449ca129cd7a771a26a9876da99bf"
+    },
+    {
+      "file": "scripts/gathering-plate-level-receivers.cjs",
+      "sha256": "bc920158e3a4511001816d617faf3b1b8be47566eff2a048e8797b595ec69d7c"
+    }
+  ],
+  "bundleSHA256": "e4654fef0e90fede9897abd60196c1c1ff822d49ec48ce9245b5007fb6af9f0a"
+}

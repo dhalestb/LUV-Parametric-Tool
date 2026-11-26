@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import GatheringStudio from '../../vendor/gathering-preserved/src/components/AmphitheaterStudio';
+import GatheringStudio from './gathering-recovery/GatheringStudio';
 import WorkspaceStudio from './AmphitheaterStudio';
 import LobbyStudio from './LobbyGeneratorStudio';
 import {TypologyContext,familyOf,LOBBY_OPTIONS,GATHERING_OPTIONS} from './UnifiedTypologySelect';

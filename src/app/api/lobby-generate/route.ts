@@ -9,6 +9,7 @@ import {createHash} from 'node:crypto';
 import {LOBBY_ENGINES,LOBBY_GENERATORS,lobbyId,lobbyEngine,recordedLobbyEngine} from '@/components/lobbyEngineVersions';
 import manifests from '@/server/lobbyEngineManifest.json';
 import {recordedLobbySpacingRevision,hasFixedLobbySpacing,measureLobbySourceSpacing,measureLobbyMeshSpacing,assertLobbySpacing} from '@/components/lobbySpacingRules';
+import {resolveLobbyPlacementRevision,measureContinuousStudy87Placement,assertContinuousStudy87Placement} from '@/components/lobbyPlacementRules';
 export const runtime='nodejs';export const dynamic='force-dynamic';export const maxDuration=300;
 const run=promisify(execFile),root=path.join(process.cwd(),'data/lobby-generated/v1');
 const names:Record<string,string>={'vertical-void-lobby':'Vertical Void Lobby','compressed-sequential-lobby':'Compressed Sequential Lobby','continuous-hall-lobby':'Continuous Hall Lobby','topographic-ground-field-lobby':'Topographic Lobby','linear-gallery-lobby':'Linear Gallery Lobby'};
@@ -39,6 +40,8 @@ const spacingRevision=parent?recordedLobbySpacingRevision(parent):requestedSpaci
 if(parent&&requestedSpacing!==undefined&&requestedSpacing!==spacingRevision)throw Error('Regeneration must retain the saved spacing revision. Create a new design to use updated spacing.');
 if(spacingRevision&&!hasFixedLobbySpacing(type))throw Error('Fixed Lobby spacing is registered only for Continuous Hall and Linear Gallery.');
 const spacingMode=parent&&(parent.provenance?.spacingMode==='edited-source'||JSON.stringify(parent.request.source)!==JSON.stringify(r.source))?'edited-source':'automatic';
+const placementRevision=resolveLobbyPlacementRevision(type,r,parent);
+const placementMode=parent&&(parent.provenance?.placementMode==='edited-source'||JSON.stringify(parent.request.source)!==JSON.stringify(r.source))?'edited-source':'automatic';
 const version=LOBBY_ENGINES[engine],packageRoot=path.join(process.cwd(),'vendor',version.package);
 for(const f of manifests[engine])if(createHash('sha256').update(await readFile(path.join(packageRoot,f.file))).digest('hex')!==f.sha256)throw Error('Verified Lobby source integrity failed: '+f.file);if(!names[r.lobbyTypology])throw Error('Choose one of the five registered Lobby typologies.');
  if(!r.field||!['width','depth','height'].every(k=>[20,40,60].includes(r.field[k])))throw Error('Field dimensions must be 20, 40 or 60 ft.');
@@ -47,13 +50,15 @@ for(const f of manifests[engine])if(createHash('sha256').update(await readFile(p
  if(r.population!=='auto'&&r.population!==r.source.length)throw Error('Requested and actual source populations differ.');
  for(const p of r.source){if(!['L','U','V'].includes(p.letter)||!['x','y','z','rx','ry','rz','scale','scaleX','scaleY','scaleZ'].every(k=>Number.isFinite(p[k]))||[p.scale,p.scaleX,p.scaleY,p.scaleZ].some(v=>v<=0)||p.rotationOrder&&!['XYZ','ZYX'].includes(p.rotationOrder))throw Error('L/U/V source poses require finite coordinates, valid rotation order and positive scales.');}
  if(spacingRevision&&spacingMode==='automatic')assertLobbySpacing(measureLobbySourceSpacing(type,r.source,engine));
+ if(placementRevision&&placementMode==='automatic')assertContinuousStudy87Placement(r.source);
  const id=randomUUID();
- const request={...r,engineRevision:engine,proof:'lobby',typologyName:names[r.lobbyTypology],generator:'source-preserving',articulationElevation:'feature',sourceId:randomUUID(),sourceName:r.sourceName||names[r.lobbyTypology],sourceSnapshot:{...r.sourceSnapshot,...(spacingRevision?{spacingRuleRevision:spacingRevision}:{}),lobbyTypology:r.lobbyTypology,engineRevision:engine,engineSHA256:version.engineSHA256,sourceCommit:version.sourceCommit,adapter:'isolated-lobby-v2'}};
+ const request={...r,engineRevision:engine,proof:'lobby',typologyName:names[r.lobbyTypology],generator:'source-preserving',articulationElevation:'feature',sourceId:randomUUID(),sourceName:r.sourceName||names[r.lobbyTypology],sourceSnapshot:{...r.sourceSnapshot,...(spacingRevision?{spacingRuleRevision:spacingRevision}:{}),...(placementRevision?{placementRuleRevision:placementRevision}:{}),lobbyTypology:r.lobbyTypology,engineRevision:engine,engineSHA256:version.engineSHA256,sourceCommit:version.sourceCommit,adapter:'isolated-lobby-v2'}};
  out=await mkdtemp(path.join(tmpdir(),'luv-lobby-private-'));await writeFile(path.join(out,'request.json'),JSON.stringify(request));
  await run(process.execPath,[path.join(packageRoot,'scripts/amphitheater-interactive-worker.cjs'),path.join(out,'request.json'),out],{cwd:process.cwd(),windowsHide:true,timeout:180000,maxBuffer:4000000});
  const result=JSON.parse(await readFile(path.join(out,'result.json'),'utf8'));if(!result.validation?.passed||JSON.stringify(result.request.source)!==JSON.stringify(r.source)||(result.letters.length!==r.source.length||result.sourceCount!==r.source.length))throw Error('Validated result did not preserve the requested source configuration.');
  if(spacingRevision){result.sourceSpacingValidation={...measureLobbyMeshSpacing(type,r.source,result.letters),mode:spacingMode};if(spacingMode==='automatic')assertLobbySpacing(result.sourceSpacingValidation);}
- result.id=id;result.warnings=[...(result.warnings??[]),'Versioned Lobby engine '+engine+'. New derivative; approved references remain immutable.'];result.provenance={sourceCommit:version.sourceCommit,engineRevision:engine,engineSHA256:version.engineSHA256,packageManifestSHA256:createHash('sha256').update(JSON.stringify(manifests[engine])).digest('hex'),typology:r.lobbyTypology,adapter:'isolated-lobby-v2',approvedFinal:false,...(spacingRevision?{spacingRuleRevision:spacingRevision,spacingMode}:{}),...(r.parentStudyId?{parentStudyId:r.parentStudyId}:{})};
+ if(placementRevision)result.sourcePlacementValidation={...measureContinuousStudy87Placement(r.source),mode:placementMode};
+ result.id=id;result.warnings=[...(result.warnings??[]),'Versioned Lobby engine '+engine+'. New derivative; approved references remain immutable.'];result.provenance={sourceCommit:version.sourceCommit,engineRevision:engine,engineSHA256:version.engineSHA256,packageManifestSHA256:createHash('sha256').update(JSON.stringify(manifests[engine])).digest('hex'),typology:r.lobbyTypology,adapter:'isolated-lobby-v2',approvedFinal:false,...(spacingRevision?{spacingRuleRevision:spacingRevision,spacingMode}:{}),...(placementRevision?{placementRuleRevision:placementRevision,placementMode}:{}),...(r.parentStudyId?{parentStudyId:r.parentStudyId}:{})};
  await mkdir(root,{recursive:true});await writeFile(path.join(root,id+'.json'),JSON.stringify(result),{flag:'wx'});
  return NextResponse.json(result,{status:201});
  }catch(e){return NextResponse.json({error:e instanceof Error?e.message:String(e),geometryRejected:true,previousStudyRetained:true},{status:422});}
