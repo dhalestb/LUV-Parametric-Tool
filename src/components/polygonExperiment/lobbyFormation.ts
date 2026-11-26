@@ -1,7 +1,8 @@
 import type {CrossSection,Manifold,ManifoldToplevel} from 'manifold-3d';
 import {lobbyStudy,lobbyStudyHashes} from './allocatedDesign';
-import {automaticLetterTarget,maxLetterTarget,type LobbyTypology} from './model';
+import {automaticLetterTarget,maxLetterTarget,type LobbyTypology,type RegistryItem} from './model';
 import {candidates,projectMesh,siteMesh,type FormationPart,type Letter,type PlanLayer} from './continuousFormation';
+import {developLobbyTerritory,type LobbyStation} from './lobbyTerritory';
 import type {HeightBand} from './compositionHeights';
 import type {Point,Ring} from './territories';
 
@@ -12,7 +13,6 @@ const layouts={
   'topographic-ground-field-lobby':{name:'Topographic Lobby',unit:'field',collection:'fields',limit:15,heights:[60,40,20],headings:[0,90,45,135,30,60,120,150]},
 } satisfies Record<LobbyTypology,{name:string;unit:string;collection:string;limit:number;heights:number[];headings:number[]}>;
 type Mesh=Letter['mesh'];
-type Station={point:Point;radius:number};
 
 function toSolid(api:ManifoldToplevel,mesh:Mesh){
   // Invert the saved Y-up site conversion to recover the native Z-up solid.
@@ -29,14 +29,15 @@ function toSolid(api:ManifoldToplevel,mesh:Mesh){
 }
 
 export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,domain:CrossSection,origin:Point,datum:number,
-  label:Point,clustering:number,cap:number,bands:HeightBand[],target?:number){
+  label:Point,clustering:number,cap:number,bands:HeightBand[],rule:RegistryItem,target?:number){
   const {name,unit,collection,limit:groupLimit,heights,headings}=layouts[typology];
+  const footprintCutFeet=1; // Above the 0.75 ft shared floor, measured from the site datum.
   const letterTarget=target??automaticLetterTarget(domain.area());
   if(!Number.isInteger(letterTarget)||letterTarget<2||letterTarget>maxLetterTarget)
     throw Error(name+' needs a target between 2 and '+maxLetterTarget+' letters.');
   const owned:{delete():void}[]=[];
   function own<T extends {delete():void}>(s:T){owned.push(s);return s;}
-  const stations:Station[]=[],letters:Letter[]=[],parts:FormationPart[]=[],layers:PlanLayer[]=[];
+  const stations:LobbyStation[]=[],letters:Letter[]=[],parts:FormationPart[]=[],layers:PlanLayer[]=[];
   const solids:Manifold[]=[],projections:CrossSection[]=[];
   const placements:{headingDegrees?:number;key:string;sha256:string;center:Point;fieldHeight:number;count:number}[]=[];
   const pool=candidates(domain,label);
@@ -104,10 +105,28 @@ export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,doma
           }
           return {...l,id:prefix+l.id,mesh:{positions,indices:l.mesh.indices}};
         });
-        solids.push(placed);stations.push(at);letters.push(...sources);
+        solids.push(placed);letters.push(...sources);
+        const upper=own(placed.trimByPlane([0,0,1],footprintCutFeet+.01));
+        const footprint=own(projectMesh(api,siteMesh(upper,origin,datum),origin));
+        // Retain the checkpoint's actual floor elevations and its longitudinal
+        // shell profile when continuing a stack or a sequence into the site.
+        const peak=placed.boundingBox().max[2];
+        const levels=study.letters.map(l=>{
+          let top=0;
+          for(let i=1;i<l.mesh.positions.length;i+=3)top=Math.max(top,l.mesh.positions[i]-bottom);
+          return top;
+        }).sort((a,b)=>a-b);
+        if(typology==='compressed-sequential-lobby'){
+          const axial=own(native.rotate([0,-90,0])),box=native.boundingBox();
+          for(let i=0;i<levels.length;i++){
+            const x=box.min[0]+(i+.5)/levels.length*(box.max[0]-box.min[0]);
+            const profile=own(axial.slice(x));
+            levels[i]=profile.isEmpty()?peak:-profile.bounds().min[0]-bottom;
+          }
+        }
+        stations.push({...at,heading:angle,peak,levels,footprint,prefix,sources:sources.map(l=>l.id)});
         parts.push({id:prefix+'envelope',sources:sources.map(l=>l.id),mesh:siteMesh(placed,origin,datum)});
         for(const l of sources)projections.push(own(projectMesh(api,l.mesh,origin)));
-        const peak=placed.boundingBox().max[2];
         for(const fraction of [.1,.5,.9]){
           const top=peak*fraction;
           layers.push({name:prefix+'section',typology,top,contours:contours(own(placed.slice(top)))});
@@ -119,13 +138,17 @@ export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,doma
       if(!added)break;
     }
     if(!placements.length)throw Error('No native '+name+' fits the territory and height limits.');
+    developLobbyTerritory(api,typology,domain,stations,bands,cap,origin,datum,own,solids,parts,layers,
+      Number(rule.A.parameters.preferredFeet),Number(rule.B.parameters.platformThicknessFeet??rule.B.parameters.wallThicknessFeet));
     parts.unshift({id:typology+'/floor',sources:letters.map(l=>l.id),mesh:siteMesh(floor,origin,datum)});
     const solid=own(api.Manifold.union(solids));
     if(solid.status()!=='NoError'||solid.isEmpty())throw Error(name+' could not be joined to the site floor.');
-    const plan=own(projectMesh(api,siteMesh(solid,origin,datum),origin));
+    // Measure built architecture in the finished mesh independently of the 0.75 ft joining floor.
+    const architecture=own(solid.trimByPlane([0,0,1],footprintCutFeet));
+    const plan=own(projectMesh(api,siteMesh(architecture,origin,datum),origin));
     const outside=own(plan.subtract(domain)).area(),missing=own(domain.subtract(plan)).area();
-    if(Math.max(outside,missing)>Math.max(.01,domain.area()*1e-6))throw Error(name+' footprint differs from its allocation.');
+    if(Math.max(outside,missing)>Math.max(.01,domain.area()*1e-6))throw Error(name+' architecture differs from its allocation ('+missing.toFixed(3)+' ft² missing, '+outside.toFixed(3)+' ft² outside).');
     return {solid:solid.translate([0,0,0]),letters,parts,layers,placements,collection,letterTarget,sourceArea:own(api.CrossSection.union(projections)).area(),
-      footprintArea:plan.area(),outside,missing,height:solid.boundingBox().max[2]};
+      footprintCutFeet,footprintArea:plan.area(),outside,missing,height:solid.boundingBox().max[2]};
   }finally{for(const s of owned.reverse())s.delete();}
 }

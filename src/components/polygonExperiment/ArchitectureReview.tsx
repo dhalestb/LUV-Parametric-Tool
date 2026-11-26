@@ -9,7 +9,7 @@ import {DISPLAY_MODE_KEY,DisplayModeSelector,setDisplayMode,readDisplayMode} fro
 import {readLibrary,writeLibrary,saveDesignReference,publishDesign,type DesignReference} from './alternatives';
 import {readOrientation,saveOrientation,writeSiteSelection,selectionDefault,type OrientationResult,type OrientationSelection} from './orientationStore';
 import cohort from './hybrid-cohort.json';
-import type {Experiment,Registry} from './model';
+import {isLobbyTypology,type Experiment,type Registry} from './model';
 import SitePlan from './SitePlan';
 import ArchitecturePresentation,{boardLabels,renderStudyBoard} from './ArchitecturePresentation';
 import styles from './workflow.module.css';
@@ -40,6 +40,8 @@ export default function ArchitectureReview({state,registry,results,selected,view
   },[reference]);
   const record=reference?(loaded?.id===reference?loaded.record:undefined):selected;
   const {result,error,loading}=useArchitecture(record),saved=library.find(r=>r.id===record?.id);
+  const lobbyMembers=result?.provenance.adapter==='polygon-composition/v1'
+    ?result.provenance.members?.filter(m=>isLobbyTypology(m.typology)):undefined;
   const title=result?.typologyName??record?.typologyName??'Linear Edge Gallery';
   useEffect(()=>{setName(saved?.name??(record?record.typologyName??record.parameters.recipe:''));},[record,saved?.name]);
   function choose(value:string){
@@ -168,6 +170,9 @@ export default function ArchitectureReview({state,registry,results,selected,view
         <thead><tr><th>Typology</th><th>Requested</th><th>Built share</th><th>Footprint</th><th>Letters placed</th><th>Letter target</th></tr></thead>
         <tbody>{result.provenance.members?.map(m=><tr key={m.typology}><td>{m.name}</td><td>{m.allocatedPercent}%</td><td>{m.achievedPercent.toFixed(2)}%</td><td>{m.footprintAreaFeet2.toLocaleString(undefined,{maximumFractionDigits:1})} ft²</td><td>{m.sourceCount??'—'}</td><td>{m.letterTarget??'—'}</td></tr>)}</tbody>
       </table>}
+      {lobbyMembers?.length ? <p>{lobbyMembers.every(m=>m.footprintCutFeet!==undefined)
+        ? 'Lobby built shares measure the architecture above the joining floor, from 1 ft above the site base.'
+        : 'This saved study includes the site floor in its lobby shares. Choose Generate Design to build the lobbies across their allocated areas.'}</p> : null}
       {result?.provenance.heightRegions?.length ? <table className={styles.areaReport}>
         <caption>Site heights above base · {result.provenance.heightPolicy}</caption>
         <thead><tr><th>Region</th><th>Height limit</th><th>Built height</th></tr></thead>

@@ -337,6 +337,59 @@ async function main(){
     }
     console.log('Miami linear gallery:',m.galleries.map(g=>g.key),m.achievedPercent,m.sourceCount);
   }
+  function checkLobbyCoverage(batch){
+    for(const {architecture,orientation} of batch.records){
+      const plan=batch.territoryByZone[orientation.zoneId].results.area;
+      for(const member of architecture.provenance.members){
+        const id=member.typology;
+        const native=architecture.components.filter(p=>p.id.startsWith(id+'/')&&p.id.endsWith('/envelope'));
+        const parts=architecture.components.filter(p=>p.id.startsWith(id+'/')&&p.id!==id+'/floor');
+        const permitted=new api.CrossSection(plan.territories.find(t=>t.typology===id).contours,'NonZero');
+        // Independently project the actual emitted faces above the shared slab.
+        // Clip each triangle in Y, so neither a ground sheet nor a painted plan can pass.
+        const cut=orientation.parameters.datum+1;
+        function projected(parts,level){
+          const rings=[];
+          for(const {mesh:{indices,positions}} of parts)for(let j=0;j<indices.length;j+=3){
+            const tri=indices.slice(j,j+3).map(v=>positions.slice(v*3,v*3+3)),ring=[];
+            for(let k=0;k<3;k++){
+              const a=tri[k],b=tri[(k+1)%3];
+              if(a[1]>=level)ring.push([a[0],a[2]]);
+              if((a[1]<level)!==(b[1]<level)){
+                const t=(level-a[1])/(b[1]-a[1]);
+                ring.push([a[0]+(b[0]-a[0])*t,a[2]+(b[2]-a[2])*t]);
+              }
+            }
+            if(ring.length>=3 && territory.signedArea(ring)<-1e-9)rings.push(ring.reverse());
+          }
+          return new api.CrossSection(rings,'NonZero');
+        }
+        const original=projected(native,cut),raised=projected(parts,cut),occupied=projected(parts,cut+4);
+        const missing=permitted.subtract(raised),outside=raised.subtract(permitted);
+        console.log(orientation.zoneId,id,'native / developed / allocated ft²',original.area().toFixed(1),raised.area().toFixed(1),permitted.area().toFixed(1));
+        assert(missing.area()<.04&&outside.area()<.04,id+' architecture must fill its allocated ground above the site slab');
+        assert(occupied.area()>permitted.area()*.55,id+' must develop occupied-height architecture across the territory');
+        assert(Math.abs(100*raised.area()/plan.allocatableArea-member.allocatedPercent)<.001);
+        for(const section of [permitted,original,raised,occupied,missing,outside])section.delete();
+      }
+    }
+  }
+  checkLobbyCoverage(galleries);
+  const uneven=structuredClone(allLobbies);
+  for(const [i,z] of uneven.site.zones.entries()){
+    const mix=i?[30,20,15,35]:[15,30,35,20];
+    [lobby,compressed,topo,linear].forEach((id,j)=>{uneven.assignments[z.id].shares[id]=mix[j];});
+    const controls=uneven.territoryByZone[z.id].controls;
+    controls.clustering=i?30:85;
+    const [x,y]=i?[1160,-2035]:[1150,-2360];
+    controls.reserved=[{id:'protected-court',polygon:[[x,y],[x+12,y],[x+12,y+15],[x,y+15]]}];
+  }
+  const protectedLobbies=await generateContinuousSite(uneven,registry,()=>null,()=>{});
+  for(const {architecture:r} of protectedLobbies.records){
+    assert(r.measurements.registeredProtectedVoidAreaFeet2>=179.99);
+    assert(r.validation.protectedArea<.01);
+  }
+  checkLobbyCoverage(protectedLobbies);
   const oldState=structuredClone(restored);
   delete oldState.profiles[compressed];
   for(const a of Object.values(oldState.assignments)){delete a.shares[compressed];delete a.variants[compressed];}
