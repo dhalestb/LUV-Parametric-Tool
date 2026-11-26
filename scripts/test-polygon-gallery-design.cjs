@@ -15,6 +15,11 @@ async function verify(record,root) {
   assert.equal(architecture.provenance.checkpoint,'a6493b62cb784e7ccacc327dbe8dc90a604f1e48');
   assert(architecture.validation.occupiedSiteEnvelope.passed);
   assert(architecture.validation.outsideArea<=1e-6);
+  const m=architecture.measurements;
+  assert(m.sourceLetterCoveragePercent>0 && m.sourceLetterCoveragePercent<=100);
+  assert(m.totalPrimaryFloorPlateAreaFeet2>0 && m.exposedTerraceAreaFeet2>=0 && Number.isFinite(m.registeredProtectedVoidAreaFeet2));
+  assert.equal(architecture.validation.occupiedSiteEnvelope.ledger.length,architecture.provenance.regions.length);
+  assert(response.orientation.components.every(l=>Number.isFinite(l.nominalSizeFeet)));
   const ids=new Set(response.orientation.components.map(l=>l.id));
   for(const part of architecture.components)assert(part.sources.length && part.sources.every(id=>ids.has(id)));
   const kinds=new Set(architecture.components.map(p=>p.kind));

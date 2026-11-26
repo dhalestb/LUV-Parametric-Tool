@@ -115,16 +115,33 @@ async function buildWing(w,section,height,input,dir,insetFeet) {
   }
   checkVertical(built.architecture);
   const builtHeight=highest;
+  const sourcePlans=[];
   for(const letter of nativeA){
     const p=project(letter.mesh),off=p.subtract(localDomain);
-    const a=off.area();off.delete();p.delete();assert(a<=1e-6,'Letter outside its tier: '+letter.id);
+    const a=off.area();off.delete();sourcePlans.push(p);assert(a<=1e-6,'Letter outside its tier: '+letter.id);
     checkVertical(letter.mesh);
   }
+  const letterPlan=w.CrossSection.union(sourcePlans),sourceArea=letterPlan.area();
+  letterPlan.delete();for(const p of sourcePlans)p.delete();
+  let floorArea=0;
+  const lowerRoof=[],upperForm=[];
+  for(const [i,surface] of built.galleryReport.surfaces.entries()){
+    const isFloor=surface.kind==='contour-floor',isLowerRoof=surface.zone==='lower' && surface.kind==='roof-plank';
+    if(!isFloor && !isLowerRoof && surface.zone!=='upper')continue;
+    const plan=project(built.components[i].mesh);
+    if(isFloor)floorArea+=plan.area();
+    if(isLowerRoof)lowerRoof.push(plan);
+    else if(surface.zone==='upper')upperForm.push(plan);
+    else plan.delete();
+  }
+  const roof=w.CrossSection.union(lowerRoof),upperProjection=w.CrossSection.union(upperForm);
+  const terraces=roof.subtract(upperProjection),terraceArea=terraces.area();
+  for(const p of [...lowerRoof,...upperForm,roof,upperProjection,terraces])p.delete();
   assert(lowest>=-1e-6 && highest<=height+1e-6,'Gallery exceeds its local height envelope');
   const datum=input.datum, mapMesh=mesh=>localToSite(mesh,center,angle,datum);
   const worldFootprint=footprint.toPolygons().map(r=>r.map(([x,y])=>[center[0]+c*x-s*y,center[1]+s*x+c*y]));
   const footprintArea=footprint.area();footprint.delete();localDomain.delete();
-  return {ring,center,rotation:request.sourceSnapshot.terraceRotation,requestHash,sourceHash,
+  return {ring,center,sourceArea,floorArea,terraceArea,rotation:request.sourceSnapshot.terraceRotation,requestHash,sourceHash,
     footprintArea,worldFootprint,outside,builtHeight,height:highest,architecture:mapMesh(built.architecture),
     letters:nativeA.map((l,i)=>({id:l.id,letter:request.source[i].letter,nominalSizeFeet:request.sourceSnapshot.stations[i].size,mesh:mapMesh(l.mesh)})),
     parts:built.components.map((p,i)=>({id:p.id,sources:p.sources,kind:built.galleryReport.surfaces[i].kind,mesh:mapMesh(p.mesh)}))};
@@ -187,6 +204,7 @@ async function generatePolygonGallery(input, policy, {outputRoot}={}) {
           for(const p of wing.parts)parts.push({...p,id:prefix+p.id,sources:p.sources.map(id=>prefix+id)});
           wings.push(wing.architecture);footprints.push(...wing.worldFootprint);
           receipts.push({tierId:tier.id,role:tier.role,limitFeet:tier.heightFeet,heightFeet:wing.height,builtFeet:wing.builtHeight,
+            sourceFeet2:wing.sourceArea,floorFeet2:wing.floorArea,terraceFeet2:wing.terraceArea,
             buildingFootprintFeet2:wing.footprintArea,outsideAreaFeet2:wing.outside,sourceCount:wing.letters.length,
             componentCount:wing.parts.length,course:wing.ring,pivot:wing.center,upperRotationDegrees:wing.rotation,
             courseInsetFeet:insetFeet,nativeRuleAHash:wing.sourceHash,nativeRequestHash:wing.requestHash,solidComponents:1});
@@ -216,10 +234,16 @@ async function generatePolygonGallery(input, policy, {outputRoot}={}) {
       validation:{outsideArea:0,maxElevationError:0,triangles:letters.reduce((n,l)=>n+sizeOf(l.mesh),0),
       attempts:1,grossArea:rules.grossAreaFeet2,permittedArea:permitted.area(),protectedArea:rules.grossAreaFeet2-rules.permittedAreaFeet2},
       provenance:{...provenance,entry:'linear-gallery-automatic.cjs#arrangeMixed',B:{executed:false}},limitations};
-    const measurements={buildingFootprintFeet2:footprintArea,buildingCoveragePercent:100*footprintArea/rules.actualDomainAreaFeet2,
+    const total=key=>receipts.reduce((sum,r)=>sum+r[key],0);
+    const measurements={expectationBuildingCoveragePercent:input.development.targetBuildingCoveragePercent??null,
+      sourceLetterCoveragePercent:100*total('sourceFeet2')/rules.actualDomainAreaFeet2,
+      totalPrimaryFloorPlateAreaFeet2:total('floorFeet2'),exposedTerraceAreaFeet2:total('terraceFeet2'),
+      registeredProtectedVoidAreaFeet2:Math.max(0,rules.grossAreaFeet2-rules.permittedAreaFeet2),
+      buildingFootprintFeet2:footprintArea,buildingCoveragePercent:100*footprintArea/rules.actualDomainAreaFeet2,
       territoryAreaFeet2:rules.actualDomainAreaFeet2,openSiteAreaFeet2:rules.actualDomainAreaFeet2-footprintArea};
     const validation={outsideArea,protectedArea:0,footprintArea,heightAboveDatum:Math.max(...receipts.map(r=>r.heightFeet)),
-      occupiedSiteEnvelope:{passed:true},connectedSolids:wings.length,exactSavedAConsumed:true,triangles:sizeOf(architectureMesh)};
+      occupiedSiteEnvelope:{passed:true,ledger:receipts.map((r,i)=>({regions:[{regionId:provenance.heightRegions[i].id,
+        occupiedAreaFeet2:r.buildingFootprintFeet2,excessProjectedAreaFeet2:0}]}))},connectedSolids:wings.length,exactSavedAConsumed:true,triangles:sizeOf(architectureMesh)};
     const architecture={version:1,id:bid,kind:'architecture-rule-b',typologyId:'linear-edge-gallery',typologyName:name,variant:'print-contour',
       parentOrientationId:id,parentGeometryHash:geometryHash,geometryHash:architectureHash,site,zoneId,datum,frame:orientation.frame,
       architecture:architectureMesh,components:parts,validation,measurements,
