@@ -112,6 +112,8 @@
 .zonePlan [role=button]:focus-visible {stroke:white;outline:none}
 .combinedPlan {display:block;width:100%;height:clamp(180px,34vh,380px)}
 .zoneTabs,.zoneChoices {display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.extensionRule {scroll-margin-top:5rem;display:inline-flex;align-items:center;gap:8px;color:var(--ink);font-size:14px;cursor:pointer}
+.extensionRule input {width:18px;height:18px;margin:0;accent-color:var(--gold)}
 .zoneTabs button {padding:6px 12px;background:var(--field);border:1px solid #58787b;color:var(--ink);border-radius:4px}
 .zoneTabs [aria-pressed=true] {border-color:var(--gold);color:var(--gold)}
 .zoneChoices {align-items:start;margin-bottom:20px}

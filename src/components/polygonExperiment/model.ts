@@ -17,8 +17,8 @@ export type GenerationMethod = 'typology-area'|'hybrid-rule'|'descriptor';
 export type LetterTargets = Partial<Record<Typology,number>>;
 export const maxLetterTarget = 48;
 export const automaticLetterTarget = (areaFeet2:number) => Math.min(maxLetterTarget, Math.max(3, Math.round(areaFeet2 / 850)));
-export type MethodDrafts = {letterTargets?:LetterTargets;fullZone?:Partial<Record<'hybrid-rule'|'descriptor',string>>;rules?:Record<Typology,number>; descriptors?:Partial<Record<import('./descriptorInfluence').Descriptor,number>>};
-export type Experiment = { distributedLobbyLetters?:boolean; generation?:{method:GenerationMethod;zones:Record<string,MethodDrafts>}; version:2; territoryByZone:Record<string,TerritoryState>; descriptorAllocation:boolean; descriptorSpatialTargeting:boolean; legacyDescriptorDrafts?:unknown; site:SiteInput|null; selected:string[]; focus:string|null; unitsConfirmed:boolean; transform:'within'|'derived'; allocation:'territories'|'blended'; seedMethod:'letters'|'features'; assignments:Record<string,Assignment>; descriptorIds:Five<string|null>; profiles:Record<Typology,RuleProfile> };
+export type MethodDrafts = {extendLobbyTerritories?:boolean;letterTargets?:LetterTargets;fullZone?:Partial<Record<'hybrid-rule'|'descriptor',string>>;rules?:Record<Typology,number>; descriptors?:Partial<Record<import('./descriptorInfluence').Descriptor,number>>};
+export type Experiment = { lobbyLetterLayout?:'compact'|'distributed'; generation?:{method:GenerationMethod;zones:Record<string,MethodDrafts>}; version:2; territoryByZone:Record<string,TerritoryState>; descriptorAllocation:boolean; descriptorSpatialTargeting:boolean; legacyDescriptorDrafts?:unknown; site:SiteInput|null; selected:string[]; focus:string|null; unitsConfirmed:boolean; transform:'within'|'derived'; allocation:'territories'|'blended'; seedMethod:'letters'|'features'; assignments:Record<string,Assignment>; descriptorIds:Five<string|null>; profiles:Record<Typology,RuleProfile> };
 export type Rule = { entry:string; statements:string[]; parameters:Record<string,unknown>; bindings:{category:'A'|'B';sourceFile:string;sha256:string}[] };
 export type RegistryItem = { id:Typology; name:string; A:Rule; B:Rule; variants:string[]; evidence:{id:string;variant:string;sourceCount:number;request:Record<string,unknown>;validation:unknown;architecturalValidation:unknown}[] };
 export type Registry = { snapshot:string; boardCommit:string; siteCommit:string; counts:{boardFiles:number;siteFiles:number;savedStudies:number}; items:RegistryItem[] };
@@ -61,7 +61,7 @@ export function withImportedSite(state:Experiment,site:SiteInput):Experiment {
     }
     if(!sameSnapshot&&sameBoundary&&generation){
       const prior=generation.zones[JSON.stringify([previous!.fingerprint,zone.id])];
-      if(prior)generation.zones[JSON.stringify([site.fingerprint,zone.id])]={rules:prior.rules,descriptors:prior.descriptors,letterTargets:prior.letterTargets};
+      if(prior)generation.zones[JSON.stringify([site.fingerprint,zone.id])]={rules:prior.rules,descriptors:prior.descriptors,letterTargets:prior.letterTargets,extendLobbyTerritories:prior.extendLobbyTerritories};
     }
   }
   const enabled=site.zones.filter(z=>z.enabled).map(z=>z.id);
@@ -79,6 +79,18 @@ export function loadState(raw:string):Experiment {
  if(![1,2].includes(state.version)||!Array.isArray(state.selected)||!state.profiles||!state.assignments)throw Error('Unsupported experimental settings.');
  if(state.version===1){const migrated=initialState();return loadState(JSON.stringify({...migrated,...state,version:2,descriptorIds:[...DESCRIPTORS],profiles:migrated.profiles,legacyDescriptorDrafts:{descriptorIds:state.descriptorIds,profiles:state.profiles},descriptorAllocation:false,descriptorSpatialTargeting:false,territoryByZone:{},site:state.site?{...state.site,protectionMetadataComplete:false,corridors:[],reservedAreas:[],zones:state.site.zones.map((z:Zone)=>({...z,holes:z.holes??[]}))}:null}));}
  if(!state.territoryByZone)throw Error('Missing territory state.');
+ if(state.site&&!state.site.zones.some((z:Zone)=>z.id===state.focus))state.focus=state.site.zones.find((z:Zone)=>z.enabled)?.id??null;
+ // Earlier studies coupled distributed placement to an open territory. Split the
+ // saved choice once so later layout edits cannot change a cluster's extension rule.
+ if(typeof state.distributedLobbyLetters==='boolean'){
+   if(state.distributedLobbyLetters){
+     state.lobbyLetterLayout??='distributed';
+     const generation=state.generation??={method:'typology-area',zones:{}};
+     for(const zone of state.site?.zones??[])generation.zones[JSON.stringify([state.site.fingerprint,zone.id])]??={};
+     for(const draft of Object.values(generation.zones) as MethodDrafts[])draft.extendLobbyTerritories??=false;
+   }
+   delete state.distributedLobbyLetters;
+ }
  for(const lobby of TYPOLOGIES.filter(isLobbyTypology)){
    state.profiles[lobby]??={scale:'percentage',values:emptyFive()};
    for(const assignment of Object.values(state.assignments) as Assignment[]){

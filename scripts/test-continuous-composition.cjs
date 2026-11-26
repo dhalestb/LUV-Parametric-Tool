@@ -456,6 +456,35 @@ async function main(){
       assert(Math.abs(r.measurements.buildingFootprintFeet2-footprint)<.05);
       console.log('Distributed native lobby groups · Miami zone',i+1,groupCount,'groups,',o.components.length,'letters,',r.measurements.buildingCoveragePercent.toFixed(2)+'% built');
     }
+    // The extension runs after native placement. Switch one cluster, reload,
+    // and independently compare both the source hashes and emitted footprints.
+    const extendedZone=experiment.site.zones[settings===allLobbies?0:1];
+    assert.equal(experiment.lobbyLetterLayout,'distributed');
+    const sessionEntry=model.loadState(JSON.stringify({...experiment,focus:null}));
+    assert.equal(sessionEntry.focus,experiment.site.zones.find(z=>z.enabled).id);
+    for(const z of experiment.site.zones)assert.equal(experiment.generation.zones[key(z)].extendLobbyTerritories,false);
+    experiment.generation.zones[key(extendedZone)].extendLobbyTerritories=true;
+    const reloaded=model.loadState(JSON.stringify(experiment));
+    const refreshed=model.withImportedSite(reloaded,{...reloaded.site,fingerprint:'updated-source',revision:'updated'});
+    for(const z of reloaded.site.zones){
+      assert.equal(refreshed.generation.zones[JSON.stringify(['updated-source',z.id])].extendLobbyTerritories,z.id===extendedZone.id);
+    }
+    const mixed=await generateContinuousSite(reloaded,registry,()=>null,()=>{});
+    for(const [i,{architecture:a,orientation:o}] of mixed.records.entries()){
+      const before=built.records[i],extended=o.zoneId===extendedZone.id;
+      assert.equal(a.provenance.extendLobbyTerritories,extended);
+      assert.equal(o.geometryHash,before.orientation.geometryHash);
+      assert.equal(a.provenance.territorySignature,before.architecture.provenance.territorySignature);
+      assert.deepEqual(a.components.filter(p=>p.id.endsWith('/envelope')),before.architecture.components);
+      assert(a.validation.protectedArea<.01 && a.validation.outsideArea<.01);
+      if(extended){
+        assert.equal(a.validation.connectedBodies,1);
+        for(const member of a.provenance.members){
+          assert(Math.abs(member.achievedPercent-member.allocatedPercent)<.001);
+          assert.equal(member.footprintCutFeet,1);
+        }
+      }else assert.equal(a.geometryHash,before.architecture.geometryHash);
+    }
   }
   const oldState=structuredClone(restored);
   delete oldState.profiles[compressed];

@@ -59,7 +59,7 @@ function distributionCenters(samples:Point[], groups:number):Point[] {
 }
 
 export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,domain:CrossSection,origin:Point,datum:number,
-  label:Point,clustering:number,cap:number,bands:HeightBand[],rule:RegistryItem,target?:number,distributed=false){
+  label:Point,clustering:number,cap:number,bands:HeightBand[],rule:RegistryItem,target:number|undefined,distributed:boolean,extend:boolean){
   const {name,limit}=layouts[typology];
   const letterTarget=target??automaticLetterTarget(domain.area());
   if(!Number.isInteger(letterTarget)||letterTarget<2||letterTarget>maxLetterTarget)
@@ -69,7 +69,7 @@ export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,doma
   const preferred=distributed?Math.max(1,Math.floor(letterTarget/motifSize)):minimum;
   let bestCount=0;
   for(let groups=preferred;groups>=minimum;groups--){
-    const layout=await tryLobbyLayout(typology,api,domain,origin,datum,label,clustering,cap,bands,rule,letterTarget,distributed,groups);
+    const layout=await tryLobbyLayout(typology,api,domain,origin,datum,label,clustering,cap,bands,rule,letterTarget,distributed,groups,extend);
     if(!('placedCount' in layout))return layout;
     bestCount=Math.max(bestCount,layout.placedCount??0);
   }
@@ -79,7 +79,7 @@ export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,doma
 // Narrow territories may fit fewer, longer native sequences. Each attempt starts
 // from the original Rule A and B study and retains the full letter target.
 async function tryLobbyLayout(typology:LobbyTypology,api:ManifoldToplevel,domain:CrossSection,origin:Point,datum:number,
-  label:Point,clustering:number,cap:number,bands:HeightBand[],rule:RegistryItem,letterTarget:number,distributed:boolean,groupCount:number){
+  label:Point,clustering:number,cap:number,bands:HeightBand[],rule:RegistryItem,letterTarget:number,distributed:boolean,groupCount:number,extend:boolean){
   const {name,unit,collection,limit:groupLimit,heights,headings}=layouts[typology];
   const footprintCutFeet=1; // Above the 0.75 ft shared floor, measured from the site datum.
   const owned:{delete():void}[]=[];
@@ -104,7 +104,7 @@ async function tryLobbyLayout(typology:LobbyTypology,api:ManifoldToplevel,domain
     }finally{outside.delete();located.delete();}
   }
   try{
-    const floor=distributed?undefined:own(domain.extrude(.75));
+    const floor=extend?own(domain.extrude(.75)):undefined;
     if(floor){
       solids.push(floor);
       layers.push({name:'Lobby floor',typology,top:.75,contours:contours(domain)});
@@ -179,7 +179,7 @@ async function tryLobbyLayout(typology:LobbyTypology,api:ManifoldToplevel,domain
           for(let i=1;i<l.mesh.positions.length;i+=3)top=Math.max(top,l.mesh.positions[i]-bottom);
           return top;
         }).sort((a,b)=>a-b);
-        if(!distributed&&typology==='compressed-sequential-lobby'){
+        if(extend&&typology==='compressed-sequential-lobby'){
           const axial=own(native.rotate([0,-90,0])),box=native.boundingBox();
           for(let i=0;i<levels.length;i++){
             const x=box.min[0]+(i+.5)/levels.length*(box.max[0]-box.min[0]);
@@ -190,7 +190,7 @@ async function tryLobbyLayout(typology:LobbyTypology,api:ManifoldToplevel,domain
         stations.push({...at,heading:angle,peak,levels,footprint,prefix,sources:sources.map(l=>l.id)});
         parts.push({id:prefix+'envelope',sources:sources.map(l=>l.id),mesh:siteMesh(placed,origin,datum)});
         for(const l of sources)projections.push(own(projectMesh(api,l.mesh,origin)));
-        if(distributed){
+        if(!extend){
           const base=own(projectMesh(api,siteMesh(placed,origin,datum),origin));
           layers.push({name:prefix+'projected envelope',typology,top:0,contours:contours(base)});
         }
@@ -214,11 +214,11 @@ async function tryLobbyLayout(typology:LobbyTypology,api:ManifoldToplevel,domain
     const solid=own(api.Manifold.union(solids));
     if(solid.status()!=='NoError'||solid.isEmpty())throw Error(name+' produced invalid architectural geometry.');
     // Measure built architecture in the finished mesh independently of the 0.75 ft joining floor.
-    const architecture=distributed?solid:own(solid.trimByPlane([0,0,1],footprintCutFeet));
+    const architecture=extend?own(solid.trimByPlane([0,0,1],footprintCutFeet)):solid;
     const plan=own(projectMesh(api,siteMesh(architecture,origin,datum),origin));
     const outside=own(plan.subtract(domain)).area(),missing=own(domain.subtract(plan)).area();
-    if(Math.max(outside,distributed?0:missing)>Math.max(.01,domain.area()*1e-6))throw Error(name+' architecture differs from its allocation ('+missing.toFixed(3)+' ft² missing, '+outside.toFixed(3)+' ft² outside).');
+    if(Math.max(outside,extend?missing:0)>Math.max(.01,domain.area()*1e-6))throw Error(name+' architecture differs from its allocation ('+missing.toFixed(3)+' ft² missing, '+outside.toFixed(3)+' ft² outside).');
     return {solid:solid.translate([0,0,0]),letters,parts,layers,placements,collection,letterTarget,sourceArea:own(api.CrossSection.union(projections)).area(),
-      footprintCutFeet:distributed?undefined:footprintCutFeet,footprintArea:plan.area(),outside,missing,height:solid.boundingBox().max[2]};
+      footprintCutFeet:extend?footprintCutFeet:undefined,footprintArea:plan.area(),outside,missing,height:solid.boundingBox().max[2]};
   }finally{for(const s of owned.reverse())s.delete();}
 }

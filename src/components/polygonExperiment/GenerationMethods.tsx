@@ -52,8 +52,8 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   const [preparing,setPreparing]=useState(false),[planNotice,setPlanNotice]=useState('');
   useEffect(()=>{setMessage('');setPlanNotice('');},[site?.fingerprint,zoneId,method]);
   const enabledZones=site?.zones.filter(z=>z.enabled)??[];
-  const hasLobby=enabledZones.some(z=>registry.items.some(t=>isLobbyTypology(t.id)&&(state.assignments[z.id]?.shares[t.id]??0)>0));
-  const distributed=hasLobby&&state.distributedLobbyLetters===true;
+  const zoneHasLobbies=(id:string)=>registry.items.some(t=>isLobbyTypology(t.id)&&(state.assignments[id]?.shares[t.id]??0)>0);
+  const hasLobby=enabledZones.some(z=>zoneHasLobbies(z.id));
   const preparationBlocker=!site?.protectionMetadataComplete?'Refresh the site polygons in Section 1 to load their protection geometry.':
     !enabledZones.length?'Enable a polygon in Site Development, then refresh the site polygons in Section 1.':'';
   const preparedCount=enabledZones.filter(z=>{
@@ -233,12 +233,12 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
           })}
         </>:<div className={styles.fields}>{rows.map(percentageField)}</div>}
       </fieldset>
-      {method==='typology-area'&&hasLobby&&<label className={styles.categoryFilter}>Lobby formation · all enabled polygons
-        <select disabled={busy||preparing} value={distributed?'letters':'continuous'} onChange={e=>{
-          patch({distributedLobbyLetters:e.currentTarget.value==='letters'});setMessage('');
+      {method==='typology-area'&&hasLobby&&<label className={styles.categoryFilter}>Lobby letter layout · all enabled polygons
+        <select disabled={busy||preparing} value={state.lobbyLetterLayout??'compact'} onChange={e=>{
+          patch({lobbyLetterLayout:e.currentTarget.value==='distributed'?'distributed':'compact'});setMessage('');
         }}>
-          <option value="continuous">Continuous territory composition</option>
-          <option value="letters">Distributed proto-form letters (experiment)</option>
+          <option value="compact">Compact proto-form groups</option>
+          <option value="distributed">Distributed proto-form groups</option>
         </select>
       </label>}
       {method==='typology-area'&&site&&zone&&<CompositionDistribution key={draftKey} site={site} zone={zone} assignment={assignment} controls={territory}
@@ -262,7 +262,15 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         const next={...pending};delete next[method];storePending(next);setMessage('');
       }}>Apply draft percentages to this polygon</button>}
       <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>{method==='typology-area'?'Total across all space categories, including open court floors and terraces.':'Building footprint coverage is measured after generation.'}</span></div>
-      {method==='typology-area'&&site&&<div className={styles.zoneTabs}><button type="button" onClick={prepareAreas} aria-describedby="territory-preparation-status" disabled={busy||preparing||!!preparationBlocker}>{preparing?'Preparing territories…':'Prepare site territories'}</button><a href="#combined-site-plan">View site plan</a></div>}
+      {method==='typology-area'&&site&&<div className={styles.zoneTabs}><button type="button" onClick={prepareAreas} aria-describedby="territory-preparation-status" disabled={busy||preparing||!!preparationBlocker}>{preparing?'Preparing territories…':'Prepare site territories'}</button>
+        {zone&&zoneHasLobbies(zone.id)&&<label id="lobby-territory-extension" className={styles.extensionRule}>
+          <input type="checkbox" checked={draft.extendLobbyTerritories??true} disabled={busy||preparing||!zone.enabled} onChange={e=>{
+            patch({generation:{method,zones:{...zones,[draftKey]:{...draft,extendLobbyTerritories:e.currentTarget.checked}}}});
+            setMessage('');
+          }}/>
+          Extend lobby forms across their territories · {zone.name}
+        </label>}
+        <a href="#combined-site-plan">View site plan</a></div>}
       {method==='typology-area'&&site&&<p role="status" id="territory-preparation-status">{planNotice||preparationBlocker||(
         preparedCount===enabledZones.length?'Territories prepared. View the site plan or prepare again after editing percentages.':
         preparedCount>0?preparedCount+' of '+enabledZones.length+' polygons have current territories. Prepare again to update the site plan.':
@@ -277,8 +285,8 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       {presentationExport}
     </section>
     {method==='typology-area'?<>
-      <WorkflowAction local site={site?.name??'No site selected'} method={distributed?'Distributed proto-form letters':'Continuous typology composition'}
-        allocation={<><span>{distributed?'Each lobby keeps its assigned ground. Original letter groups form the buildings, with open ground between groups.':'Forms connected galleries, decks, terraces, rooms and courts across the enabled polygons.'}</span>{enabledZones.map(z=><span key={z.id} style={{display:'block'}}><strong>{z.name}</strong>{' · '+registry.items.filter(t=>(state.assignments[z.id]??newAssignment()).shares[t.id]>0).map(t=>t.name+' '+(state.assignments[z.id]??newAssignment()).shares[t.id]+'%').join(' · ')}</span>)}</>}
+      <WorkflowAction local site={site?.name??'No site selected'} method={hasLobby?'Typology Area Distribution':'Continuous typology composition'}
+        allocation={<><span>{hasLobby?'Generate the lobby forms using each cluster’s extension setting.':'Forms connected galleries, decks, terraces, rooms and courts across the enabled polygons.'}</span>{enabledZones.map(z=><span key={z.id} style={{display:'block'}}><strong>{z.name}</strong>{zoneHasLobbies(z.id)&&(zones[JSON.stringify([site!.fingerprint,z.id])]?.extendLobbyTerritories===false?' · Native lobby forms only':' · Lobby forms extended')}{' · '+registry.items.filter(t=>(state.assignments[z.id]??newAssignment()).shares[t.id]>0).map(t=>t.name+' '+(state.assignments[z.id]??newAssignment()).shares[t.id]+'%').join(' · ')}</span>)}</>}
         action={{run:()=>generateAll(),busy:busy||preparing,reason:allocationBlocker,message,fix:!site?recovery:undefined}}/>
       <details className={styles.advanced}><summary>Generate a single typology with custom settings</summary>
         <DesignPanel state={state} controls={controls} onSaved={onSaved} onBusy={setBusy} commonBlocked={!!reason||busy} openTerritories={openTerritories}
