@@ -12,7 +12,7 @@ const recipe='Continuous polygon composition';
 type Plan=ReturnType<typeof generateTerritories>;
 
 async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Plan,registry:Registry,clustering:number,letterTargets:LetterTargets,
-  rules:HeightRecord|null,runId:string,progress:(s:string)=>void){
+  rules:HeightRecord|null,runId:string,progress:(s:string)=>void,distributed=false){
   const owned:{delete():void}[]=[];
   function own<T extends {delete():void}>(s:T):T{owned.push(s);return s;}
   const xs=zone.polygon.map(p=>p[0]),zs=zone.polygon.map(p=>p[1]);
@@ -20,7 +20,8 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
   const relative=(rings:Ring[])=>rings.map(r=>r.map(([x,z]):Point=>[x-origin[0],z-origin[1]]));
   const letters:OrientationResult['components']=[],components:FormationPart[]=[],planLayers:PlanLayer[]=[];
   const formed:Manifold[]=[],members=[];
-  let sourceArea=0;
+  let sourceArea=0,openLobbyArea=0;
+  const name=distributed?'distributed lobby letters':'continuous composition';
   try{
     const permitted=own(new api.CrossSection(relative(plan.permitted),'NonZero'));
     const envelope=siteHeightBands(api,site,zone,rules,permitted,origin,own);
@@ -35,10 +36,11 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
       const cap=bands.length?Math.max(...bands.map(b=>b.cap)):envelope.zoneCap;
       const label:Point=[t.label[0]-origin[0],t.label[1]-origin[1]];
       const lobbyResult=isLobbyTypology(rule.id)
-        ? await formLobby(rule.id,api,region,origin,datum,label,clustering,cap,bands,rule,letterTargets[t.typology])
+        ? await formLobby(rule.id,api,region,origin,datum,label,clustering,cap,bands,rule,letterTargets[t.typology],distributed)
         : undefined;
       const result=lobbyResult??formTerritory(api,region,origin,datum,rule,await studyFor(rule.id),label,clustering,cap,bands,letterTargets[t.typology]);
       formed.push(own(result.solid));
+      if(distributed&&lobbyResult)openLobbyArea+=lobbyResult.missing;
       if(result.height>cap+1e-5)throw Error(rule.name+' exceeds the site height limit.');
       sourceArea+=result.sourceArea;letters.push(...result.letters);components.push(...result.parts);planLayers.push(...result.layers);
       members.push({typology:t.typology,name:rule.name,territory:t.id,allocatedPercent:t.requestedPercent,
@@ -48,13 +50,13 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
     }
     // The common lower course joins matching floor edges across typology seams.
     // Each member already passed its own footprint check before the joint union.
-    const joint=own(permitted.extrude(.25));
-    const final=own(api.Manifold.union([...formed,joint]));
+    if(!distributed)formed.push(own(permitted.extrude(.25)));
+    const final=own(api.Manifold.union(formed));
     if(final.status()!=='NoError'||final.isEmpty())throw Error('Failed to join the polygon composition.');
     const bodies=final.decompose(),domains=permitted.decompose();
     const connectedBodies=bodies.filter(b=>b.volume()>1e-5).length;
     try{
-      if(connectedBodies!==domains.length){
+      if(!distributed&&connectedBodies!==domains.length){
         const detached=bodies.filter(b=>b.volume()>1e-5).sort((a,b)=>a.volume()-b.volume())[0];
         throw Error('Architectural components do not meet across this polygon ('+detached.volume().toFixed(2)+' ft³ detached). Try a more clustered layout.');
       }
@@ -63,7 +65,7 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
     const outside=own(finished.subtract(permitted)).area(),missing=own(permitted.subtract(finished)).area();
     const protectedArea=plan.protected.length?own(finished.intersect(own(new api.CrossSection(relative(plan.protected),'NonZero')))).area():0;
     const tolerance=Math.max(.01,plan.allocatableArea*1e-6);
-    if(Math.max(outside,missing,protectedArea)>tolerance)throw Error('Finished architecture failed the measured site area or protection check.');
+    if(Math.max(outside,Math.abs(missing-openLobbyArea),protectedArea)>tolerance)throw Error('Finished architecture failed the measured site area or protection check.');
     const heightRegions=envelope.bands.map(b=>{
       const prism=own(b.section.extrude(final.boundingBox().max[2]+1));
       const occupied=own(final.intersect(prism));
@@ -78,18 +80,18 @@ async function composeZone(api:ManifoldToplevel,site:SiteInput,zone:Zone,plan:Pl
       const builtFeet=measured.isEmpty()?0:measured.boundingBox().max[2];
       return {id:b.id,role:b.role,capFeet:b.cap,builtFeet,excessAreaFeet2:excessArea,areaFeet2:b.section.area()};
     });
-    const provenance={heightPolicy:envelope.reference,heightRegions,entry:recipe,adapter:'polygon-composition/v1',runId,clustering,members,territorySignature:plan.signature,
-      buildableAreaFeet2:plan.allocatableArea,grossAreaFeet2:plan.grossArea,areaBasis:'Horizontal projection of the finished architecture, including open court floors and terraces, measured against buildable polygon area.'};
+    const provenance={heightPolicy:envelope.reference,heightRegions,entry:distributed?'Distributed native lobby letter groups':recipe,adapter:distributed?'distributed-lobby-letters/v1':'polygon-composition/v1',runId,clustering,members,territorySignature:plan.signature,
+      buildableAreaFeet2:plan.allocatableArea,grossAreaFeet2:plan.grossArea,areaBasis:distributed?'Measured projection of the emitted forms over buildable polygon area. Open ground between lobby groups is excluded.':'Horizontal projection of the finished architecture, including open court floors and terraces, measured against buildable polygon area.'};
     const id=crypto.randomUUID(),height=final.boundingBox().max[2];
-    const orientation:OrientationResult={id,version:1,kind:'orientation-only',typologyId:'continuous-site',typologyName:zone.name+' · continuous composition',
+    const orientation:OrientationResult={id,version:1,kind:'orientation-only',typologyId:'continuous-site',typologyName:zone.name+' · '+name,
       site,zoneId:zone.id,geometryHash:await fingerprint(letters),components:letters,layers:[],organizingEdges:[],
       counts:letters.reduce((n,l)=>{n[l.letter]++;return n;},{L:0,U:0,V:0}),
-      parameters:{recipe,seed:plan.seed,spacing:0,heading:0,datum,field:{width:Math.max(...xs)-Math.min(...xs),depth:Math.max(...zs)-Math.min(...zs),height}},
+      parameters:{recipe:provenance.entry,seed:plan.seed,spacing:0,heading:0,datum,field:{width:Math.max(...xs)-Math.min(...xs),depth:Math.max(...zs)-Math.min(...zs),height}},
       frame:{center:origin,angle:0,corners:zone.polygon},limitations:['Polygon-scale composition using native letter profiles and registered formation dimensions.'],
       validation:{outsideArea:outside,protectedArea,maxElevationError:0,grossArea:plan.grossArea,permittedArea:plan.allocatableArea,
         triangles:letters.reduce((n,l)=>n+l.mesh.indices.length/3,0),attempts:members.length,milliseconds:plan.metrics.milliseconds},provenance:{...provenance,B:{executed:false}}};
     const measurements={buildingFootprintFeet2:footprint,buildingCoveragePercent:100*footprint/plan.grossArea,sourceLetterCoveragePercent:100*sourceArea/plan.grossArea,
-      expectationBuildingCoveragePercent:100*plan.allocatableArea/plan.grossArea,totalPrimaryFloorPlateAreaFeet2:null,exposedTerraceAreaFeet2:null,
+      expectationBuildingCoveragePercent:distributed?null:100*plan.allocatableArea/plan.grossArea,totalPrimaryFloorPlateAreaFeet2:null,exposedTerraceAreaFeet2:null,
       openSiteAreaFeet2:Math.max(0,plan.grossArea-footprint),registeredProtectedVoidAreaFeet2:plan.protectedArea};
     const architecture={id:crypto.randomUUID(),url:'',typologyName:orientation.typologyName,parentOrientationId:id,parentGeometryHash:orientation.geometryHash,
       geometryHash:await fingerprint(mesh),architecture:mesh,components,planLayers,site,zoneId:zone.id,provenance,measurements,
@@ -120,7 +122,8 @@ export async function generateContinuousSite(state:Experiment,registry:Registry,
         }
         previous.push(shape);
         const letterTargets=state.generation?.zones[JSON.stringify([site.fingerprint,z.id])]?.letterTargets??{};
-        records.push(await composeZone(api,site,z,plan,registry,c.clustering!,letterTargets,readRules(site,z.id),runId,progress));
+        const distributed=state.distributedLobbyLetters===true&&plan.territories.some(t=>isLobbyTypology(t.typology));
+        records.push(await composeZone(api,site,z,plan,registry,c.clustering!,letterTargets,readRules(site,z.id),runId,progress,distributed));
         territoryByZone[z.id]={controls:c,results:{...stored?.results,area:plan}};
       }catch(e){throw new Error(z.name+' · '+(e instanceof Error?e.message:String(e)),{cause:e});}
     }

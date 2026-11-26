@@ -52,6 +52,8 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   const [preparing,setPreparing]=useState(false),[planNotice,setPlanNotice]=useState('');
   useEffect(()=>{setMessage('');setPlanNotice('');},[site?.fingerprint,zoneId,method]);
   const enabledZones=site?.zones.filter(z=>z.enabled)??[];
+  const hasLobby=enabledZones.some(z=>registry.items.some(t=>isLobbyTypology(t.id)&&(state.assignments[z.id]?.shares[t.id]??0)>0));
+  const distributed=hasLobby&&state.distributedLobbyLetters===true;
   const preparationBlocker=!site?.protectionMetadataComplete?'Refresh the site polygons in Section 1 to load their protection geometry.':
     !enabledZones.length?'Enable a polygon in Site Development, then refresh the site polygons in Section 1.':'';
   const preparedCount=enabledZones.filter(z=>{
@@ -231,6 +233,14 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
           })}
         </>:<div className={styles.fields}>{rows.map(percentageField)}</div>}
       </fieldset>
+      {method==='typology-area'&&hasLobby&&<label className={styles.categoryFilter}>Lobby formation · all enabled polygons
+        <select disabled={busy||preparing} value={distributed?'letters':'continuous'} onChange={e=>{
+          patch({distributedLobbyLetters:e.currentTarget.value==='letters'});setMessage('');
+        }}>
+          <option value="continuous">Continuous territory composition</option>
+          <option value="letters">Distributed proto-form letters (experiment)</option>
+        </select>
+      </label>}
       {method==='typology-area'&&site&&zone&&<CompositionDistribution key={draftKey} site={site} zone={zone} assignment={assignment} controls={territory}
         registry={registry} category={category} letterTargets={draft.letterTargets} onLetterTarget={editLetterTarget} disabled={busy||preparing}>
         <div className={styles.clustering}>
@@ -267,8 +277,8 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       {presentationExport}
     </section>
     {method==='typology-area'?<>
-      <WorkflowAction local site={site?.name??'No site selected'} method="Continuous typology composition"
-        allocation={<><span>Forms connected galleries, decks, terraces, rooms and courts across the enabled polygons.</span>{enabledZones.map(z=><span key={z.id} style={{display:'block'}}><strong>{z.name}</strong>{' · '+registry.items.filter(t=>(state.assignments[z.id]??newAssignment()).shares[t.id]>0).map(t=>t.name+' '+(state.assignments[z.id]??newAssignment()).shares[t.id]+'%').join(' · ')}</span>)}</>}
+      <WorkflowAction local site={site?.name??'No site selected'} method={distributed?'Distributed proto-form letters':'Continuous typology composition'}
+        allocation={<><span>{distributed?'Each lobby keeps its assigned ground. Original letter groups form the buildings, with open ground between groups.':'Forms connected galleries, decks, terraces, rooms and courts across the enabled polygons.'}</span>{enabledZones.map(z=><span key={z.id} style={{display:'block'}}><strong>{z.name}</strong>{' · '+registry.items.filter(t=>(state.assignments[z.id]??newAssignment()).shares[t.id]>0).map(t=>t.name+' '+(state.assignments[z.id]??newAssignment()).shares[t.id]+'%').join(' · ')}</span>)}</>}
         action={{run:()=>generateAll(),busy:busy||preparing,reason:allocationBlocker,message,fix:!site?recovery:undefined}}/>
       <details className={styles.advanced}><summary>Generate a single typology with custom settings</summary>
         <DesignPanel state={state} controls={controls} onSaved={onSaved} onBusy={setBusy} commonBlocked={!!reason||busy} openTerritories={openTerritories}

@@ -40,6 +40,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
   },[reference]);
   const record=reference?(loaded?.id===reference?loaded.record:undefined):selected;
   const {result,error,loading}=useArchitecture(record),saved=library.find(r=>r.id===record?.id);
+  const distributed=result?.provenance.adapter==='distributed-lobby-letters/v1';
   const lobbyMembers=result?.provenance.adapter==='polygon-composition/v1'
     ?result.provenance.members?.filter(m=>isLobbyTypology(m.typology)):undefined;
   const title=result?.typologyName??record?.typologyName??'Linear Edge Gallery';
@@ -166,10 +167,11 @@ export default function ArchitectureReview({state,registry,results,selected,view
         <div><span>Site containment</span><strong>{result.validation.outsideArea<=(result.validation.areaToleranceFeet2??1e-6)&&result.validation.protectedArea<=(result.validation.areaToleranceFeet2??1e-6)?'Passed':'Review'}</strong></div>
         <div><span>Site height check</span><strong>{heightPassed===undefined?'Unrecorded':heightPassed?'Passed':'Review'}</strong></div>
       </div>:<p role="status">{loading?'Loading architectural geometry…':error||'Only source-letter geometry is available.'}</p>}
-      {result?.provenance.adapter==='polygon-composition/v1'&&<table className={styles.areaReport}><caption>Measured composition · {result.provenance.clustering}% clustering · {result.provenance.buildableAreaFeet2?.toLocaleString(undefined,{maximumFractionDigits:1})} ft² buildable ground</caption>
-        <thead><tr><th>Typology</th><th>Requested</th><th>Built share</th><th>Footprint</th><th>Letters placed</th><th>Letter target</th></tr></thead>
+      {result&&(distributed||result.provenance.adapter==='polygon-composition/v1')&&<table className={styles.areaReport}><caption>Measured composition · {result.provenance.clustering}% clustering · {result.provenance.buildableAreaFeet2?.toLocaleString(undefined,{maximumFractionDigits:1})} ft² buildable ground</caption>
+        <thead><tr><th>Typology</th><th>{distributed?'Assigned ground':'Requested'}</th><th>Built share</th><th>Footprint</th><th>Letters placed</th><th>Letter target</th></tr></thead>
         <tbody>{result.provenance.members?.map(m=><tr key={m.typology}><td>{m.name}</td><td>{m.allocatedPercent}%</td><td>{m.achievedPercent.toFixed(2)}%</td><td>{m.footprintAreaFeet2.toLocaleString(undefined,{maximumFractionDigits:1})} ft²</td><td>{m.sourceCount??'—'}</td><td>{m.letterTarget??'—'}</td></tr>)}</tbody>
       </table>}
+      {distributed&&<p>Built share is the projected form footprint as a percentage of buildable ground in this polygon. Space between lobby groups stays open.</p>}
       {lobbyMembers?.length ? <p>{lobbyMembers.every(m=>m.footprintCutFeet!==undefined)
         ? 'Lobby built shares measure the architecture above the joining floor, from 1 ft above the site base.'
         : 'This saved study includes the site floor in its lobby shares. Choose Generate Design to build the lobbies across their allocated areas.'}</p> : null}

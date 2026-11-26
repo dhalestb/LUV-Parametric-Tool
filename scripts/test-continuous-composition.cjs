@@ -390,6 +390,73 @@ async function main(){
     assert(r.validation.protectedArea<.01);
   }
   checkLobbyCoverage(protectedLobbies);
+  // Read the final meshes independently of the generator's coverage measurements.
+  const {lobbyStudy,lobbyStudyHashes}=require(dir+'allocatedDesign.ts');
+  for(const [settings,baseline] of [[allLobbies,galleries],[uneven,protectedLobbies]]){
+    const experiment=model.loadState(JSON.stringify({...settings,distributedLobbyLetters:true}));
+    const built=await generateContinuousSite(experiment,registry,()=>null,()=>{});
+    assert.equal(built.records.length,2);
+    for(const [i,{architecture:r,orientation:o}] of built.records.entries()){
+      const plan=built.territoryByZone[o.zoneId].results.area;
+      assert.deepEqual(plan.territories,baseline.territoryByZone[o.zoneId].results.area.territories);
+      assert.equal(r.provenance.adapter,'distributed-lobby-letters/v1');
+      assert(r.provenance.heightRegions.every(b=>b.builtFeet<=b.capFeet+.001));
+      assert(r.validation.protectedArea<.01 && r.validation.outsideArea<.01);
+      const remainingLetters=new Set(o.components.map(l=>l.id));
+      let groupCount=0,footprint=0;
+      for(const member of r.provenance.members){
+        const id=member.typology;
+        const groups=member.stacks??member.sequences??member.fields??member.galleries;
+        const assigned=experiment.assignments[o.zoneId].shares[id];
+        assert.equal(member.allocatedPercent,assigned);
+        assert(Math.abs(member.territoryAreaFeet2*100/plan.allocatableArea-assigned)<.01);
+        assert.equal(member.sourceCount,member.letterTarget);
+        assert(groups.length>=2 && (new Set(groups.map(g=>g.center.join(',')))).size===groups.length);
+        const region=new api.CrossSection(plan.territories.find(t=>t.typology===id).contours,'NonZero');
+        const parts=r.components.filter(p=>p.id.startsWith(id+'/'));
+        assert.equal(parts.length,groups.length);
+        const projections=[];
+        for(const [j,g] of groups.entries()){
+          const part=parts[j],native=await lobbyStudy(id,g.fieldHeight,g.count);
+          assert.equal(g.sha256,lobbyStudyHashes[id][g.key]);
+          assert(part.id.endsWith('/envelope'));
+          const angle=(g.headingDegrees??0)*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle);
+          const original=projectMesh(api,native.architecture);
+          const delta=[g.center[0]-c*native.center[0]+s*native.center[1],g.center[1]-s*native.center[0]-c*native.center[1]];
+          const rotated=original.rotate(g.headingDegrees??0),expected=rotated.translate(delta);
+          const placed=projectMesh(api,part.mesh),excess=placed.subtract(expected),missing=expected.subtract(placed);
+          assert(excess.area()+missing.area()<.05,id+' uses its original Rule B footprint at the same scale');
+          for(const area of [original,rotated,expected,excess,missing])area.delete();
+          projections.push(placed);
+          assert.equal(part.sources.length,g.count);
+          for(const [k,sourceId] of part.sources.entries()){
+            assert(remainingLetters.delete(sourceId),'each source belongs to exactly one rule group');
+            const source=o.components.find(l=>l.id===sourceId),letter=native.letters[k];
+            assert.equal(source.letter,letter.letter);
+            assert(sourceId.endsWith('/'+letter.id));
+            assert.deepEqual(source.mesh.indices,letter.mesh.indices);
+            const positions=letter.mesh.positions,placedPositions=source.mesh.positions;
+            for(let v=0;v<positions.length;v+=3){
+              assert(Math.abs(placedPositions[v]-(c*positions[v]-s*positions[v+2]+delta[0]))<1e-5);
+              assert(Math.abs(placedPositions[v+2]-(s*positions[v]+c*positions[v+2]+delta[1]))<1e-5);
+              assert(Math.abs((placedPositions[v+1]-placedPositions[1])-(positions[v+1]-positions[1]))<1e-5);
+            }
+          }
+        }
+        const real=api.CrossSection.union(projections),outside=real.subtract(region);
+        assert(outside.area()<.01);
+        assert(Math.abs(real.area()-member.footprintAreaFeet2)<.05);
+        assert(Math.abs(real.area()*100/plan.allocatableArea-member.achievedPercent)<.001);
+        assert(real.area()>0 && real.area()<region.area());
+        footprint+=real.area();groupCount+=groups.length;
+        for(const section of [...projections,region,outside,real])section.delete();
+      }
+      assert.equal(remainingLetters.size,0);
+      assert.equal(r.components.length,groupCount);
+      assert(Math.abs(r.measurements.buildingFootprintFeet2-footprint)<.05);
+      console.log('Distributed native lobby groups · Miami zone',i+1,groupCount,'groups,',o.components.length,'letters,',r.measurements.buildingCoveragePercent.toFixed(2)+'% built');
+    }
+  }
   const oldState=structuredClone(restored);
   delete oldState.profiles[compressed];
   for(const a of Object.values(oldState.assignments)){delete a.shares[compressed];delete a.variants[compressed];}
