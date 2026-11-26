@@ -1,7 +1,8 @@
 // Compute the gold presentation overlay from the saved architectural solid.
-const fs=require('node:fs');
 async function clearance(study){
- const w=await require('manifold-3d/manifold.js').default();w.setup();
+ const {default: initializeManifold} = await import('manifold-3d/manifold.js');
+ const w = await initializeManifold();
+ w.setup();
  const surfaces=study.galleryReport?.surfaces??[],parts=new Map(study.components.map(c=>[c.id,c.mesh]));
  const solid=mesh=>{const m=new w.Mesh({numProp:3,vertProperties:new Float32Array(mesh.positions),triVerts:new Uint32Array(mesh.indices)});m.merge();return new w.Manifold(m);};
  const form=solid(study.architecture),levels=new Map(),mid=study.request.field.height/2;
@@ -27,5 +28,10 @@ async function clearance(study){
  }
  return output;
 }
-if(require.main===module)clearance(JSON.parse(fs.readFileSync(0,'utf8'))).then(a=>process.stdout.write(JSON.stringify(a))).catch(e=>{console.error(e);process.exitCode=1;});
+async function runFromStdin() {
+ const {readFileSync} = await import('node:fs');
+ const result = await clearance(JSON.parse(readFileSync(0, 'utf8')));
+ process.stdout.write(JSON.stringify(result));
+}
+if (require.main === module) runFromStdin().catch(error => { console.error(error); process.exitCode = 1; });
 module.exports={clearance};

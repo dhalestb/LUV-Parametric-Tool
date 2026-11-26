@@ -222,7 +222,7 @@ export default function ArchitecturalEvaluations() {
     setBusy(false);
     const imported = result.imported ? `Imported ${result.imported} OBJ file${result.imported === 1 ? "" : "s"}.` : "No OBJ files were imported.";
     const follow = "Press Analyze All Forms. Keep the unit at feet so the recorded Open Volume scores stay comparable.";
-    setStatus([imported, result.note, result.error, follow].filter(Boolean).join(" "));
+    setStatus([imported, result.error, follow].filter(Boolean).join(" "));
   }
 
   function clearLoadedForms() {
@@ -325,7 +325,7 @@ export default function ArchitecturalEvaluations() {
       <p className="text-[12px]" style={{ color: "var(--muted)" }}>
         Unit {unit}. Up axis {upAxisMode}. {includeTopDecks ? "Uncovered top decks on a counted level are scored as open-to-sky floor. Roof lids stay excluded. Press Analyze All Forms after changing this." : "Official v4.1: uncovered top decks are excluded from interior Open Volume, visibility, and light. Press Analyze All Forms after changing this."}
       </p>
-      {!geometryPersisted && (
+      {geometryPersisted === false && meshes.length > 0 && (
         <p className="text-[12px]" style={{ color: "var(--muted)" }}>
           The uploaded meshes are in this browser tab only. They are too large for browser storage, so a refresh clears them. Evaluations does not substitute the bundled sample tiles.
         </p>

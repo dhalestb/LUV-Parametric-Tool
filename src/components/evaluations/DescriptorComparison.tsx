@@ -129,6 +129,7 @@ function browserDrawContext(ctx: CanvasRenderingContext2D): DrawContext {
     beginPath() {
       ctx.beginPath();
     },
+    arc: ctx.arc.bind(ctx),
     moveTo(x, y) {
       ctx.moveTo(x, y);
     },

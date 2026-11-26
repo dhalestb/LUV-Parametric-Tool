@@ -1,5 +1,7 @@
 import type { CompositionPlacement, DescriptorSettings } from "./compositionEngine";
 import { evaluateSpatialDesign } from "./descriptorEvaluation";
+import { isHeightRoutingActive, projectSelectionOntoField } from "./selectionHeightRouting";
+import { localizeIntersectingPlacements } from "./selectionFieldGeometry";
 import { gridDimensions } from "./constraintValidation";
 import { letterDepthSpan, octetBoxes, UNIT_LETTER_SPAN } from "./letterVolumeLayout";
 import type { CandidateFocus, GenerationRules, OptimizerControls, OrthogonalGrid, SelectionVolume, SpatialAlternative } from "./optimizerTypes";
@@ -88,7 +90,8 @@ export function selectBestSubvolume(args: {
   maxPositions?: number;
 }) {
   const overall = gridDimensions(args.overallGrid);
-  const selection = {
+  const routed = isHeightRoutingActive(args.selection);
+  const selection = routed ? projectSelectionOntoField(args.selection, overall) : {
     ...args.selection,
     width: Math.min(args.selection.width, overall.width),
     height: Math.min(args.selection.height, overall.height),
@@ -110,7 +113,7 @@ export function selectBestSubvolume(args: {
       halfZ: letterDepthSpan(depth, args.rules.letterThicknessPercent ?? 12, false) / 2,
     };
   }), { cols: args.overallGrid.xCells, rows: args.overallGrid.yCells, layers: args.overallGrid.zCells });
-  const dashedCenters = dashedBoxes.map((box) => ({
+  const dashedCenters = routed ? [] : dashedBoxes.map((box) => ({
     x: box.x,
     y: box.y,
     z: box.z,
@@ -151,9 +154,12 @@ export function selectBestSubvolume(args: {
       height: center.height,
       depth: center.depth,
     };
-    const contained = args.fullPlacements.filter((placement) => placementCenterInSelection(placement, window));
-    if (!contained.length) return;
-    const localPlacements = contained.map((placement) => ({ ...structuredClone(placement), x: placement.x - center.x, y: placement.y - center.y, z: placement.z - center.z }));
+    const localPlacements = routed
+      ? localizeIntersectingPlacements(args.fullPlacements, window, args.rules.letterThicknessPercent)
+      : args.fullPlacements.filter((placement) => placementCenterInSelection(placement, window)).map((placement) => ({
+          ...structuredClone(placement), x: placement.x - center.x, y: placement.y - center.y, z: placement.z - center.z,
+        }));
+    if (!localPlacements.length) return;
     const evaluation = evaluateSpatialDesign({
       placements: localPlacements,
       grid: selectionEvaluationGrid(window, args.overallGrid),
@@ -173,6 +179,7 @@ export function selectBestSubvolume(args: {
       evaluation,
       generation: args.generation,
       selection: {
+        ...(routed ? { heightRouting: selection.heightRouting } : {}),
         centerX: window.centerX,
         centerY: window.centerY,
         centerZ: window.centerZ,

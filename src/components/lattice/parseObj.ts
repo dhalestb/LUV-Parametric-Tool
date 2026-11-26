@@ -84,7 +84,7 @@ export function parseObj(text: string, filename: string): ImportedObj {
   };
 }
 
-export function faceTriangles(face: ObjFace) {
+export function faceTriangles(face: Pick<ObjFace, "vertices">) {
   const triangles: Array<[number, number, number]> = [];
   for (let index = 1; index < face.vertices.length - 1; index += 1) {
     triangles.push([face.vertices[0], face.vertices[index], face.vertices[index + 1]]);

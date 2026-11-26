@@ -1356,22 +1356,23 @@ export function descriptorFigures(descriptorId: string, input: SpatialInput): De
   if (descriptorId === "verticallyIntegrated") {
     const rays: DescriptorFigure["rays"] = [];
     const swatches: DescriptorFigure["swatches"] = [];
-    for (const cell of takeEven(walk.list, 40)) {
-      const above = walk.set.has(keyOf(cell.x, cell.y, cell.z + 1));
-      const below = walk.set.has(keyOf(cell.x, cell.y, cell.z - 1));
-      if (!above && !below) continue;
-      swatches.push({ cell: asVoxel(cell), color: above && below ? FIGURE_GOLD : FIGURE_CYAN });
-      if (above) rays.push(figureRay(asVoxel(cell), [cell.x, cell.y, cell.z + 1], true, FIGURE_CYAN));
+    for (const cell of walk.list) {
+      const neighbors = (links.get(keyOf(cell.x, cell.y, cell.z)) ?? []).map(parseKey);
+      const higher = neighbors.filter(next => next.z > cell.z);
+      const hasLower = neighbors.some(next => next.z < cell.z);
+      if (!higher.length && !hasLower) continue;
+      swatches.push({ cell: asVoxel(cell), color: higher.length && hasLower ? FIGURE_GOLD : FIGURE_CYAN });
+      for (const next of higher) rays.push(figureRay(asVoxel(cell), asVoxel(next), true, FIGURE_CYAN));
     }
     if (!swatches.length) {
       return {
-        legend: "No walkable cell sits directly above or below another, so Vertically Integrated has no vertical link to draw. The cream form is the mass that was tested.",
+        legend: "The measured walkable network has no cross-level links. The cream form is the mass that was tested.",
         swatches: [],
         rays: [],
       };
     }
     return {
-      legend: "Cyan links are walkable cells stacked on the next level. Gold marks a cell with walkable space both above and below. This is the vertical connection Vertically Integrated scores.",
+      legend: "Cyan lines join walkable cells connected across levels. Gold marks cells connected to both higher and lower levels.",
       swatches: takeEven(swatches, 50),
       rays: takeEven(rays, 30),
     };

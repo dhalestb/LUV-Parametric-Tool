@@ -1,3 +1,4 @@
+import { buildFaces } from "../lattice/analyze.ts";
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { TileModel, TileVariant } from "../lattice/types.ts";
@@ -25,7 +26,7 @@ function hall(size = 16, height = 14): DescriptorSource {
 }
 
 function model(id: string): TileModel {
-  const variant = {
+  const variant: TileVariant = {
     rotation: 0,
     mirror: "none",
     occupied: [],
@@ -34,8 +35,8 @@ function model(id: string): TileModel {
     voidCells: [],
     vertical: [],
     bounds: { minX: 0, minY: 0, minZ: 0, maxX: 0, maxY: 0, maxZ: 0 },
-    faces: {},
-  } as TileVariant;
+    faces: buildFaces([], new Set(), new Set(), new Set(), 2),
+  };
   return {
     id,
     filename: `${id}.obj`,

@@ -90,7 +90,7 @@ describe("comparative ranks", () => {
   });
 
   it("ranks Sequential by verified gain, then higher levels, and reports ties", () => {
-    const forms = [
+    const forms: { formId: string; descriptors: RankDescriptor[] }[] = [
       { formId: "A", descriptors: [{ id: "sequential", absoluteScore: 8, components: [{ name: "Verified Vertical Gain", raw: 8, weight: 1 }, { name: "Higher Levels Reached", raw: 0, weight: 0.5 }] }] },
       { formId: "B", descriptors: [{ id: "sequential", absoluteScore: 12, components: [{ name: "Verified Vertical Gain", raw: 12, weight: 1 }, { name: "Higher Levels Reached", raw: 1, weight: 0.5 }] }] },
       { formId: "C", descriptors: [{ id: "sequential", absoluteScore: 8, components: [{ name: "Verified Vertical Gain", raw: 8, weight: 1 }, { name: "Higher Levels Reached", raw: 2, weight: 0.5 }] }] },

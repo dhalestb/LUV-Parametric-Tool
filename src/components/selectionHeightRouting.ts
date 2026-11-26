@@ -245,6 +245,7 @@ export function applyDashedGroupSelection(
   if (!dashed || isHeightRoutingActive(selection)) return selection;
   return {
     ...selection,
+    heightRouting: null,
     width: dashed.width,
     height: dashed.height,
     depth: dashed.depth,

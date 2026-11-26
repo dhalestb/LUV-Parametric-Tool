@@ -244,7 +244,7 @@ function emphasisFor(id: string): EvidenceLayer["emphasis"] {
   return undefined;
 }
 
-function asArrows(layer: EvidenceLayer, role: GraphicRole): Pick<EvidenceLayer, "kind" | "arrows" | "segments"> {
+function asArrows(layer: EvidenceLayer, role: GraphicRole): Partial<Pick<EvidenceLayer, "kind" | "arrows" | "segments">> {
   const shouldArrow = role === "connection" || role === "dimension";
   if (!shouldArrow) return {};
   if (layer.arrows?.length) return { kind: "arrow", arrows: layer.arrows };
@@ -337,7 +337,7 @@ function styleLayer(layer: EvidenceLayer, options: PresentationOptions = {}): Ev
   };
 }
 
-function presentationOverride(id: string): Pick<EvidenceLayer, "color" | "pointShape" | "pointScale"> {
+function presentationOverride(id: string): Partial<Pick<EvidenceLayer, "color" | "pointShape" | "pointScale">> {
   if (id === "ov-field") return { color: GRAPHIC.colors.entry };
   if (id === "ov-field-volume" || id === "ov-volume") return { color: GRAPHIC.colors.surface };
   if (id === "ov-qualifying") return { color: GRAPHIC.colors.connection };

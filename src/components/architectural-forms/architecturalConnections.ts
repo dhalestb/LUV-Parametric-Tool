@@ -5,6 +5,7 @@ import type { Letter } from "@/components/architectural-forms/letterTypes";
 
 export type IntersectionPlacement = {
   letterRules?: LetterPlacementRules;
+  openHallRole?: import("../architecturalConnections").IntersectionPlacement["openHallRole"];
   letter: Letter;
   x: number;
   y: number;

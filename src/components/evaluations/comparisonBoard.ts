@@ -132,6 +132,7 @@ export type DrawContext = {
   fillRect(x: number, y: number, w: number, h: number): void;
   strokeRect(x: number, y: number, w: number, h: number): void;
   beginPath(): void;
+  arc: CanvasRenderingContext2D["arc"];
   moveTo(x: number, y: number): void;
   lineTo(x: number, y: number): void;
   closePath(): void;

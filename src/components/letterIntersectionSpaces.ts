@@ -3,7 +3,7 @@ import { connectionFillet } from './connectionFillet';
 import { letterBoxGap } from './letterOverlapRule';
 import { adjacentLetterPairs } from './interlockAdjacentLetters';
 import { buildTypologyContinuity } from "./typologyContinuity";
-import { OFFICE_TYPOLOGIES } from "./officeWorkspaceRules";
+import { OFFICE_TYPOLOGIES, type OfficeCheck } from "./officeWorkspaceRules";
 import { validateIntersectingOffice } from "./officeLetterIntersections";
 import { canyonStaggering } from "./canyonStaggering";
 import { CANYON_TYPOLOGIES, GATHERING_TYPOLOGIES, DEFAULT_GATHERING_OPERATIONS, type GatheringOperations } from "./gatheringOperations";
@@ -385,7 +385,7 @@ export type ConnectionWorkflow = {
   variants: Record<ArchitecturalSpaceMode,WorkflowMesh>;
   source:WorkflowMesh; intersections:WorkflowMesh; bridges:WorkflowMesh; floors?:WorkflowMesh;
   links:NonNullable<ReturnType<typeof buildFaceBridges>["links"]>;
-  settings:FaceBridgeSettings; boundaryDesignations?:{sourceIndex:number;letter:string;role:string;rotation:[number,number,number]}[]; gatheringOperations?:GatheringOperations; gatheringValidation?:{label:string;status:"pass"|"unverified";detail:string}[]; officeValidation?:{label:string;status:"pass"|"unverified";detail:string}[]; protectedVoid?:WorkflowMesh; enclosure?:WorkflowMesh; arrangedSource?:WorkflowMesh; arrangement?:{originalPlacements:IntersectionPlacement[];sourceIndices?:number[];placements:IntersectionPlacement[];sequence:number[];preservedPairs:number[][];overlapFractions?:number[];riseFractions?:number[]}; formation?:{operations:string[];supported:boolean};
+  settings:FaceBridgeSettings; boundaryDesignations?:{sourceIndex:number;letter:string;role:string;rotation:[number,number,number]}[]; gatheringOperations?:GatheringOperations; gatheringValidation?:{label:string;status:"pass"|"unverified";detail:string}[]; officeValidation?:OfficeCheck[]; protectedVoid?:WorkflowMesh; enclosure?:WorkflowMesh; arrangedSource?:WorkflowMesh; arrangement?:{originalPlacements:IntersectionPlacement[];sourceIndices?:number[];placements:IntersectionPlacement[];sequence:number[];preservedPairs:number[][];overlapFractions?:number[];riseFractions?:number[]}; formation?:{operations:string[];supported:boolean};
 };
 
 /** A, B and C share a single source, bridge graph and boolean construction. */
