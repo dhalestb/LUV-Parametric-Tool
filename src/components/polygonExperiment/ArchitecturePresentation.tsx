@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {loadSavedArchitecture} from './ArchitectureLayer';
 import type {OrientationResult} from './orientationStore';
 import {renderPresentation,sheetHeight,sheetWidth} from './renderPresentation';
@@ -18,7 +18,7 @@ export async function renderStudyBoard(records:Pick<OrientationResult,'id'|'geom
 
 export const boardLabels=(records:OrientationResult[])=>records.map(label);
 
-export default function ArchitecturePresentation({records,exportOnly=false}:{records:OrientationResult[];exportOnly?:boolean}){
+export default function ArchitecturePresentation({records,exportOnly=false,children}:{records:OrientationResult[];exportOnly?:boolean;children?:ReactNode}){
   const [open,setOpen]=useState(false),[choice,setChoice]=useState('all'),[image,setImage]=useState({key:'',url:''}),[error,setError]=useState('');
   const dialog=useRef<HTMLDialogElement>(null);
   const selected=records.some(r=>r.id===choice)?records.filter(r=>r.id===choice):records;
@@ -52,6 +52,7 @@ export default function ArchitecturePresentation({records,exportOnly=false}:{rec
     <summary>Exports</summary>
     {records.length?<>{chooser}<p>{download||<span role="status">{error||'Preparing presentation board PNG…'}</span>}</p></>:
       <p>Generate a design or <a href="#review-architecture">select a finished study in Step 4</a> to download its presentation board.</p>}
+    {children}
   </details>;
   if(!records.length)return null;
   return <>

@@ -119,8 +119,23 @@ export default function ArchitectureReview({state,registry,results,selected,view
     }catch(e){setExportStatus('OBJ export failed. '+(e instanceof Error?e.message:String(e)));}
     finally{setExporting(false);}
   }
+  const [siteBoardBusy,setSiteBoardBusy]=useState(false),[siteBoardMessage,setSiteBoardMessage]=useState('');
+  async function downloadSiteBoard(){
+    if(!boardRecords.length||siteBoardBusy)return;
+    setSiteBoardBusy(true);setSiteBoardMessage('');
+    try{
+      const {renderSiteAssessment}=await import('./siteAssessmentBoard');
+      const png=await renderSiteAssessment(boardRecords,state,registry);
+      downloadDesignFile(png,objName(boardLabels(boardRecords).join(' + '))+'-site-analysis.png');
+      setSiteBoardMessage('Site analysis board download started.');
+    }catch(e){setSiteBoardMessage('Site analysis export failed. '+(e instanceof Error?e.message:String(e)));}
+    finally{setSiteBoardBusy(false);}
+  }
+  const siteBoardExport=<div><button type="button" disabled={!boardRecords.length||siteBoardBusy} onClick={downloadSiteBoard}>
+    Download Site Analysis Board PNG{boardRecords.length>1&&' ('+boardRecords.length+' zones)'}
+  </button>{(siteBoardBusy||siteBoardMessage)&&<p role="status">{siteBoardBusy?'Rendering site analysis board…':siteBoardMessage}</p>}</div>;
   const heightPassed=result?.validation.occupiedSiteEnvelope?.passed??result?.validation.allocatedHeightChecked;
-  return <>{renderMethods(<ArchitecturePresentation key={record?.id} exportOnly records={boardRecords}/>)}
+  return <>{renderMethods(<ArchitecturePresentation key={record?.id} exportOnly records={boardRecords}>{siteBoardExport}</ArchitecturePresentation>)}
   <section id="review-architecture" className={styles.review} aria-labelledby="review-heading">
     <h2 id="review-heading"><small>04</small> Review Generated Architecture</h2>
     {site&&site.zones.length>0&&<section id="combined-site-plan"><h3>Combined site plan</h3>
@@ -183,6 +198,7 @@ export default function ArchitectureReview({state,registry,results,selected,view
       <p>{record||group.length?'OBJ files use site coordinates in feet, with Y up.':'Generate a design or select a saved study to export its form.'}</p>
       <div className={styles.zoneTabs}>
         <button type="button" disabled={!boardRecords.length||renderingBoard} onClick={downloadBoard}>Download Presentation Board PNG{boardRecords.length>1&&' ('+boardRecords.length+' zones)'}</button>
+        {siteBoardExport}
         <button type="button" disabled={exporting||!result} onClick={()=>record&&exportForms([record],(saved?.name??title)+'-'+record.id.slice(0,8))}>Download selected form OBJ</button>
         {group.length>0&&<button type="button" disabled={exporting} onClick={()=>exportForms(group,(site?.name??'site')+'-forms')}>Download site plan OBJ ({group.length} {group.length===1?'zone':'zones'})</button>}
       </div>
