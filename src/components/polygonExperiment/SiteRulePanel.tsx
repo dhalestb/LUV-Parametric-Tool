@@ -9,7 +9,16 @@ export function readSiteRules(site:SiteInput,zoneId:string):HeightRecord|null {c
 type Plan={status:string;blockers:string[];siteRules:{requestedTerritoryAreaFeet2:number;actualDomainAreaFeet2:number;unassignedAreaFeet2:number;overlapAreaFeet2:number;legacyZoneMaxHeightFeet:number|null;regions:{id:string;heightFeet:number;areaFeet2:number;contours:number[][][]}[]}};
 export default function SiteRulePanel({site,zoneId,allocationPercent=100,territory,typologyId='linear-edge-gallery'}:{site:SiteInput|null;zoneId:string|null;allocationPercent?:number;territory?:unknown;typologyId?:string}){
  const [plan,setPlan]=useState<Plan|null>(null),[notice,setNotice]=useState(''),[revision,setRevision]=useState(0);const zone=site?.zones.find(z=>z.id===zoneId),signature=JSON.stringify({site,zoneId,allocationPercent,territory});
- useEffect(()=>{const update=()=>setRevision(x=>x+1);window.addEventListener('storage',update);window.addEventListener('luv-site-rules',update);return()=>{window.removeEventListener('storage',update);window.removeEventListener('luv-site-rules',update)}},[]);
+ useEffect(() => {
+   // The importing panel already has the validated plan. Other tabs receive a storage event.
+   const update = (event: StorageEvent) => {
+     if (event.storageArea === localStorage && (event.key === SITE_RULE_KEY || event.key === null)) {
+       setRevision(value => value + 1);
+     }
+   };
+   window.addEventListener('storage', update);
+   return () => window.removeEventListener('storage', update);
+ }, []);
  async function validate(record?:HeightRecord|null){if(!site||!zoneId)throw Error('Select a Site polygon');const saved=record===undefined?readSiteRules(site,zoneId):record;const response=await requestSiteWorker('/experiment/site-polygon-morphogenesis/site-rules',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({site,zoneId,allocationPercent,territory,heightRegions:saved?.regions??[],heightSource:saved?.source})});const result=await response.json();if(!response.ok)throw Error(result.error);return result as Plan;}
  useEffect(()=>{let active=true;setPlan(null);if(site&&zone){validate().then(p=>{if(active){setPlan(p);setNotice('')}}).catch(e=>{if(active)setNotice(String(e))});}return()=>{active=false}},[signature,revision]);
  async function load(file?:File){if(!file)return;try{const record=JSON.parse(await file.text()) as HeightRecord,p=await validate(record);if(p.blockers.length)throw Error(p.blockers.join(' '));const raw=localStorage.getItem(SITE_RULE_KEY),old=JSON.parse(raw??'[]');if(!Array.isArray(old))throw Error('Existing site-rule records invalid; refusing overwrite');localStorage.setItem(SITE_RULE_KEY,JSON.stringify([...old,{...record,savedAt:new Date().toISOString()}]));setPlan(p);setNotice('Validated height regions appended to separate experimental storage. No saved geometry changed.');window.dispatchEvent(new Event('luv-site-rules'));}catch(e){setNotice(String(e))}}
