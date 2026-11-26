@@ -1,19 +1,30 @@
 'use client';
 
 import { useState } from 'react';
+import { isSiteIntegrationPreview } from './siteWorkerPolicy';
+
+const usePreviewSession = isSiteIntegrationPreview(
+  process.env.NEXT_PUBLIC_VERCEL_ENV, process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
+);
 
 let accessKey = '';
 
-export function requestSiteWorker(url: string, init: RequestInit) {
+export async function requestSiteWorker(url: string, init: RequestInit) {
   const target = new URL(url, window.location.origin);
   if (target.origin !== window.location.origin) throw Error('Site workers require the same origin.');
   const headers = new Headers(init.headers);
-  if (accessKey) headers.set('X-LUV-Site-Key', accessKey);
-  return fetch(target, {...init, headers, redirect: 'error'});
+  if (usePreviewSession) headers.set('Accept', 'application/json');
+  else if (accessKey) headers.set('X-LUV-Site-Key', accessKey);
+  const response = await fetch(target, {...init, headers, credentials: 'same-origin', redirect: 'error'});
+  if (usePreviewSession && response.status === 401) {
+    throw Error('Sign in to the Vercel Preview again to run this operation.');
+  }
+  return response;
 }
 
 export function WorkerAccess() {
   const [enabled, setEnabled] = useState(Boolean(accessKey));
+  if (usePreviewSession) return null;
   return <details>
     <summary>Hosted generation access</summary>
     <form onSubmit={event => {

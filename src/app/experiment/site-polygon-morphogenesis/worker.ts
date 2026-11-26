@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { gzip } from 'node:zlib';
-import { canAccessSiteWorker, isLocalRequest } from './workerAccess';
+import { canRunGenerationWorker, isLocalRequest, usesProtectedSitePreview } from './workerAccess';
 
 const programs = {
   design: 'generate-design.cjs',
@@ -87,7 +87,11 @@ function runWorker(name: Program, body: Buffer, signal: AbortSignal, outputRoot?
 }
 
 export async function executeSiteWorker(request: Request, name: Program) {
-  if (!canAccessSiteWorker(request)) return failure('Hosted operation requires a configured origin and a valid access key.', 403);
+  if (!(await canRunGenerationWorker(request))) {
+    return failure(usesProtectedSitePreview()
+      ? 'Generation requires the Vercel-protected integration Preview and a same-origin request.'
+      : 'Hosted operation requires a configured origin and a valid access key.', 403);
+  }
   if (request.headers.get('content-type')?.split(';')[0].trim() !== 'application/json') {
     return failure('Content-Type must be application/json.', 415);
   }
