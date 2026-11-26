@@ -33,17 +33,30 @@ function nativeGlyphOnSide(glyph, letter, side, size, variant, domain) {
  const g=glyph(letter,0,size,variant),t=frames(domain.lower)[side].tangent,a=Math.atan2(t[1],t[0]);
  return {...g,angle:g.angle+a,outline:g.outline.map(p=>rotate(p,a))};
 }
-function specialize(domain, trace) {
+function specialize(domain, trace = []) {
  authenticate(); require(path.join(VENDOR,'proof/rule-amphitheater.cjs'));
  const changes=[],cache=new Map();
+ // The site's upper gallery retains the checkpoint's compact four-sided, rotated terrace.
+ const polygonSite = domain.nativeUpper === true;
+ let band = 'lower';
+ const cacheGlyph = new Map();
  const hooks={
-  glyph:(g,...args)=>nativeGlyphOnSide(g,...args,domain),
+  glyph:(g,letter,side,size,variant)=>{
+   const key=[band,letter,side,size,variant].join('/');
+   if(!cacheGlyph.has(key)) cacheGlyph.set(key, polygonSite && band==='upper'
+    ? g(letter,side,size,variant)
+    : nativeGlyphOnSide(g,letter,side % domain.lower.length,size,variant,domain));
+   return cacheGlyph.get(key);
+  },
   frames:()=>frames(domain.lower),
-  region:zone=>{const vertices=domain[zone];return {vertices,lengths:frames(vertices).map(f=>f.length)};},
+  usable:(length,i)=>band==='upper'?length:length-(domain.cornerMargins?.[i]??domain.cornerClearanceFeet)-(domain.cornerMargins?.[(i+1)%domain.lower.length]??domain.cornerClearanceFeet),
+  region:zone=>{band=zone;const vertices=domain[zone];return {vertices,lengths:frames(vertices).map(f=>f.length)};},
   starts:(region,lengths,cornerBack)=>region.vertices.map((p,i)=>{
-   const occupied=lengths[i]-(cornerBack.to-cornerBack.from),available=region.lengths[i]-2*domain.cornerClearanceFeet;
+   const occupied=lengths[i]-(cornerBack.to-cornerBack.from);
+   const start=domain.cornerMargins?.[i]??domain.cornerClearanceFeet, end=domain.cornerMargins?.[(i+1)%region.vertices.length]??domain.cornerClearanceFeet;
+   const available=region.lengths[i]-start-end;
    assert(occupied<=available+1e-7,'NATIVE_POPULATION_CAPACITY: edge '+i+' needs '+occupied+' ft, available '+available);
-   const offset=(region.lengths[i]-occupied)/2,t=frames(region.vertices)[i].tangent;
+   const offset=start+(available-occupied)/2,t=frames(region.vertices)[i].tangent;
    return [p[0]+offset*t[0],p[1]+offset*t[1]];
   }),
   area,
@@ -68,6 +81,18 @@ function specialize(domain, trace) {
    patch('side<4','side<tangents.length','N-side placement');
    patch("...(j===0?{secondSide:(side+3)%4,secondCurve:5}:{})", "...{}", 'open corner interface: no false perpendicular second receiver at oblique corner');
    patch('layers.push({...ref,vertices,lengths,count,capacity:count,perimeter:2*(width+height),occupiedEdgeFeet:2*(width+height),achieved:width*height,target:width*height,edgesForFullPerimeter:count+4});', 'layers.push({...ref,vertices:region.vertices,lengths,count,capacity:count,perimeter:region.lengths.reduce((a,b)=>a+b,0),occupiedEdgeFeet:lengths.reduce((a,b)=>a+b,0),achieved:hooks.area(region.vertices),target:hooks.area(region.vertices),edgesForFullPerimeter:count});', 'polygon layer topology and areas');
+   if(polygonSite) {
+    patch('small=Math.min(...limit)<25', 'small=Math.min(...limit.map(hooks.usable))<25', 'size native corner populations for the usable edge');
+    patch('const available=limit[side]-2*'+domain.cornerClearanceFeet+';', 'const available=hooks.usable(limit[side],side);', 'angular corner clearances');
+    patch('at+=span(g);previous[side]', "at+=span(g)+(zone==='lower'?1/8192:0);previous[side]", 'one native grid unit between oblique coplanar source ends');
+    patch('const sides=tangents.map((t,side)=>{', "const courseTangents=zone==='upper'?[[1,0],[0,1],[-1,0],[0,-1]]:tangents,courseNormals=courseTangents.map(t=>[t[1],-t[0]]);\n const sides=courseTangents.map((t,side)=>{", 'compact upper gallery keeps its native orthogonal receiving edges');
+    patch('previous=hooks.frames().map(()=>[])', 'previous=Array.from({length:Math.max(4,hooks.frames().length)},()=>[])', 'reserve running bond history for both footprints');
+    patch('const vertices=hooks.starts(region,lengths,cornerBack);', "const [w,h]=lengths;const vertices=zone==='upper'?[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]]:hooks.starts(region,lengths,cornerBack);", 'native upper corner locations about the terrace center');
+    patch('side<tangents.length', 'side<courseTangents.length', 'traverse the current footprint');
+    patch('t=tangents[side],n=normals[side]', 't=courseTangents[side],n=courseNormals[side]', 'use the frame of the current course');
+    patch('...{}', "...(zone==='upper'&&j===0?{secondSide:(side+3)%4,secondCurve:5}:{})", 'preserve native upper corner second receivers');
+    patch('vertices:region.vertices,lengths,count', "vertices:zone==='upper'?vertices:region.vertices,lengths,count", 'store the actual upper footprint');
+   }
    patch('const count=source.length-before;', "const count=source.length-before;hooks.trace('arrangeMixed-course',{level,zone,count,vertices:region.vertices});", 'trace actual original course execution');
   }
   if(rel==='scripts/linear-gallery-current-edges.cjs') {
@@ -78,6 +103,9 @@ function specialize(domain, trace) {
    patch('for(const side of [0,1,2,3])','for(const side of layer.vertices.map((_,i)=>i))','N-side empty intervals');
   }
   if(rel==='scripts/linear-gallery-print.cjs') {
+   if(polygonSite) {
+    patch('p.tangent.map((v,i)=>snap(a*v+d*p.normal[i]))','p.tangent.map((v,i)=>a*v+d*p.normal[i])', 'apply the native grid in the receiver frame so oblique wall faces stay collinear');
+   }
    patch('const rows=layers.map(l=>[0,1,2,3].map(side=>','const rows=layers.map(l=>l.vertices.map((_,side)=>','N-side source-derived formation rows');
    patch('side<4','side<rows[first.level].length','N-side wall and contour traversal');
    patch("const id=kind+'-'+(parts.length+1),sources=[p.sourceId,q.sourceId];", "const id=kind+'-'+(parts.length+1),sources=[p.sourceId,q.sourceId];require('polygon-domain-hooks').trace('buildGallery-add',{kind,bottom,top,sources,level:p.level,receiverLevel:q.level});", 'trace unchanged formation operations');
@@ -141,4 +169,4 @@ async function runAdapter(input,out) {
   limitations:['Controlled irregular fixture; not full Miami generation.','At oblique corners, native letter runs terminate with open interfaces; no fabricated second perpendicular arm or new corner-closure wall.','Convex, single-loop same-topology offsets only; holes, split courses, cross-tier architecture and corner closure remain unresolved.','Original axis-based terrace-threshold search remains active and may reject other polygons.','Original upper binary-grid rotation and snap tolerances remain; no structural or accessibility certification.']};
  fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'result.json'),JSON.stringify(result));return result;
 }
-module.exports={runAdapter,authenticate,hash,VERSION};
+module.exports={runAdapter,specialize,authenticate,hash,VERSION};

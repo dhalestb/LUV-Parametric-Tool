@@ -13,7 +13,9 @@ async function generateDesign(input,{outputRoot}={}){
  if(input.development?.ruleBasis!=='historical-study'){
   const plan=await require('./site-rule-contract.cjs').planSiteRules({...input,allocationPercent:input.adaptive?.allocationPercent??100,territory:input.adaptive?.territory,heightRegions:input.siteRulePlan?.regions??[],heightSource:input.siteRulePlan?.source});
   if(plan.blockers.length)throw Error(plan.blockers.join(' '));
-  throw Error('AUTHENTIC_POLYGON_ADAPTER_REQUIRED: site rules validated, but the original Print-Contour A/B still assume four sides. No perimeter-ring or rectangular substitute generated.');
+  if(input.development?.ruleBasis==='polygon-site-v1' && input.adaptive?.typologyId==='linear-edge-gallery' && input.recipe==='print-contour')
+   return require('./polygon-gallery-design.cjs').generatePolygonGallery(input,plan,{outputRoot});
+  throw Error('AUTHENTIC_POLYGON_ADAPTER_REQUIRED: select a supported polygon typology and variant.');
  }
  const d=input.development;if(!d||!['compact','distributed-connected','perimeter-oriented'].includes(d.distribution))throw Error('Select a supported spatial-domain strategy');
  if(!Number.isFinite(d.targetBuildingCoveragePercent)||d.targetBuildingCoveragePercent<=0||d.targetBuildingCoveragePercent>100||!Number.isFinite(d.spatialExtentPercent)||d.spatialExtentPercent<=0||d.spatialExtentPercent>100)throw Error('Invalid independent coverage or spatial-extent control');
@@ -39,5 +41,3 @@ function browserBundle(result,outputRoot){
  return {...result,payload};
 }
 module.exports={generateDesign};if(require.main===module){let raw='';process.stdin.on('data',b=>raw+=b);process.stdin.on('end',async()=>{try{const outputRoot=process.env.LUV_DESIGN_OUTPUT_ROOT;const result=await generateDesign(JSON.parse(raw),{outputRoot});process.stdout.write(JSON.stringify(outputRoot?browserBundle(result,outputRoot):result));}catch(e){process.stderr.write(e.message);process.exitCode=1;}});}
-
-
