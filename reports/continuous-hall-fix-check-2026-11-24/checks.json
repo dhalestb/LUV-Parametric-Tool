@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-24",
+  "remoteHeads": 27,
+  "uniqueRemoteTips": 24,
+  "newestTypologyCommit": "9542fcadb2847749bbea1ff464de472cf688f5b2",
+  "newestTypologyChange": "Evaluation floor/clearance scoring only",
+  "commitFiles": [
+    "src/components/evaluations/ArchitecturalEvaluations.tsx",
+    "src/components/evaluations/descriptorVersion.ts",
+    "src/components/evaluations/openVolumeCache.test.ts",
+    "src/components/evaluations/v4/evaluateV4.test.ts",
+    "src/components/evaluations/v4/evaluateV4.ts",
+    "src/components/evaluations/v4/surfaces.ts"
+  ],
+  "commitsSinceAuditedEngine": 2,
+  "aggregateFilesSinceAuditedEngine": 103,
+  "directByteComparisons": [
+    {
+      "file": "src/components/lobbyProof.ts",
+      "blob": "6acd0a63fd44891ef0f5bed043d2b8fc7bb5b929",
+      "sha256": "e32694e6fc9476be3937bb75ac12500043a7e1a7ccd64a4541b5c94f5c315317",
+      "exact": true
+    },
+    {
+      "file": "src/components/letterGeometry3d.ts",
+      "blob": "8ac2af737b00e92dbbf97e6642cbd897b88c3665",
+      "sha256": "352827db6cbb7fddab6ce6cc2125061468adba179e907a88fe19458756d3e07d",
+      "exact": true
+    },
+    {
+      "file": "scripts/source-lobby-envelope.cjs",
+      "blob": "8b094a2c9eb3c477892f1c04d2444077f337a6dc",
+      "sha256": "ed1d8c7693b364793eaddd26c7dbd409ecf45f8e22f597775c5179a3edb3080b",
+      "exact": true
+    },
+    {
+      "file": "scripts/source-envelope.cjs",
+      "blob": "06ff8a770a2aa52909213b38e126250b0ecaad2a",
+      "sha256": "888c037992f5a7c7cb1d09990a79a6ef88564aebaf404ef70cdfab4767bd35bc",
+      "exact": true
+    },
+    {
+      "file": "proof/rule-validation.cjs",
+      "blob": "c5fac09608e3f419a4daa6c75242f29249602bbf",
+      "sha256": "098e67f5384fe3c2673adcb73f60559fb761477f8bdbd3e88ac2c2ad5e2afdc2",
+      "exact": true
+    }
+  ],
+  "verifiedRuntimePackageFiles": 27,
+  "runtimeFilesChanged": [],
+  "overlapConstant": 0.45,
+  "negativeGapUnchanged": true,
+  "sourceOverlapLimitAdded": false,
+  "overlapFixFound": false,
+  "existingMeasurements": {
+    "freshStudy": "12eb8d26-78e1-45b9-a0de-75a8c221f696",
+    "freshPairs": 6,
+    "freshMaximumPercent": 19.19751431976081,
+    "approvedStudy": 10,
+    "approvedMaximumPercent": 3.4161550359951027,
+    "nativeArchitectureValidation": {
+      "passed": true,
+      "selfIntersectionPairs": 0,
+      "nonAdjacentTriangleChecks": 99942,
+      "legacyFlags": 21
+    },
+    "measurementMethod": "Existing exact saved-source Manifold intersection evidence; unchanged source, glyphs and record verified. No new geometry is generated."
+  },
+  "preservation": {
+    "protectedFilesUnchanged": 1012,
+    "changedProtected": [],
+    "localBranchUnchanged": true,
+    "localRefsUnchanged": true,
+    "worktreesUnchanged": true,
+    "applicationCodeEdited": false,
+    "studiesSavedOrRegenerated": false,
+    "presentationBoardsChanged": false,
+    "integrated": false,
+    "committed": false,
+    "pushed": false
+  }
+}

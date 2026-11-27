@@ -4,31 +4,41 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/patch-next-eisdir.js && next build",
+    "build": "node scripts/patch-next-eisdir.js && node scripts/prepare-presentation-assets.mjs && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "node scripts/patch-next-eisdir.js"
+    "presentation:check": "node scripts/presentation-format-lock.cjs && node scripts/presentation-format-tests.cjs",
+    "postinstall": "node scripts/patch-next-eisdir.js",
+    "predev": "node scripts/prepare-geometry-runtime.cjs",
+    "prebuild": "node scripts/prepare-geometry-runtime.cjs",
+    "dev:polygon": "node scripts/start-polygon-experiment.cjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.8",
     "@react-three/fiber": "^9.7.0",
     "@types/three": "^0.186.0",
+    "@vercel/blob": "^2.9.0",
     "manifold-3d": "^3.5.3",
     "next": "15.5.27",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "rhino3dm": "^8.35.0",
-    "three": "^0.186.0"
+    "sharp": "0.35.4",
+    "three": "^0.186.0",
+    "three-mesh-bvh": "0.8.3",
+    "typescript": "5.9.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@napi-rs/canvas": "^0.1.80",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^20.19.13",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
     "eslint": "^9.35.0",
     "eslint-config-next": "15.5.27",
-    "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2"
+    "tailwindcss": "^4.1.13"
   }
 }

@@ -1,0 +1,42 @@
+[
+  {
+    "height": 20,
+    "instances": 7,
+    "sharedLevels": 3,
+    "componentProvenance": true,
+    "sourceContainment": true,
+    "focusClear": true,
+    "positiveMaterialShells": 1,
+    "signedShellVolumes": [
+      207.747812094434
+    ],
+    "actualHeight": 15.058173913043479
+  },
+  {
+    "height": 40,
+    "instances": 11,
+    "sharedLevels": 4,
+    "componentProvenance": true,
+    "sourceContainment": true,
+    "focusClear": true,
+    "positiveMaterialShells": 1,
+    "signedShellVolumes": [
+      694.1195680387666
+    ],
+    "actualHeight": 27.522
+  },
+  {
+    "height": 60,
+    "instances": 16,
+    "sharedLevels": 6,
+    "componentProvenance": true,
+    "sourceContainment": true,
+    "focusClear": true,
+    "positiveMaterialShells": 1,
+    "signedShellVolumes": [
+      1568.4204897096552,
+      -0.009431331474498579
+    ],
+    "actualHeight": 46.86669565217392
+  }
+]

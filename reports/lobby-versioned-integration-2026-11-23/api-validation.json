@@ -1,0 +1,599 @@
+{
+  "approved": [
+    {
+      "study": 77,
+      "type": "linear-gallery-lobby",
+      "status": 201,
+      "id": "b20f670e-bf5d-40aa-84ed-d0678d81adc7",
+      "engine": "bfce854",
+      "count": 15,
+      "triangles": 7306,
+      "volume": 4029.645447672962,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 239165,
+        "legacyFlags": 79
+      },
+      "meshHash": "f22d09de40bbb9eb7bacf6f677f64a12f6cb0fa5d99b2696c38f8e71e18a23a2",
+      "architectureExact": true,
+      "lettersExact": true,
+      "sourcesExact": true,
+      "componentsExact": true
+    },
+    {
+      "study": 66,
+      "type": "compressed-sequential-lobby",
+      "status": 201,
+      "id": "93f48dcc-f9f1-4cbc-8085-9143ce86f75e",
+      "engine": "bfce854",
+      "count": 15,
+      "triangles": 2716,
+      "volume": 1710.2780390003277,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 95094,
+        "legacyFlags": 1
+      },
+      "meshHash": "c727dc7575c7ab9f6f78abeb910f2b1bc711e98ec9536aaec2c435dc1128988b",
+      "architectureExact": true,
+      "lettersExact": true,
+      "sourcesExact": true,
+      "componentsExact": true
+    },
+    {
+      "study": 65,
+      "type": "topographic-ground-field-lobby",
+      "status": 201,
+      "id": "e1a9ad93-eee5-4852-8fc3-45f36e740963",
+      "engine": "bfce854",
+      "count": 15,
+      "triangles": 9018,
+      "volume": 15442.862043003928,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 327686,
+        "legacyFlags": 95
+      },
+      "meshHash": "fd18134511df1c3db8ed0e97b1f617195da4c544657d668c7d849aee8781cf05",
+      "architectureExact": true,
+      "lettersExact": true,
+      "sourcesExact": true,
+      "componentsExact": true
+    },
+    {
+      "study": 26,
+      "type": "vertical-void-lobby",
+      "status": 201,
+      "id": "0bf17147-9ba3-4eb6-85be-cc9b5d4bd9bb",
+      "engine": "bf7fc3c",
+      "count": 10,
+      "triangles": 4194,
+      "volume": 3277.978972051938,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 146712,
+        "legacyFlags": 7
+      },
+      "meshHash": "88c206e7e83520e4c1cdcfaa641fd5052164924138672e9eb6a2b3b34464fb24",
+      "architectureExact": true,
+      "lettersExact": true,
+      "sourcesExact": true,
+      "componentsExact": true
+    },
+    {
+      "study": 10,
+      "type": "continuous-hall-lobby",
+      "status": 201,
+      "id": "65208c7e-225e-4727-9f49-49e5ba11fc28",
+      "engine": "bf7fc3c",
+      "count": 15,
+      "triangles": 7754,
+      "volume": 2395.3970585847933,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 249274,
+        "legacyFlags": 40
+      },
+      "meshHash": "4aa62681a9bc7dc9d92c75128b98a558a62362bd3ba1a772e275d13ea3e39f23",
+      "architectureExact": true,
+      "lettersExact": true,
+      "sourcesExact": true,
+      "componentsExact": true
+    }
+  ],
+  "newDesigns": [
+    {
+      "type": "vertical-void-lobby",
+      "requested": 6,
+      "action": "Generate Design",
+      "status": 201,
+      "id": "6d00a5db-5ffa-4b42-bdbc-e0fb9a432a2b",
+      "engine": "bf7fc3c",
+      "count": 6,
+      "triangles": 2762,
+      "volume": 9552.612172613266,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 94667,
+        "legacyFlags": 37
+      },
+      "meshHash": "ba4be9f8b899641bd0eb467a8593ef4a11bcdba718f7e4c9e34870cc776e2f92",
+      "sourcePosesExact": true
+    },
+    {
+      "type": "vertical-void-lobby",
+      "requested": 7,
+      "action": "New Design",
+      "status": 201,
+      "id": "9651281f-c4a9-4adf-b8f8-239faebe3653",
+      "engine": "bf7fc3c",
+      "count": 7,
+      "triangles": 3252,
+      "volume": 13094.478236054587,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 99803,
+        "legacyFlags": 39
+      },
+      "meshHash": "2529634d193317859026808e054ad552d5b38faadaf3f77c649a71ab71f8bb36",
+      "sourcePosesExact": true
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "requested": 6,
+      "action": "Generate Design",
+      "status": 201,
+      "id": "3456896d-7e8c-4468-b818-d9401ff8bb69",
+      "engine": "bfce854",
+      "count": 6,
+      "triangles": 996,
+      "volume": 1303.8448441033504,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 40150,
+        "legacyFlags": 1
+      },
+      "meshHash": "2c5247c048401523f1e58921d50ad834b07d40ac354b3bcaf20a47baed74481d",
+      "sourcePosesExact": true
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "requested": 7,
+      "action": "New Design",
+      "status": 201,
+      "id": "0cabc668-bb29-49c1-bae1-8e6c181aa160",
+      "engine": "bfce854",
+      "count": 7,
+      "triangles": 1056,
+      "volume": 1247.0801703033587,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 37251,
+        "legacyFlags": 1
+      },
+      "meshHash": "67e4e0e76b2f464af86c2161c5edfb693461bac3e31c4dd6c239015e556d473f",
+      "sourcePosesExact": true
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "requested": 6,
+      "action": "Generate Design",
+      "status": 201,
+      "id": "e9f3658d-b522-42ae-9f96-c6c4eac96a27",
+      "engine": "bf7fc3c",
+      "count": 6,
+      "triangles": 2400,
+      "volume": 3277.77906799262,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 70588,
+        "legacyFlags": 20
+      },
+      "meshHash": "94694bba2929119743a61e0b0f992c8ec30b291d5633fc94e6ad2ebc2b9152f8",
+      "sourcePosesExact": true
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "requested": 7,
+      "action": "New Design",
+      "status": 201,
+      "id": "d61f793e-3482-4cde-9dcc-5d4257975edc",
+      "engine": "bf7fc3c",
+      "count": 7,
+      "triangles": 3196,
+      "volume": 3864.1839924558785,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 108281,
+        "legacyFlags": 36
+      },
+      "meshHash": "a6e09783944d712572a949cac9b1638736b0a9bd8372508313be6d92c0c56717",
+      "sourcePosesExact": true
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "requested": 6,
+      "action": "Generate Design",
+      "status": 201,
+      "id": "facc6256-6867-47ac-9876-3efa6ad4259c",
+      "engine": "bfce854",
+      "count": 6,
+      "triangles": 3632,
+      "volume": 10515.84461134749,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 120441,
+        "legacyFlags": 47
+      },
+      "meshHash": "2f49fb7637efed7b796e53862323e15e59a5f2699c29007f9557f8713ba0c8c6",
+      "sourcePosesExact": true
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "requested": 7,
+      "action": "New Design",
+      "status": 201,
+      "id": "cf04bf68-069e-4ec1-b33d-19398dff5437",
+      "engine": "bfce854",
+      "count": 7,
+      "triangles": 4498,
+      "volume": 9800.810652506074,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 147864,
+        "legacyFlags": 56
+      },
+      "meshHash": "4970850fbafc720b4eca02962688c8528e349bcb204c22a69c839a0c2a2eaa9c",
+      "sourcePosesExact": true
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "requested": 6,
+      "action": "Generate Design",
+      "status": 201,
+      "id": "6077b888-7323-42c2-97af-534a19690861",
+      "engine": "bfce854",
+      "count": 6,
+      "triangles": 3036,
+      "volume": 3238.95553356655,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 88808,
+        "legacyFlags": 13
+      },
+      "meshHash": "8786df3f878c57350229af95f2d65a197201d786c993d9302f655322e8d6a1da",
+      "sourcePosesExact": true
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "requested": 7,
+      "action": "New Design",
+      "status": 201,
+      "id": "50a5ce70-2b88-47ff-a205-a1d6f10e12c6",
+      "engine": "bfce854",
+      "count": 7,
+      "triangles": 3160,
+      "volume": 2576.053004618408,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 105016,
+        "legacyFlags": 19
+      },
+      "meshHash": "c20fe43b0c50db74e5c53434facbfc5f861d2e9782bf4e6a0dd2721b83e585b1",
+      "sourcePosesExact": true
+    }
+  ],
+  "regeneration": [
+    {
+      "type": "vertical-void-lobby",
+      "parent": "6d00a5db-5ffa-4b42-bdbc-e0fb9a432a2b",
+      "status": 201,
+      "id": "51d5c0f0-c71f-4ced-a2a3-574b478d4f0d",
+      "engine": "bf7fc3c",
+      "count": 6,
+      "triangles": 2762,
+      "volume": 9552.612172613266,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 94667,
+        "legacyFlags": 37
+      },
+      "meshHash": "ba4be9f8b899641bd0eb467a8593ef4a11bcdba718f7e4c9e34870cc776e2f92",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    },
+    {
+      "type": "vertical-void-lobby",
+      "parent": "9651281f-c4a9-4adf-b8f8-239faebe3653",
+      "status": 201,
+      "id": "05a6d382-aad1-4a1f-b52e-5849527a0ee3",
+      "engine": "bf7fc3c",
+      "count": 7,
+      "triangles": 3252,
+      "volume": 13094.478236054587,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 99803,
+        "legacyFlags": 39
+      },
+      "meshHash": "2529634d193317859026808e054ad552d5b38faadaf3f77c649a71ab71f8bb36",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "parent": "3456896d-7e8c-4468-b818-d9401ff8bb69",
+      "status": 201,
+      "id": "609bd5c6-09a0-4e8f-97e1-c1388b7b5155",
+      "engine": "bfce854",
+      "count": 6,
+      "triangles": 996,
+      "volume": 1303.8448441033504,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 40150,
+        "legacyFlags": 1
+      },
+      "meshHash": "2c5247c048401523f1e58921d50ad834b07d40ac354b3bcaf20a47baed74481d",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "parent": "0cabc668-bb29-49c1-bae1-8e6c181aa160",
+      "status": 201,
+      "id": "5a8b0f71-35c3-4f58-9ec4-48911005b944",
+      "engine": "bfce854",
+      "count": 7,
+      "triangles": 1056,
+      "volume": 1247.0801703033587,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 37251,
+        "legacyFlags": 1
+      },
+      "meshHash": "67e4e0e76b2f464af86c2161c5edfb693461bac3e31c4dd6c239015e556d473f",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "parent": "e9f3658d-b522-42ae-9f96-c6c4eac96a27",
+      "status": 201,
+      "id": "27351a1d-2357-406f-abdf-20b31c6f0aad",
+      "engine": "bf7fc3c",
+      "count": 6,
+      "triangles": 2400,
+      "volume": 3277.77906799262,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 70588,
+        "legacyFlags": 20
+      },
+      "meshHash": "94694bba2929119743a61e0b0f992c8ec30b291d5633fc94e6ad2ebc2b9152f8",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "parent": "d61f793e-3482-4cde-9dcc-5d4257975edc",
+      "status": 201,
+      "id": "5295aadd-2052-4391-a261-e70fd186b8a6",
+      "engine": "bf7fc3c",
+      "count": 7,
+      "triangles": 3196,
+      "volume": 3864.1839924558785,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 108281,
+        "legacyFlags": 36
+      },
+      "meshHash": "a6e09783944d712572a949cac9b1638736b0a9bd8372508313be6d92c0c56717",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "parent": "facc6256-6867-47ac-9876-3efa6ad4259c",
+      "status": 201,
+      "id": "9620d96f-d23b-4dbd-b653-4f8fccda95a9",
+      "engine": "bfce854",
+      "count": 6,
+      "triangles": 3632,
+      "volume": 10515.84461134749,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 120441,
+        "legacyFlags": 47
+      },
+      "meshHash": "2f49fb7637efed7b796e53862323e15e59a5f2699c29007f9557f8713ba0c8c6",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "parent": "cf04bf68-069e-4ec1-b33d-19398dff5437",
+      "status": 201,
+      "id": "fd8c5474-68c7-4322-90b3-5b8c464156f7",
+      "engine": "bfce854",
+      "count": 7,
+      "triangles": 4498,
+      "volume": 9800.810652506074,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 147864,
+        "legacyFlags": 56
+      },
+      "meshHash": "4970850fbafc720b4eca02962688c8528e349bcb204c22a69c839a0c2a2eaa9c",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "parent": "6077b888-7323-42c2-97af-534a19690861",
+      "status": 201,
+      "id": "aa4f6be6-3b50-4be8-bd35-04c999966410",
+      "engine": "bfce854",
+      "count": 6,
+      "triangles": 3036,
+      "volume": 3238.95553356655,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 88808,
+        "legacyFlags": 13
+      },
+      "meshHash": "8786df3f878c57350229af95f2d65a197201d786c993d9302f655322e8d6a1da",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "parent": "50a5ce70-2b88-47ff-a205-a1d6f10e12c6",
+      "status": 201,
+      "id": "164e296c-c9cc-4f31-b6bb-7304ba9ea232",
+      "engine": "bfce854",
+      "count": 7,
+      "triangles": 3160,
+      "volume": 2576.053004618408,
+      "validation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 105016,
+        "legacyFlags": 19
+      },
+      "meshHash": "c20fe43b0c50db74e5c53434facbfc5f861d2e9782bf4e6a0dd2721b83e585b1",
+      "meshExact": true,
+      "sourceExact": true,
+      "reopenExact": true
+    }
+  ],
+  "negative": [
+    {
+      "type": "vertical-void-lobby",
+      "case": "source outside field",
+      "status": 422,
+      "error": "Command failed: C:\\Program Files\\nodejs\\node.exe <project>\\vendor\\lobby-bf7fc3c\\scripts\\amphitheater-interactive-worker.cjs <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-jW9H6z\\request.json <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-jW9H6z\n(node:114560) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Letter 1 extends outside the selected field. Edit its pose or enlarge the field.\n    at <project>\\vendor\\lobby-bf7fc3c\\scripts\\source-envelope.cjs:10:202\n    at Array.map (<anonymous>)\n    at derive (<project>\\vendor\\lobby-bf7fc3c\\scripts\\source-envelope.cjs:7:34)\n    at Object.buildSource (<project>\\vendor\\lobby-bf7fc3c\\scripts\\source-envelope.cjs:33:30)\n    at <project>\\vendor\\lobby-bf7fc3c\\scripts\\amphitheater-interactive-worker.cjs:23:52\n    at Object.<anonymous> (<project>\\vendor\\lobby-bf7fc3c\\scripts\\amphitheater-interactive-worker.cjs:53:3)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n"
+    },
+    {
+      "type": "vertical-void-lobby",
+      "case": "saved revision switch",
+      "status": 422,
+      "error": "Regeneration must use the saved engine revision bf7fc3c. Create a new design to use another revision."
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "case": "source outside field",
+      "status": 422,
+      "error": "Command failed: C:\\Program Files\\nodejs\\node.exe <project>\\vendor\\lobby-bfce854\\scripts\\amphitheater-interactive-worker.cjs <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-Ktqguw\\request.json <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-Ktqguw\n(node:107652) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Letter 1 extends outside the selected field. Edit its pose or enlarge the field.\n    at <project>\\vendor\\lobby-bfce854\\scripts\\source-envelope.cjs:12:202\n    at Array.map (<anonymous>)\n    at derive (<project>\\vendor\\lobby-bfce854\\scripts\\source-envelope.cjs:7:34)\n    at Object.buildSource (<project>\\vendor\\lobby-bfce854\\scripts\\source-envelope.cjs:35:30)\n    at <project>\\vendor\\lobby-bfce854\\scripts\\amphitheater-interactive-worker.cjs:23:52\n    at Object.<anonymous> (<project>\\vendor\\lobby-bfce854\\scripts\\amphitheater-interactive-worker.cjs:53:3)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n"
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "case": "saved revision switch",
+      "status": 422,
+      "error": "Regeneration must use the saved engine revision bfce854. Create a new design to use another revision."
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "case": "source outside field",
+      "status": 422,
+      "error": "Command failed: C:\\Program Files\\nodejs\\node.exe <project>\\vendor\\lobby-bf7fc3c\\scripts\\amphitheater-interactive-worker.cjs <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-iz5DlL\\request.json <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-iz5DlL\n(node:114624) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Letter 1 extends outside the selected field. Edit its pose or enlarge the field.\n    at <project>\\vendor\\lobby-bf7fc3c\\scripts\\source-envelope.cjs:10:202\n    at Array.map (<anonymous>)\n    at derive (<project>\\vendor\\lobby-bf7fc3c\\scripts\\source-envelope.cjs:7:34)\n    at Object.buildSource (<project>\\vendor\\lobby-bf7fc3c\\scripts\\source-envelope.cjs:33:30)\n    at <project>\\vendor\\lobby-bf7fc3c\\scripts\\amphitheater-interactive-worker.cjs:23:52\n    at Object.<anonymous> (<project>\\vendor\\lobby-bf7fc3c\\scripts\\amphitheater-interactive-worker.cjs:53:3)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n"
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "case": "saved revision switch",
+      "status": 422,
+      "error": "Regeneration must use the saved engine revision bf7fc3c. Create a new design to use another revision."
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "case": "source outside field",
+      "status": 422,
+      "error": "Command failed: C:\\Program Files\\nodejs\\node.exe <project>\\vendor\\lobby-bfce854\\scripts\\amphitheater-interactive-worker.cjs <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-zEL3Aa\\request.json <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-zEL3Aa\n(node:117684) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Letter 1 extends outside the selected field. Edit its pose or enlarge the field.\n    at <project>\\vendor\\lobby-bfce854\\scripts\\source-envelope.cjs:12:202\n    at Array.map (<anonymous>)\n    at derive (<project>\\vendor\\lobby-bfce854\\scripts\\source-envelope.cjs:7:34)\n    at Object.buildSource (<project>\\vendor\\lobby-bfce854\\scripts\\source-envelope.cjs:35:30)\n    at <project>\\vendor\\lobby-bfce854\\scripts\\amphitheater-interactive-worker.cjs:23:52\n    at Object.<anonymous> (<project>\\vendor\\lobby-bfce854\\scripts\\amphitheater-interactive-worker.cjs:53:3)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n"
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "case": "saved revision switch",
+      "status": 422,
+      "error": "Regeneration must use the saved engine revision bfce854. Create a new design to use another revision."
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "case": "source outside field",
+      "status": 422,
+      "error": "Command failed: C:\\Program Files\\nodejs\\node.exe <project>\\vendor\\lobby-bfce854\\scripts\\amphitheater-interactive-worker.cjs <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-fCizcj\\request.json <local-user>\\AppData\\Local\\Temp\\luv-lobby-private-fCizcj\n(node:115092) [THREE_CJS_DEPRECATED] DeprecationWarning: `require(\"three\")` is deprecated and will be removed.\nReplace `const THREE = require(\"three\")` with `import * as THREE from \"three\"`.\n(Use `node --trace-deprecation ...` to show where the warning was created)\nError: Letter 1 extends outside the selected field. Edit its pose or enlarge the field.\n    at <project>\\vendor\\lobby-bfce854\\scripts\\source-envelope.cjs:12:202\n    at Array.map (<anonymous>)\n    at derive (<project>\\vendor\\lobby-bfce854\\scripts\\source-envelope.cjs:7:34)\n    at Object.buildSource (<project>\\vendor\\lobby-bfce854\\scripts\\source-envelope.cjs:35:30)\n    at <project>\\vendor\\lobby-bfce854\\scripts\\amphitheater-interactive-worker.cjs:23:52\n    at Object.<anonymous> (<project>\\vendor\\lobby-bfce854\\scripts\\amphitheater-interactive-worker.cjs:53:3)\n    at Module._compile (node:internal/modules/cjs/loader:1929:14)\n    at Object..js (node:internal/modules/cjs/loader:2060:10)\n    at Module.load (node:internal/modules/cjs/loader:1651:32)\n    at Module._load (node:internal/modules/cjs/loader:1443:12)\n"
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "case": "saved revision switch",
+      "status": 422,
+      "error": "Regeneration must use the saved engine revision bfce854. Create a new design to use another revision."
+    }
+  ],
+  "legacy": {
+    "parent": "3b3a0768-fbfd-4edf-a176-1d376fee84a1",
+    "status": 201,
+    "engine": "bf7fc3c",
+    "meshExact": true
+  },
+  "referenceMutationStatus": 405,
+  "newDesignVariation": [
+    {
+      "type": "vertical-void-lobby",
+      "accepted": 2,
+      "distinctHashes": 2
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "accepted": 2,
+      "distinctHashes": 2
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "accepted": 2,
+      "distinctHashes": 2
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "accepted": 2,
+      "distinctHashes": 2
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "accepted": 2,
+      "distinctHashes": 2
+    }
+  ]
+}

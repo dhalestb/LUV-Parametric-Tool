@@ -1,0 +1,100 @@
+[
+  {
+    "a": "boundary-L-1",
+    "b": "boundary-U-2",
+    "volumeFeet3": 2.307039863686627,
+    "basis": "Native wall junction ledger",
+    "authorized": true
+  },
+  {
+    "a": "boundary-L-1",
+    "b": "boundary-V-3",
+    "volumeFeet3": 3.6748441913368453,
+    "basis": "Native wall junction ledger",
+    "authorized": true
+  },
+  {
+    "a": "boundary-U-2",
+    "b": "boundary-V-3",
+    "volumeFeet3": 2.528052700004207,
+    "basis": "Native wall junction ledger",
+    "authorized": true
+  },
+  {
+    "a": "boundary-U-2",
+    "b": "plate-L-1",
+    "volumeFeet3": 0.031259580993707556,
+    "basis": "Native finished plate receiver",
+    "authorized": true
+  },
+  {
+    "a": "boundary-U-2",
+    "b": "corner-pier-L-7",
+    "volumeFeet3": 6.118511642524048,
+    "basis": "Native pier receiver contact",
+    "authorized": true
+  },
+  {
+    "a": "boundary-V-3",
+    "b": "plate-L-1",
+    "volumeFeet3": 0.07791787275371487,
+    "basis": "Native finished plate receiver",
+    "authorized": true
+  },
+  {
+    "a": "boundary-V-3",
+    "b": "corner-pier-L-7",
+    "volumeFeet3": 16.088147574424404,
+    "basis": "Native pier receiver contact",
+    "authorized": true
+  },
+  {
+    "a": "boundary-L-4",
+    "b": "boundary-U-5",
+    "volumeFeet3": 2.307085079470628,
+    "basis": "Native wall junction ledger",
+    "authorized": true
+  },
+  {
+    "a": "boundary-L-4",
+    "b": "boundary-V-6",
+    "volumeFeet3": 3.7338700674314618,
+    "basis": "Native wall junction ledger",
+    "authorized": true
+  },
+  {
+    "a": "boundary-U-5",
+    "b": "boundary-V-6",
+    "volumeFeet3": 2.5280463755880254,
+    "basis": "Native wall junction ledger",
+    "authorized": true
+  },
+  {
+    "a": "boundary-U-5",
+    "b": "plate-L-4",
+    "volumeFeet3": 0.031329638731359986,
+    "basis": "Native finished plate receiver",
+    "authorized": true
+  },
+  {
+    "a": "boundary-U-5",
+    "b": "corner-pier-L-7",
+    "volumeFeet3": 3.558175565737044,
+    "basis": "Native pier receiver contact",
+    "authorized": true
+  },
+  {
+    "a": "boundary-V-6",
+    "b": "plate-L-4",
+    "volumeFeet3": 0.06499746668516604,
+    "basis": "Native finished plate receiver",
+    "authorized": true
+  },
+  {
+    "a": "boundary-V-6",
+    "b": "corner-pier-L-7",
+    "volumeFeet3": 8.533789845564993,
+    "basis": "Native pier receiver contact",
+    "authorized": true
+  }
+]

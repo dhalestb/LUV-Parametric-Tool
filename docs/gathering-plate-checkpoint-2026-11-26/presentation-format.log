@@ -1,0 +1,4 @@
+PASS presentation contract: 22 immutable rule fixtures, fixed fonts/palette/frames, approved export presets, 300 ppi, permitted rule edits, overflow rejection and simulated template tampering. {"version":"luv-presentation-format-v1-2026-11-25","protectedFiles":444,"formatFiles":31,"preservedAssets":413}
+(node:53744) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)

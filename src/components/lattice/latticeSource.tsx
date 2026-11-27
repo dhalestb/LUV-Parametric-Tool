@@ -25,6 +25,7 @@ export type LatticeSourceOrigin = "empty" | "session" | "user" | "sample";
 
 type LatticeSourceValue = {
   hydrated: boolean;
+  geometryPersisted: boolean | null;
   origin: LatticeSourceOrigin;
   meshes: ImportedObj[];
   assignments: Record<string, string | null>;
@@ -54,6 +55,7 @@ function sampleFilename(slot: (typeof LATTICE_SLOTS)[number]) {
 }
 
 export function LatticeSourceProvider({ children }: { children: React.ReactNode }) {
+  const [geometryPersisted, setGeometryPersisted] = useState<boolean | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [origin, setOrigin] = useState<LatticeSourceOrigin>("empty");
   const [meshes, setMeshes] = useState<ImportedObj[]>([]);
@@ -80,7 +82,7 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
     if (!hydrated) return;
     const handle = window.setTimeout(() => {
       const previous = readJson<Record<string, unknown>>(LATTICE_SESSION_KEY) ?? { version: 1 };
-      writeJson(LATTICE_SESSION_KEY, {
+      const saved = writeJson(LATTICE_SESSION_KEY, {
         ...previous,
         version: 1,
         meshes: meshes.map(packMesh),
@@ -88,6 +90,7 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
         unit,
         upAxisMode,
       });
+      setGeometryPersisted(saved);
     }, 200);
     return () => window.clearTimeout(handle);
   }, [hydrated, meshes, assignments, unit, upAxisMode]);
@@ -142,6 +145,7 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
 
   const value = useMemo<LatticeSourceValue>(() => ({
     hydrated,
+    geometryPersisted,
     origin,
     meshes,
     assignments,
@@ -153,7 +157,7 @@ export function LatticeSourceProvider({ children }: { children: React.ReactNode 
     setUpAxisMode,
     importObjFiles,
     loadSampleObjs,
-  }), [hydrated, origin, meshes, assignments, unit, upAxisMode, importObjFiles, loadSampleObjs]);
+  }), [hydrated, geometryPersisted, origin, meshes, assignments, unit, upAxisMode, importObjFiles, loadSampleObjs]);
 
   return <LatticeSourceContext.Provider value={value}>{children}</LatticeSourceContext.Provider>;
 }

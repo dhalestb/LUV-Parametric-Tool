@@ -1,0 +1,8 @@
+PASS src/components: five plans/arrangements preserved; wrong typology rejected; no Open Hall fallback
+PASS src/components/architectural-forms: five plans/arrangements preserved; wrong typology rejected; no Open Hall fallback
+(node:117580) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+PASS direct-intersection placement equivalence on both routes for all five typologies
+PASS independent report IDs and byte-identical generated meshes for all five workspace typologies
+PASS Study 201 generator, checkpoint PNG/STL/result and regression hashes unchanged

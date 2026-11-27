@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "kind": "letters",
+      "vertices": 7848,
+      "faces": 2616,
+      "objects": [
+        "L-1",
+        "U-2",
+        "L-3",
+        "L-4",
+        "V-5",
+        "U-6",
+        "U-7",
+        "V-8",
+        "V-9",
+        "U-10",
+        "V-11",
+        "V-12"
+      ]
+    },
+    {
+      "kind": "form",
+      "vertices": 2949,
+      "faces": 5922,
+      "objects": [
+        "architecture"
+      ]
+    }
+  ],
+  "dpi": 300
+}

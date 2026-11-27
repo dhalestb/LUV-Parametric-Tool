@@ -1,0 +1,10 @@
+{
+  "checkedFiles": 1012,
+  "changedExistingFiles": [
+    "src/app/api/lobby-generate/route.ts",
+    "src/components/LobbyGeneratorStudio.tsx",
+    "src/components/lobbyPopulation.ts"
+  ],
+  "verifiedEngineFiles": 54,
+  "allOtherExistingFilesUnchanged": true
+}

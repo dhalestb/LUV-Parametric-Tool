@@ -1,0 +1,337 @@
+{
+  "site": {
+    "protectionMetadataComplete": true,
+    "corridors": [],
+    "reservedAreas": [],
+    "name": "Miami waterfront study",
+    "revision": "site-diagram:Miami%20waterfront%20study:v1:2026-11-22T16:55:08.819Z",
+    "fingerprint": "662e7000dd4f4982c7205c443e24fb3dc05aca1fa7a77d1e910933c9b38bb637",
+    "coordinates": {
+      "unit": "feet",
+      "unitAssumption": "confirmed",
+      "feetPerModel": 1,
+      "origin": [
+        0,
+        0,
+        0
+      ],
+      "northDeg": 0,
+      "elevationDatum": 0,
+      "rhinoZToGltfY": true,
+      "policy": "Site display is Three.js Y-up. Rhino Map-Z-to-glTF-Y is already in the file; do not swap axes again. Plan polygons store (x,z) in site feet. Lattice proto forms stay 20×20×20 ft and are not stretched to the property."
+    },
+    "origin": "file",
+    "zones": [
+      {
+        "id": "zone-1-1210",
+        "name": "Cluster Zone 1",
+        "polygon": [
+          [
+            345.70025762792903,
+            -733.4402590399076
+          ],
+          [
+            384.0654602848471,
+            -740.5075332135503
+          ],
+          [
+            409.3057251907143,
+            -703.151941152867
+          ],
+          [
+            385.0750708810818,
+            -676.9020656507653
+          ],
+          [
+            352.7675318015718,
+            -656.7098537260715
+          ],
+          [
+            335.60415166558215,
+            -697.0942775754596
+          ]
+        ],
+        "holes": [],
+        "enabled": true,
+        "areaFeet2": 3834.1479410043976,
+        "inputParameters": {
+          "id": "zone-1-1210",
+          "name": "Cluster Zone 1",
+          "kind": "zone",
+          "color": "#d6ad4f",
+          "typologies": [
+            {
+              "id": "stepped-amphitheater",
+              "weight": 100
+            }
+          ],
+          "hybridization": "integrated",
+          "enabled": true,
+          "visible": true,
+          "quantityMode": "automatic",
+          "targetCount": 4,
+          "targetCoveragePercent": 25,
+          "targetGrossFloorArea": 0,
+          "minCount": 1,
+          "maxCount": 120,
+          "density": 0.45,
+          "dispersionPercent": 55,
+          "preferredClusterCount": 3,
+          "concentrationPercent": 55,
+          "typologyDiversityPercent": 45,
+          "representAllTypologies": false,
+          "distributionMode": "balanced",
+          "maxHeightFeet": 48,
+          "occupiedLevels": 3,
+          "floorToFloorFeet": 16,
+          "gatheringFloorToFloorFeet": 20,
+          "doubleHeightFeet": 32,
+          "minSpacingFeet": 20,
+          "minEdgeClearanceFeet": 0,
+          "clusterSeparationFeet": 40,
+          "crossZoneSeparationFeet": 0,
+          "connectionToleranceFeet": 0,
+          "preferredYawDeg": 0,
+          "orientationMode": "fixed",
+          "lockPreferredYaw": false,
+          "orientationFine45": false,
+          "elevationOffsetFeet": 0,
+          "waterfrontPriority": 80,
+          "acousticPriority": 30,
+          "solarPriority": 40,
+          "protectedVoids": true,
+          "program": [
+            "public-gathering",
+            "waterfront-leisure"
+          ]
+        }
+      },
+      {
+        "id": "zone-2-1082",
+        "name": "Cluster Zone 2",
+        "polygon": [
+          [
+            325.68301407531635,
+            -747.3026767938265
+          ],
+          [
+            335.4819605230015,
+            -747.3026767938265
+          ],
+          [
+            328.4827130603693,
+            -738.903579838668
+          ]
+        ],
+        "holes": [],
+        "enabled": true,
+        "areaFeet2": 41.151150636258535,
+        "inputParameters": {
+          "id": "zone-2-1082",
+          "name": "Cluster Zone 2",
+          "kind": "zone",
+          "color": "#1293c2",
+          "typologies": [
+            {
+              "id": "stepped-amphitheater",
+              "weight": 100
+            }
+          ],
+          "hybridization": "integrated",
+          "enabled": true,
+          "visible": true,
+          "quantityMode": "automatic",
+          "targetCount": 4,
+          "targetCoveragePercent": 25,
+          "targetGrossFloorArea": 0,
+          "minCount": 1,
+          "maxCount": 120,
+          "density": 0.45,
+          "dispersionPercent": 55,
+          "preferredClusterCount": 3,
+          "concentrationPercent": 55,
+          "typologyDiversityPercent": 45,
+          "representAllTypologies": false,
+          "distributionMode": "balanced",
+          "maxHeightFeet": 48,
+          "occupiedLevels": 3,
+          "floorToFloorFeet": 16,
+          "gatheringFloorToFloorFeet": 20,
+          "doubleHeightFeet": 32,
+          "minSpacingFeet": 20,
+          "minEdgeClearanceFeet": 0,
+          "clusterSeparationFeet": 40,
+          "crossZoneSeparationFeet": 0,
+          "connectionToleranceFeet": 0,
+          "preferredYawDeg": 0,
+          "orientationMode": "fixed",
+          "lockPreferredYaw": false,
+          "orientationFine45": false,
+          "elevationOffsetFeet": 0,
+          "waterfrontPriority": 40,
+          "acousticPriority": 70,
+          "solarPriority": 40,
+          "protectedVoids": true,
+          "program": [
+            "focused-work",
+            "collaborative-work"
+          ]
+        }
+      }
+    ],
+    "exclusions": [],
+    "constraints": {
+      "waterfrontGradient": 70,
+      "viewPreservation": 70,
+      "roadNoiseBuffer": 55,
+      "heightLimitFeet": 80,
+      "officeFloorToFloor": 15.5,
+      "collaborativeFloorToFloor": 17,
+      "gatheringFloorToFloor": 20,
+      "doubleHeightFeet": 32,
+      "daytimeOccupants": 450,
+      "eveningGathering": 800,
+      "badgeHolders": 1500
+    }
+  },
+  "zoneId": "zone-1-1210",
+  "recipe": "void-field",
+  "seed": 0,
+  "rotationSeed": 189,
+  "spacing": 13,
+  "heading": 0,
+  "datum": 0.19913573563098907,
+  "fixture": true,
+  "development": {
+    "ruleBasis": "polygon-site-v1",
+    "targetBuildingCoveragePercent": null
+  },
+  "siteRulePlan": {
+    "source": {
+      "zoneId": "zone-1-1210",
+      "polygon": [
+        [
+          345.70025762792903,
+          -733.4402590399076
+        ],
+        [
+          384.0654602848471,
+          -740.5075332135503
+        ],
+        [
+          409.3057251907143,
+          -703.151941152867
+        ],
+        [
+          385.0750708810818,
+          -676.9020656507653
+        ],
+        [
+          352.7675318015718,
+          -656.7098537260715
+        ],
+        [
+          335.60415166558215,
+          -697.0942775754596
+        ]
+      ],
+      "coordinates": {
+        "unit": "feet",
+        "unitAssumption": "confirmed",
+        "feetPerModel": 1,
+        "origin": [
+          0,
+          0,
+          0
+        ],
+        "northDeg": 0,
+        "elevationDatum": 0,
+        "rhinoZToGltfY": true,
+        "policy": "Site display is Three.js Y-up. Rhino Map-Z-to-glTF-Y is already in the file; do not swap axes again. Plan polygons store (x,z) in site feet. Lattice proto forms stay 20×20×20 ft and are not stretched to the property."
+      }
+    },
+    "regions": [
+      {
+        "id": "user-requested-miami-zone1-60ft-envelope",
+        "role": "street",
+        "heightFeet": 60,
+        "polygon": [
+          [
+            345.70025762792903,
+            -733.4402590399076
+          ],
+          [
+            384.0654602848471,
+            -740.5075332135503
+          ],
+          [
+            409.3057251907143,
+            -703.151941152867
+          ],
+          [
+            385.0750708810818,
+            -676.9020656507653
+          ],
+          [
+            352.7675318015718,
+            -656.7098537260715
+          ],
+          [
+            335.60415166558215,
+            -697.0942775754596
+          ]
+        ]
+      }
+    ],
+    "note": "Explicit user-requested 60-ft experimental envelope. Street is the existing schema label for the 60-ft tier, not an inferred frontage classification.",
+    "savedAt": "2026-11-22T18:06:01.053Z"
+  },
+  "adaptive": {
+    "typologyId": "void-field",
+    "allocationPercent": 100,
+    "coveragePercent": 40,
+    "heightFeet": 60,
+    "setbackFeet": 0,
+    "descriptorDistribution": false,
+    "descriptorSpatialTargeting": false
+  },
+  "reserved": [],
+  "voidField": {
+    "setbackFeet": 0,
+    "organizingField": {
+      "id": "void-independent-six-sided-field",
+      "kind": "polygon",
+      "boundary": [
+        [
+          406.76178272,
+          -703.34463782
+        ],
+        [
+          383.78749475,
+          -678.45582585
+        ],
+        [
+          353.69258534,
+          -659.6465074600001
+        ],
+        [
+          337.71837833,
+          -697.2328769000001
+        ],
+        [
+          347.29255899000003,
+          -731.69992727
+        ],
+        [
+          383.14088511,
+          -738.30356629
+        ]
+      ],
+      "anchor": [
+        368.7644907968193,
+        -702.6025709514979
+      ],
+      "derivation": "Existing explicit six-sided 2-ft-inset study field; does not prescribe final footprint."
+    }
+  }
+}

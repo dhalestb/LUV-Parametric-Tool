@@ -1,0 +1,197 @@
+{
+  "studyNumber": 26,
+  "name": "Vertical Final",
+  "typologyId": "vertical-void-lobby",
+  "lobbyStudyId": "6dafc1cb-4b29-49ae-92b5-42c702d07af4",
+  "architectureStudyId": "54376fdf-c5f2-4480-a34f-fd1a4eecf5c0",
+  "created": "2026-11-17T19:21:50.645Z",
+  "fieldFeet": {
+    "width": 40,
+    "depth": 40,
+    "height": 40
+  },
+  "preferredFeet": 13,
+  "population": 10,
+  "sourceCount": 10,
+  "links": [],
+  "parameters": {
+    "proof": "lobby",
+    "typologyName": "Vertical Void Lobby",
+    "generator": "source-preserving",
+    "organization": "proximity",
+    "articulationElevation": "feature",
+    "articulation": 0.75,
+    "field": {
+      "width": 40,
+      "depth": 40,
+      "height": 40
+    },
+    "preferredFeet": 13,
+    "population": 10,
+    "sourceId": "ef4942b4-7d25-4d17-8941-7babec1328be",
+    "sourceName": "Vertical Void Lobby · 10 letters"
+  },
+  "generationSeed": null,
+  "ruleVariant": null,
+  "displayModes": {
+    "A": "Original letters",
+    "B": "Letters + architecture",
+    "C": "Architecture only"
+  },
+  "sourceMatchesArchitectureRequest": true,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 146712,
+    "legacyFlags": 7
+  },
+  "volume": 3277.978972051938,
+  "bounds": {
+    "min": [
+      -6.009787559509277,
+      -6.595719337463379,
+      1
+    ],
+    "max": [
+      6.009787559509277,
+      5.560997486114502,
+      39
+    ]
+  },
+  "warnings": [
+    "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review."
+  ],
+  "letters": [
+    {
+      "letter": "L",
+      "x": 0,
+      "y": 0,
+      "z": -17.572239545592627,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 6.11086360837423,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 0,
+      "y": 0,
+      "z": -14.945998415539687,
+      "rx": 0,
+      "ry": 90,
+      "rz": 15,
+      "scale": 4.364902577410165,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "V",
+      "x": 0,
+      "y": 0,
+      "z": -11.11757335937733,
+      "rx": 45,
+      "ry": 0,
+      "rz": 30,
+      "scale": 3.2736769330576236,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 0,
+      "y": 0,
+      "z": -5.793002237637442,
+      "rx": 0,
+      "ry": 90,
+      "rz": 45,
+      "scale": 6.11086360837423,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 0,
+      "y": 0,
+      "z": -0.22146735690775715,
+      "rx": 0,
+      "ry": 90,
+      "rz": 0,
+      "scale": 4.364902577410165,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "V",
+      "x": 0,
+      "y": 0,
+      "z": 1.733505387362758,
+      "rx": 0,
+      "ry": 0,
+      "rz": 15,
+      "scale": 3.2736769330576236,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 0,
+      "y": 0,
+      "z": 5.492698828684758,
+      "rx": 0,
+      "ry": 90,
+      "rz": 30,
+      "scale": 6.11086360837423,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 0,
+      "y": 0,
+      "z": 11.81598085378119,
+      "rx": 0,
+      "ry": 90,
+      "rz": 45,
+      "scale": 4.364902577410165,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "V",
+      "x": 0,
+      "y": 0,
+      "z": 15.876852957515268,
+      "rx": 60,
+      "ry": 0,
+      "rz": 0,
+      "scale": 3.2736769330576236,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 0,
+      "y": 0,
+      "z": 17.572239545592627,
+      "rx": 0,
+      "ry": 0,
+      "rz": 15,
+      "scale": 6.11086360837423,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    }
+  ],
+  "screenshot": "reference-isometric.png"
+}

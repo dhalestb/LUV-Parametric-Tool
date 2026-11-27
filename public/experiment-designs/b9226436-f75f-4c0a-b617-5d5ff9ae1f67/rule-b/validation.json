@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "broadPhaseFlags": 22,
+  "preciseMethod": "all nonadjacent BVH pairs tested with independent segment/triangle crossings and coplanar polygon clipping; original preflight retained separately",
+  "exports": [
+    {
+      "file": "combined-envelope.obj",
+      "status": "NoError",
+      "volume": 5486.17333798468,
+      "vertices": 9685,
+      "triangles": 19418
+    },
+    {
+      "file": "suspended-room-and-landing.obj",
+      "status": "NoError",
+      "volume": 376.985128950672,
+      "vertices": 210,
+      "triangles": 416
+    },
+    {
+      "file": "perimeter-and-floor.obj",
+      "status": "NoError",
+      "volume": 4836.709689612001,
+      "vertices": 24523,
+      "triangles": 49042
+    },
+    {
+      "file": "open-top-planks.obj",
+      "status": "NoError",
+      "volume": 302.84323685008786,
+      "vertices": 539,
+      "triangles": 1074
+    }
+  ],
+  "coplanarAreas": [],
+  "nonAdjacentTriangleChecks": 687077,
+  "selfIntersectionPairs": 0,
+  "coplanar": 0,
+  "nonCoplanar": 0,
+  "examples": [],
+  "shellVolumes": [
+    5486.173337452445
+  ]
+}

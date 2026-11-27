@@ -1,0 +1,43 @@
+{
+  "preview": "http://127.0.0.1:3015/amphitheater",
+  "proxyTarget": "http://127.0.0.1:3014",
+  "boards": [
+    {
+      "file": "compressed-sequential-lobby-4096px.png",
+      "status": 200,
+      "width": 4096,
+      "height": 5156,
+      "hashExact": true
+    },
+    {
+      "file": "continuous-hall-lobby-4096px.png",
+      "status": 200,
+      "width": 4096,
+      "height": 5156,
+      "hashExact": true
+    },
+    {
+      "file": "linear-gallery-lobby-4096px.png",
+      "status": 200,
+      "width": 4096,
+      "height": 5156,
+      "hashExact": true
+    },
+    {
+      "file": "topographic-ground-field-lobby-4096px.png",
+      "status": 200,
+      "width": 4096,
+      "height": 5156,
+      "hashExact": true
+    },
+    {
+      "file": "vertical-void-lobby-4096px.png",
+      "status": 200,
+      "width": 4096,
+      "height": 5156,
+      "hashExact": true
+    }
+  ],
+  "reviewPageStatus": 200,
+  "previewPageStatus": 200
+}

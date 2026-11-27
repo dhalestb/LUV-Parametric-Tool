@@ -1,0 +1,22 @@
+import {fingerprint,importSite,type SiteInput,type Assignment} from './model';
+import type {Controls,Result} from './territories';
+export const ALTERNATIVES_KEY='luv-experiment-polygon-alternatives-v1';
+export const VIEW_KEY='luv-experiment-polygon-view-v1';
+export type Alternative={id:string;name:string;createdAt:string;publishedAt:string|null;kind:'territory-2d';site:SiteInput;zoneId:string;assignment:Assignment;controls:Controls;result:Result;revision:string};
+export type Library={designs?:DesignReference[];activeDesignId?:string;version:1;items:Alternative[];visible:boolean;active:Record<string,string>;compare:boolean;showOriginal:boolean};
+export const emptyLibrary=():Library=>({version:1,items:[],visible:false,active:{},compare:false,showOriginal:true});
+export function readLibrary():Library{const raw=localStorage.getItem(ALTERNATIVES_KEY);if(!raw)return emptyLibrary();const data=JSON.parse(raw);if(data.version!==1||!Array.isArray(data.items))throw Error('Unsupported alternative library; original record retained.');return data;}
+export function writeLibrary(change:(old:Library)=>Library){const next=change(readLibrary());localStorage.setItem(ALTERNATIVES_KEY,JSON.stringify(next));window.dispatchEvent(new Event('polygon-alternatives'));return next;}
+export async function sessionSite(){const raw=localStorage.getItem('vul-site-development-v1');if(!raw)throw Error('No Site Development session on this origin. Open the copied Site tab or import an exported Site JSON. Other ports have separate storage.');return importSite(raw,'file');}
+export async function saveAlternative(name:string,site:SiteInput,zoneId:string,assignment:Assignment,controls:Controls,result:Result){if(!result.metrics.valid)throw Error('Only geometrically valid results can be saved.');const revision=await fingerprint({source:result.source,signature:result.signature,geometry:result.territories.map(t=>t.contours)});const existing=readLibrary().items.find(a=>a.revision===revision);if(existing)return existing;const item:Alternative=structuredClone({id:crypto.randomUUID(),name,createdAt:new Date().toISOString(),publishedAt:null,kind:'territory-2d',site,zoneId,assignment,controls,result,revision});writeLibrary(old=>({...old,items:[...old.items,item]}));return item;}
+export function publish(id:string){return writeLibrary(old=>{const item=old.items.find(a=>a.id===id);if(!item)throw Error('Select a saved alternative first.');return {...old,items:old.items.map(a=>a.id===id?{...a,publishedAt:a.publishedAt??new Date().toISOString()}:a)};});}
+
+export type DesignReference={id:string;name:string;createdAt:string;publishedAt:string|null;status:'complete'|'rule-a-only';site:SiteInput;zoneId:string;orientationHash:string;architectureId?:string;architectureUrl?:string;coveragePercent?:number;error?:string};
+type DesignResponse={status:'complete'|'rule-a-only';orientation:import('./orientationStore').OrientationResult;architecture?:{id:string;url:string;measurements:{buildingCoveragePercent:number}};error?:{message:string}};
+function designReference(response:DesignResponse){const a=response.orientation;const item:DesignReference={id:a.id,name:(a.typologyName??'Linear Edge')+' '+a.components.length+' letters · seed '+a.parameters.seed+' · '+a.id.slice(0,8),createdAt:new Date().toISOString(),publishedAt:null,status:response.status,site:a.site,zoneId:a.zoneId,orientationHash:a.geometryHash,architectureId:response.architecture?.id,architectureUrl:response.architecture?.url,coveragePercent:response.architecture?.measurements.buildingCoveragePercent,error:response.error?.message};return item;}
+export function saveDesignReferences(responses:DesignResponse[]){
+  const items=responses.map(designReference),ids=new Set(items.map(item=>item.id));
+  return writeLibrary(old=>({...old,designs:[...(old.designs??[]).filter(d=>!ids.has(d.id)),...items]}));
+}
+export function saveDesignReference(response:DesignResponse){return saveDesignReferences([response]);}
+export function publishDesign(id:string){return writeLibrary(old=>{const item=old.designs?.find(d=>d.id===id);if(!item||item.status!=='complete')throw Error('Only a complete validated architectural design can be published.');return {...old,designs:old.designs!.map(d=>d.id===id?{...d,publishedAt:d.publishedAt??new Date().toISOString()}:d)};});}

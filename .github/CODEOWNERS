@@ -1,1 +1,13 @@
 * @dhalestb
+
+# Presentation format and its enforcement require owner review.
+/src/components/presentation/formatContract.ts @dhalestb
+/src/components/presentation/formatGuards.ts @dhalestb
+/src/components/presentation/adaptedPresentation.ts @dhalestb
+/src/components/presentation/approved/ @dhalestb
+/src/components/presentation/verificationBaseline/ @dhalestb
+/src/components/presentation/rules.ts @dhalestb
+/src/components/presentationExportSizing.ts @dhalestb
+/presentation-format-lock.json @dhalestb
+/scripts/presentation-format-*.cjs @dhalestb
+/.github/ @dhalestb

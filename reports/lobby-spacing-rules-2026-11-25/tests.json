@@ -1,0 +1,423 @@
+{
+  "approved": [
+    {
+      "study": 77,
+      "engine": "bfce854",
+      "geometryExact": true,
+      "lettersExact": true,
+      "sourcePosesExact": true,
+      "componentsExact": true
+    },
+    {
+      "study": 66,
+      "engine": "bfce854",
+      "geometryExact": true,
+      "lettersExact": true,
+      "sourcePosesExact": true,
+      "componentsExact": true
+    },
+    {
+      "study": 65,
+      "engine": "bfce854",
+      "geometryExact": true,
+      "lettersExact": true,
+      "sourcePosesExact": true,
+      "componentsExact": true
+    },
+    {
+      "study": 26,
+      "engine": "bf7fc3c",
+      "geometryExact": true,
+      "lettersExact": true,
+      "sourcePosesExact": true,
+      "componentsExact": true
+    },
+    {
+      "study": 10,
+      "engine": "bf7fc3c",
+      "geometryExact": true,
+      "lettersExact": true,
+      "sourcePosesExact": true,
+      "componentsExact": true
+    }
+  ],
+  "newDesigns": [
+    {
+      "type": "continuous-hall-lobby",
+      "id": "a7a2bcd4-c33e-4401-893b-871c482ee58a",
+      "preferred": 9,
+      "count": 8,
+      "field": {
+        "width": 40,
+        "depth": 20,
+        "height": 20
+      },
+      "engine": "bf7fc3c",
+      "spacingRuleRevision": "lobby-spacing-2026-11-25",
+      "sourcePosesExact": true,
+      "reopenExact": true,
+      "sourceSpacingPassed": true,
+      "nativeValidation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 79796,
+        "legacyFlags": 23
+      },
+      "connectedSolids": 1,
+      "insideField": true,
+      "meshSHA256": "7da6791a2208c07580031a7269571539318a34791e94f5c27e5a648b78b348ac",
+      "pairs": [
+        {
+          "from": "U-1",
+          "to": "L-2",
+          "gapFt": -0.40499999999999936,
+          "centerFt": 3.645000060349704
+        },
+        {
+          "from": "L-2",
+          "to": "V-3",
+          "gapFt": -0.4049999999999998,
+          "centerFt": 0.7290000048279777
+        },
+        {
+          "from": "V-3",
+          "to": "U-4",
+          "gapFt": -0.4049999999999998,
+          "centerFt": 0.7290000048279769
+        },
+        {
+          "from": "U-4",
+          "to": "L-5",
+          "gapFt": -0.4050000000000003,
+          "centerFt": 0.7290000048279769
+        },
+        {
+          "from": "L-5",
+          "to": "V-6",
+          "gapFt": -0.40500000000000014,
+          "centerFt": 0.7290000048279778
+        },
+        {
+          "from": "V-6",
+          "to": "U-7",
+          "gapFt": -0.4049999999999989,
+          "centerFt": 0.7290000048279784
+        },
+        {
+          "from": "U-7",
+          "to": "L-8",
+          "gapFt": -0.40500000000000025,
+          "centerFt": 3.8880000700056563
+        }
+      ]
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "id": "4e059cc8-eb9c-41bd-8690-f5506a53ebc1",
+      "preferred": 13,
+      "count": 8,
+      "field": {
+        "width": 20,
+        "depth": 20,
+        "height": 20
+      },
+      "engine": "bf7fc3c",
+      "spacingRuleRevision": "lobby-spacing-2026-11-25",
+      "sourcePosesExact": true,
+      "reopenExact": true,
+      "sourceSpacingPassed": true,
+      "nativeValidation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 80637,
+        "legacyFlags": 72
+      },
+      "connectedSolids": 1,
+      "insideField": true,
+      "meshSHA256": "39ae37d06d9000928a7733574f9ca71eea47c9c6d583fc261cf38c55e3422f1d",
+      "pairs": [
+        {
+          "from": "U-1",
+          "to": "L-2",
+          "gapFt": -0.40500000000000025,
+          "centerFt": 3.3801827901100827
+        },
+        {
+          "from": "L-2",
+          "to": "V-3",
+          "gapFt": -0.405,
+          "centerFt": 0.654851169950101
+        },
+        {
+          "from": "V-3",
+          "to": "U-4",
+          "gapFt": -0.4049999999999999,
+          "centerFt": 0.6548511699501003
+        },
+        {
+          "from": "U-4",
+          "to": "L-5",
+          "gapFt": -0.405,
+          "centerFt": 0.6548511699501005
+        },
+        {
+          "from": "L-5",
+          "to": "V-6",
+          "gapFt": -0.405,
+          "centerFt": 0.6548511699501013
+        },
+        {
+          "from": "V-6",
+          "to": "U-7",
+          "gapFt": -0.4049999999999999,
+          "centerFt": 0.6548511699501006
+        },
+        {
+          "from": "U-7",
+          "to": "L-8",
+          "gapFt": -0.40500000000000025,
+          "centerFt": 3.60729376315705
+        }
+      ]
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "id": "d1ea7e12-722a-46e3-8d9e-962f15faf53c",
+      "preferred": 13,
+      "count": 8,
+      "field": {
+        "width": 40,
+        "depth": 20,
+        "height": 20
+      },
+      "engine": "bfce854",
+      "spacingRuleRevision": "lobby-spacing-2026-11-25",
+      "sourcePosesExact": true,
+      "reopenExact": true,
+      "sourceSpacingPassed": true,
+      "nativeValidation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 143003,
+        "legacyFlags": 122
+      },
+      "connectedSolids": 1,
+      "insideField": true,
+      "meshSHA256": "280d7f29804c265cb6f8dec99e0364d8aa8814830d60c4d80d90f6bdbcce6f96",
+      "pairs": [
+        {
+          "from": "L-1",
+          "to": "U-2",
+          "gapFt": -0.7469999999999981,
+          "centerFt": 3.287493606070253
+        },
+        {
+          "from": "U-2",
+          "to": "L-3",
+          "gapFt": 1.0130000000000017,
+          "centerFt": 5.047493606070254
+        },
+        {
+          "from": "L-3",
+          "to": "U-4",
+          "gapFt": -0.7469999999999999,
+          "centerFt": 3.2874936060702526
+        },
+        {
+          "from": "U-4",
+          "to": "L-5",
+          "gapFt": 1.013,
+          "centerFt": 5.047493606070253
+        },
+        {
+          "from": "L-5",
+          "to": "U-6",
+          "gapFt": -0.7469999999999999,
+          "centerFt": 3.287493606070252
+        },
+        {
+          "from": "U-6",
+          "to": "L-7",
+          "gapFt": 1.0130000000000017,
+          "centerFt": 5.047493606070254
+        },
+        {
+          "from": "L-7",
+          "to": "U-8",
+          "gapFt": -0.7469999999999999,
+          "centerFt": 3.2874936060702513
+        }
+      ]
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "id": "571ca60f-21a1-4c33-ab67-5475c2e602cf",
+      "preferred": 9,
+      "count": 6,
+      "field": {
+        "width": 60,
+        "depth": 20,
+        "height": 20
+      },
+      "engine": "bfce854",
+      "spacingRuleRevision": "lobby-spacing-2026-11-25",
+      "sourcePosesExact": true,
+      "reopenExact": true,
+      "sourceSpacingPassed": true,
+      "nativeValidation": {
+        "passed": true,
+        "selfIntersectionPairs": 0,
+        "nonAdjacentTriangleChecks": 102909,
+        "legacyFlags": 26
+      },
+      "connectedSolids": 1,
+      "insideField": true,
+      "meshSHA256": "656975ec00ae58bda36438ffc64016732c46dacafbd47d37c724706347981f18",
+      "pairs": [
+        {
+          "from": "L-1",
+          "to": "U-2",
+          "gapFt": -0.7470000000000017,
+          "centerFt": 7.018517244635062
+        },
+        {
+          "from": "U-2",
+          "to": "L-3",
+          "gapFt": 1.0129999999999981,
+          "centerFt": 8.778517244635061
+        },
+        {
+          "from": "L-3",
+          "to": "U-4",
+          "gapFt": -0.7469999999999999,
+          "centerFt": 7.0185172446350625
+        },
+        {
+          "from": "U-4",
+          "to": "L-5",
+          "gapFt": 1.013,
+          "centerFt": 8.778517244635061
+        },
+        {
+          "from": "L-5",
+          "to": "U-6",
+          "gapFt": -0.7469999999999999,
+          "centerFt": 7.018517244635062
+        }
+      ]
+    }
+  ],
+  "regeneration": [
+    {
+      "parent": "a7a2bcd4-c33e-4401-893b-871c482ee58a",
+      "id": "08d5d255-6735-4ad2-b872-e06a3ed8a907",
+      "engineAndSpacingRetained": true,
+      "geometryExact": true,
+      "sourceExact": true
+    },
+    {
+      "parent": "4e059cc8-eb9c-41bd-8690-f5506a53ebc1",
+      "id": "ce9ac8d8-a202-494d-b737-6fb60035b003",
+      "engineAndSpacingRetained": true,
+      "geometryExact": true,
+      "sourceExact": true
+    },
+    {
+      "parent": "d1ea7e12-722a-46e3-8d9e-962f15faf53c",
+      "id": "c04a2522-ce69-4c7c-9878-83a5eb3ffe5e",
+      "engineAndSpacingRetained": true,
+      "geometryExact": true,
+      "sourceExact": true
+    },
+    {
+      "parent": "571ca60f-21a1-4c33-ab67-5475c2e602cf",
+      "id": "fe97303d-e0f8-40bc-9d5c-d5dc5fd80bba",
+      "engineAndSpacingRetained": true,
+      "geometryExact": true,
+      "sourceExact": true
+    },
+    {
+      "parent": "12eb8d26-78e1-45b9-a0de-75a8c221f696",
+      "id": "e07823ce-cce8-4691-b3c7-2c15736d6940",
+      "legacy": true,
+      "geometryExact": true,
+      "sourceExact": true,
+      "spacingNotRetagged": true
+    },
+    {
+      "parent": "aa686595-c222-4a55-b705-f2ab41697f7d",
+      "id": "0384e083-1b03-4f1a-90eb-ae8f0b630500",
+      "legacy": true,
+      "geometryExact": true,
+      "sourceExact": true,
+      "spacingNotRetagged": true
+    },
+    {
+      "parent": "a7a2bcd4-c33e-4401-893b-871c482ee58a",
+      "id": "433d9299-a217-4298-8205-8ca6db5e43d6",
+      "editedPosesExact": true,
+      "nativeGeometryPassed": true,
+      "spacingDepartureReported": true
+    },
+    {
+      "parent": "433d9299-a217-4298-8205-8ca6db5e43d6",
+      "id": "1f11184a-3a11-427e-900c-9c86f31d9305",
+      "editedModeRetained": true,
+      "geometryExact": true
+    }
+  ],
+  "negative": [
+    {
+      "case": "Too-small letters reject an impossible fixed overlap",
+      "passed": true
+    },
+    {
+      "case": "Dense arrangement rejected without shrinking gaps",
+      "passed": true
+    },
+    {
+      "case": "Invalid fixed spacing",
+      "status": 422,
+      "error": "Fixed Lobby spacing failed for U-1 / L-2: measured signed X gap -0.305000 ft; expected -0.405 ft."
+    },
+    {
+      "case": "Unknown spacing revision",
+      "status": 422,
+      "error": "Unknown saved Lobby spacing revision. The study was not changed."
+    },
+    {
+      "case": "Legacy regeneration refuses spacing-version switch",
+      "parent": "12eb8d26-78e1-45b9-a0de-75a8c221f696",
+      "status": 422
+    },
+    {
+      "case": "Legacy regeneration refuses spacing-version switch",
+      "parent": "aa686595-c222-4a55-b705-f2ab41697f7d",
+      "status": 422
+    }
+  ],
+  "otherTypologies": [
+    {
+      "type": "vertical-void-lobby",
+      "originalPlacementExact": true
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "originalPlacementExact": true
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "originalPlacementExact": true
+    }
+  ],
+  "preservation": {
+    "checkedFiles": 1012,
+    "changedFiles": [
+      "src/app/api/lobby-generate/route.ts",
+      "src/components/LobbyGeneratorStudio.tsx",
+      "src/components/lobbyPopulation.ts"
+    ],
+    "existingSavedStudiesAndBoardsUnchanged": true,
+    "verifiedEnginePackagesUnchanged": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "normalizedRenderingOperationsSHA256": "f2054d4b4cddf20718aae6b5d8879e8b0ba6dc658a4a92bcd7ed62d07878cb6d",
+  "helpersUnchanged": [
+    "plateJunctionPresentation.ts",
+    "linearGalleryInteriorMaterial.ts",
+    "linearGalleryPresentationPanel.ts",
+    "voidFieldBoardJoint.ts",
+    "amphitheaterInteractiveTypes.ts"
+  ],
+  "colorsUnchanged": true,
+  "pngDensityDefaultUnchanged": true,
+  "note": "Behavioral/source equivalence; strict GPU pixel comparison is reported independently with no tolerance."
+}

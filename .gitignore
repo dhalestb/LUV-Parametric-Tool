@@ -35,7 +35,8 @@ build-output.log
 /exports/
 
 # local session checkpoints
-/checkpoints/
+/checkpoints/*
+!/checkpoints/stepped-amphitheater-restored-terraces-2026-11-18/
 
 # env files
 .env*
@@ -46,3 +47,7 @@ next-env.d.ts
 
 # Generated descriptor calibration snapshots
 reports/descriptor-calibration/*.json
+
+# Isolated Next.js preview outputs and local publication checks
+/.next*/
+/reports/lobby-publication-check/

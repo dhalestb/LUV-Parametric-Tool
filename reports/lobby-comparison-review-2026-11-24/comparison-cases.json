@@ -1,0 +1,82 @@
+[
+  {
+    "id": "vertical-void-lobby",
+    "name": "Vertical Void Lobby",
+    "referenceStudy": 26,
+    "engine": "bf7fc3c",
+    "count": 10,
+    "field": {
+      "width": 40,
+      "depth": 40,
+      "height": 40
+    },
+    "derivedId": "0bf17147-9ba3-4eb6-85be-cc9b5d4bd9bb",
+    "alternativeId": "9651281f-c4a9-4adf-b8f8-239faebe3653",
+    "exact": true,
+    "meshHash": "88c206e7e83520e4c1cdcfaa641fd5052164924138672e9eb6a2b3b34464fb24"
+  },
+  {
+    "id": "compressed-sequential-lobby",
+    "name": "Compressed Sequential Lobby",
+    "referenceStudy": 66,
+    "engine": "bfce854",
+    "count": 15,
+    "field": {
+      "width": 60,
+      "depth": 20,
+      "height": 20
+    },
+    "derivedId": "93f48dcc-f9f1-4cbc-8085-9143ce86f75e",
+    "alternativeId": "0cabc668-bb29-49c1-bae1-8e6c181aa160",
+    "exact": true,
+    "meshHash": "c727dc7575c7ab9f6f78abeb910f2b1bc711e98ec9536aaec2c435dc1128988b"
+  },
+  {
+    "id": "continuous-hall-lobby",
+    "name": "Continuous Hall Lobby",
+    "referenceStudy": 10,
+    "engine": "bf7fc3c",
+    "count": 15,
+    "field": {
+      "width": 40,
+      "depth": 20,
+      "height": 20
+    },
+    "derivedId": "65208c7e-225e-4727-9f49-49e5ba11fc28",
+    "alternativeId": "d61f793e-3482-4cde-9dcc-5d4257975edc",
+    "exact": true,
+    "meshHash": "4aa62681a9bc7dc9d92c75128b98a558a62362bd3ba1a772e275d13ea3e39f23"
+  },
+  {
+    "id": "topographic-ground-field-lobby",
+    "name": "Topographic Lobby",
+    "referenceStudy": 65,
+    "engine": "bfce854",
+    "count": 15,
+    "field": {
+      "width": 60,
+      "depth": 60,
+      "height": 60
+    },
+    "derivedId": "e1a9ad93-eee5-4852-8fc3-45f36e740963",
+    "alternativeId": "cf04bf68-069e-4ec1-b33d-19398dff5437",
+    "exact": true,
+    "meshHash": "fd18134511df1c3db8ed0e97b1f617195da4c544657d668c7d849aee8781cf05"
+  },
+  {
+    "id": "linear-gallery-lobby",
+    "name": "Linear Gallery Lobby",
+    "referenceStudy": 77,
+    "engine": "bfce854",
+    "count": 15,
+    "field": {
+      "width": 40,
+      "depth": 20,
+      "height": 20
+    },
+    "derivedId": "b20f670e-bf5d-40aa-84ed-d0678d81adc7",
+    "alternativeId": "50a5ce70-2b88-47ff-a205-a1d6f10e12c6",
+    "exact": true,
+    "meshHash": "f22d09de40bbb9eb7bacf6f677f64a12f6cb0fa5d99b2696c38f8e71e18a23a2"
+  }
+]

@@ -1,0 +1,151 @@
+{
+  "packagePath": "..\\reports\\lobby-engine-handoff-2026-11-23\\developer-working-package",
+  "compatibilityBasis": "Developer confirms the supplied ZIP driver/glyph and unchanged helper/worker versions match this Nov 19 working engine; no historical Nov 18 engine is claimed.",
+  "files": [
+    {
+      "file": "src/components/lobbyProof.ts",
+      "origin": "previously verified final export ZIP; developer confirms matching working-copy source",
+      "sha256": "5bd022de048e48cfd0854bd5423364687fa1704bf4f93c1f836601a18b3e1b19",
+      "gitBlob": "99202f3e1bf178b31095dba17da79715fcffb3b1",
+      "normalizedGitBlob": "ddd8a52ce4b7f406d388091bea988d1c444f79c8"
+    },
+    {
+      "file": "src/components/amphitheaterInteractiveTypes.ts",
+      "origin": "bf7fc3c",
+      "sha256": "ea6d4fbb31b621c76c34a3ec988904f9ec64968dd64a88c1a0aff793172df424"
+    },
+    {
+      "file": "src/components/letterGeometry3d.ts",
+      "origin": "previously verified final export ZIP; developer confirms matching working-copy source",
+      "sha256": "2b62ed40f2d26d0106996e4c457abfb67bbe34a314d6610f16b9b3cf0a509ec8",
+      "gitBlob": "0cc2e66da2b511327779034854b85a2a6afaec86",
+      "normalizedGitBlob": "76a30ef3154b87189d90483550752b14d90c8f15"
+    },
+    {
+      "file": "src/components/letterTypes.ts",
+      "origin": "bf7fc3c",
+      "sha256": "78f422564e6565866281287c11553bf11efa266b943c038f7dd728ba40c5acec"
+    },
+    {
+      "file": "scripts/amphitheater-interactive-worker.cjs",
+      "origin": "previously verified final export ZIP; developer confirms matching working-copy source",
+      "sha256": "46c3b16b75e3e7125345ecf18d405a91ec7cac6e1c289a37bf1551e6bd931303",
+      "gitBlob": "56e8fcaf814cdc18b4216538f50252acb96c49cf",
+      "normalizedGitBlob": "02ec24cbd98b56b00d014793137d5a37d247bd1f"
+    },
+    {
+      "file": "proof/rule-amphitheater.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "ad74b8fcb8a4163a40f5ecfb067282e8ea17562a2e891cf7cb5b8dbba6a3dcb5"
+    },
+    {
+      "file": "proof/render.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "030b40d2561a4e854b9bdade51bdb9786012b3742afaab032286a9834b33c2dc"
+    },
+    {
+      "file": "proof/field-config.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "b125eddfcee1795bdae1b94d7886637a7498b645bb28e3c24cbbec25ab651efb"
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "origin": "bf7fc3c",
+      "sha256": "3186759e3bd0b38583e8710d6ce0d0717ea8010cc8406fa7b074ec213e67ebf6"
+    },
+    {
+      "file": "src/components/letterVolumeLayout.ts",
+      "origin": "bf7fc3c",
+      "sha256": "c290654559825224fc16f7242f5c6bfe4c6cfa18cadad2501fd9058f63022316"
+    },
+    {
+      "file": "src/components/optimizerTypes.ts",
+      "origin": "bf7fc3c",
+      "sha256": "b81e8acae1872524b3cd2220b35a47475b7f4c5c39cff48c946bab1ecdd9b999"
+    },
+    {
+      "file": "src/components/compositionEngine.ts",
+      "origin": "bf7fc3c",
+      "sha256": "5641f5867edfe4b90a86855fe64087e6da3424eea85861308edc69852bf83545"
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "origin": "bf7fc3c",
+      "sha256": "393968da1b1ab146906f726a92a148cf43380d4202183e17310fc4f178da76e9"
+    },
+    {
+      "file": "src/components/constraintValidation.ts",
+      "origin": "bf7fc3c",
+      "sha256": "5a588ae8a966a3a7ce06fd1da3feb728eedddcfbec70a3ca9c2bdf01caf517ce"
+    },
+    {
+      "file": "scripts/source-envelope.cjs",
+      "origin": "previously verified final export ZIP; developer confirms matching working-copy source",
+      "sha256": "d342cfc76068a2df1ee17350d3f6194728b25b33dfb5fc0257fb542954a2faa6",
+      "gitBlob": "5b71a98acf630ffcb00d7575d2cb4c777f9ca665",
+      "normalizedGitBlob": "a11fa0cdc31fad0e6cdac7fab764570f2200ef84"
+    },
+    {
+      "file": "scripts/source-profile-envelope.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "0480da3ce7019950b79f536d067212704684fe70444b0b255183cf84449dde72"
+    },
+    {
+      "file": "scripts/source-lobby-envelope.cjs",
+      "origin": "exact developer handoff aec2db5",
+      "sha256": "bfce854844db696eb3c3759a36d90cfb4d3ed418432fc9aff15f08db6b5dec4d",
+      "gitBlob": "29ad344dcac8fceb5333fffa4dfc1b94461bf39c",
+      "normalizedGitBlob": "0deecd39978bbf44d59f3750f20a64a88c042884"
+    },
+    {
+      "file": "scripts/source-vertical-envelope.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "895fc69768d7e5ae61c77bef394361bda17c60293670f5cbd8bfeaf4035d1c6b"
+    },
+    {
+      "file": "scripts/experimental-opening-profile.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "ed55e904af72b61988ba1c85ae30f1a391402850f06d00f17473033cd27a7933"
+    },
+    {
+      "file": "scripts/upright-opening-profile.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "5beb2af56f4401729fe939c3c6f0234fb7b432323cbde0661e32a1a0936fcf2d"
+    },
+    {
+      "file": "scripts/source-inserted-plate.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "9c39db98c094c97f443adbe1d3c8ce9146960c90ae81910c96cfa440902c4e92"
+    },
+    {
+      "file": "scripts/source-void-field.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "8af2917cd1e34b48cda21fa8039418245d7f2d38150c2b8c7b321bf4b202449b"
+    },
+    {
+      "file": "scripts/source-face-normal-facade.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "86e43aae9b13331603eb2394c2c74dd8ebd85bc1397f978fa95940ca8c92d4f5"
+    },
+    {
+      "file": "scripts/source-atrium-openings.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "95bee59e9f9ad77b4dd1d6c6c3cda515944ea86cee14a4a85062255860cc7ba2"
+    },
+    {
+      "file": "scripts/source-level-envelope.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "9d900dafd8646ee7b975974e7a32e96573144cd24a299fe604abba0f143abf7f"
+    },
+    {
+      "file": "scripts/source-articulation.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "892d88c22465942b783756efbabd20bc14b2c9525711620b915493e643ca3e75"
+    },
+    {
+      "file": "proof/rule-validation.cjs",
+      "origin": "bf7fc3c",
+      "sha256": "098e67f5384fe3c2673adcb73f60559fb761477f8bdbd3e88ac2c2ad5e2afdc2"
+    }
+  ]
+}

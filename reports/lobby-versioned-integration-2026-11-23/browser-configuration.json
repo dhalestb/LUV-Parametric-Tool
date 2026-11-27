@@ -1,0 +1,11 @@
+{
+  "id": "552408ef-fce4-4879-a740-068f6c0c2c8a",
+  "engine": "bfce854",
+  "count": 15,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 95094,
+    "legacyFlags": 1
+  }
+}

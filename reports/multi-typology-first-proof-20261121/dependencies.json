@@ -1,0 +1,1249 @@
+{
+  "roots": {
+    "inserted-horizontal-plate": {
+      "A": {
+        "entries": [
+          "src/components/insertedPlatePopulation.ts"
+        ],
+        "closure": [
+          "src/components/amphitheaterInteractiveTypes.ts",
+          "src/components/insertedPlatePopulation.ts",
+          "src/components/letterGeometry3d.ts",
+          "src/components/letterTypes.ts"
+        ]
+      },
+      "B": {
+        "entries": [
+          "scripts/source-envelope.cjs",
+          "scripts/source-inserted-plate.cjs"
+        ],
+        "closure": [
+          "proof/field-config.cjs",
+          "proof/render.cjs",
+          "proof/rule-amphitheater.cjs",
+          "scripts/anchored-room.cjs",
+          "scripts/corner-pier.cjs",
+          "scripts/experimental-opening-profile.cjs",
+          "scripts/fit-planks-to-walls.cjs",
+          "scripts/full-corner-joints.cjs",
+          "scripts/full-perimeter-lofts.cjs",
+          "scripts/join-curved-neighbors.cjs",
+          "scripts/join-v-flanks.cjs",
+          "scripts/live-perimeter-room.cjs",
+          "scripts/perimeter-letter-panels.cjs",
+          "scripts/room-contour-plan.cjs",
+          "scripts/room-edge-platforms.cjs",
+          "scripts/room-top-planks.cjs",
+          "scripts/seal-curved-walls.cjs",
+          "scripts/source-articulation.cjs",
+          "scripts/source-atrium-openings.cjs",
+          "scripts/source-edge-envelope.cjs",
+          "scripts/source-envelope.cjs",
+          "scripts/source-face-normal-facade.cjs",
+          "scripts/source-inserted-plate-legacy.cjs",
+          "scripts/source-inserted-plate.cjs",
+          "scripts/source-level-envelope.cjs",
+          "scripts/source-merged-walls.cjs",
+          "scripts/source-profile-envelope.cjs",
+          "scripts/source-room-volume-hull-pilot.cjs",
+          "scripts/source-room-volume.cjs",
+          "scripts/source-suspended-plate.cjs",
+          "scripts/source-two-u.cjs",
+          "scripts/source-vertical-envelope.cjs",
+          "scripts/source-void-field.cjs",
+          "scripts/suspended-polygon-room.cjs",
+          "scripts/upright-opening-profile.cjs",
+          "src/components/architecturalLetterSizing.ts",
+          "src/components/compositionEngine.ts",
+          "src/components/constraintValidation.ts",
+          "src/components/letterGeometry3d.ts",
+          "src/components/letterTypes.ts",
+          "src/components/letterVolumeLayout.ts",
+          "src/components/optimizerTypes.ts",
+          "src/components/selectionHeightRouting.ts"
+        ]
+      }
+    },
+    "stepped-amphitheater": {
+      "A": {
+        "entries": [
+          "src/components/sourcePopulation.ts",
+          "src/components/amphitheaterCompositionSources.ts"
+        ],
+        "closure": [
+          "src/components/amphitheaterCompositionSources.ts",
+          "src/components/amphitheaterInteractiveTypes.ts",
+          "src/components/compositionEngine.ts",
+          "src/components/constraintValidation.ts",
+          "src/components/descriptorEvaluation.ts",
+          "src/components/letterGeometry3d.ts",
+          "src/components/letterTypes.ts",
+          "src/components/letterVolumeLayout.ts",
+          "src/components/optimizerTypes.ts",
+          "src/components/selectionFieldGeometry.ts",
+          "src/components/selectionHeightRouting.ts",
+          "src/components/selectionSearch.ts",
+          "src/components/sourcePopulation.ts",
+          "src/components/threeLiftPopulation.ts"
+        ]
+      },
+      "B": {
+        "entries": [
+          "scripts/source-envelope.cjs",
+          "scripts/source-vertical-envelope.cjs",
+          "proof/rule-amphitheater.cjs"
+        ],
+        "closure": [
+          "proof/field-config.cjs",
+          "proof/render.cjs",
+          "proof/rule-amphitheater.cjs",
+          "scripts/anchored-room.cjs",
+          "scripts/corner-pier.cjs",
+          "scripts/experimental-opening-profile.cjs",
+          "scripts/fit-planks-to-walls.cjs",
+          "scripts/full-corner-joints.cjs",
+          "scripts/full-perimeter-lofts.cjs",
+          "scripts/join-curved-neighbors.cjs",
+          "scripts/join-v-flanks.cjs",
+          "scripts/live-perimeter-room.cjs",
+          "scripts/perimeter-letter-panels.cjs",
+          "scripts/room-contour-plan.cjs",
+          "scripts/room-edge-platforms.cjs",
+          "scripts/room-top-planks.cjs",
+          "scripts/seal-curved-walls.cjs",
+          "scripts/source-articulation.cjs",
+          "scripts/source-atrium-openings.cjs",
+          "scripts/source-edge-envelope.cjs",
+          "scripts/source-envelope.cjs",
+          "scripts/source-face-normal-facade.cjs",
+          "scripts/source-inserted-plate-legacy.cjs",
+          "scripts/source-inserted-plate.cjs",
+          "scripts/source-level-envelope.cjs",
+          "scripts/source-merged-walls.cjs",
+          "scripts/source-profile-envelope.cjs",
+          "scripts/source-room-volume-hull-pilot.cjs",
+          "scripts/source-room-volume.cjs",
+          "scripts/source-suspended-plate.cjs",
+          "scripts/source-two-u.cjs",
+          "scripts/source-vertical-envelope.cjs",
+          "scripts/source-void-field.cjs",
+          "scripts/suspended-polygon-room.cjs",
+          "scripts/upright-opening-profile.cjs",
+          "src/components/architecturalLetterSizing.ts",
+          "src/components/compositionEngine.ts",
+          "src/components/constraintValidation.ts",
+          "src/components/letterGeometry3d.ts",
+          "src/components/letterTypes.ts",
+          "src/components/letterVolumeLayout.ts",
+          "src/components/optimizerTypes.ts",
+          "src/components/selectionHeightRouting.ts"
+        ]
+      }
+    },
+    "room-within-volume": {
+      "A": {
+        "entries": [
+          "src/components/perimeterRoomLayout.ts"
+        ],
+        "closure": [
+          "src/components/amphitheaterInteractiveTypes.ts",
+          "src/components/perimeterRoomLayout.ts"
+        ]
+      },
+      "B": {
+        "entries": [
+          "scripts/source-envelope.cjs",
+          "scripts/source-room-volume.cjs"
+        ],
+        "closure": [
+          "proof/field-config.cjs",
+          "proof/render.cjs",
+          "proof/rule-amphitheater.cjs",
+          "scripts/anchored-room.cjs",
+          "scripts/corner-pier.cjs",
+          "scripts/experimental-opening-profile.cjs",
+          "scripts/fit-planks-to-walls.cjs",
+          "scripts/full-corner-joints.cjs",
+          "scripts/full-perimeter-lofts.cjs",
+          "scripts/join-curved-neighbors.cjs",
+          "scripts/join-v-flanks.cjs",
+          "scripts/live-perimeter-room.cjs",
+          "scripts/perimeter-letter-panels.cjs",
+          "scripts/room-contour-plan.cjs",
+          "scripts/room-edge-platforms.cjs",
+          "scripts/room-top-planks.cjs",
+          "scripts/seal-curved-walls.cjs",
+          "scripts/source-articulation.cjs",
+          "scripts/source-atrium-openings.cjs",
+          "scripts/source-edge-envelope.cjs",
+          "scripts/source-envelope.cjs",
+          "scripts/source-face-normal-facade.cjs",
+          "scripts/source-inserted-plate-legacy.cjs",
+          "scripts/source-inserted-plate.cjs",
+          "scripts/source-level-envelope.cjs",
+          "scripts/source-merged-walls.cjs",
+          "scripts/source-profile-envelope.cjs",
+          "scripts/source-room-volume-hull-pilot.cjs",
+          "scripts/source-room-volume.cjs",
+          "scripts/source-suspended-plate.cjs",
+          "scripts/source-two-u.cjs",
+          "scripts/source-vertical-envelope.cjs",
+          "scripts/source-void-field.cjs",
+          "scripts/suspended-polygon-room.cjs",
+          "scripts/upright-opening-profile.cjs",
+          "src/components/architecturalLetterSizing.ts",
+          "src/components/compositionEngine.ts",
+          "src/components/constraintValidation.ts",
+          "src/components/letterGeometry3d.ts",
+          "src/components/letterTypes.ts",
+          "src/components/letterVolumeLayout.ts",
+          "src/components/optimizerTypes.ts",
+          "src/components/selectionHeightRouting.ts"
+        ]
+      }
+    },
+    "void-field": {
+      "A": {
+        "entries": [
+          "src/components/voidFieldPopulation.ts"
+        ],
+        "closure": [
+          "src/components/amphitheaterInteractiveTypes.ts",
+          "src/components/letterGeometry3d.ts",
+          "src/components/letterTypes.ts",
+          "src/components/voidFieldPopulation.ts"
+        ]
+      },
+      "B": {
+        "entries": [
+          "scripts/source-envelope.cjs",
+          "scripts/source-void-field.cjs"
+        ],
+        "closure": [
+          "proof/field-config.cjs",
+          "proof/render.cjs",
+          "proof/rule-amphitheater.cjs",
+          "scripts/anchored-room.cjs",
+          "scripts/corner-pier.cjs",
+          "scripts/experimental-opening-profile.cjs",
+          "scripts/fit-planks-to-walls.cjs",
+          "scripts/full-corner-joints.cjs",
+          "scripts/full-perimeter-lofts.cjs",
+          "scripts/join-curved-neighbors.cjs",
+          "scripts/join-v-flanks.cjs",
+          "scripts/live-perimeter-room.cjs",
+          "scripts/perimeter-letter-panels.cjs",
+          "scripts/room-contour-plan.cjs",
+          "scripts/room-edge-platforms.cjs",
+          "scripts/room-top-planks.cjs",
+          "scripts/seal-curved-walls.cjs",
+          "scripts/source-articulation.cjs",
+          "scripts/source-atrium-openings.cjs",
+          "scripts/source-edge-envelope.cjs",
+          "scripts/source-envelope.cjs",
+          "scripts/source-face-normal-facade.cjs",
+          "scripts/source-inserted-plate-legacy.cjs",
+          "scripts/source-inserted-plate.cjs",
+          "scripts/source-level-envelope.cjs",
+          "scripts/source-merged-walls.cjs",
+          "scripts/source-profile-envelope.cjs",
+          "scripts/source-room-volume-hull-pilot.cjs",
+          "scripts/source-room-volume.cjs",
+          "scripts/source-suspended-plate.cjs",
+          "scripts/source-two-u.cjs",
+          "scripts/source-vertical-envelope.cjs",
+          "scripts/source-void-field.cjs",
+          "scripts/suspended-polygon-room.cjs",
+          "scripts/upright-opening-profile.cjs",
+          "src/components/architecturalLetterSizing.ts",
+          "src/components/compositionEngine.ts",
+          "src/components/constraintValidation.ts",
+          "src/components/letterGeometry3d.ts",
+          "src/components/letterTypes.ts",
+          "src/components/letterVolumeLayout.ts",
+          "src/components/optimizerTypes.ts",
+          "src/components/selectionHeightRouting.ts"
+        ]
+      }
+    }
+  },
+  "files": {
+    "src/components/letterTypes.ts": {
+      "file": "src/components/letterTypes.ts",
+      "sha256": "2925a06f4bdc806b6c6b7c17cb5d2d20024d40406710d330d840f7a118101709",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\letterTypes.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [],
+      "functions": [
+        "getFileExtension",
+        "parseLetterFile",
+        "revokeAsset"
+      ]
+    },
+    "src/components/letterGeometry3d.ts": {
+      "file": "src/components/letterGeometry3d.ts",
+      "sha256": "ade11f4e8cd6123ed9c63a0e17629f09988c2685fd13dd9b5b9d86115a0f5b47",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\letterGeometry3d.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterTypes.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "shapeL",
+        "shapeU",
+        "shapeV",
+        "getLetterShape",
+        "getLetterVolumeGeometry",
+        "getLetterGeometry",
+        "getLetterStampGeometry"
+      ]
+    },
+    "src/components/amphitheaterInteractiveTypes.ts": {
+      "file": "src/components/amphitheaterInteractiveTypes.ts",
+      "sha256": "0badd1f1fa4602a484e91d2123b4bbfd27894703b92e059bb41cb610919d2dc0",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\amphitheaterInteractiveTypes.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [],
+      "functions": []
+    },
+    "src/components/insertedPlatePopulation.ts": {
+      "file": "src/components/insertedPlatePopulation.ts",
+      "sha256": "8cff2e54321334ca50135c10a7a835935626e22a502d41e67689fa8e390c76ae",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\insertedPlatePopulation.ts",
+      "olderFrozenMatches": false,
+      "dependencies": [
+        "src/components/amphitheaterInteractiveTypes.ts",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "populateInsertedPlate",
+        "suggestedInsertedPlateCount",
+        "populateSpanningPlate",
+        "applyInsertedPlateSpacing",
+        "orientEdgeSources",
+        "fitNewPlateLetter",
+        "fitFacingPlateLetter",
+        "suggestedPerimeterPlateCount",
+        "populatePerimeterLevels"
+      ]
+    },
+    "proof/render.cjs": {
+      "file": "proof/render.cjs",
+      "sha256": "e32f6f1e9d8ff3058b4a10a2d6a95cdb5c6f6177ba76e79fa1641a263f6d946f",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\proof\\render.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [
+        "sharp"
+      ],
+      "functions": [
+        "corners",
+        "render"
+      ]
+    },
+    "proof/field-config.cjs": {
+      "file": "proof/field-config.cjs",
+      "sha256": "ab4638d193c69f8e98a2596f78691477d8a035c664f8f470dad9476954c37396",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\proof\\field-config.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [
+        "node:crypto"
+      ],
+      "functions": [
+        "requestConfig",
+        "cacheKey"
+      ]
+    },
+    "src/components/letterVolumeLayout.ts": {
+      "file": "src/components/letterVolumeLayout.ts",
+      "sha256": "5c722c04c38431db93c714a12517e2a55e2f32f78c67f04742644b8ac50bce71",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\letterVolumeLayout.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterTypes.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "letterCenterPitch",
+        "xyContactGap",
+        "zContactGap",
+        "separatedPitch",
+        "attractorBlend",
+        "diagonalCenterGap",
+        "diagonalAttractorScale",
+        "pairOrigin",
+        "dashedGroupMeasure",
+        "octetBoxes",
+        "pullToOctet",
+        "scaleTowardOctet",
+        "zLayerPitch",
+        "letterDepthSpan",
+        "letterPlanLayout",
+        "stableYRotation",
+        "letterVolumeLayout"
+      ]
+    },
+    "src/components/compositionEngine.ts": {
+      "file": "src/components/compositionEngine.ts",
+      "sha256": "348266168fdc3824e2bfd76361d395f01461dbec8c1211114ac94ad017cdfb99",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\compositionEngine.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterTypes.ts",
+        "src/components/letterVolumeLayout.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "randomGenerator",
+        "effectiveIntensity",
+        "rotateTowardCenter",
+        "applyDescriptor",
+        "enforceConstraints",
+        "dimensions",
+        "analyze",
+        "generateAlternative",
+        "generateAlternatives"
+      ]
+    },
+    "src/components/optimizerTypes.ts": {
+      "file": "src/components/optimizerTypes.ts",
+      "sha256": "ad0fd150a44aa9c9291b6a0c3f99fdca1892596d11e422a5da0d37e33371a5ac",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\optimizerTypes.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/compositionEngine.ts",
+        "src/components/letterTypes.ts"
+      ],
+      "packages": [],
+      "functions": []
+    },
+    "src/components/constraintValidation.ts": {
+      "file": "src/components/constraintValidation.ts",
+      "sha256": "2a219650232ad797a00a92b2d53e775d909a8f42a0cd4aafb9f742b984050954",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\constraintValidation.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/compositionEngine.ts",
+        "src/components/letterVolumeLayout.ts",
+        "src/components/optimizerTypes.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "allowsAttractorOverlap",
+        "pairOrigin",
+        "sameAttractor",
+        "depthHalf",
+        "extents",
+        "gridDimensions",
+        "repairToHardConstraints",
+        "countIntersections",
+        "validateConstraints"
+      ]
+    },
+    "src/components/selectionHeightRouting.ts": {
+      "file": "src/components/selectionHeightRouting.ts",
+      "sha256": "14c06b2e52cb8f6661eae776343322562b457c386dc105b38244af6ce7eab841",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\selectionHeightRouting.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/constraintValidation.ts",
+        "src/components/optimizerTypes.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "isSelectionHeightFeet",
+        "selectionFieldDimensions",
+        "selectionHeightPresets",
+        "typologyHeightAssignment",
+        "unresolvedTypologyHeightAssignments",
+        "selectionVolumeFitsSource",
+        "selectionVolumeInsideSource",
+        "selectionGeometryCompatibleWithHeight",
+        "planSourceFieldCapacity",
+        "heightRoutedSelectionVolume",
+        "clearHeightRouting",
+        "isHeightRoutingActive",
+        "applyDashedGroupSelection",
+        "clampToRange",
+        "projectSelectionOntoField",
+        "normalizeStoredSelection",
+        "capacityShortfallMessages",
+        "describeDeferredGeneratorInterface"
+      ]
+    },
+    "src/components/architecturalLetterSizing.ts": {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "sha256": "6abc8deffdb15e1423d88e8a71c1d98210b939e6656d8b39c1f63f823a8a2d2f",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\architecturalLetterSizing.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterVolumeLayout.ts",
+        "src/components/optimizerTypes.ts",
+        "src/components/selectionHeightRouting.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "letterFootprintFeet",
+        "scaleFromFootprintFeet",
+        "letterSizePreset",
+        "controlsFromPreset",
+        "validateLetterSizeControls",
+        "applyLetterSizeControlsToRules",
+        "letterSizeControlsFromRules",
+        "sampleLetterScale",
+        "letterSpansMultipleCells"
+      ]
+    },
+    "proof/rule-amphitheater.cjs": {
+      "file": "proof/rule-amphitheater.cjs",
+      "sha256": "e6333f82b22da3d731d640f5edd553fbd8714b68be6865451dbc0ba8599f37da",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\proof\\rule-amphitheater.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "proof/field-config.cjs",
+        "proof/render.cjs",
+        "src/components/architecturalLetterSizing.ts",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "manifold-3d/manifold.js",
+        "node:fs",
+        "node:path",
+        "three",
+        "typescript"
+      ],
+      "functions": [
+        "serialize",
+        "obj",
+        "build",
+        "surfaceCell",
+        "transform",
+        "instance",
+        "component",
+        "planarPlate"
+      ]
+    },
+    "scripts/source-profile-envelope.cjs": {
+      "file": "scripts/source-profile-envelope.cjs",
+      "sha256": "fb288d212d8dc9d8840e2b8052f9462518e1221eea7040fb80b980fed8677bbe",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-profile-envelope.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [],
+      "functions": [
+        "featurePoints",
+        "split",
+        "profileEnvelope"
+      ]
+    },
+    "scripts/perimeter-letter-panels.cjs": {
+      "file": "scripts/perimeter-letter-panels.cjs",
+      "sha256": "5a3651cd1e014a453c3b291077838aa087cc9f3fa17e149ce678b357cc398dd3",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\perimeter-letter-panels.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [
+        "node:assert/strict"
+      ],
+      "functions": [
+        "crossing",
+        "panel",
+        "quad",
+        "buildWalls"
+      ]
+    },
+    "scripts/full-perimeter-lofts.cjs": {
+      "file": "scripts/full-perimeter-lofts.cjs",
+      "sha256": "692cc1807328f425b6258d2898ebdf457e19ccca2a27c4623d3208cb6661a6e5",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\full-perimeter-lofts.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "profile",
+        "wallMesh",
+        "build",
+        "add"
+      ]
+    },
+    "scripts/room-edge-platforms.cjs": {
+      "file": "scripts/room-edge-platforms.cjs",
+      "sha256": "1feb597e9c4938b60a893b918c50a136ff63533155b2527c6f6e25bf0910da7a",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\room-edge-platforms.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "contours",
+        "sample",
+        "platforms"
+      ]
+    },
+    "scripts/suspended-polygon-room.cjs": {
+      "file": "scripts/suspended-polygon-room.cjs",
+      "sha256": "f052a094111e12d89961fe668f52f16ca45ed1e85b7395f2a7a9e49a432de704",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\suspended-polygon-room.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/room-edge-platforms.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "suspendedRoom",
+        "point",
+        "plane",
+        "cut"
+      ]
+    },
+    "scripts/room-top-planks.cjs": {
+      "file": "scripts/room-top-planks.cjs",
+      "sha256": "2c8e08e8ceea32c6c3e4e69709dd3e9f72e84b026172ecb9d4950be882f131ff",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\room-top-planks.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/room-edge-platforms.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "topPlanks"
+      ]
+    },
+    "scripts/live-perimeter-room.cjs": {
+      "file": "scripts/live-perimeter-room.cjs",
+      "sha256": "2b112edabf9586521ab3f33c7bdaf49cf17e895064019d42be7fe9d42bc75d38",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\live-perimeter-room.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/full-perimeter-lofts.cjs",
+        "scripts/perimeter-letter-panels.cjs",
+        "scripts/room-top-planks.cjs",
+        "scripts/suspended-polygon-room.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "liveRoom"
+      ]
+    },
+    "scripts/anchored-room.cjs": {
+      "file": "scripts/anchored-room.cjs",
+      "sha256": "fcd71a94f7b7bc546d118338b9e8d1d7b0722a845f46bc3f4d178c0dcf452563",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\anchored-room.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "feature",
+        "anchoredRoom"
+      ]
+    },
+    "scripts/source-room-volume-hull-pilot.cjs": {
+      "file": "scripts/source-room-volume-hull-pilot.cjs",
+      "sha256": "b88ab3c47f1d78e54252462b45d854e8ca731a06d1e6342fe91ce952bff3094c",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-room-volume-hull-pilot.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "+a.n.id);\n  outerWall=outerWall.subtract(cutter);\n  contributionBands.push({id:",
+        "three"
+      ],
+      "functions": [
+        "roomWithinVolume"
+      ]
+    },
+    "scripts/room-contour-plan.cjs": {
+      "file": "scripts/room-contour-plan.cjs",
+      "sha256": "fae4964b06a7f34c90a19a184c0abe2738dbde4266949b7c247013fe526445e4",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\room-contour-plan.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "nativePaths",
+        "intersects",
+        "contourCandidates"
+      ]
+    },
+    "scripts/source-room-volume.cjs": {
+      "file": "scripts/source-room-volume.cjs",
+      "sha256": "95e3de4384d3626e301370d55fadfa3b451840abb32e9d786e6c6d0e8aa2bde7",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-room-volume.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/anchored-room.cjs",
+        "scripts/live-perimeter-room.cjs",
+        "scripts/room-contour-plan.cjs",
+        "scripts/source-room-volume-hull-pilot.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "+a.n.id);\n  outerWall=outerWall.subtract(cutter);\n  contributionBands.push({id:",
+        "three"
+      ],
+      "functions": [
+        "roomWithinVolume"
+      ]
+    },
+    "scripts/upright-opening-profile.cjs": {
+      "file": "scripts/upright-opening-profile.cjs",
+      "sha256": "5beb2af56f4401729fe939c3c6f0234fb7b432323cbde0661e32a1a0936fcf2d",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\upright-opening-profile.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/source-profile-envelope.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "uprightOpening"
+      ]
+    },
+    "scripts/experimental-opening-profile.cjs": {
+      "file": "scripts/experimental-opening-profile.cjs",
+      "sha256": "ed55e904af72b61988ba1c85ae30f1a391402850f06d00f17473033cd27a7933",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\experimental-opening-profile.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/source-profile-envelope.cjs",
+        "scripts/upright-opening-profile.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "localOpening"
+      ]
+    },
+    "scripts/source-vertical-envelope.cjs": {
+      "file": "scripts/source-vertical-envelope.cjs",
+      "sha256": "a48425b7afc0b898ae212654bec6e0b13e0ea38a461723567e2331e952e38b9c",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-vertical-envelope.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/experimental-opening-profile.cjs"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "upperTriangles",
+        "heightAt",
+        "roleFor",
+        "verticalEnvelope",
+        "floatSafe"
+      ]
+    },
+    "scripts/source-face-normal-facade.cjs": {
+      "file": "scripts/source-face-normal-facade.cjs",
+      "sha256": "86e43aae9b13331603eb2394c2c74dd8ebd85bc1397f978fa95940ca8c92d4f5",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-face-normal-facade.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/source-vertical-envelope.cjs"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "faceNormalWall"
+      ]
+    },
+    "scripts/source-atrium-openings.cjs": {
+      "file": "scripts/source-atrium-openings.cjs",
+      "sha256": "95bee59e9f9ad77b4dd1d6c6c3cda515944ea86cee14a4a85062255860cc7ba2",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-atrium-openings.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/source-profile-envelope.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "trimPath",
+        "buildAtriumBays",
+        "bundleClear",
+        "validateAtriumViews"
+      ]
+    },
+    "scripts/source-void-field.cjs": {
+      "file": "scripts/source-void-field.cjs",
+      "sha256": "8af2917cd1e34b48cda21fa8039418245d7f2d38150c2b8c7b321bf4b202449b",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-void-field.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/source-atrium-openings.cjs",
+        "scripts/source-face-normal-facade.cjs",
+        "scripts/source-profile-envelope.cjs",
+        "scripts/source-vertical-envelope.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "pack",
+        "floatSafe",
+        "innerProfile",
+        "voidFieldEnvelope"
+      ]
+    },
+    "scripts/source-inserted-plate-legacy.cjs": {
+      "file": "scripts/source-inserted-plate-legacy.cjs",
+      "sha256": "9c39db98c094c97f443adbe1d3c8ce9146960c90ae81910c96cfa440902c4e92",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-inserted-plate-legacy.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/source-vertical-envelope.cjs",
+        "scripts/source-void-field.cjs"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "safe",
+        "insertedPlateEnvelope"
+      ]
+    },
+    "scripts/seal-curved-walls.cjs": {
+      "file": "scripts/seal-curved-walls.cjs",
+      "sha256": "190e9a2b212805cc1f2a789dc242d368ebff9eac6a2cef235905862b70c22d37",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\seal-curved-walls.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "sealCurvedWalls"
+      ]
+    },
+    "scripts/full-corner-joints.cjs": {
+      "file": "scripts/full-corner-joints.cjs",
+      "sha256": "13b4464c1628e18979c77451951ef3734afedeac1c3b925014fc4c36a965ea7d",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\full-corner-joints.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "sealOpposite",
+        "rotateToSweep",
+        "fullCornerPier",
+        "joinPlatesToPier",
+        "extendBendsToPier"
+      ]
+    },
+    "scripts/corner-pier.cjs": {
+      "file": "scripts/corner-pier.cjs",
+      "sha256": "6fa92178a17e2cece3cd9c0666c8e0fb5a71914fe9f6ae4f38f4a3a1a5d1bc84",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\corner-pier.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "cornerPier"
+      ]
+    },
+    "scripts/join-curved-neighbors.cjs": {
+      "file": "scripts/join-curved-neighbors.cjs",
+      "sha256": "d130be49b42daedfaeeb9be990bc84e2c25103dacaf31b993129d71d29381c93",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\join-curved-neighbors.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [],
+      "functions": [
+        "joinCurvedNeighbors"
+      ]
+    },
+    "scripts/join-v-flanks.cjs": {
+      "file": "scripts/join-v-flanks.cjs",
+      "sha256": "8dfa3bf2955e960ab9fd7048f18b78ff64bf6356bfbfc473653d52246a4e87d1",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\join-v-flanks.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [],
+      "functions": [
+        "joinVFlanks"
+      ]
+    },
+    "scripts/fit-planks-to-walls.cjs": {
+      "file": "scripts/fit-planks-to-walls.cjs",
+      "sha256": "73f8928681522c4e847bd483e0756d3a83ff8bf45f3f11f939192fad8f61c9a0",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\fit-planks-to-walls.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [],
+      "functions": [
+        "fitPlanks",
+        "hit"
+      ]
+    },
+    "scripts/source-edge-envelope.cjs": {
+      "file": "scripts/source-edge-envelope.cjs",
+      "sha256": "117dd1616bfebb2ad354c88857fa70f84bbf2b373c88523bde8361b6e9c64116",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-edge-envelope.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/corner-pier.cjs",
+        "scripts/fit-planks-to-walls.cjs",
+        "scripts/full-corner-joints.cjs",
+        "scripts/join-curved-neighbors.cjs",
+        "scripts/join-v-flanks.cjs",
+        "scripts/seal-curved-walls.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "fs",
+        "three"
+      ],
+      "functions": [
+        "edgeEnvelope",
+        "receivingEdge"
+      ]
+    },
+    "scripts/source-merged-walls.cjs": {
+      "file": "scripts/source-merged-walls.cjs",
+      "sha256": "e987329e0223639a8f9fb70e2150135e7bab56495b5345076a52fac0717aaa93",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-merged-walls.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/source-profile-envelope.cjs",
+        "scripts/source-void-field.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "mergedWalls"
+      ]
+    },
+    "scripts/source-two-u.cjs": {
+      "file": "scripts/source-two-u.cjs",
+      "sha256": "82b40e7b7890cb0840daca443d024cf1bfd59c4ed63d7d362fe30a64375de017",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-two-u.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "uPlates",
+        "outline",
+        "world",
+        "join"
+      ]
+    },
+    "scripts/source-suspended-plate.cjs": {
+      "file": "scripts/source-suspended-plate.cjs",
+      "sha256": "a7a06b1bbe66a5f8f98825247f2ae477b9718844d924ac10ae35cf8e531a167e",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-suspended-plate.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/source-vertical-envelope.cjs"
+      ],
+      "packages": [],
+      "functions": [
+        "suspendedPlate"
+      ]
+    },
+    "scripts/source-inserted-plate.cjs": {
+      "file": "scripts/source-inserted-plate.cjs",
+      "sha256": "fbdcdf31ce61d40a2c2c15a218adc45448a9ac9f68608ad767e7e99f20a15659",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-inserted-plate.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "scripts/source-edge-envelope.cjs",
+        "scripts/source-inserted-plate-legacy.cjs",
+        "scripts/source-merged-walls.cjs",
+        "scripts/source-suspended-plate.cjs",
+        "scripts/source-two-u.cjs",
+        "scripts/source-vertical-envelope.cjs",
+        "scripts/source-void-field.cjs"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "safe",
+        "insertedPlateEnvelope"
+      ]
+    },
+    "scripts/source-level-envelope.cjs": {
+      "file": "scripts/source-level-envelope.cjs",
+      "sha256": "22e4bf20457cf5649e0b914406c24a70303d6cf49d46ca5c605d3e8a7251929c",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-level-envelope.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [],
+      "functions": [
+        "levelEnvelope",
+        "contributionReport"
+      ]
+    },
+    "scripts/source-articulation.cjs": {
+      "file": "scripts/source-articulation.cjs",
+      "sha256": "9ce79946b9fa64d96182d9c6749f3c858687244f179a4bdade3c98b4f54f069d",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-articulation.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [],
+      "functions": [
+        "articulate"
+      ]
+    },
+    "scripts/source-envelope.cjs": {
+      "file": "scripts/source-envelope.cjs",
+      "sha256": "78c1df5575eb8d6d0ebc287aa18598d791c0b558cb8b9780538da67cafa0c695",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\scripts\\source-envelope.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "proof/rule-amphitheater.cjs",
+        "scripts/source-articulation.cjs",
+        "scripts/source-inserted-plate.cjs",
+        "scripts/source-level-envelope.cjs",
+        "scripts/source-profile-envelope.cjs",
+        "scripts/source-room-volume.cjs",
+        "scripts/source-vertical-envelope.cjs",
+        "scripts/source-void-field.cjs",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "manifold-3d/manifold.js",
+        "node:fs",
+        "node:path",
+        "three"
+      ],
+      "functions": [
+        "derive",
+        "buildSource"
+      ]
+    },
+    "src/components/threeLiftPopulation.ts": {
+      "file": "src/components/threeLiftPopulation.ts",
+      "sha256": "47f5e52ff555cf8793d479421cd229893366452d37a4a0929befb433023c2855",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\threeLiftPopulation.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/amphitheaterInteractiveTypes.ts",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "hull",
+        "matrix",
+        "outline",
+        "populateThreeLifts"
+      ]
+    },
+    "src/components/sourcePopulation.ts": {
+      "file": "src/components/sourcePopulation.ts",
+      "sha256": "e291600d03446888789585625341059631dc2ebe940c8258fb8e1a7b343f0119",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\sourcePopulation.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/amphitheaterInteractiveTypes.ts",
+        "src/components/letterGeometry3d.ts",
+        "src/components/threeLiftPopulation.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "suggestedCount",
+        "rotation",
+        "populate"
+      ]
+    },
+    "src/components/selectionFieldGeometry.ts": {
+      "file": "src/components/selectionFieldGeometry.ts",
+      "sha256": "44878d09eb2a1203cfcfa240b88587667d8cd30cbb35c2b5f3fc3af680195e86",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\selectionFieldGeometry.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/compositionEngine.ts",
+        "src/components/letterGeometry3d.ts",
+        "src/components/selectionHeightRouting.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "placementScale",
+        "placementWorldMatrix",
+        "letterWorldBounds",
+        "selectionFieldBounds",
+        "boundsOverlap",
+        "boundsContained",
+        "classifyBoundsAgainstField",
+        "classifyPlacementsAgainstSelection",
+        "intersectingSelectionPlacements",
+        "localizeIntersectingPlacements",
+        "triangleMeshFromPlacement",
+        "defaultHeightSelectionVolume"
+      ]
+    },
+    "src/components/descriptorEvaluation.ts": {
+      "file": "src/components/descriptorEvaluation.ts",
+      "sha256": "01352f7d804c957fcbb2359e40e768fb851c561555e919c11c252530538f3151",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\descriptorEvaluation.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/compositionEngine.ts",
+        "src/components/constraintValidation.ts",
+        "src/components/optimizerTypes.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "voxelAnalysis",
+        "measureSpatialMetrics",
+        "descriptorMeasurements",
+        "scoreMeasurements",
+        "evaluateSpatialDesign"
+      ]
+    },
+    "src/components/selectionSearch.ts": {
+      "file": "src/components/selectionSearch.ts",
+      "sha256": "e15c9f8625606b34cd20153d1494483f9f4ca9c7c424609a033bbe25b318a80e",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\selectionSearch.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/compositionEngine.ts",
+        "src/components/constraintValidation.ts",
+        "src/components/descriptorEvaluation.ts",
+        "src/components/letterTypes.ts",
+        "src/components/letterVolumeLayout.ts",
+        "src/components/optimizerTypes.ts",
+        "src/components/selectionFieldGeometry.ts",
+        "src/components/selectionHeightRouting.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "axisCenters",
+        "sourceAwareCenters",
+        "placementCenterInSelection",
+        "selectionEvaluationGrid",
+        "rank",
+        "selectedLetterCount",
+        "selectBestSubvolume"
+      ]
+    },
+    "src/components/amphitheaterCompositionSources.ts": {
+      "file": "src/components/amphitheaterCompositionSources.ts",
+      "sha256": "24c1db19ed15da3faf22b7acd019404e99971f51d734606ce1d991c24e4df3fc",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\amphitheaterCompositionSources.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/amphitheaterInteractiveTypes.ts",
+        "src/components/optimizerTypes.ts",
+        "src/components/selectionFieldGeometry.ts",
+        "src/components/selectionSearch.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "collectCompositionSources",
+        "collect",
+        "mergeCompositionSources",
+        "compositionRefreshMessage"
+      ]
+    },
+    "src/components/perimeterRoomLayout.ts": {
+      "file": "src/components/perimeterRoomLayout.ts",
+      "sha256": "b0dd6b0e5922863da8e5b18fa557d5b09d69c9de3fc497e5b1a4ef4f7a65cc17",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\perimeterRoomLayout.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/amphitheaterInteractiveTypes.ts"
+      ],
+      "packages": [],
+      "functions": [
+        "perimeterLayout",
+        "perimeterRoomSource"
+      ]
+    },
+    "src/components/voidFieldPopulation.ts": {
+      "file": "src/components/voidFieldPopulation.ts",
+      "sha256": "a19b868d8fee581d95d90e5324e225a25f3b3754eb398b322c9c6b8772b0a6cd",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\src\\components\\voidFieldPopulation.ts",
+      "olderFrozenMatches": true,
+      "dependencies": [
+        "src/components/amphitheaterInteractiveTypes.ts",
+        "src/components/letterGeometry3d.ts"
+      ],
+      "packages": [
+        "three"
+      ],
+      "functions": [
+        "hull",
+        "populateVoidField",
+        "applyVoidFieldSpacing",
+        "addVoidFieldFourthLevel"
+      ]
+    },
+    "proof/rule-validation.cjs": {
+      "file": "proof/rule-validation.cjs",
+      "sha256": "e5ff6cbe0562a5756cdcf398d75d51386202792baeb2257d3f8a511fbde95ad5",
+      "original": "C:\\Users\\DHale\\Documents\\Codex\\LUV-Gathering-Envelope-Experiment\\proof\\rule-validation.cjs",
+      "olderFrozenMatches": true,
+      "dependencies": [],
+      "packages": [
+        "manifold-3d/manifold.js",
+        "node:assert/strict",
+        "node:fs",
+        "node:path",
+        "three",
+        "three-mesh-bvh"
+      ],
+      "functions": [
+        "overlapArea",
+        "strictEdgeCrosses"
+      ]
+    }
+  },
+  "note": "Static conditional closure includes all source-envelope dispatch branches, not a claim that all branches execute. Runtime proof records the selected loaded modules separately."
+}

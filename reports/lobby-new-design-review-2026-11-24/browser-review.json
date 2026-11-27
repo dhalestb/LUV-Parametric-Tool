@@ -1,0 +1,97 @@
+[
+  {
+    "type": "vertical-void-lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/index.html?typology=vertical-void-lobby",
+    "meta": "8 letters · 40 × 40 × 60 ft · preferred letter size 13 ft · engine bf7fc3c",
+    "images": [
+      {
+        "complete": true,
+        "height": 644,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/models/vertical-void-lobby.jpg",
+        "width": 615
+      },
+      {
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/boards/vertical-void-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  },
+  {
+    "type": "compressed-sequential-lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/index.html?typology=compressed-sequential-lobby",
+    "meta": "8 letters · 40 × 20 × 20 ft · preferred letter size 13 ft · engine bfce854",
+    "images": [
+      {
+        "complete": true,
+        "height": 644,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/models/compressed-sequential-lobby.jpg",
+        "width": 615
+      },
+      {
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/boards/compressed-sequential-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  },
+  {
+    "type": "continuous-hall-lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/index.html?typology=continuous-hall-lobby",
+    "meta": "8 letters · 40 × 20 × 20 ft · preferred letter size 13 ft · engine bf7fc3c",
+    "images": [
+      {
+        "complete": true,
+        "height": 644,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/models/continuous-hall-lobby.jpg",
+        "width": 615
+      },
+      {
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/boards/continuous-hall-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  },
+  {
+    "type": "topographic-ground-field-lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/index.html?typology=topographic-ground-field-lobby",
+    "meta": "8 letters · 40 × 40 × 40 ft · preferred letter size 13 ft · engine bfce854",
+    "images": [
+      {
+        "complete": true,
+        "height": 644,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/models/topographic-ground-field-lobby.jpg",
+        "width": 615
+      },
+      {
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/boards/topographic-ground-field-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  },
+  {
+    "type": "linear-gallery-lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/index.html?typology=linear-gallery-lobby",
+    "meta": "8 letters · 40 × 20 × 20 ft · preferred letter size 13 ft · engine bfce854",
+    "images": [
+      {
+        "complete": true,
+        "height": 644,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/models/linear-gallery-lobby.jpg",
+        "width": 615
+      },
+      {
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-new-design-review-2026-11-24/boards/linear-gallery-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  }
+]

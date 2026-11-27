@@ -1,0 +1,37 @@
+{
+  "id": "miami-zone1-independent-rule-b/v1",
+  "version": "v3.3",
+  "basis": "Complete site-coordinate Rule B OBJ, Y up, feet",
+  "forms": [
+    {
+      "typology": "vertical-walls",
+      "slot": "G1",
+      "study": "0aef1f14-66a5-45b3-a2ba-a31248841e7f",
+      "geometryHash": "187f58aa983f508dc00e4e000eee108e4b6677f2e42892db6f5665e4ef6506cb",
+      "objSha256": "6a4d303b9cf2cde93d1a6e259aacbfd01e4c3e7b8525b20686db3df5c916369d",
+      "cellFeet": 2,
+      "scores": {
+        "openVolume": 54.05000000000001,
+        "visuallyConnected": 16.218886871093634,
+        "circulationActivated": 87.89702538840469,
+        "verticallyIntegrated": 98.61111111111113,
+        "centralized": 84.35
+      }
+    },
+    {
+      "typology": "inserted-plate",
+      "slot": "G3",
+      "study": "17cb9692-eb78-4a54-9314-7e3de823daa7",
+      "geometryHash": "2cddd1c7856ee399960997c569e42569de1c88c21e78d7a1f61eaf5d12df6690",
+      "objSha256": "37eba2b46caf94b130d07322f8dd9ed87869cfac0de9045b3b94d191e044c15b",
+      "cellFeet": 2,
+      "scores": {
+        "openVolume": 65.85000000000001,
+        "visuallyConnected": 28.29042903812472,
+        "circulationActivated": 81.05951158454889,
+        "verticallyIntegrated": 45.00000000000001,
+        "centralized": 91.25
+      }
+    }
+  ]
+}

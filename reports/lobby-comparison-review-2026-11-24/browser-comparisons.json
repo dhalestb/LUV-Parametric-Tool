@@ -1,0 +1,112 @@
+[
+  {
+    "name": "Vertical Void Lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/index.html?typology=vertical-void-lobby",
+    "board": "boards/vertical-void-lobby-4096px.png",
+    "screenshot": "vertical-void-lobby-comparison.jpg",
+    "images": [
+      {
+        "alt": "Vertical Void Lobby — approved developer reference",
+        "complete": true,
+        "height": 580,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/reference/vertical-void-lobby.png",
+        "width": 812
+      },
+      {
+        "alt": "Vertical Void Lobby — approved-configuration Presentation Board",
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/boards/vertical-void-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  },
+  {
+    "name": "Compressed Sequential Lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/index.html?typology=compressed-sequential-lobby",
+    "board": "boards/compressed-sequential-lobby-4096px.png",
+    "screenshot": "compressed-sequential-lobby-comparison.jpg",
+    "images": [
+      {
+        "alt": "Compressed Sequential Lobby — approved developer reference",
+        "complete": true,
+        "height": 580,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/reference/compressed-sequential-lobby.png",
+        "width": 812
+      },
+      {
+        "alt": "Compressed Sequential Lobby — approved-configuration Presentation Board",
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/boards/compressed-sequential-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  },
+  {
+    "name": "Continuous Hall Lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/index.html?typology=continuous-hall-lobby",
+    "board": "boards/continuous-hall-lobby-4096px.png",
+    "screenshot": "continuous-hall-lobby-comparison.jpg",
+    "images": [
+      {
+        "alt": "Continuous Hall Lobby — approved developer reference",
+        "complete": true,
+        "height": 580,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/reference/continuous-hall-lobby.png",
+        "width": 812
+      },
+      {
+        "alt": "Continuous Hall Lobby — approved-configuration Presentation Board",
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/boards/continuous-hall-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  },
+  {
+    "name": "Topographic Lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/index.html?typology=topographic-ground-field-lobby",
+    "board": "boards/topographic-ground-field-lobby-4096px.png",
+    "screenshot": "topographic-ground-field-lobby-comparison.jpg",
+    "images": [
+      {
+        "alt": "Topographic Lobby — approved developer reference",
+        "complete": true,
+        "height": 580,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/reference/topographic-ground-field-lobby.png",
+        "width": 812
+      },
+      {
+        "alt": "Topographic Lobby — approved-configuration Presentation Board",
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/boards/topographic-ground-field-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  },
+  {
+    "name": "Linear Gallery Lobby",
+    "url": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/index.html?typology=linear-gallery-lobby",
+    "board": "boards/linear-gallery-lobby-4096px.png",
+    "screenshot": "linear-gallery-lobby-comparison.jpg",
+    "images": [
+      {
+        "alt": "Linear Gallery Lobby — approved developer reference",
+        "complete": true,
+        "height": 580,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/reference/linear-gallery-lobby.png",
+        "width": 812
+      },
+      {
+        "alt": "Linear Gallery Lobby — approved-configuration Presentation Board",
+        "complete": true,
+        "height": 5156,
+        "src": "http://127.0.0.1:3015/reports/lobby-comparison-review-2026-11-24/boards/linear-gallery-lobby-4096px.png",
+        "width": 4096
+      }
+    ]
+  }
+]

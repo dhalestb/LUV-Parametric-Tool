@@ -1,0 +1,162 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lobby transfer — implementation review</title><style>body{font:16px/1.55 system-ui;background:#10151b;color:#e9eef5;max-width:1400px;margin:30px auto;padding:24px}a{color:#83d7f4}h1,h2{line-height:1.2}.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}img{width:100%;height:auto}article{background:#000;padding:18px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#17212b;padding:24px}strong{color:#f3cc68}@media(max-width:850px){.gallery{grid-template-columns:1fr}}.single-board{max-width:980px;margin-top:24px}select{padding:8px;background:#17212b;color:#eef;border:1px solid #607080}details{margin-top:24px}</style><h1>Lobby transfer — implementation review</h1><p><strong>15 selector options. All five Lobby generators passed six- and seven-letter UI runs with strict mesh validation.</strong></p><p><a href="/amphitheater">Open Proto-Form Generation</a> · <a href="/lobby">Approved immutable originals</a> · <a href="/lobby-transfer-review">Board test harness</a></p><p>286 existing studies and the five approved finals remain preserved. Live code is the coherent pinned developer revision bf7fc3c; later ZIP final generator parity remains unresolved. Full production build still fails in existing tooling, and the same 54 prior TypeScript errors remain.</p><div class="single-board"><label>Captured typology <select id="captured-typology"><option value="3b3a0768-fbfd-4edf-a176-1d376fee84a1" data-typology="compressed-sequential-lobby">Compressed Sequential Lobby</option><option value="3c1b6694-4f44-4ac6-876f-14bba5dad1bd" data-typology="linear-gallery-lobby" selected>Linear Gallery Lobby</option><option value="88d6e70b-d74b-42ab-8bb5-fb0658b6fa7f" data-typology="continuous-hall-lobby">Continuous Hall Lobby</option><option value="9e41efc7-a4b4-4814-8718-f3f9cfddb52a" data-typology="topographic-ground-field-lobby">Topographic Lobby</option><option value="aeb63d94-145c-40d7-b7b9-1068d6b18290" data-typology="vertical-void-lobby">Vertical Void Lobby</option></select></label><p><a href="/lobby-transfer-review">Open Presentation &amp; Export with resolution controls</a></p><article><h2 id="captured-title">Linear Gallery Lobby</h2><p><a id="captured-open" href="/amphitheater?typology=linear-gallery-lobby&lobbyStudy=3c1b6694-4f44-4ac6-876f-14bba5dad1bd">Open saved study</a> · <a id="captured-png" href="/api/lobby-transfer-evidence?id=3c1b6694-4f44-4ac6-876f-14bba5dad1bd">Open full-resolution PNG</a></p><img id="captured-board" src="/api/lobby-transfer-evidence?id=3c1b6694-4f44-4ac6-876f-14bba5dad1bd" alt="Linear Gallery Lobby board"></article></div><script>document.getElementById('captured-typology').addEventListener('change',function(){var option=this.selectedOptions[0],id=option.value;document.getElementById('captured-title').textContent=option.textContent;document.getElementById('captured-board').alt=option.textContent+' board';document.getElementById('captured-board').src='/api/lobby-transfer-evidence?id='+id;document.getElementById('captured-png').href='/api/lobby-transfer-evidence?id='+id;document.getElementById('captured-open').href='/amphitheater?typology='+option.dataset.typology+'&lobbyStudy='+id;});</script><details><summary>Implementation audit details</summary><pre># Lobby implementation transfer — review report
+
+The isolated integration application now exposes **all 15 typologies** in Proto-Form Generation: five Gathering, five Workspace and the five requested Lobby names. Lobby generation reuses the developer's pinned Ruleset A and Ruleset B. It is not a saved-final substitution.
+
+**Revision boundary:** live generation uses the coherent Git source at bf7fc3c8a9235fc3d4910b7b266821d484af93bf. The later ZIP finals retain their original saved meshes/configurations in the immutable reference namespace. The ZIP does not include its final source-lobby-envelope revision, so this implementation does not claim to reproduce that later final generator revision. No mixed ZIP/Git engine was assembled.
+
+## Preview and review
+
+- [Unified Proto-Form Generation](http://127.0.0.1:3014/amphitheater)
+- [Local HTML report and five captured boards](http://127.0.0.1:3014/reports/lobby-live-transfer-2026-11-21.html)
+- [Live board review harness](http://127.0.0.1:3014/lobby-transfer-review)
+- [Approved immutable Lobby references](http://127.0.0.1:3014/lobby)
+
+Open these URLs in a browser on this Windows computer. Port **3014** serves **<project>**. Other previews and source directories were preserved. If this local development server has stopped, run the following in PowerShell; do not run a second server on an occupied port:
+
+~~~powershell
+Set-Location '<project>'
+$env:LUV_NEXT_DIST_DIR='.next-presentation-rules-dev'
+npm run dev -- --hostname 127.0.0.1 --port 3014
+~~~
+
+Choose a Lobby type, adjust field/letter controls, and use Generate Design or New Design. Original population functions are deterministic: unchanged inputs produce the same arrangement with a new result identity; changing the population, field, preferred size or enabled letter composition supplies a different original-rules arrangement. No new random placement rule was invented. Edit Letters / Regenerate Architecture use the exact edited source poses. Open approved reference loads the verified ZIP mesh and removes editing/regeneration actions for that original. Generate Design remains available as an explicitly separate derivative operation.
+
+## Live results
+
+Both UI actions were exercised for every Lobby: Generate Design with six letters, New Design with seven. Preferred size was 13 ft. Fields were 40 × 40 × 60 for Vertical, 40 × 40 × 40 for Topographic, and 40 × 20 × 20 for the other three, matching the developer's category defaults. All ten accepted source counts equal the requested quantity and displayed mesh count.
+
+| Typology | Tested arrangements | Full mesh result |
+|---|---|---|
+| Vertical Void Lobby | 6 letters: 2,762 triangles; 7 letters: 3,252 triangles | Both passed; 0 crossings/overlaps |
+| Compressed Sequential Lobby | 6 letters: 998 triangles; 7 letters: 996 triangles | Both passed; 0 crossings/overlaps |
+| Continuous Hall Lobby | 6 letters: 2,400 triangles; 7 letters: 3,196 triangles | Both passed; 0 crossings/overlaps |
+| Topographic Lobby | 6 letters: 3,524 triangles; 7 letters: 4,240 triangles | Both passed; 0 crossings/overlaps |
+| Linear Gallery Lobby | 6 letters: 1,686 triangles; 7 letters: 1,722 triangles | Both passed; 0 crossings/overlaps |
+
+Ten additional direct original-worker probes passed. Each of the ten UI results was then replayed through the **unchanged** original worker with its **exact transmitted poses**: architecture and letter mesh arrays matched exactly. Source placement code and all 27 pinned package files match their original byte hashes. Browser/Node math drift when independently populating the same inputs was at most 5.33e-15; the existing 1e-9 transform-identity threshold was retained. No intersection, coplanar-area, manifold, containment, cavity or connectivity validation threshold changed.
+
+An additional seven-letter Vertical study was regenerated after changing one source X position by 0.05 ft. All edited poses and the population were preserved exactly, a fresh result ID was assigned, and strict mesh validation passed. A source moved outside the field was rejected with HTTP 422, without adding a stored study. Approved-final mutation was rejected with HTTP 405.
+
+The source and mesh validation findings are in [validation.json](validation.json), [preservation.json](preservation.json), and the per-case probe/replay output folders. Circulation/occupancy and structural performance were not newly certified by these mesh tests.
+
+## Implementations and dependency map
+
+All five types share the original source files; they are **not five independent solid-engine implementations**.
+
+| Typology | Ruleset A | Ruleset B |
+|---|---|---|
+| Vertical Void Lobby | lobbyProof.ts → populateLobby('vertical-void-lobby', …), original sizing/pose/fit helpers | source-envelope.cjs → lobbyEnvelope in source-lobby-envelope.cjs; original source-profile dispatch |
+| Compressed Sequential Lobby | lobbyProof.ts → populateLobby('compressed-sequential-lobby', …), original sizing/pose/fit helpers | source-envelope.cjs → lobbyEnvelope in source-lobby-envelope.cjs; original compressed dispatch |
+| Continuous Hall Lobby | lobbyProof.ts → populateLobby('continuous-hall-lobby', …), original sizing/pose/fit helpers | source-envelope.cjs → lobbyEnvelope in source-lobby-envelope.cjs; original source-profile dispatch |
+| Topographic Lobby | lobbyProof.ts → populateLobby('topographic-ground-field-lobby', …), original sizing/pose/fit helpers | source-envelope.cjs → lobbyEnvelope in source-lobby-envelope.cjs; original source-profile dispatch |
+| Linear Gallery Lobby | lobbyProof.ts → populateLobby('linear-gallery-lobby', …), original sizing/pose/fit helpers | source-envelope.cjs → lobbyEnvelope in source-lobby-envelope.cjs; original source-profile dispatch |
+
+~~~text
+Unified selector
+ ├─ preserved Gathering controller → private existing Gathering API/worker
+ ├─ existing Workspace controller → unchanged existing API/worker
+ └─ Lobby adapter
+     ├─ Ruleset A: private pinned lobbyProof / letterGeometry3d
+     └─ private POST → unchanged worker → buildSource → lobbyEnvelope
+          ├─ private featurePoints / upperTriangles / profile helpers
+          ├─ Three + Manifold packages already installed
+          └─ unchanged full rule-validation (MeshBVH + crossings/coplanar checks)
+               → new UUID → separate lobby-generated namespace
+
+Approved ZIP finals → existing hash-verified immutable API → saved raw meshes
+Current board renderer ← saved current result (no architectural regeneration)
+~~~
+
+The original glyph implementation differs from the application's shared glyph helpers, so it was copied privately. The profile/vertical helpers needed by Lobby were also pinned privately. The worker's TypeScript loader runs in a child process and cannot replace the application's runtime glyph module. Private packages include fallback/type dependencies for their original runtime closure; the Lobby endpoint forces proof='lobby', so other generator paths are not registered through it. UI-only Canvas/navigation/presentation helpers are reused from the current application where compatible.
+
+The original fitLobbyLettersToArchitecture display post-process was transferred as source but is not applied to stored generated meshes or approved raw references. New studies are shown in their actual validated coordinates. Historical display fitting and the missing later ZIP engine remain separate parity questions.
+
+### Exact pinned Lobby source files reused
+
+- src/components/lobbyProof.ts
+- src/components/amphitheaterInteractiveTypes.ts
+- src/components/letterGeometry3d.ts
+- src/components/letterTypes.ts
+- scripts/amphitheater-interactive-worker.cjs
+- proof/rule-amphitheater.cjs
+- proof/render.cjs
+- proof/field-config.cjs
+- src/components/architecturalLetterSizing.ts
+- src/components/letterVolumeLayout.ts
+- src/components/optimizerTypes.ts
+- src/components/compositionEngine.ts
+- src/components/selectionHeightRouting.ts
+- src/components/constraintValidation.ts
+- scripts/source-envelope.cjs
+- scripts/source-profile-envelope.cjs
+- scripts/source-lobby-envelope.cjs
+- scripts/source-vertical-envelope.cjs
+- scripts/experimental-opening-profile.cjs
+- scripts/upright-opening-profile.cjs
+- scripts/source-inserted-plate.cjs
+- scripts/source-void-field.cjs
+- scripts/source-face-normal-facade.cjs
+- scripts/source-atrium-openings.cjs
+- scripts/source-level-envelope.cjs
+- scripts/source-articulation.cjs
+- proof/rule-validation.cjs
+
+Each resides under vendor/lobby-bf7fc3c with the original relative import structure. [source-transfer.json](source-transfer.json) records original file hashes and provenance for both private packages. The ZIP's four supplemental code files were investigated but did not replace these modules or shared application files.
+
+## File-by-file changes
+
+| File / group | Change |
+|---|---|
+| src/app/amphitheater/page.tsx | Modified: selects the additive unified controller. |
+| src/components/AmphitheaterStudio.tsx | Modified minimally: common selector, exported existing Viewer, Workspace-only saved-list filter. All named controller functions are unchanged. |
+| next.config.ts | Modified additively: trace private worker packages for the two new API routes. |
+| src/components/UnifiedProtoFormStudio.tsx | Added: preserves the existing family controllers and their state; supports typology links. |
+| src/components/UnifiedTypologySelect.tsx | Added: exactly 15 choices grouped Gathering / Workspace / Lobby; delegates to native selection handlers. |
+| src/components/LobbyGeneratorStudio.tsx | Added: UI adapter to original populateLobby, new-result storage, editing, A/B/C, references and current Presentation &amp; Export. |
+| src/components/PreservedGatheringPresentation.tsx | Added: type-only bridge from the preserved Gathering result to the current board renderer. No geometry conversion. |
+| src/app/api/lobby-generate/route.ts | Added: forces Lobby dispatch, validates inputs, invokes unchanged private worker/full validator, saves fresh UUIDs with exclusive creation. GET loads stored new results. No update/delete endpoint. |
+| src/app/api/gathering-preserved/route.ts | Added: dispatches the existing completed Gathering API privately. |
+| vendor/gathering-preserved/src/components/AmphitheaterStudio.tsx | Added from correction checkpoint: retargeted imports and API URLs, common selector and category-only list. Native generation/control functions preserved. |
+| vendor/gathering-preserved/src/app/api/amphitheater/route.ts | Added from correction checkpoint: private worker/input paths and private imports. Geometry and validation rules unchanged. |
+| vendor/lobby-bf7fc3c/** | Added: 27 byte-identical files from pinned developer commit; complete manifest below. No ZIP/Git hybrid. |
+| vendor/gathering-preserved/** | Added: 76-file controller/runtime dependency closure; 73 files byte-identical, one has import routing only, two are controller/route adapters. Four filename-addressed worker/input assets are included. |
+| .amphitheater-runs/&lt;213 original IDs&gt;/result.json | Added byte-identical copies only where absent. Existing 73 records were not overwritten. |
+| data/lobby-generated/v1/&lt;new UUID&gt;.json | Added new validated derivatives in a separate namespace. Approved Lobby finals are never written here. |
+| src/app/lobby-transfer-review/page.tsx | Added: local review harness calling the existing board renderer on saved generated records. |
+| src/app/api/lobby-transfer-evidence/route.ts | Added: local-only PNG evidence capture with input/mesh/PNG hashes and strict dimensions/density checks; read-only captured-PNG retrieval. |
+| scripts/transfer-lobby-sources.cjs; scripts/connect-preserved-controllers.cjs | Added one-time source transfer tools, guarded against overwriting an installed package. |
+| scripts/lobby-transfer-probe.cjs; scripts/lobby-transfer-validation.cjs; scripts/lobby-transfer-preservation.cjs; scripts/lobby-transfer-report.cjs | Added targeted validation/report tools. |
+| reports/lobby-live-transfer-2026-11-21/**; public/reports/lobby-live-transfer-2026-11-21.html | Added evidence, logs, source hashes, validation results and reports. |
+
+Application edits were additive or limited to dispatch/UI wiring. Existing shared letterGeometry3d, architectural generation modules, /api/amphitheater, board renderers/layouts, Composition, Lattice, Site Development and descriptor implementations were not replaced or modified. New private copies preserve the completed Gathering controller rather than reconstructing its controls or architecture.
+
+## Preservation and regression evidence
+
+- The existing 1,705-file checkpoint was retained. **All 1227 files outside the integration worktree** were rechecked against it and are unchanged.
+- All 213 original/corrected Gathering result files were copied byte-for-byte only into absent destinations. All 73 preexisting integration results retain their hashes. The local saved-study catalog now contains **286** existing records; category lists route to the corresponding controller. New Lobby studies live separately.
+- All **20 approved Lobby assets** (five configurations, five meshes, five summaries, five reference images) retain their original hashes. Original numeric study labels, UUIDs, names, source poses, dimensions and provenance are preserved.
+- AST comparisons confirm the Gathering and Workspace helper/generation function bodies are unchanged (Gathering API URLs normalized only for comparison). The shared selector does not implement architectural rules.
+- Existing Workspace isolation tests passed for all five types on both runtime routes, including exact generated-mesh equivalence, separate ruleset metadata and Study 201 regression hashes.
+- Existing Gathering presentation-equivalence tests passed: rendering operations, detail helpers, colors and PNG density are preserved.
+- Existing Lobby read-only tests passed: original asset buffers, viewer geometry, 405 mutation behavior and 95 saved files checked.
+- Five PNG captures use actual new seven-letter saved meshes, with record/mesh/image SHA-256 evidence. They are 4096 × 5156 px with 300-ppi metadata. Native Presentation &amp; Export retains its existing title formatting, cameras, colors, illustration sizing, translucency, sections, text and export settings. Captured review PNGs used the explicitly selected SW review camera; the native per-typology defaults are unchanged. The review harness also resolves those existing defaults for future captures.
+- The final Room reference was opened in the unified UI with its saved 21 letters, full-bearing center-joined top planks and existing Presentation &amp; Export. Linear Edge's completed footprint/elevation controls and Open Hall's guide/grid controls were verified in the UI.
+
+## Remaining issues and limits
+
+1. **Production build is not passing.** Initial sandboxed build failed on font-network/filesystem access. A separate-cache build with normal access failed in the existing Webpack WasmHash path (TypeError reading null.length). Prior readiness logs record the same tooling problem. No font, validation, TypeScript or build checks were disabled to obtain a pass. See build.log and build-review.log.
+2. **Full TypeScript remains at 54 errors, unchanged from 54; no new errors.** Errors remain in the previously reported height-routing, sizing and evaluation code. The new adapter/controller graph adds no diagnostic. See typescript.log and preservation.json.
+3. **Later ZIP live-generator parity is unresolved.** Its final source-lobby-envelope revision and final display-fitting environment were not supplied. Approved saved final fidelity is protected; live operation is verified for the explicitly pinned Git revision, not an invented reconstruction of that later revision.
+4. Original deterministic Ruleset A does not supply a random seed variation for unchanged inputs. New Design creates a fresh original-rules run; use different valid input settings for a distinct geometry. Tested populations six and seven produce distinct meshes for every type.
+5. This is a local, isolated review implementation. No commit, push, merge, deployment, source-worktree overwrite, reset, stash or discard was performed. Browser-based generation and board captures were observed before the browser connection became unavailable during the final recapture attempt; the saved screenshots/PNGs and server endpoints remain available for review.
+
+## Five captured current studies
+
+- [Compressed Sequential Lobby — open generated study](http://127.0.0.1:3014/amphitheater?typology=compressed-sequential-lobby&amp;lobbyStudy=3b3a0768-fbfd-4edf-a176-1d376fee84a1); [full board PNG](boards/3b3a0768-fbfd-4edf-a176-1d376fee84a1-0698df52286fda1ac9c9b553c4b896110d566844963aecbcbbfa02e0a12b22de.png).
+- [Linear Gallery Lobby — open generated study](http://127.0.0.1:3014/amphitheater?typology=linear-gallery-lobby&amp;lobbyStudy=3c1b6694-4f44-4ac6-876f-14bba5dad1bd); [full board PNG](boards/3c1b6694-4f44-4ac6-876f-14bba5dad1bd-a66b22ac3184ea6a20ef9027faccf5c7cbe5fb4feb0d140a9b0a9817208f914d.png).
+- [Continuous Hall Lobby — open generated study](http://127.0.0.1:3014/amphitheater?typology=continuous-hall-lobby&amp;lobbyStudy=88d6e70b-d74b-42ab-8bb5-fb0658b6fa7f); [full board PNG](boards/88d6e70b-d74b-42ab-8bb5-fb0658b6fa7f-6cbba756b9c540aac98afddf9be0c37df99e7e2bee294f694804276320a09c1e.png).
+- [Topographic Lobby — open generated study](http://127.0.0.1:3014/amphitheater?typology=topographic-ground-field-lobby&amp;lobbyStudy=9e41efc7-a4b4-4814-8718-f3f9cfddb52a); [full board PNG](boards/9e41efc7-a4b4-4814-8718-f3f9cfddb52a-4c0a6c11b665ad6509ee98f485da0c6bcaa0e682b272a158f55e63d63e8bf892.png).
+- [Vertical Void Lobby — open generated study](http://127.0.0.1:3014/amphitheater?typology=vertical-void-lobby&amp;lobbyStudy=aeb63d94-145c-40d7-b7b9-1068d6b18290); [full board PNG](boards/aeb63d94-145c-40d7-b7b9-1068d6b18290-08b87a4a9662dfe270843c8cc3aeb73ab99cf372053af663549517847e8d581b.png).
+
+
+</pre></details></html>

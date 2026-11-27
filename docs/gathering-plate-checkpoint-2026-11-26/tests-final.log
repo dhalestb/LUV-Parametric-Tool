@@ -1,0 +1,39 @@
+(node:128404) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ the matched November 22 package resolves all 63 dependencies and its private worker (15.7952ms)
+✔ a dependency mismatch rejects generation without editing the package (1.8357ms)
+✔ new generation adds provenance without changing source poses or an absent snapshot (0.3716ms)
+✔ recorded regeneration retains its revision and rejects unknown revisions or helper hashes (0.9459ms)
+✔ historical unversioned studies require an explicit separate verified copy (0.3495ms)
+✔ parent identity, operation and typology cannot silently change (0.3852ms)
+✔ saved results retain engine identity outside geometry and board inputs (0.2786ms)
+(node:2872) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ Study 135 placement reference is an exact source-only copy of the preserved study (7.0717ms)
+✔ approved level roles, inclinations, glyph sizes and corner-cap relationship are retained (0.2899ms)
+✔ cell expansion preserves input poses and glyph transforms while approaching a cell face (19.4302ms)
+✔ shorter fields preserve canonical automatic level populations (1.4196ms)
+✔ native junction rejection selects a passing outward candidate and retains its provenance (2.1381ms)
+✔ missing engines, unknown placement revisions and entirely invalid candidates do not fall back (4.7198ms)
+(node:145320) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ both terminal levels require a complete three-corner perimeter (2.2591ms)
+✔ a missing reverse U/L seal is rejected even when other walls have contacts (0.5695ms)
+✔ the final solid section is checked after all native wall continuations (0.3643ms)
+✔ the actual reported saved design is recognized as open without altering it (6.7143ms)
+✔ new closure validation has a distinct revision from historical placement (2.3807ms)
+✔ the same-level receiver policy has its own complete pinned adapter bundle (3.248ms)
+✔ saved placement revisions cannot silently change during regeneration (527.6486ms)
+✔ rigid fitting retains letter size and reports no solution for an undersized cell (291.0274ms)
+✔ closed fitting never substitutes another engine on an unavailable dependency (7.1676ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1484.5278

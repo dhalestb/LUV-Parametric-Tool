@@ -1,0 +1,29 @@
+PASS fixed-spacing checkpoint continuous-hall-lobby 9 ft / width 40
+PASS fixed-spacing checkpoint continuous-hall-lobby 13 ft / width 20
+PASS fixed-spacing checkpoint linear-gallery-lobby 13 ft / width 40
+PASS fixed-spacing checkpoint linear-gallery-lobby 9 ft / width 60
+PASS four updated configurations, pinned engine and spacing revisions, actual-mesh distances and unchanged legacy provenance.
+(node:145968) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ scripts\lobby-spacing-checkpoint-tests.cjs (767.526ms)
+(node:105276) [THREE_CJS_DEPRECATED] DeprecationWarning: `require("three")` is deprecated and will be removed.
+Replace `const THREE = require("three")` with `import * as THREE from "three"`.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✔ Study 87 uses exactly the developer one-level poses and keeps fitting/rotations/spacing (27.3135ms)
+✔ other Continuous dimensions, sizes, counts and letter choices also use Z=0 (3.8006ms)
+✔ the other four Lobby populations and their metadata are unchanged (12.3747ms)
+✔ new automatic Continuous requests receive the placement revision (0.2968ms)
+✔ legacy regeneration keeps its unversioned poses/policy and rejects silent migration (0.4987ms)
+✔ corrected regeneration retains the recorded placement revision (0.1682ms)
+✔ approved historical configuration copies keep their supplied source policy (0.1308ms)
+✔ unknown revisions and use on another Lobby typology are rejected (0.1889ms)
+✔ Z verification rejects an uncorrected new request and does not mutate edited poses (2.9286ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 777.2467
