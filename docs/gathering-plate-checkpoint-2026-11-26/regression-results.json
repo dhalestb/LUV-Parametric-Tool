@@ -1,0 +1,57 @@
+[
+  {
+    "case": "approved-135-exact",
+    "status": 201,
+    "id": "394bd83f-e097-47bd-ad46-c4a03441320c",
+    "originalUnchanged": true,
+    "geometryExact": true,
+    "meshSHA256": "3c63b4c558cc797a59805f03eaa7843ce6b139a6acf9a3fd16643c37184e0f36"
+  },
+  {
+    "case": "legacy-v1-exact-no-silent-upgrade",
+    "status": 201,
+    "id": "99fd91c9-1a1f-4226-b7fd-0362df2a8ee6",
+    "originalUnchanged": true,
+    "geometryExact": true,
+    "meshSHA256": "44c2fc5dad8c2bc8fda0a0ec07286be9197815dba8c005b4cfe5b1798a287933"
+  },
+  {
+    "case": "saved-v2-validator-hash-mismatch",
+    "status": 400,
+    "rejectedWithoutSaving": true
+  },
+  {
+    "case": "legacy-v2-exact-no-silent-upgrade",
+    "status": 201,
+    "id": "1d18a229-aa61-4a0c-89a3-7f5abeffbd0e",
+    "geometryExact": true
+  },
+  {
+    "case": "other-gathering-gallery",
+    "status": 201,
+    "id": "5ad91461-dd3f-4f0c-8113-8d6406ed220d",
+    "geometryExact": true,
+    "meshSHA256": "99061026fd13003b3e98826b7ab70732968ee2c982e51ad3373161397d225ed8"
+  },
+  {
+    "case": "other-gathering-stepped",
+    "status": 201,
+    "id": "7b8c2dc3-f207-4a91-a8c1-a7ed23681d35",
+    "geometryExact": true,
+    "meshSHA256": "b56c9db0097c1f69848bf4b2e798b793aa9cdf9e2a443d9544a47202f3df9503"
+  },
+  {
+    "case": "other-gathering-room-custom",
+    "status": 201,
+    "id": "bbcd7fd4-1f44-43e7-a43f-81243f92a9e7",
+    "geometryExact": true,
+    "meshSHA256": "007e1a1fbcc5d6043fd3484eea004fe9b8e1bb9a3070b01b362aecc9ace929b9"
+  },
+  {
+    "case": "other-gathering-void",
+    "status": 201,
+    "id": "bbaf78c7-3ed1-43b8-9188-c5f37f620fb9",
+    "geometryExact": true,
+    "meshSHA256": "2ad5f6b64ed898b7de06ef675e6be3e80c708ba0ca767455d67dcce0c2c81132"
+  }
+]

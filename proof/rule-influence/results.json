@@ -1,0 +1,481 @@
+{
+  "method": "Full bidirectional vertex-to-triangle boundary distance; 0.05 ft source pivot perturbation, 0.0005 ft significance threshold",
+  "rows": [
+    {
+      "id": "L-0",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.054800417743462254,
+      "finalBoundaryDelta": 0.05480352794074542,
+      "changedFinalVertices": 1257,
+      "volumeDelta": -1.374191778387285,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-1",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.064076671310893,
+      "finalBoundaryDelta": 0.06569320150716643,
+      "changedFinalVertices": 1989,
+      "volumeDelta": -0.7982670200963184,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-2",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.06548131298499696,
+      "finalBoundaryDelta": 0.0626833769192205,
+      "changedFinalVertices": 1649,
+      "volumeDelta": -0.6756766764374333,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-3",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.0649445794629089,
+      "finalBoundaryDelta": 0.06494223515883894,
+      "changedFinalVertices": 1934,
+      "volumeDelta": -0.2502167752109017,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-4",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.06396027160970627,
+      "finalBoundaryDelta": 0.5613756998689619,
+      "changedFinalVertices": 1942,
+      "volumeDelta": -0.9608610651312119,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-5",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.06339753718321975,
+      "finalBoundaryDelta": 0.06339571252623327,
+      "changedFinalVertices": 1948,
+      "volumeDelta": -0.168344469454496,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-6",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.061856925662654244,
+      "finalBoundaryDelta": 0.06185982472756422,
+      "changedFinalVertices": 1929,
+      "volumeDelta": -0.9327968742727535,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-7",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.060104899605431084,
+      "finalBoundaryDelta": 0.06010496156109354,
+      "changedFinalVertices": 1684,
+      "volumeDelta": -0.4679133281315444,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-8",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.0588205601959627,
+      "finalBoundaryDelta": 0.06965716553750284,
+      "changedFinalVertices": 1981,
+      "volumeDelta": -0.10871909033812699,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-9",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.057782938110577275,
+      "finalBoundaryDelta": 0.222894382848346,
+      "changedFinalVertices": 1881,
+      "volumeDelta": -0.5616750623958069,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-10",
+      "role": "L",
+      "sourceIndex": 0,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.05744614703076342,
+      "finalBoundaryDelta": 0.057446648368712876,
+      "changedFinalVertices": 1548,
+      "volumeDelta": -0.20595093771134998,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "L-11",
+      "role": "L",
+      "sourceIndex": 3,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.07011645270625937,
+      "finalBoundaryDelta": 0.07011360553661741,
+      "changedFinalVertices": 1423,
+      "volumeDelta": -3.4975854493341103,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "U-0",
+      "role": "U",
+      "sourceIndex": 1,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.048696182246532355,
+      "finalBoundaryDelta": 0.04869150582548828,
+      "changedFinalVertices": 1379,
+      "volumeDelta": 0.03274492637228832,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "U-1",
+      "role": "U",
+      "sourceIndex": 4,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.044402692941543156,
+      "finalBoundaryDelta": 0.36529561430116764,
+      "changedFinalVertices": 2756,
+      "volumeDelta": 1.0880009949869418,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "U-2",
+      "role": "U",
+      "sourceIndex": 1,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.047789927201639534,
+      "finalBoundaryDelta": 0.20959967263977136,
+      "changedFinalVertices": 2834,
+      "volumeDelta": 1.4920872326356402,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "U-3",
+      "role": "U",
+      "sourceIndex": 4,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.04867194047437535,
+      "finalBoundaryDelta": 0.05366775720226718,
+      "changedFinalVertices": 2269,
+      "volumeDelta": 1.6787051251967569,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "U-4",
+      "role": "U",
+      "sourceIndex": 1,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.049999237060546875,
+      "finalBoundaryDelta": 0.0500030517578125,
+      "changedFinalVertices": 1488,
+      "volumeDelta": 5.816449030354306,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-0",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010727349177632418,
+      "finalBoundaryDelta": 0.010724623339718298,
+      "changedFinalVertices": 626,
+      "volumeDelta": 0.002078940479805169,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-1",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010796123956260449,
+      "finalBoundaryDelta": 0.010795901324650978,
+      "changedFinalVertices": 329,
+      "volumeDelta": 0.09623209095843777,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-2",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010801179351609458,
+      "finalBoundaryDelta": 0.01080248809177868,
+      "changedFinalVertices": 333,
+      "volumeDelta": 0.09510561913430138,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-3",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.01080521308390864,
+      "finalBoundaryDelta": 0.04454110729752173,
+      "changedFinalVertices": 646,
+      "volumeDelta": 0.09436211304455355,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-4",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010813727202001935,
+      "finalBoundaryDelta": 0.010812691831785052,
+      "changedFinalVertices": 356,
+      "volumeDelta": 0.11124787601693242,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-5",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010825059181937437,
+      "finalBoundaryDelta": 0.010832814472250426,
+      "changedFinalVertices": 638,
+      "volumeDelta": 0.11298357114901592,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-6",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010841157729115026,
+      "finalBoundaryDelta": 0.01084166928100012,
+      "changedFinalVertices": 345,
+      "volumeDelta": 0.1340710913609655,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-7",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010858998007469861,
+      "finalBoundaryDelta": 0.010857212006273615,
+      "changedFinalVertices": 353,
+      "volumeDelta": 0.13478413995017036,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-8",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010880078935195922,
+      "finalBoundaryDelta": 0.010884659176964899,
+      "changedFinalVertices": 614,
+      "volumeDelta": 0.14272310445358016,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-9",
+      "role": "V",
+      "sourceIndex": 5,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.017510888253383088,
+      "finalBoundaryDelta": 0.017510006388087973,
+      "changedFinalVertices": 238,
+      "volumeDelta": 0.07033904771833477,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    },
+    {
+      "id": "V-10",
+      "role": "V",
+      "sourceIndex": 2,
+      "perturbation": [
+        0,
+        0,
+        0.05
+      ],
+      "constructionOperand": true,
+      "rawBoundaryDelta": 0.010886596720136978,
+      "finalBoundaryDelta": 0.010887239205671383,
+      "changedFinalVertices": 224,
+      "volumeDelta": 0.16444779140329047,
+      "perturbationSolidValid": true,
+      "status": "retained surface influence measured"
+    }
+  ]
+}

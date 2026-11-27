@@ -1,0 +1,20 @@
+{
+  "presentationFormatVersion": "luv-presentation-format-v1-2026-11-25",
+  "presentationContractFixtures": 22,
+  "presentationContractPassed": true,
+  "formatFiles": 31,
+  "preservedEvidenceFiles": 413,
+  "approvedStudyNativeReplays": 5,
+  "earlierNewDesignNativeReplays": 5,
+  "correctedSpacingNativeReplays": 4,
+  "allNativeReplaysExact": true,
+  "savedLobbyDerivatives": 71,
+  "typescript": {
+    "baselineErrors": 54,
+    "currentErrors": 54,
+    "newErrors": []
+  },
+  "freshBrowserCapture": false,
+  "browserLimitation": "Computer Use stopped because it could not reliably identify the native browser URL. No GitHub protection settings were changed.",
+  "githubEnforcement": "Workflow and CODEOWNERS included; required owner reviews and required status checks need repository-owner activation."
+}

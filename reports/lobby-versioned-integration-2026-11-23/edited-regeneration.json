@@ -1,0 +1,13 @@
+{
+  "parent": "6d00a5db-5ffa-4b42-bdbc-e0fb9a432a2b",
+  "id": "3bdad258-739c-4b6a-99ec-811e2b4a4b74",
+  "exactEditedPoses": true,
+  "sourceCount": 6,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 93197,
+    "legacyFlags": 29
+  },
+  "engine": "bf7fc3c"
+}

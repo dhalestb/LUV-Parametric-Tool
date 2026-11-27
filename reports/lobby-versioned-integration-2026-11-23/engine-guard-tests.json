@@ -1,0 +1,15 @@
+{
+  "requests": [
+    {
+      "case": "wrong engine for new design",
+      "status": 422,
+      "error": "New designs must use the verified engine for this Lobby typology. Historical revisions require a saved parent and Regenerate Architecture."
+    },
+    {
+      "case": "unknown engine",
+      "status": 422,
+      "error": "Unknown Lobby engine revision; the saved study was not changed."
+    }
+  ],
+  "conflictingMetadataRejected": true
+}

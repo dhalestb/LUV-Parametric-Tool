@@ -1,0 +1,27 @@
+[
+  {
+    "type": "vertical-void-lobby",
+    "name": "Vertical Void Lobby",
+    "url": "http://127.0.0.1:3015/amphitheater?typology=vertical-void-lobby&lobbyStudy=a0462c5d-8882-42d1-881c-dad25e557eea"
+  },
+  {
+    "type": "compressed-sequential-lobby",
+    "name": "Compressed Sequential Lobby",
+    "url": "http://127.0.0.1:3015/amphitheater?typology=compressed-sequential-lobby&lobbyStudy=414c91ae-a8ea-4ab1-a7d0-75f3664a6bf8"
+  },
+  {
+    "type": "continuous-hall-lobby",
+    "name": "Continuous Hall Lobby",
+    "url": "http://127.0.0.1:3015/amphitheater?typology=continuous-hall-lobby&lobbyStudy=12eb8d26-78e1-45b9-a0de-75a8c221f696"
+  },
+  {
+    "type": "topographic-ground-field-lobby",
+    "name": "Topographic Lobby",
+    "url": "http://127.0.0.1:3015/amphitheater?typology=topographic-ground-field-lobby&lobbyStudy=1dd269b8-7eda-468c-b9cd-73c609cb0be1"
+  },
+  {
+    "type": "linear-gallery-lobby",
+    "name": "Linear Gallery Lobby",
+    "url": "http://127.0.0.1:3015/amphitheater?typology=linear-gallery-lobby&lobbyStudy=aa686595-c222-4a55-b705-f2ab41697f7d"
+  }
+]

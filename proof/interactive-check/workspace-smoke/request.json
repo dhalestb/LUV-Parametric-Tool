@@ -1,0 +1,560 @@
+{
+  "generator": "workspace-ten-rule",
+  "envelopeVersion": "workspace-ten-rule",
+  "workspaceTypology": "open-hall-workspace",
+  "typologyName": "Open Hall Workspace",
+  "field": {
+    "width": 40,
+    "depth": 40,
+    "height": 40
+  },
+  "preferredFeet": 13,
+  "population": 3,
+  "sourceId": "workspace-smoke",
+  "sourceName": "workspace smoke open-hall-workspace",
+  "source": [
+    {
+      "letter": "L",
+      "x": -16.38,
+      "y": -11.88,
+      "z": -19.09124,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 3.2399999999999998,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "letterRules": {
+        "yaw": 0,
+        "level": 0,
+        "supportZ": -19.09124,
+        "strokeWidth": 0.4536,
+        "footTilt": 0,
+        "armRoll": 0,
+        "deviations": [],
+        "architectural": true,
+        "mirrored": false,
+        "enclosed": false
+      }
+    },
+    {
+      "letter": "V",
+      "x": -16.4,
+      "y": 7.140000000000002,
+      "z": -9.8432,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 3.2,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "letterRules": {
+        "yaw": 0,
+        "level": 1,
+        "supportZ": -9.8432,
+        "strokeWidth": 0.44800000000000006,
+        "footTilt": 0,
+        "armRoll": 0,
+        "deviations": [],
+        "architectural": true,
+        "mirrored": false,
+        "enclosed": false
+      }
+    },
+    {
+      "letter": "L",
+      "x": -16.38,
+      "y": -9.126000000000001,
+      "z": -19.09124,
+      "rx": 0,
+      "ry": 0,
+      "rz": 0,
+      "scale": 3.2399999999999998,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1,
+      "letterRules": {
+        "yaw": 0,
+        "level": 2,
+        "supportZ": -19.09124,
+        "strokeWidth": 0.4536,
+        "footTilt": 0,
+        "armRoll": 0,
+        "deviations": [],
+        "architectural": true,
+        "mirrored": false,
+        "enclosed": false
+      }
+    }
+  ],
+  "workspacePlan": {
+    "typology": "open-hall-workspace",
+    "plates": [
+      {
+        "id": "ground-hall",
+        "polygon": [
+          [
+            -18,
+            -13.5
+          ],
+          [
+            18,
+            -13.5
+          ],
+          [
+            18,
+            13.5
+          ],
+          [
+            -18,
+            13.5
+          ]
+        ],
+        "zTop": -19.25,
+        "thickness": 0.75,
+        "role": "ground"
+      },
+      {
+        "id": "mezzanine",
+        "polygon": [
+          [
+            -18,
+            3.5
+          ],
+          [
+            8,
+            3.5
+          ],
+          [
+            8,
+            -13.5
+          ],
+          [
+            18,
+            -13.5
+          ],
+          [
+            18,
+            13.5
+          ],
+          [
+            -18,
+            13.5
+          ]
+        ],
+        "zTop": -10,
+        "thickness": 0.75,
+        "role": "mezzanine"
+      },
+      {
+        "id": "roof",
+        "polygon": [
+          [
+            -18,
+            -13.5
+          ],
+          [
+            18,
+            -13.5
+          ],
+          [
+            18,
+            13.5
+          ],
+          [
+            -18,
+            13.5
+          ]
+        ],
+        "zTop": 19.950000000000003,
+        "thickness": 0.75,
+        "role": "roof"
+      },
+      {
+        "id": "support-1",
+        "polygon": [
+          [
+            -14.5,
+            9
+          ],
+          [
+            -12.1,
+            9
+          ],
+          [
+            -12.1,
+            9.911999999999999
+          ],
+          [
+            -13.588000000000001,
+            9.911999999999999
+          ],
+          [
+            -13.588000000000001,
+            11.4
+          ],
+          [
+            -14.5,
+            11.4
+          ]
+        ],
+        "zTop": -9.95,
+        "thickness": 9.850000000000001,
+        "role": "support"
+      },
+      {
+        "id": "support-2",
+        "polygon": [
+          [
+            13.5,
+            -10
+          ],
+          [
+            13.5,
+            -7.6
+          ],
+          [
+            12.588000000000001,
+            -7.6
+          ],
+          [
+            12.588000000000001,
+            -9.088
+          ],
+          [
+            11.1,
+            -9.088
+          ],
+          [
+            11.1,
+            -10
+          ]
+        ],
+        "zTop": -9.95,
+        "thickness": 9.850000000000001,
+        "role": "support"
+      }
+    ],
+    "voids": [],
+    "links": [],
+    "checks": [
+      {
+        "label": "Working floor ratio",
+        "status": "pass",
+        "detail": "Ground plate is 36.00 × 27.00 ft inside the 40 × 40 × 40 ft field. Longer-to-shorter ratio 1.333 is between 1:1 and 5:3."
+      },
+      {
+        "label": "Central hall",
+        "status": "pass",
+        "detail": "The ground plate is continuous through the centre. The mezzanine opening sits over that centre, so the hall is usable floor under an open volume of air."
+      },
+      {
+        "label": "Mezzanine opening",
+        "status": "pass",
+        "detail": "The L-shaped mezzanine leaves a 45.5% opening (threshold 40–70%). Measured on the 2-face wrap with 10.00 ft bands."
+      },
+      {
+        "label": "Mezzanine platform width",
+        "status": "pass",
+        "detail": "Mezzanine usable width is 10.00 ft (threshold ≥10 ft) on a L-shaped wrap across 2 faces, with a clear 10 × 10 ft patch."
+      },
+      {
+        "label": "Mezzanine elevation",
+        "status": "pass",
+        "detail": "Measured mezzanine finished surface 10.00 ft above field bottom; threshold 10 ft; units feet. Both occupied plates are horizontal."
+      },
+      {
+        "label": "Headroom",
+        "status": "pass",
+        "detail": "Clear height is 8.50 ft at ground-hall under mezzanine, including slab thickness. Ground-to-mezzanine underside and mezzanine-to-roof underside both stay above 8 ft."
+      },
+      {
+        "label": "Supports and movement",
+        "status": "pass",
+        "detail": "2 vertical L supports stand on the mezzanine bands, nearest pair 33.8 ft apart. The central hall floor stays clear."
+      },
+      {
+        "label": "Field envelope",
+        "status": "pass",
+        "detail": "All plates, voids, supports and connections span 36.00 × 27.00 × 39.95 ft inside the 40 × 40 × 40 ft field. Footprint rotation is 0°."
+      },
+      {
+        "label": "15° footprint rotation",
+        "status": "pass",
+        "detail": "Measured rotation 0°; threshold 15° increments; units degrees. Working surfaces stay horizontal."
+      },
+      {
+        "label": "No uniform rescale",
+        "status": "pass",
+        "detail": "The arrangement was generated inside the selected field. Completed geometry is not scaled to force a fit."
+      },
+      {
+        "label": "Letter variations",
+        "status": "pass",
+        "detail": "L and V variations form the plates; vertical L extrusions are the supports. All 3 selected source letters are placed (identities and proportions preserved; poses rearranged). Each letter mapped to a preferred plate slot."
+      }
+    ],
+    "slots": [
+      {
+        "x": -16.38,
+        "y": -11.88,
+        "z": -19.625,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2399999999999998,
+        "prefer": "L"
+      },
+      {
+        "x": -16.38,
+        "y": -9.126000000000001,
+        "z": -19.625,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2399999999999998,
+        "prefer": "L"
+      },
+      {
+        "x": -16.38,
+        "y": -6.372000000000002,
+        "z": -19.625,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2399999999999998,
+        "prefer": "L"
+      },
+      {
+        "x": -16.38,
+        "y": -3.618000000000002,
+        "z": -19.625,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2399999999999998,
+        "prefer": "L"
+      },
+      {
+        "x": -16.38,
+        "y": -0.8640000000000025,
+        "z": -19.625,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2399999999999998,
+        "prefer": "L"
+      },
+      {
+        "x": -16.38,
+        "y": 1.889999999999997,
+        "z": -19.625,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2399999999999998,
+        "prefer": "L"
+      },
+      {
+        "x": -13.626,
+        "y": -11.88,
+        "z": -19.625,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2399999999999998,
+        "prefer": "L"
+      },
+      {
+        "x": -13.626,
+        "y": -9.126000000000001,
+        "z": -19.625,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2399999999999998,
+        "prefer": "L"
+      },
+      {
+        "x": -16.4,
+        "y": 7.140000000000002,
+        "z": -10.375,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2,
+        "prefer": "V"
+      },
+      {
+        "x": -16.4,
+        "y": 9.860000000000003,
+        "z": -10.375,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2,
+        "prefer": "V"
+      },
+      {
+        "x": -13.679999999999998,
+        "y": 7.140000000000002,
+        "z": -10.375,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2,
+        "prefer": "V"
+      },
+      {
+        "x": -13.679999999999998,
+        "y": 9.860000000000003,
+        "z": -10.375,
+        "rx": 0,
+        "ry": 0,
+        "rz": 0,
+        "scale": 3.2,
+        "prefer": "V"
+      }
+    ],
+    "operations": [
+      "Open Hall: a 36.0 × 27.0 ft horizontal plate (ratio 1.33) sized to the 40 × 40 × 40 ft field.",
+      "The ground plate stays continuous across the centre. L and V letters sit toward the perimeter.",
+      "Mezzanine is a L-shaped platform wrapping 2 faces, 10.0 ft usable width; opening is 45.5% of the ground footprint.",
+      "Mezzanine top is 10 ft above the field bottom. Headroom above both occupied surfaces is greater than 8 ft.",
+      "Vertical L supports stand apart on the perimeter bands and leave the central floor open.",
+      "L and V variations form the plates; vertical L extrusions are the supports.",
+      "Horizontal letter forms rise above their supporting surfaces while retaining a solid overlap with the floor.",
+      "Source policy: every provided letter is kept; quantity is not invented; slots may be reused when sources exceed preferred positions."
+    ],
+    "rotation": 0
+  },
+  "letterArrangementReport": {
+    "rulesetId": "workspace-letter-arrangement",
+    "rulesetVersion": "1.0.0",
+    "stage": "letter-arrangement",
+    "typology": "open-hall-workspace",
+    "typologyName": "Open Hall Workspace",
+    "sourcePolicy": "Source letter identities and proportions are preserved; poses may be rearranged to satisfy the letter-arrangement ruleset. Letter count is not invented: every provided source letter is placed (slots may be reused if more letters than preferred slots).",
+    "overall": "pass",
+    "rules": [
+      {
+        "id": "LA-01",
+        "title": "Permitted letters and placement",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "Letter variations [pass]: L and V variations form the plates; vertical L extrusions are the supports. All 3 selected source letters are placed (identities and proportions preserved; poses rearranged). Each letter mapped to a preferred plate slot."
+        ]
+      },
+      {
+        "id": "LA-02",
+        "title": "Ground footprint ratio 1:1–5:3",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "Working floor ratio [pass]: Ground plate is 36.00 × 27.00 ft inside the 40 × 40 × 40 ft field. Longer-to-shorter ratio 1.333 is between 1:1 and 5:3."
+        ]
+      },
+      {
+        "id": "LA-03",
+        "title": "15° footprint orientation",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "15° footprint rotation [pass]: Measured rotation 0°; threshold 15° increments; units degrees. Working surfaces stay horizontal."
+        ]
+      },
+      {
+        "id": "LA-04",
+        "title": "Central hall kept open in plan",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "Central hall [pass]: The ground plate is continuous through the centre. The mezzanine opening sits over that centre, so the hall is usable floor under an open volume of air."
+        ]
+      },
+      {
+        "id": "LA-05",
+        "title": "Mezzanine opening reserved 40–70%",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "Mezzanine opening [pass]: The L-shaped mezzanine leaves a 45.5% opening (threshold 40–70%). Measured on the 2-face wrap with 10.00 ft bands."
+        ]
+      },
+      {
+        "id": "LA-06",
+        "title": "Mezzanine usable width ≥10 ft (2–4 face wrap)",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "Mezzanine platform width [pass]: Mezzanine usable width is 10.00 ft (threshold ≥10 ft) on a L-shaped wrap across 2 faces, with a clear 10 × 10 ft patch."
+        ]
+      },
+      {
+        "id": "LA-07",
+        "title": "No silent rescale of letters",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "No uniform rescale [pass]: The arrangement was generated inside the selected field. Completed geometry is not scaled to force a fit."
+        ]
+      }
+    ]
+  },
+  "architecturalGenerationReport": {
+    "rulesetId": "workspace-architectural-generation",
+    "rulesetVersion": "1.0.0",
+    "stage": "architectural-generation",
+    "typology": "open-hall-workspace",
+    "typologyName": "Open Hall Workspace",
+    "sourcePolicy": "Source letter identities and proportions are preserved; poses may be rearranged to satisfy the letter-arrangement ruleset. Letter count is not invented: every provided source letter is placed (slots may be reused if more letters than preferred slots).",
+    "overall": "pass",
+    "rules": [
+      {
+        "id": "AG-01",
+        "title": "Field containment",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "Field envelope [pass]: All plates, voids, supports and connections span 36.00 × 27.00 × 39.95 ft inside the 40 × 40 × 40 ft field. Footprint rotation is 0°."
+        ]
+      },
+      {
+        "id": "AG-02",
+        "title": "Mezzanine elevation at 10 ft",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "Mezzanine elevation [pass]: Measured mezzanine finished surface 10.00 ft above field bottom; threshold 10 ft; units feet. Both occupied plates are horizontal."
+        ]
+      },
+      {
+        "id": "AG-03",
+        "title": "Occupied headroom >8 ft",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "Headroom [pass]: Clear height is 8.50 ft at ground-hall under mezzanine, including slab thickness. Ground-to-mezzanine underside and mezzanine-to-roof underside both stay above 8 ft."
+        ]
+      },
+      {
+        "id": "AG-04",
+        "title": "Supports preserve hall movement",
+        "status": "pass",
+        "hard": true,
+        "evidence": [
+          "Supports and movement [pass]: 2 vertical L supports stand on the mezzanine bands, nearest pair 33.8 ft apart. The central hall floor stays clear."
+        ]
+      }
+    ]
+  },
+  "letterArrangementRulesetId": "workspace-letter-arrangement",
+  "letterArrangementRulesetVersion": "1.0.0",
+  "architecturalGenerationRulesetId": "workspace-architectural-generation",
+  "architecturalGenerationRulesetVersion": "1.0.0",
+  "rulesetId": "workspace-letter-arrangement+workspace-architectural-generation",
+  "rulesetVersion": "1.0.0/1.0.0"
+}

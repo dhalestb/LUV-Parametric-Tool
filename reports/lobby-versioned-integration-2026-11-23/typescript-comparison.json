@@ -1,0 +1,549 @@
+{
+  "baselineErrors": 54,
+  "currentErrors": 54,
+  "newErrors": [],
+  "baseline": [
+    {
+      "file": "src/components/amphitheaterCompositionSources.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type '{ centerX: number; centerY: number; centerZ: number; width: number; height: number; depth: number; evaluatedPositions: number; totalPositions: number; exhaustive: boolean; }'."
+    },
+    {
+      "file": "src/components/architectural-forms/openHallLetterLayout.ts",
+      "code": 2339,
+      "message": "Property 'openHallRole' does not exist on type '{ letter: \"L\"; letterRules: { architectural: boolean; yaw: number; level: number; supportZ: number; strokeWidth: number; footTilt: number; armRoll: number; deviations: string[]; mirrored?: boolean | undefined; enclosed?: boolean | undefined; }; ... 9 more ...; scaleZ: number; }'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'preferredLetterSize' does not exist in type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2339,
+      "message": "Property 'preferredLetterSize' does not exist on type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2339,
+      "message": "Property 'letterSizeVariation' does not exist on type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2339,
+      "message": "Property 'preferredLetterSize' does not exist on type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2339,
+      "message": "Property 'letterSizeVariation' does not exist on type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/evaluations/ArchitecturalEvaluations.tsx",
+      "code": 2339,
+      "message": "Property 'geometryPersisted' does not exist on type 'LatticeSourceValue'."
+    },
+    {
+      "file": "src/components/evaluations/ArchitecturalEvaluations.tsx",
+      "code": 2339,
+      "message": "Property 'note' does not exist on type '{ imported: number; error?: string | undefined; }'."
+    },
+    {
+      "file": "src/components/evaluations/comparisonBoard.ts",
+      "code": 2339,
+      "message": "Property 'arc' does not exist on type 'DrawContext'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorCache.test.ts",
+      "code": 2352,
+      "message": "Conversion of type '{ rotation: 0; mirror: \"none\"; occupied: number[]; floor: never[]; passage: never[]; voidCells: never[]; vertical: never[]; bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number; }; faces: {}; }' to type 'TileVariant' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.   Types of property 'faces' are incompatible.     Type '{}' is missing the following properties from type 'Record<Direction, FaceLayer>': \"+X\", \"-X\", \"+Y\", \"-Y\", and 2 more."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'tieBreakUsed' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'tieBreakUsed' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'tieBreakUsed' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/openVolumeCache.test.ts",
+      "code": 2352,
+      "message": "Conversion of type '{ rotation: 0; mirror: \"none\"; occupied: never[]; floor: never[]; passage: never[]; voidCells: never[]; vertical: never[]; bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number; }; faces: {}; }' to type 'TileVariant' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.   Types of property 'faces' are incompatible.     Type '{}' is missing the following properties from type 'Record<Direction, FaceLayer>': \"+X\", \"-X\", \"+Y\", \"-Y\", and 2 more."
+    },
+    {
+      "file": "src/components/evaluations/openVolumeClearance.ts",
+      "code": 2345,
+      "message": "Argument of type 'Pick<ObjFace, \"vertices\">' is not assignable to parameter of type 'ObjFace'.   Property 'normals' is missing in type 'Pick<ObjFace, \"vertices\">' but required in type 'ObjFace'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'kind' is missing in type '{}' but required in type 'Pick<EvidenceLayer, \"kind\" | \"segments\" | \"arrows\">'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'kind' is missing in type '{ arrows: { a: Vec3; b: Vec3; }[]; }' but required in type 'Pick<EvidenceLayer, \"kind\" | \"segments\" | \"arrows\">'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'kind' is missing in type '{}' but required in type 'Pick<EvidenceLayer, \"kind\" | \"segments\" | \"arrows\">'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'color' is missing in type '{ pointShape: \"circle\"; pointScale: number; }' but required in type 'Pick<EvidenceLayer, \"color\" | \"pointShape\" | \"pointScale\">'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'color' is missing in type '{}' but required in type 'Pick<EvidenceLayer, \"color\" | \"pointShape\" | \"pointScale\">'."
+    },
+    {
+      "file": "src/components/letterIntersectionSpaces.ts",
+      "code": 2322,
+      "message": "Type 'OfficeCheck[] | undefined' is not assignable to type '{ label: string; status: \"pass\" | \"unverified\"; detail: string; }[] | undefined'.   Type 'OfficeCheck[]' is not assignable to type '{ label: string; status: \"pass\" | \"unverified\"; detail: string; }[]'.     Type 'OfficeCheck' is not assignable to type '{ label: string; status: \"pass\" | \"unverified\"; detail: string; }'.       Types of property 'status' are incompatible.         Type '\"pass\" | \"fail\" | \"unverified\"' is not assignable to type '\"pass\" | \"unverified\"'.           Type '\"fail\"' is not assignable to type '\"pass\" | \"unverified\"'."
+    },
+    {
+      "file": "src/components/selectionFieldGeometry.test.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionFieldGeometry.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type '{ centerX: number; centerY: number; centerZ: number; width: number; height: number; depth: number; evaluatedPositions: number; totalPositions: number; exhaustive: boolean; }'."
+    },
+    {
+      "file": "src/components/selectionFieldGeometry.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type '{ centerX: number; centerY: number; centerZ: number; width: number; height: number; depth: number; evaluatedPositions: number; totalPositions: number; exhaustive: boolean; }'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2345,
+      "message": "Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'.   Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2345,
+      "message": "Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'.   Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'Partial<SelectionVolume>'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'Partial<SelectionVolume>'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2344,
+      "message": "Type '\"enabled\" | \"heightRouting\"' does not satisfy the constraint 'keyof SelectionVolume'.   Type '\"heightRouting\"' is not assignable to type 'keyof SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2345,
+      "message": "Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'.   Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2345,
+      "message": "Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'.   Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'Partial<SelectionVolume>'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'Partial<SelectionVolume>'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    }
+  ],
+  "current": [
+    {
+      "file": "src/components/amphitheaterCompositionSources.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type '{ centerX: number; centerY: number; centerZ: number; width: number; height: number; depth: number; evaluatedPositions: number; totalPositions: number; exhaustive: boolean; }'."
+    },
+    {
+      "file": "src/components/architectural-forms/openHallLetterLayout.ts",
+      "code": 2339,
+      "message": "Property 'openHallRole' does not exist on type '{ letter: \"L\"; letterRules: { architectural: boolean; yaw: number; level: number; supportZ: number; strokeWidth: number; footTilt: number; armRoll: number; deviations: string[]; mirrored?: boolean | undefined; enclosed?: boolean | undefined; }; ... 9 more ...; scaleZ: number; }'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'preferredLetterSize' does not exist in type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2339,
+      "message": "Property 'preferredLetterSize' does not exist on type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2339,
+      "message": "Property 'letterSizeVariation' does not exist on type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2339,
+      "message": "Property 'preferredLetterSize' does not exist on type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/architecturalLetterSizing.ts",
+      "code": 2339,
+      "message": "Property 'letterSizeVariation' does not exist on type 'GenerationRules'."
+    },
+    {
+      "file": "src/components/evaluations/ArchitecturalEvaluations.tsx",
+      "code": 2339,
+      "message": "Property 'geometryPersisted' does not exist on type 'LatticeSourceValue'."
+    },
+    {
+      "file": "src/components/evaluations/ArchitecturalEvaluations.tsx",
+      "code": 2339,
+      "message": "Property 'note' does not exist on type '{ imported: number; error?: string | undefined; }'."
+    },
+    {
+      "file": "src/components/evaluations/comparisonBoard.ts",
+      "code": 2339,
+      "message": "Property 'arc' does not exist on type 'DrawContext'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorCache.test.ts",
+      "code": 2352,
+      "message": "Conversion of type '{ rotation: 0; mirror: \"none\"; occupied: number[]; floor: never[]; passage: never[]; voidCells: never[]; vertical: never[]; bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number; }; faces: {}; }' to type 'TileVariant' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.   Types of property 'faces' are incompatible.     Type '{}' is missing the following properties from type 'Record<Direction, FaceLayer>': \"+X\", \"-X\", \"+Y\", \"-Y\", and 2 more."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'comparativeRank' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'tieBreakUsed' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'tieBreakUsed' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/descriptorRank.test.ts",
+      "code": 2339,
+      "message": "Property 'tieBreakUsed' does not exist on type '{ id: string; absoluteScore: number; components: { name: string; raw: number; weight: number; }[]; }'."
+    },
+    {
+      "file": "src/components/evaluations/openVolumeCache.test.ts",
+      "code": 2352,
+      "message": "Conversion of type '{ rotation: 0; mirror: \"none\"; occupied: never[]; floor: never[]; passage: never[]; voidCells: never[]; vertical: never[]; bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number; }; faces: {}; }' to type 'TileVariant' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.   Types of property 'faces' are incompatible.     Type '{}' is missing the following properties from type 'Record<Direction, FaceLayer>': \"+X\", \"-X\", \"+Y\", \"-Y\", and 2 more."
+    },
+    {
+      "file": "src/components/evaluations/openVolumeClearance.ts",
+      "code": 2345,
+      "message": "Argument of type 'Pick<ObjFace, \"vertices\">' is not assignable to parameter of type 'ObjFace'.   Property 'normals' is missing in type 'Pick<ObjFace, \"vertices\">' but required in type 'ObjFace'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'kind' is missing in type '{}' but required in type 'Pick<EvidenceLayer, \"kind\" | \"segments\" | \"arrows\">'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'kind' is missing in type '{ arrows: { a: Vec3; b: Vec3; }[]; }' but required in type 'Pick<EvidenceLayer, \"kind\" | \"segments\" | \"arrows\">'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'kind' is missing in type '{}' but required in type 'Pick<EvidenceLayer, \"kind\" | \"segments\" | \"arrows\">'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'color' is missing in type '{ pointShape: \"circle\"; pointScale: number; }' but required in type 'Pick<EvidenceLayer, \"color\" | \"pointShape\" | \"pointScale\">'."
+    },
+    {
+      "file": "src/components/evaluations/presentEvidence.ts",
+      "code": 2741,
+      "message": "Property 'color' is missing in type '{}' but required in type 'Pick<EvidenceLayer, \"color\" | \"pointShape\" | \"pointScale\">'."
+    },
+    {
+      "file": "src/components/letterIntersectionSpaces.ts",
+      "code": 2322,
+      "message": "Type 'OfficeCheck[] | undefined' is not assignable to type '{ label: string; status: \"pass\" | \"unverified\"; detail: string; }[] | undefined'.   Type 'OfficeCheck[]' is not assignable to type '{ label: string; status: \"pass\" | \"unverified\"; detail: string; }[]'.     Type 'OfficeCheck' is not assignable to type '{ label: string; status: \"pass\" | \"unverified\"; detail: string; }'.       Types of property 'status' are incompatible.         Type '\"pass\" | \"fail\" | \"unverified\"' is not assignable to type '\"pass\" | \"unverified\"'.           Type '\"fail\"' is not assignable to type '\"pass\" | \"unverified\"'."
+    },
+    {
+      "file": "src/components/selectionFieldGeometry.test.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionFieldGeometry.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type '{ centerX: number; centerY: number; centerZ: number; width: number; height: number; depth: number; evaluatedPositions: number; totalPositions: number; exhaustive: boolean; }'."
+    },
+    {
+      "file": "src/components/selectionFieldGeometry.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type '{ centerX: number; centerY: number; centerZ: number; width: number; height: number; depth: number; evaluatedPositions: number; totalPositions: number; exhaustive: boolean; }'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2345,
+      "message": "Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'.   Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2345,
+      "message": "Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'.   Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'Partial<SelectionVolume>'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'Partial<SelectionVolume>'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.test.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2344,
+      "message": "Type '\"enabled\" | \"heightRouting\"' does not satisfy the constraint 'keyof SelectionVolume'.   Type '\"heightRouting\"' is not assignable to type 'keyof SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2345,
+      "message": "Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'.   Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2345,
+      "message": "Argument of type 'SelectionVolume' is not assignable to parameter of type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'.   Property 'heightRouting' is missing in type 'SelectionVolume' but required in type 'Pick<SelectionVolume, \"enabled\" | \"heightRouting\">'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'SelectionVolume'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'Partial<SelectionVolume>'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2339,
+      "message": "Property 'heightRouting' does not exist on type 'Partial<SelectionVolume>'."
+    },
+    {
+      "file": "src/components/selectionHeightRouting.ts",
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'heightRouting' does not exist in type 'SelectionVolume'."
+    }
+  ]
+}

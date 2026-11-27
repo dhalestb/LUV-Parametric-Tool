@@ -1,0 +1,101 @@
+{
+  "existingFilesChecked": 972,
+  "allowedExistingChanges": [
+    "src/app/api/lobby-generate/route.ts",
+    "src/components/LobbyGeneratorStudio.tsx",
+    "next.config.ts"
+  ],
+  "existingFilesUnchanged": 969,
+  "checkpointFiles": 1705,
+  "checkpointAllMatch": true,
+  "authoritativeSources": [
+    {
+      "source": "original",
+      "unchangedFiles": 389
+    },
+    {
+      "source": "correction",
+      "unchangedFiles": 391
+    }
+  ],
+  "preservedArchitecturalRecords": 292,
+  "approvedLobbyAssets": 20,
+  "privatePackageFiles": {
+    "bf7fc3c": 27,
+    "bfce854": 27
+  },
+  "presentation": [
+    {
+      "type": "vertical-void-lobby",
+      "id": "6d00a5db-5ffa-4b42-bdbc-e0fb9a432a2b",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    },
+    {
+      "type": "vertical-void-lobby",
+      "id": "9651281f-c4a9-4adf-b8f8-239faebe3653",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "id": "3456896d-7e8c-4468-b818-d9401ff8bb69",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    },
+    {
+      "type": "compressed-sequential-lobby",
+      "id": "0cabc668-bb29-49c1-bae1-8e6c181aa160",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "id": "e9f3658d-b522-42ae-9f96-c6c4eac96a27",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    },
+    {
+      "type": "continuous-hall-lobby",
+      "id": "d61f793e-3482-4cde-9dcc-5d4257975edc",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "id": "facc6256-6867-47ac-9876-3efa6ad4259c",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    },
+    {
+      "type": "topographic-ground-field-lobby",
+      "id": "cf04bf68-069e-4ec1-b33d-19398dff5437",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "id": "6077b888-7323-42c2-97af-534a19690861",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    },
+    {
+      "type": "linear-gallery-lobby",
+      "id": "50a5ce70-2b88-47ff-a205-a1d6f10e12c6",
+      "orientationDetails": 2,
+      "generationDetails": 3,
+      "sourceAndGeometryUnchanged": true
+    }
+  ],
+  "branch": "architectural-space-generation",
+  "head": "d40fbc7eef38ac19f5bd51fe3bb3beca89b690ec"
+}

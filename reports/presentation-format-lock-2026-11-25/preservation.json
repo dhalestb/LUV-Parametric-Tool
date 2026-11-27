@@ -1,0 +1,19 @@
+{
+  "checkedExistingIntegrationFiles": 1037,
+  "changedExistingFiles": [
+    "src/components/AmphitheaterPresentation.tsx",
+    "src/components/presentation/adaptedPresentation.ts",
+    "src/components/presentation/rules.ts",
+    "src/components/presentationExportSizing.ts",
+    "package.json",
+    ".github/CODEOWNERS"
+  ],
+  "allOtherExistingFilesByteUnchanged": true,
+  "missingFiles": [],
+  "historicalCheckpointFilesCompared": 396,
+  "historicalCheckpointAssetsByteUnchanged": true,
+  "activeIntegrationHeadUnchanged": true,
+  "activeIntegrationBranchUnchanged": true,
+  "spacingImplementationUnchangedThisTask": true,
+  "note": "This task modifies only formatting source, its UI explanation, package check command, and ownership rules among the pre-existing integration files. No existing saved study, geometry, board PNG, vendor package, generation route, or typology placement was changed."
+}

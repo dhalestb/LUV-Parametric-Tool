@@ -1,0 +1,263 @@
+{
+  "revision": "gathering-nov22-v1",
+  "checkpoint": "2026-11-22T01:00:29.692Z",
+  "sourceBaseCommit": "70b3b7d5ee57f7e3b7b19ff3330199222a6a261a",
+  "sourceState": "Preserved November 22 working-source checkpoint, including verified uncommitted improvements",
+  "package": "vendor/gathering-preserved",
+  "worker": "scripts/amphitheater-interactive-worker.cjs",
+  "bundleSHA256": "9149b5b9f13029964102b3c37593db338c80259cc5329c655ffa5f9d0c35ef01",
+  "files": [
+    {
+      "path": "proof/field-config.cjs",
+      "sha256": "ab4638d193c69f8e98a2596f78691477d8a035c664f8f470dad9476954c37396"
+    },
+    {
+      "path": "proof/render.cjs",
+      "sha256": "e32f6f1e9d8ff3058b4a10a2d6a95cdb5c6f6177ba76e79fa1641a263f6d946f"
+    },
+    {
+      "path": "proof/rule-amphitheater.cjs",
+      "sha256": "e6333f82b22da3d731d640f5edd553fbd8714b68be6865451dbc0ba8599f37da"
+    },
+    {
+      "path": "proof/rule-validation.cjs",
+      "sha256": "e5ff6cbe0562a5756cdcf398d75d51386202792baeb2257d3f8a511fbde95ad5"
+    },
+    {
+      "path": "scripts/amphitheater-interactive-worker.cjs",
+      "sha256": "ebd11a36d7421f36ab58a56bd4e8bbd495a95a2f70845d2c0ab884ff7d72dd90"
+    },
+    {
+      "path": "scripts/anchored-room.cjs",
+      "sha256": "fcd71a94f7b7bc546d118338b9e8d1d7b0722a845f46bc3f4d178c0dcf452563"
+    },
+    {
+      "path": "scripts/corner-pier.cjs",
+      "sha256": "6fa92178a17e2cece3cd9c0666c8e0fb5a71914fe9f6ae4f38f4a3a1a5d1bc84"
+    },
+    {
+      "path": "scripts/experimental-opening-profile.cjs",
+      "sha256": "ed55e904af72b61988ba1c85ae30f1a391402850f06d00f17473033cd27a7933"
+    },
+    {
+      "path": "scripts/fit-planks-to-walls.cjs",
+      "sha256": "73f8928681522c4e847bd483e0756d3a83ff8bf45f3f11f939192fad8f61c9a0"
+    },
+    {
+      "path": "scripts/full-corner-joints.cjs",
+      "sha256": "13b4464c1628e18979c77451951ef3734afedeac1c3b925014fc4c36a965ea7d"
+    },
+    {
+      "path": "scripts/full-perimeter-lofts.cjs",
+      "sha256": "692cc1807328f425b6258d2898ebdf457e19ccca2a27c4623d3208cb6661a6e5"
+    },
+    {
+      "path": "scripts/join-curved-neighbors.cjs",
+      "sha256": "d130be49b42daedfaeeb9be990bc84e2c25103dacaf31b993129d71d29381c93"
+    },
+    {
+      "path": "scripts/join-v-flanks.cjs",
+      "sha256": "8dfa3bf2955e960ab9fd7048f18b78ff64bf6356bfbfc473653d52246a4e87d1"
+    },
+    {
+      "path": "scripts/linear-gallery-approved-envelope.cjs",
+      "sha256": "7ac2089d38df6ffd80ef2c3dbdbc77464aedb831be79fd682a02ed2beb8369fc"
+    },
+    {
+      "path": "scripts/linear-gallery-automatic.cjs",
+      "sha256": "44f03e0ac0425b8c4728165e8c4d63853b0e6849d5a3509192f48423cc63406e"
+    },
+    {
+      "path": "scripts/linear-gallery-current-edges.cjs",
+      "sha256": "60f51476e0c5e33744f96cafdc440e2ed91d74acc63983e067323b8cd3a39954"
+    },
+    {
+      "path": "scripts/linear-gallery-print.cjs",
+      "sha256": "0ca95098fe2fd7d6e55d934d6228eda91f293430803f0bfe4109fac8cd15c379"
+    },
+    {
+      "path": "scripts/linear-gallery-roofs.cjs",
+      "sha256": "c104b01a6eaebf7a33970057bb782fc873cc18b2db92b122d5e26eb74461e626"
+    },
+    {
+      "path": "scripts/live-perimeter-room.cjs",
+      "sha256": "2b112edabf9586521ab3f33c7bdaf49cf17e895064019d42be7fe9d42bc75d38"
+    },
+    {
+      "path": "scripts/perimeter-letter-panels.cjs",
+      "sha256": "5a3651cd1e014a453c3b291077838aa087cc9f3fa17e149ce678b357cc398dd3"
+    },
+    {
+      "path": "scripts/room-contour-plan.cjs",
+      "sha256": "fae4964b06a7f34c90a19a184c0abe2738dbde4266949b7c247013fe526445e4"
+    },
+    {
+      "path": "scripts/room-edge-platforms.cjs",
+      "sha256": "1feb597e9c4938b60a893b918c50a136ff63533155b2527c6f6e25bf0910da7a"
+    },
+    {
+      "path": "scripts/room-top-planks.cjs",
+      "sha256": "2c8e08e8ceea32c6c3e4e69709dd3e9f72e84b026172ecb9d4950be882f131ff"
+    },
+    {
+      "path": "scripts/seal-curved-walls.cjs",
+      "sha256": "190e9a2b212805cc1f2a789dc242d368ebff9eac6a2cef235905862b70c22d37"
+    },
+    {
+      "path": "scripts/source-articulation.cjs",
+      "sha256": "9ce79946b9fa64d96182d9c6749f3c858687244f179a4bdade3c98b4f54f069d"
+    },
+    {
+      "path": "scripts/source-atrium-openings.cjs",
+      "sha256": "95bee59e9f9ad77b4dd1d6c6c3cda515944ea86cee14a4a85062255860cc7ba2"
+    },
+    {
+      "path": "scripts/source-edge-envelope.cjs",
+      "sha256": "117dd1616bfebb2ad354c88857fa70f84bbf2b373c88523bde8361b6e9c64116"
+    },
+    {
+      "path": "scripts/source-envelope.cjs",
+      "sha256": "78c1df5575eb8d6d0ebc287aa18598d791c0b558cb8b9780538da67cafa0c695"
+    },
+    {
+      "path": "scripts/source-face-normal-facade.cjs",
+      "sha256": "86e43aae9b13331603eb2394c2c74dd8ebd85bc1397f978fa95940ca8c92d4f5"
+    },
+    {
+      "path": "scripts/source-gallery-receivers.cjs",
+      "sha256": "201d09126daf20945827818c1709d6f00048c40bca013b9de70de1521174d15e"
+    },
+    {
+      "path": "scripts/source-inserted-plate-legacy.cjs",
+      "sha256": "9c39db98c094c97f443adbe1d3c8ce9146960c90ae81910c96cfa440902c4e92"
+    },
+    {
+      "path": "scripts/source-inserted-plate.cjs",
+      "sha256": "fbdcdf31ce61d40a2c2c15a218adc45448a9ac9f68608ad767e7e99f20a15659"
+    },
+    {
+      "path": "scripts/source-level-envelope.cjs",
+      "sha256": "22e4bf20457cf5649e0b914406c24a70303d6cf49d46ca5c605d3e8a7251929c"
+    },
+    {
+      "path": "scripts/source-linear-gallery.cjs",
+      "sha256": "b366a94c970ddd797e055ecb43b55f538eed19444cfcebfa11199872b335faf5"
+    },
+    {
+      "path": "scripts/source-merged-walls.cjs",
+      "sha256": "e987329e0223639a8f9fb70e2150135e7bab56495b5345076a52fac0717aaa93"
+    },
+    {
+      "path": "scripts/source-polygonal-gallery.cjs",
+      "sha256": "1d3d8f1609ece7d86e16a90a4e6c5a991bc0f0a6b13967a9488af2bca712709a"
+    },
+    {
+      "path": "scripts/source-profile-envelope.cjs",
+      "sha256": "fb288d212d8dc9d8840e2b8052f9462518e1221eea7040fb80b980fed8677bbe"
+    },
+    {
+      "path": "scripts/source-room-volume-hull-pilot.cjs",
+      "sha256": "b88ab3c47f1d78e54252462b45d854e8ca731a06d1e6342fe91ce952bff3094c"
+    },
+    {
+      "path": "scripts/source-room-volume.cjs",
+      "sha256": "95e3de4384d3626e301370d55fadfa3b451840abb32e9d786e6c6d0e8aa2bde7"
+    },
+    {
+      "path": "scripts/source-suspended-plate.cjs",
+      "sha256": "a7a06b1bbe66a5f8f98825247f2ae477b9718844d924ac10ae35cf8e531a167e"
+    },
+    {
+      "path": "scripts/source-two-u.cjs",
+      "sha256": "82b40e7b7890cb0840daca443d024cf1bfd59c4ed63d7d362fe30a64375de017"
+    },
+    {
+      "path": "scripts/source-vertical-envelope.cjs",
+      "sha256": "a48425b7afc0b898ae212654bec6e0b13e0ea38a461723567e2331e952e38b9c"
+    },
+    {
+      "path": "scripts/source-void-field.cjs",
+      "sha256": "8af2917cd1e34b48cda21fa8039418245d7f2d38150c2b8c7b321bf4b202449b"
+    },
+    {
+      "path": "scripts/suspended-polygon-room.cjs",
+      "sha256": "f052a094111e12d89961fe668f52f16ca45ed1e85b7395f2a7a9e49a432de704"
+    },
+    {
+      "path": "scripts/upright-opening-profile.cjs",
+      "sha256": "5beb2af56f4401729fe939c3c6f0234fb7b432323cbde0661e32a1a0936fcf2d"
+    },
+    {
+      "path": "src/components/amphitheaterInteractiveTypes.ts",
+      "sha256": "0badd1f1fa4602a484e91d2123b4bbfd27894703b92e059bb41cb610919d2dc0"
+    },
+    {
+      "path": "src/components/architecturalLetterSizing.ts",
+      "sha256": "6abc8deffdb15e1423d88e8a71c1d98210b939e6656d8b39c1f63f823a8a2d2f"
+    },
+    {
+      "path": "src/components/compositionEngine.ts",
+      "sha256": "348266168fdc3824e2bfd76361d395f01461dbec8c1211114ac94ad017cdfb99"
+    },
+    {
+      "path": "src/components/constraintValidation.ts",
+      "sha256": "2a219650232ad797a00a92b2d53e775d909a8f42a0cd4aafb9f742b984050954"
+    },
+    {
+      "path": "src/components/insertedPlatePopulation.ts",
+      "sha256": "8cff2e54321334ca50135c10a7a835935626e22a502d41e67689fa8e390c76ae"
+    },
+    {
+      "path": "src/components/letterGeometry3d.ts",
+      "sha256": "ade11f4e8cd6123ed9c63a0e17629f09988c2685fd13dd9b5b9d86115a0f5b47"
+    },
+    {
+      "path": "src/components/letterTypes.ts",
+      "sha256": "2925a06f4bdc806b6c6b7c17cb5d2d20024d40406710d330d840f7a118101709"
+    },
+    {
+      "path": "src/components/letterVolumeLayout.ts",
+      "sha256": "5c722c04c38431db93c714a12517e2a55e2f32f78c67f04742644b8ac50bce71"
+    },
+    {
+      "path": "src/components/linearGalleryLayers.ts",
+      "sha256": "73b3214789521ce78c5db1e740504214a048a2b6925c2d8d6497c9c5b21a5ea6"
+    },
+    {
+      "path": "src/components/linearGalleryPerimeter.ts",
+      "sha256": "20f5be90b7e5179d4984259f64ea41db9addc79b203c8207d098ddd9eaf5a124"
+    },
+    {
+      "path": "src/components/linearGalleryPopulation.ts",
+      "sha256": "78e074c4b8491df2d1459d26622b16136361f39cd1861659a3832f650339a4eb"
+    },
+    {
+      "path": "src/components/linearGalleryVariablePopulation.ts",
+      "sha256": "e0b1160a14aab15e264a2c3ad2a6d7ba3e8be937998c538d8206fb56eb6308d4"
+    },
+    {
+      "path": "src/components/optimizerTypes.ts",
+      "sha256": "ad0fd150a44aa9c9291b6a0c3f99fdca1892596d11e422a5da0d37e33371a5ac"
+    },
+    {
+      "path": "src/components/perimeterRoomLayout.ts",
+      "sha256": "b0dd6b0e5922863da8e5b18fa557d5b09d69c9de3fc497e5b1a4ef4f7a65cc17"
+    },
+    {
+      "path": "src/components/selectionHeightRouting.ts",
+      "sha256": "14c06b2e52cb8f6661eae776343322562b457c386dc105b38244af6ce7eab841"
+    },
+    {
+      "path": "src/components/sourcePopulation.ts",
+      "sha256": "e291600d03446888789585625341059631dc2ebe940c8258fb8e1a7b343f0119"
+    },
+    {
+      "path": "src/components/threeLiftPopulation.ts",
+      "sha256": "47f5e52ff555cf8793d479421cd229893366452d37a4a0929befb433023c2855"
+    },
+    {
+      "path": "src/components/voidFieldPopulation.ts",
+      "sha256": "a19b868d8fee581d95d90e5324e225a25f3b3754eb398b322c9c6b8772b0a6cd"
+    }
+  ]
+}

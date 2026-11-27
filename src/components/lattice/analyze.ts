@@ -68,7 +68,7 @@ function cellKey(y: number, z: number) {
   return `${y}:${z}`;
 }
 
-function buildFaces(
+export function buildFaces(
   occupied: number[],
   floor: Set<number>,
   passage: Set<number>,

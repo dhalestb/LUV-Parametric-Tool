@@ -1,0 +1,1272 @@
+{
+  "generatedAt": "2026-11-08T18:32:48.850Z",
+  "worktree": "Cursor-App-eval-refinement",
+  "officialVersions": {
+    "suite": "v4.3.0",
+    "openVolume": "v4.3.2"
+  },
+  "experimentalVersion": "exp-5d-0.1",
+  "registryOfficePath": "workspaces\\v2\\modified forms",
+  "priorAuditScores": {
+    "Closed hall 14 ft": {
+      "openVolume": 75,
+      "visuallyConnected": 51.12,
+      "circulationActivated": 50,
+      "centralized": 60.69,
+      "verticallyIntegrated": 0
+    },
+    "Two rooms (partition)": {
+      "openVolume": 46.13,
+      "visuallyConnected": 28.35,
+      "circulationActivated": 25,
+      "centralized": 62.77,
+      "verticallyIntegrated": 0
+    },
+    "Roofed atrium": {
+      "openVolume": 53.82,
+      "visuallyConnected": 51.4,
+      "circulationActivated": 25.74,
+      "centralized": 53.14,
+      "verticallyIntegrated": 50.39
+    }
+  },
+  "official": [
+    {
+      "form": "Closed hall 14 ft",
+      "suite": "official v4.3.0/v4.3.2",
+      "rows": [
+        {
+          "id": "openVolume",
+          "score": 75,
+          "version": "v4.3.2",
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "weight": 0.45,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Open Void Share",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Clearance Volume",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "Qualifying clear floor forms one continuous field.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "Open-void share and open contribution to clearance volume use the largest continuous open pocket; disconnected open pockets are not credited."
+          ]
+        },
+        {
+          "id": "visuallyConnected",
+          "score": 73.0285544380925,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "weight": 0.4,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 37.06662702221584,
+              "reason": null
+            },
+            {
+              "name": "Region-Pair Connection",
+              "weight": 0.3,
+              "status": "unavailable",
+              "precise": null,
+              "reason": "Single-region form: inter-region connection does not apply; weight renormalized over coverage and sightline."
+            }
+          ],
+          "notes": [
+            "Undivided single-region forms are not penalized for missing a second region.",
+            "Region-Pair Connection: Single-region form: inter-region connection does not apply; weight renormalized over coverage and sightline.",
+            "Weights renormalized over 2 of 3 components."
+          ]
+        },
+        {
+          "id": "circulationActivated",
+          "score": 58.82352941176471,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Network Continuity",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Region Reach",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Interfaces",
+              "weight": 0.2,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Junctions",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Level Distribution",
+              "weight": 0.15,
+              "status": "unavailable",
+              "precise": null,
+              "reason": "Single-level form: multi-level circulation distribution does not apply."
+            }
+          ],
+          "notes": [
+            "Level Distribution: Single-level form: multi-level circulation distribution does not apply.",
+            "Weights renormalized over 4 of 5 components."
+          ]
+        },
+        {
+          "id": "centralized",
+          "score": 60.68965517241374,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "weight": 0.35,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Radial Concentration",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 35.63218390804598,
+              "reason": null
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "weight": 0.2,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Occupiable Centrality",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 99.99999999999957,
+              "reason": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "verticallyIntegrated",
+          "score": 0,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Vertical Circulation",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ]
+        }
+      ]
+    },
+    {
+      "form": "Two rooms (partition)",
+      "suite": "official v4.3.0/v4.3.2",
+      "rows": [
+        {
+          "id": "openVolume",
+          "score": 42.75,
+          "version": "v4.3.2",
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "weight": 0.45,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Open Void Share",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Clearance Volume",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 67.5,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "The counted field is the largest connected run, 50% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "Open-void share and open contribution to clearance volume use the largest continuous open pocket; disconnected open pockets are not credited."
+          ]
+        },
+        {
+          "id": "visuallyConnected",
+          "score": 28.347182511843748,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "weight": 0.4,
+              "status": "measured",
+              "precise": 49.333333333333336,
+              "reason": null
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 28.712830595034717,
+              "reason": null
+            },
+            {
+              "name": "Region-Pair Connection",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "circulationActivated",
+          "score": 29.411764705882355,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Network Continuity",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Region Reach",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Interfaces",
+              "weight": 0.2,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Junctions",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Level Distribution",
+              "weight": 0.15,
+              "status": "unavailable",
+              "precise": null,
+              "reason": "Single-level form: multi-level circulation distribution does not apply."
+            }
+          ],
+          "notes": [
+            "Level Distribution: Single-level form: multi-level circulation distribution does not apply.",
+            "Weights renormalized over 4 of 5 components."
+          ]
+        },
+        {
+          "id": "centralized",
+          "score": 63.99999999999994,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "weight": 0.35,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Radial Concentration",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 46.666666666666664,
+              "reason": null
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "weight": 0.2,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Occupiable Centrality",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 99.99999999999957,
+              "reason": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "verticallyIntegrated",
+          "score": 0,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Vertical Circulation",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ]
+        }
+      ]
+    },
+    {
+      "form": "Roofed atrium",
+      "suite": "official v4.3.0/v4.3.2",
+      "rows": [
+        {
+          "id": "openVolume",
+          "score": 53.82352941176471,
+          "version": "v4.3.2",
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "weight": 0.45,
+              "status": "measured",
+              "precise": 52.94117647058824,
+              "reason": null
+            },
+            {
+              "name": "Open Void Share",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Clearance Volume",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "The counted field is the largest connected run, 53% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "Open-void share and open contribution to clearance volume use the largest continuous open pocket; disconnected open pockets are not credited."
+          ]
+        },
+        {
+          "id": "visuallyConnected",
+          "score": 73.42180266047629,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "weight": 0.4,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 37.98420620777801,
+              "reason": null
+            },
+            {
+              "name": "Region-Pair Connection",
+              "weight": 0.3,
+              "status": "unavailable",
+              "precise": null,
+              "reason": "Single-region form: inter-region connection does not apply; weight renormalized over coverage and sightline."
+            }
+          ],
+          "notes": [
+            "Undivided single-region forms are not penalized for missing a second region.",
+            "Region-Pair Connection: Single-region form: inter-region connection does not apply; weight renormalized over coverage and sightline.",
+            "Weights renormalized over 2 of 3 components."
+          ]
+        },
+        {
+          "id": "circulationActivated",
+          "score": 25.735294117647058,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Network Continuity",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 52.94117647058824,
+              "reason": null
+            },
+            {
+              "name": "Region Reach",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Interfaces",
+              "weight": 0.2,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Junctions",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Level Distribution",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "centralized",
+          "score": 53.138686131386805,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "weight": 0.35,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Radial Concentration",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 10.46228710462287,
+              "reason": null
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "weight": 0.2,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Occupiable Centrality",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 99.99999999999957,
+              "reason": null
+            }
+          ],
+          "notes": []
+        },
+        {
+          "id": "verticallyIntegrated",
+          "score": 35.38830715532286,
+          "version": "v4.3.0",
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 21.55322862129145,
+              "reason": null
+            },
+            {
+              "name": "Vertical Circulation",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "Potential inter-level links are drawn dashed gray and are not given partial circulation credit."
+          ]
+        }
+      ]
+    }
+  ],
+  "experimental": [
+    {
+      "form": "Closed hall 14 ft",
+      "suite": "experimental exp-5d-0.1",
+      "rows": [
+        {
+          "id": "openVolume",
+          "score": 75,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "weight": 0.45,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Open Void Share",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Clearance Volume",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "Qualifying clear floor forms one continuous field.",
+            "Experimental continuity: open-void / top-deck volume uses the largest continuous open pocket, matching sheltered continuity."
+          ]
+        },
+        {
+          "id": "visuallyConnected",
+          "score": 73.0285544380925,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "weight": 0.4,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 37.06662702221584,
+              "reason": null
+            },
+            {
+              "name": "Region-Pair Connection",
+              "weight": 0.3,
+              "status": "unavailable",
+              "precise": null,
+              "reason": "Single-region form: inter-region connection does not apply; weight renormalized over coverage and sightline."
+            }
+          ],
+          "notes": [
+            "Presentation: one best eye-height point per occupiable zone; dense ray clouds are diagnostic-only.",
+            "Undivided single-region forms are not penalized for missing a second region.",
+            "Region-Pair Connection: Single-region form: inter-region connection does not apply; weight renormalized over coverage and sightline.",
+            "Weights renormalized over 2 of 3 components."
+          ]
+        },
+        {
+          "id": "circulationActivated",
+          "score": 77.94117647058823,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Spine Continuity",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Gathering Access",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Gathering Opportunities",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 25,
+              "reason": null
+            },
+            {
+              "name": "Level Distribution",
+              "weight": 0.15,
+              "status": "unavailable",
+              "precise": null,
+              "reason": "Single-level form: multi-level circulation distribution does not apply."
+            }
+          ],
+          "notes": [
+            "Presentation shows the primary spine and gathering spaces it activates; the raw circulation graph stays out of the default view.",
+            "Level Distribution: Single-level form: multi-level circulation distribution does not apply.",
+            "Weights renormalized over 3 of 4 components."
+          ]
+        },
+        {
+          "id": "centralized",
+          "score": 100.00000000000001,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Destination Strength",
+              "weight": 0.35,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Circulation Convergence",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Spatial Dominance",
+              "weight": 0.2,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Offset from Mass Centre",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "Centralization uses an architectural gathering destination, not the bounding-box centroid alone."
+          ]
+        },
+        {
+          "id": "verticallyIntegrated",
+          "score": 0,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Verified Vertical Circulation",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0)."
+          ]
+        }
+      ]
+    },
+    {
+      "form": "Two rooms (partition)",
+      "suite": "experimental exp-5d-0.1",
+      "rows": [
+        {
+          "id": "openVolume",
+          "score": 42.75,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "weight": 0.45,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Open Void Share",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Clearance Volume",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 67.5,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "The counted field is the largest connected run, 50% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Experimental continuity: open-void / top-deck volume uses the largest continuous open pocket, matching sheltered continuity."
+          ]
+        },
+        {
+          "id": "visuallyConnected",
+          "score": 28.347182511843748,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "weight": 0.4,
+              "status": "measured",
+              "precise": 49.333333333333336,
+              "reason": null
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 28.712830595034717,
+              "reason": null
+            },
+            {
+              "name": "Region-Pair Connection",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "Presentation: one best eye-height point per occupiable zone; dense ray clouds are diagnostic-only."
+          ]
+        },
+        {
+          "id": "circulationActivated",
+          "score": 42.64705882352941,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Spine Continuity",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Gathering Access",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Gathering Opportunities",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 25,
+              "reason": null
+            },
+            {
+              "name": "Level Distribution",
+              "weight": 0.15,
+              "status": "unavailable",
+              "precise": null,
+              "reason": "Single-level form: multi-level circulation distribution does not apply."
+            }
+          ],
+          "notes": [
+            "Presentation shows the primary spine and gathering spaces it activates; the raw circulation graph stays out of the default view.",
+            "Level Distribution: Single-level form: multi-level circulation distribution does not apply.",
+            "Weights renormalized over 3 of 4 components."
+          ]
+        },
+        {
+          "id": "centralized",
+          "score": 60.00000000000001,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Destination Strength",
+              "weight": 0.35,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Circulation Convergence",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Spatial Dominance",
+              "weight": 0.2,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Offset from Mass Centre",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "Centralization uses an architectural gathering destination, not the bounding-box centroid alone."
+          ]
+        },
+        {
+          "id": "verticallyIntegrated",
+          "score": 0,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Verified Vertical Circulation",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0)."
+          ]
+        }
+      ]
+    },
+    {
+      "form": "Roofed atrium",
+      "suite": "experimental exp-5d-0.1",
+      "rows": [
+        {
+          "id": "openVolume",
+          "score": 53.82352941176471,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "weight": 0.45,
+              "status": "measured",
+              "precise": 52.94117647058824,
+              "reason": null
+            },
+            {
+              "name": "Open Void Share",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Clearance Volume",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "The counted field is the largest connected run, 53% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Experimental continuity: open-void / top-deck volume uses the largest continuous open pocket, matching sheltered continuity."
+          ]
+        },
+        {
+          "id": "visuallyConnected",
+          "score": 73.42180266047629,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "weight": 0.4,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 37.98420620777801,
+              "reason": null
+            },
+            {
+              "name": "Region-Pair Connection",
+              "weight": 0.3,
+              "status": "unavailable",
+              "precise": null,
+              "reason": "Single-region form: inter-region connection does not apply; weight renormalized over coverage and sightline."
+            }
+          ],
+          "notes": [
+            "Presentation: one best eye-height point per occupiable zone; dense ray clouds are diagnostic-only.",
+            "Undivided single-region forms are not penalized for missing a second region.",
+            "Region-Pair Connection: Single-region form: inter-region connection does not apply; weight renormalized over coverage and sightline.",
+            "Weights renormalized over 2 of 3 components."
+          ]
+        },
+        {
+          "id": "circulationActivated",
+          "score": 37.13235294117647,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Spine Continuity",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 52.94117647058824,
+              "reason": null
+            },
+            {
+              "name": "Gathering Access",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 50,
+              "reason": null
+            },
+            {
+              "name": "Gathering Opportunities",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 25,
+              "reason": null
+            },
+            {
+              "name": "Level Distribution",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "Presentation shows the primary spine and gathering spaces it activates; the raw circulation graph stays out of the default view."
+          ]
+        },
+        {
+          "id": "centralized",
+          "score": 76.47058823529413,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Destination Strength",
+              "weight": 0.35,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Circulation Convergence",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 52.94117647058824,
+              "reason": null
+            },
+            {
+              "name": "Spatial Dominance",
+              "weight": 0.2,
+              "status": "measured",
+              "precise": 52.94117647058824,
+              "reason": null
+            },
+            {
+              "name": "Offset from Mass Centre",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "Centralization uses an architectural gathering destination, not the bounding-box centroid alone."
+          ]
+        },
+        {
+          "id": "verticallyIntegrated",
+          "score": 35.38830715532286,
+          "version": "exp-5d-0.1",
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 100,
+              "reason": null
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "weight": 0.25,
+              "status": "measured",
+              "precise": 21.55322862129145,
+              "reason": null
+            },
+            {
+              "name": "Verified Vertical Circulation",
+              "weight": 0.3,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "weight": 0.15,
+              "status": "measured",
+              "precise": 0,
+              "reason": null
+            }
+          ],
+          "notes": [
+            "Potential inter-level links are drawn dashed gray and are not given partial circulation credit."
+          ]
+        }
+      ]
+    }
+  ],
+  "deltasFromPriorAudit": [
+    {
+      "form": "Closed hall 14 ft",
+      "changes": [
+        {
+          "id": "openVolume",
+          "prior": 75,
+          "now": 75,
+          "delta": 0
+        },
+        {
+          "id": "visuallyConnected",
+          "prior": 51.12,
+          "now": 73.0285544380925,
+          "delta": 21.9085544380925
+        },
+        {
+          "id": "circulationActivated",
+          "prior": 50,
+          "now": 58.82352941176471,
+          "delta": 8.82352941176471
+        },
+        {
+          "id": "centralized",
+          "prior": 60.69,
+          "now": 60.68965517241374,
+          "delta": -0.0003448275862609762
+        },
+        {
+          "id": "verticallyIntegrated",
+          "prior": 0,
+          "now": 0,
+          "delta": 0
+        }
+      ]
+    },
+    {
+      "form": "Two rooms (partition)",
+      "changes": [
+        {
+          "id": "openVolume",
+          "prior": 46.13,
+          "now": 42.75,
+          "delta": -3.3800000000000026
+        },
+        {
+          "id": "visuallyConnected",
+          "prior": 28.35,
+          "now": 28.347182511843748,
+          "delta": -0.0028174881562534893
+        },
+        {
+          "id": "circulationActivated",
+          "prior": 25,
+          "now": 29.411764705882355,
+          "delta": 4.411764705882355
+        },
+        {
+          "id": "centralized",
+          "prior": 62.77,
+          "now": 63.99999999999994,
+          "delta": 1.22999999999994
+        },
+        {
+          "id": "verticallyIntegrated",
+          "prior": 0,
+          "now": 0,
+          "delta": 0
+        }
+      ]
+    },
+    {
+      "form": "Roofed atrium",
+      "changes": [
+        {
+          "id": "openVolume",
+          "prior": 53.82,
+          "now": 53.82352941176471,
+          "delta": 0.003529411764709778
+        },
+        {
+          "id": "visuallyConnected",
+          "prior": 51.4,
+          "now": 73.42180266047629,
+          "delta": 22.02180266047629
+        },
+        {
+          "id": "circulationActivated",
+          "prior": 25.74,
+          "now": 25.735294117647058,
+          "delta": -0.004705882352940449
+        },
+        {
+          "id": "centralized",
+          "prior": 53.14,
+          "now": 53.138686131386805,
+          "delta": -0.0013138686131952682
+        },
+        {
+          "id": "verticallyIntegrated",
+          "prior": 50.39,
+          "now": 35.38830715532286,
+          "delta": -15.001692844677137
+        }
+      ]
+    }
+  ]
+}

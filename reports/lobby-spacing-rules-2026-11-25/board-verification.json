@@ -1,0 +1,20 @@
+[
+  {
+    "type": "continuous-hall-lobby",
+    "studyId": "a7a2bcd4-c33e-4401-893b-871c482ee58a",
+    "width": 4096,
+    "height": 5156,
+    "dpi": 300,
+    "sha256": "97c78075a637803fe12f402e96fac6f912d73e8381a29fdb54a13104ede83c60",
+    "visuallyChecked": true
+  },
+  {
+    "type": "linear-gallery-lobby",
+    "studyId": "d1ea7e12-722a-46e3-8d9e-962f15faf53c",
+    "width": 4096,
+    "height": 5156,
+    "dpi": 300,
+    "sha256": "8c83afb6818d4a8999c83151befb4c8baaf0c9d170e94097cfa3e00031d32295",
+    "visuallyChecked": true
+  }
+]

@@ -1,0 +1,55 @@
+{
+  "passed": false,
+  "exports": [
+    {
+      "file": "combined-envelope.obj",
+      "status": "NoError",
+      "volume": 179.63246814475355,
+      "vertices": 1554,
+      "triangles": 3104
+    },
+    {
+      "file": "Orthogonal_curved_projection.obj",
+      "status": "NoError",
+      "volume": 99.39774728676244,
+      "vertices": 745,
+      "triangles": 1486
+    },
+    {
+      "file": "Cross_letter_folded_enclosure.obj",
+      "status": "NoError",
+      "volume": 115.54897125238492,
+      "vertices": 808,
+      "triangles": 1612
+    },
+    {
+      "file": "primary-gathering-void.obj",
+      "status": "NoError",
+      "volume": 144.56083712612275,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "alcove-0.obj",
+      "status": "NoError",
+      "volume": 28.7653603700815,
+      "vertices": 8,
+      "triangles": 12
+    },
+    {
+      "file": "alcove-1.obj",
+      "status": "NoError",
+      "volume": 28.76535495463999,
+      "vertices": 8,
+      "triangles": 12
+    }
+  ],
+  "nonCoplanar": 28,
+  "coplanar": 0,
+  "coplanarAreas": [],
+  "shellVolumes": [
+    37.476660445883745,
+    142.15581108341922
+  ],
+  "sourceFocusOverlap": 1.2735579884595407
+}

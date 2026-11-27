@@ -41,6 +41,13 @@ test('keyless generation on both protected URLs checks protection without sendin
     assert.equal(probe.mock.calls.at(-1).arguments[0].host, host);
   }
 });
+test('the combined release Preview requires the same verified deployment protection', async t => {
+  process.env.VERCEL_GIT_COMMIT_REF = 'codex/combined-generators-release';
+  const probe = t.mock.method(globalThis, 'fetch', async () => Response.json({ protection: { vercel_auth_enabled: true } }, { status: 401 }));
+  assert.equal(await canRunGenerationWorker(request(branchHost)), true);
+  probe.mock.mockImplementation(async () => new Response(null, { status: 405 }));
+  assert.equal(await canRunGenerationWorker(request(branchHost)), false);
+});
 test('an untrusted host, mismatched origin, or empty origin is rejected without probing', async t => {
   const probe = t.mock.method(globalThis, 'fetch', () => { throw Error('unexpected'); });
   for (const req of [request('foreign.example.test'), request(branchHost, 'https://' + deployHost),

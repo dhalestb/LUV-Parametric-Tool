@@ -1,0 +1,262 @@
+{
+  "studyNumber": 65,
+  "name": "Topo Final 2",
+  "typologyId": "topographic-ground-field-lobby",
+  "lobbyStudyId": "c1a4f058-850d-4dde-a043-fb997247d3e3",
+  "architectureStudyId": "8ee69779-cc51-4090-9efe-34678d9aa84e",
+  "created": "2026-11-18T16:21:34.528Z",
+  "fieldFeet": {
+    "width": 60,
+    "depth": 60,
+    "height": 60
+  },
+  "preferredFeet": 13,
+  "population": 15,
+  "sourceCount": 15,
+  "links": [],
+  "parameters": {
+    "proof": "lobby",
+    "typologyName": "Topographic / Ground-Field Lobby",
+    "generator": "source-preserving",
+    "organization": "proximity",
+    "articulationElevation": "feature",
+    "articulation": 0.75,
+    "field": {
+      "width": 60,
+      "depth": 60,
+      "height": 60
+    },
+    "preferredFeet": 13,
+    "population": 15,
+    "sourceId": "d8d1ea6a-2402-4c0a-a3cd-3425b2a71431",
+    "sourceName": "Topographic / Ground-Field Lobby · 15 letters"
+  },
+  "generationSeed": null,
+  "ruleVariant": null,
+  "displayModes": {
+    "A": "Original letters",
+    "B": "Letters + architecture",
+    "C": "Architecture only"
+  },
+  "sourceMatchesArchitectureRequest": true,
+  "validation": {
+    "passed": true,
+    "selfIntersectionPairs": 0,
+    "nonAdjacentTriangleChecks": 327686,
+    "legacyFlags": 95
+  },
+  "volume": 15442.862043003928,
+  "bounds": {
+    "min": [
+      -19.250534057617188,
+      -23.66533851623535,
+      7.349353790283203
+    ],
+    "max": [
+      19.05859375,
+      24.161619186401367,
+      52.091365814208984
+    ]
+  },
+  "warnings": [
+    "Source-driven stepped banks. Alcove candidates describe geometric clearance only. Circulation, access and occupancy require architectural review."
+  ],
+  "letters": [
+    {
+      "letter": "U",
+      "x": -14.296132203752748,
+      "y": -18.197642215679032,
+      "z": -15,
+      "rx": 0,
+      "ry": 0,
+      "rz": 180,
+      "scale": 5.126518057898553,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": -11.885994644931202,
+      "y": -18.197642215679032,
+      "z": -15,
+      "rx": 0,
+      "ry": 0,
+      "rz": 188.57142857142858,
+      "scale": 6.207243486320411,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "V",
+      "x": -9.14181250886421,
+      "y": -17.784023309884038,
+      "z": -15,
+      "rx": 90,
+      "ry": 0,
+      "rz": 197.14285714285714,
+      "scale": 4.045792629476696,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": -4.321802265811953,
+      "y": -16.297247052491073,
+      "z": -15,
+      "rx": 60,
+      "ry": 0,
+      "rz": 205.71428571428572,
+      "scale": 4.766276248424601,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": -0.681428181867735,
+      "y": -14.544135290698831,
+      "z": -5,
+      "rx": 15,
+      "ry": 0,
+      "rz": 214.28571428571428,
+      "scale": 5.847001676846458,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "V",
+      "x": 2.4136657505591037,
+      "y": -12.433935977951208,
+      "z": -5,
+      "rx": 105,
+      "ry": 0,
+      "rz": 222.85714285714286,
+      "scale": 3.6855508200027436,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 6.210844255467886,
+      "y": -8.910669209609527,
+      "z": -5,
+      "rx": 75,
+      "ry": 0,
+      "rz": 231.42857142857142,
+      "scale": 4.406034438950648,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 9.176308384538393,
+      "y": -5.192094808993635,
+      "z": -5,
+      "rx": 0,
+      "ry": 0,
+      "rz": 240,
+      "scale": 5.4867598673725055,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "V",
+      "x": 11.10108976479868,
+      "y": -1.8582756649202665,
+      "z": 5,
+      "rx": 120,
+      "ry": 0,
+      "rz": 248.57142857142856,
+      "scale": 3.325309010528791,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 12.558092964638256,
+      "y": 1.8541079437189532,
+      "z": 5,
+      "rx": 90,
+      "ry": 0,
+      "rz": 257.14285714285717,
+      "scale": 4.045792629476696,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 13.460739486154797,
+      "y": 5.80886075287745,
+      "z": 5,
+      "rx": 45,
+      "ry": 0,
+      "rz": 265.7142857142857,
+      "scale": 5.126518057898553,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "V",
+      "x": 13.757727474174741,
+      "y": 9.771890038103534,
+      "z": 5,
+      "rx": 90,
+      "ry": 0,
+      "rz": 274.2857142857143,
+      "scale": 4.045792629476696,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "U",
+      "x": 13.444013415512044,
+      "y": 13.958113224961576,
+      "z": 15,
+      "rx": 45,
+      "ry": 0,
+      "rz": 282.85714285714283,
+      "scale": 5.126518057898553,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "L",
+      "x": 12.867444236637873,
+      "y": 16.484227850646807,
+      "z": 15,
+      "rx": 0,
+      "ry": 0,
+      "rz": 291.42857142857144,
+      "scale": 6.207243486320411,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    },
+    {
+      "letter": "V",
+      "x": 11.854075875230215,
+      "y": 19.06624832583697,
+      "z": 15,
+      "rx": 0,
+      "ry": 0,
+      "rz": 300,
+      "scale": 3.6855508200027436,
+      "scaleX": 1,
+      "scaleY": 1,
+      "scaleZ": 1
+    }
+  ],
+  "screenshot": "reference-isometric.png"
+}

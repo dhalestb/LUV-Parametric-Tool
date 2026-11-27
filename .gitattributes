@@ -17,3 +17,12 @@
 /reports/room-optional-platforms-20261123/reference-replay/input.json -text
 /reports/plate-corner-top-proof-20261121/control-spacing13p5/result.json -text
 /reports/minimum-polygon-corrections-20261121/runs/field-fit-rectangular-field/result.json -text
+# Keep verified engines, saved geometry and evidence byte-identical on every platform.
+/src/** text eol=lf
+/scripts/** text eol=lf
+/*.ts text eol=lf
+/data/** -text
+/.amphitheater-runs/** -text
+/public/reports/** -text
+/reports/** -text
+/docs/** text eol=lf

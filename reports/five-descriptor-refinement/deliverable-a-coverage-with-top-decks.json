@@ -1,0 +1,3316 @@
+{
+  "generatedAt": "2026-11-07T01:18:59.559Z",
+  "settings": {
+    "registryDirectory": "C:\\design 7\\assignment 2\\obj files",
+    "registryDirs": [
+      "gathering",
+      "lobbies",
+      "workspaces\\v2\\original forms"
+    ],
+    "formCount": 15,
+    "descriptorAlgorithmVersion": "v4.3.0",
+    "openVolumeAlgorithmVersion": "v4.3.1",
+    "includeTopDecks": true,
+    "unit": "feet",
+    "upAxis": "y (file) → z-up analysis",
+    "sampleFeet": 1,
+    "clearanceMinFeet": 5,
+    "clearanceReferenceFeet": 10,
+    "volumeClearCapFeet": 20,
+    "eyeHeightFeet": 5.5,
+    "minLevelAreaFt2": 16,
+    "note": "Official Open Volume / visibility / light exclude uncovered top decks when includeTopDecks=false. UI currently defaults the toggle to true."
+  },
+  "forms": [
+    {
+      "filename": "Gathering Linear.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\gathering\\Gathering Linear.obj",
+      "suggestedSlot": null,
+      "importOk": true,
+      "triangleCount": 41604,
+      "floorSamples": 1061,
+      "levels": 4,
+      "interiorAreaFt2": 880,
+      "networkNodes": 442,
+      "regions": 9,
+      "entries": 22,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 22.60698731823496,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 0.7939327231985076,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 20.82940622054665,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 56.80788679219657,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 9% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "93 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 68.97514698866478,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 69.23076923076923,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 37.609464321190266,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 33.71911585146879,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 6,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 6.787330316742081,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 11.11111111111111,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 84.61538461538461,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 57.14285714285714,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 25,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 47.498311518482375,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 93.31450185413354,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 3.665672485374949,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 94.03400914973759,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 31.34548611111111,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 3,
+          "measuredLayers": 2,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 21.354166666666664,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 39.75694444444444,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "filename": "Gathering, Plate.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\gathering\\Gathering, Plate.obj",
+      "suggestedSlot": null,
+      "importOk": true,
+      "triangleCount": 7924,
+      "floorSamples": 648,
+      "levels": 1,
+      "interiorAreaFt2": 537,
+      "networkNodes": 243,
+      "regions": 3,
+      "entries": 92,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 23.757246807425776,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 0.0003940550962437209,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 32.25308641975309,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 52.312659592313985,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 17% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "29 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 70.90355159138494,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 70.51282051282051,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 42.328077954189105,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 50.1929012345679,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 5,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 38.2716049382716,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 33.33333333333333,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 95.83333333333334,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 87.5,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Single level; multi-level circulation distribution is absent.",
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [
+            "Level Distribution"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Level Distribution.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 39.46100780202706,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 73.88197274869152,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 6.737308639694713,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 81.69903741364055,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        }
+      ]
+    },
+    {
+      "filename": "Gathering, Room within Volume.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\gathering\\Gathering, Room within Volume.obj",
+      "suggestedSlot": "G4",
+      "importOk": true,
+      "triangleCount": 29854,
+      "floorSamples": 525,
+      "levels": 1,
+      "interiorAreaFt2": 324,
+      "networkNodes": 266,
+      "regions": 1,
+      "entries": 23,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 33.735598942318155,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 8,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 39.285714285714285,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 12.362637362637363,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 43.22122724362463,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 90% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "69 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 41.46896480298014,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 80.65476190476191,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 30.690200136917905,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Each level holds a single floor region; there is no second region to connect.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Region-Pair Connection"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Region-Pair Connection.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 78.6582776385408,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 6,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 93.98496240601504,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 85.18518518518519,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 87.5,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Single level; multi-level circulation distribution is absent.",
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [
+            "Level Distribution"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Level Distribution.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 34.31877897145096,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 65.08739124090789,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 76.92128024755465,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 1,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        }
+      ]
+    },
+    {
+      "filename": "Gathering, Stepped.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\gathering\\Gathering, Stepped.obj",
+      "suggestedSlot": null,
+      "importOk": true,
+      "triangleCount": 21593,
+      "floorSamples": 570,
+      "levels": 3,
+      "interiorAreaFt2": 304,
+      "networkNodes": 412,
+      "regions": 3,
+      "entries": 52,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 34.261961255347664,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 3.0618911893009715,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 46.666666666666664,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 70.7248118449852,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 34% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "2 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 47.71814740022404,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 95.78313253012048,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 31.349647960586154,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Each level holds a single floor region; there is no second region to connect.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Region-Pair Connection"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Region-Pair Connection.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 51.6965350268876,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 6,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 28.640776699029125,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 33.33333333333333,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 92.85714285714286,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 84.21052631578947,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 33.33333333333333,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 44.05956267522547,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 76.14255101128288,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 8.040302227516822,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 17.25585055719193,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 76.9760602772202,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 21.47644927536232,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 2,
+          "measuredLayers": 1,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 25.905797101449274,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "filename": "Gathering, Void Field.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\gathering\\Gathering, Void Field.obj",
+      "suggestedSlot": "G2",
+      "importOk": true,
+      "triangleCount": 7138,
+      "floorSamples": 531,
+      "levels": 1,
+      "interiorAreaFt2": 373,
+      "networkNodes": 301,
+      "regions": 4,
+      "entries": 89,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 21.592866041769494,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 2.980990033990319,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 29.943502824858758,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 42.55181606753054,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 34% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "56 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 64.9280213502024,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 59.13978494623656,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 37.573691239025926,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 45.49941949773158,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 5,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 25.581395348837212,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 25,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 95.6989247311828,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 91.42857142857143,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Single level; multi-level circulation distribution is absent.",
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [
+            "Level Distribution"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Level Distribution.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 41.00012959033871,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 60.792040221576556,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 14.706391266008293,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 28.4606980989698,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 64.12572342126973,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        }
+      ]
+    },
+    {
+      "filename": "Lobby, Cont Hall.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\lobbies\\Lobby, Cont Hall.obj",
+      "suggestedSlot": null,
+      "importOk": true,
+      "triangleCount": 4128,
+      "floorSamples": 341,
+      "levels": 1,
+      "interiorAreaFt2": 206,
+      "networkNodes": 135,
+      "regions": 1,
+      "entries": 22,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 20.2919315624441,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 6,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 0.4092753740748706,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 39.589442815249264,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 34.03465646766031,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 25% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 46.93340167819919,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 3,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 23.111338927330642,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Each level holds a single floor region; there is no second region to connect.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Region-Pair Connection"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Region-Pair Connection.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 79.42307692307692,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 84.61538461538461,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 83.33333333333334,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Single level; multi-level circulation distribution is absent.",
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [
+            "Level Distribution"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Level Distribution.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 59.53348897267525,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 48.25412211683319,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 48.49929389851357,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 53.96505374819706,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        }
+      ]
+    },
+    {
+      "filename": "Lobby, Ground Field.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\lobbies\\Lobby, Ground Field.obj",
+      "suggestedSlot": "L4",
+      "importOk": true,
+      "triangleCount": 11634,
+      "floorSamples": 1103,
+      "levels": 3,
+      "interiorAreaFt2": 893,
+      "networkNodes": 457,
+      "regions": 10,
+      "entries": 28,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 26.85693001441357,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 1.590595130568439,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 23.209428830462375,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 67.79601666014061,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 32% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "71 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 61.024927425968556,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 70.67209775967413,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 25.853627740329653,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 83.33333333333334,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 64.5474592001951,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 6,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 37.199124726477024,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 40,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 89.47368421052632,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 82.35294117647058,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 43.37011432229957,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 82.13126296089732,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 8.739382855000104,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 80.01571619656983,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 30.66524621212121,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 3,
+          "measuredLayers": 2,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 39.84375,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 14.84848484848485,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "filename": "Lobby, Linear.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\lobbies\\Lobby, Linear.obj",
+      "suggestedSlot": null,
+      "importOk": true,
+      "triangleCount": 12266,
+      "floorSamples": 616,
+      "levels": 3,
+      "interiorAreaFt2": 518,
+      "networkNodes": 201,
+      "regions": 4,
+      "entries": 25,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 19.19229607630026,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 0.8116883116883116,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 26.136363636363637,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 40.97648475649871,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 31% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "24 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 73.0022324127454,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 89.69072164948454,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 23.753145843171936,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 56.78606965174129,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 6,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 37.81094527363184,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 86.66666666666667,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 66.66666666666666,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 47.85926996117254,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 81.54297446900682,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 4.805361435975497,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 16.300189658813355,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 97.45055022976548,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 23.25,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 2,
+          "measuredLayers": 1,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 33,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "filename": "Lobby, Sequential.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\lobbies\\Lobby, Sequential.obj",
+      "suggestedSlot": null,
+      "importOk": true,
+      "triangleCount": 14911,
+      "floorSamples": 698,
+      "levels": 4,
+      "interiorAreaFt2": 589,
+      "networkNodes": 294,
+      "regions": 5,
+      "entries": 11,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 19.213464653791718,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 0.19305261698645187,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 24.355300859598856,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 43.45921920416034,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 20% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "54 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 38.22363214347374,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 76.35135135135135,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 25.610305343110657,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 38.22959183673469,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 6,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 29.25170068027211,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 20,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 73.33333333333333,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 25,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 46.95379668800295,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 81.14525410276173,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 16.520110196258,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 8.666086608485905,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 79.09138247641177,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 28.24260752688172,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 3,
+          "measuredLayers": 2,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 17.708333333333332,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 31.72043010752688,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "filename": "Lobby, Vertical Void.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\lobbies\\Lobby, Vertical Void.obj",
+      "suggestedSlot": "L1",
+      "importOk": true,
+      "triangleCount": 28528,
+      "floorSamples": 1373,
+      "levels": 3,
+      "interiorAreaFt2": 1135,
+      "networkNodes": 464,
+      "regions": 2,
+      "entries": 16,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 37.042700751433344,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 14.487572287233979,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 17.916970138383103,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 86.81350229194092,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 96% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "10 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 48.22507180351634,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 96.52351738241309,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 32.0522161685037,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Each level holds a single floor region; there is no second region to connect.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Region-Pair Connection"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Region-Pair Connection.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 53.06896551724138,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 6,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 48.275862068965516,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 80,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 33.33333333333333,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 25.936301378101167,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 52.32031063368075,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 2.364570352983793,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 4.132213737508228,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 40.58919201944081,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 18.14327485380117,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 2,
+          "measuredLayers": 1,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 12.573099415204677,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 50,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        }
+      ]
+    },
+    {
+      "filename": "cascaded workspace.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\workspaces\\v2\\original forms\\cascaded workspace.obj",
+      "suggestedSlot": "O2",
+      "importOk": true,
+      "triangleCount": 4083,
+      "floorSamples": 18,
+      "levels": 0,
+      "interiorAreaFt2": 11,
+      "networkNodes": 0,
+      "regions": 0,
+      "entries": 0,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 6.328054750434848,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 4,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 13.790802710764217,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 0.407311768636504,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 71% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "2 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Fewer than two viewing positions share a level.",
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 0,
+              "reason": "No sightlines tested.",
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Each level holds a single floor region; there is no second region to connect.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Same-Level Coverage",
+            "Region-Pair Connection"
+          ],
+          "notes": [
+            "Fewer than two eye-height viewing positions share a detected level. Visual connection is absent (scored 0) and the form is still ranked."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "No supported movement surface was found. Circulation is absent (scored 0) and the form is still ranked."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 28.144424306404844,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 55.584861166657426,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 22.34029626057007,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "unavailable",
+              "precise": null,
+              "reason": "No supported standing surface.",
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [
+            "Occupiable Centrality"
+          ],
+          "notes": [
+            "Occupiable Centrality: No supported standing surface.",
+            "Weights renormalized over 3 of 4 components."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 1,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        }
+      ]
+    },
+    {
+      "filename": "flat deep-plate workspace.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\workspaces\\v2\\original forms\\flat deep-plate workspace.obj",
+      "suggestedSlot": null,
+      "importOk": true,
+      "triangleCount": 13951,
+      "floorSamples": 57,
+      "levels": 1,
+      "interiorAreaFt2": 40,
+      "networkNodes": 21,
+      "regions": 0,
+      "entries": 12,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 15.4977511020796,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 6,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 13.128350531722107,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 31.57894736842105,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 5.6508550689979655,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 48% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 51.92704677376668,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 3,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 100,
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 39.75682257922229,
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Each level holds a single floor region; there is no second region to connect.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Region-Pair Connection"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Region-Pair Connection.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 23.333333333333332,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 33.33333333333333,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 0,
+              "reason": "No occupiable region of 16 ft² or more.",
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 75,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Single level; multi-level circulation distribution is absent.",
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [
+            "Level Distribution"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Level Distribution.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 55.13199773881799,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 95.16176387991258,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 39.72457918505565,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 92.53643029224966,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        }
+      ]
+    },
+    {
+      "filename": "open hall workspace.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\workspaces\\v2\\original forms\\open hall workspace.obj",
+      "suggestedSlot": "O1",
+      "importOk": true,
+      "triangleCount": 2356,
+      "floorSamples": 0,
+      "levels": 0,
+      "interiorAreaFt2": 0,
+      "networkNodes": 0,
+      "regions": 0,
+      "entries": 0,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 0,
+              "reason": "No interior floor surface found.",
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 0,
+              "reason": "No interior floor surface found.",
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 0,
+              "reason": "No interior floor surface found.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Sheltered Clearance Share",
+            "Open Void Share",
+            "Clearance Volume"
+          ],
+          "notes": [
+            "No interior floor surface found. Open Volume is absent (scored 0) and the form is still ranked."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Fewer than two viewing positions share a level.",
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 0,
+              "reason": "No sightlines tested.",
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Each level holds a single floor region; there is no second region to connect.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Same-Level Coverage",
+            "Region-Pair Connection"
+          ],
+          "notes": [
+            "Fewer than two eye-height viewing positions share a detected level. Visual connection is absent (scored 0) and the form is still ranked."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "No supported movement surface was found. Circulation is absent (scored 0) and the form is still ranked."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 22.59506190472818,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 3,
+          "measuredLayers": 2,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 41.191358958102484,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 0.8993820091248198,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "unavailable",
+              "precise": null,
+              "reason": "No sheltered or open-void clearance.",
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "unavailable",
+              "precise": null,
+              "reason": "No supported standing surface.",
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [
+            "Inner Clearance Dominance",
+            "Occupiable Centrality"
+          ],
+          "notes": [
+            "Inner Clearance Dominance: No sheltered or open-void clearance.",
+            "Occupiable Centrality: No supported standing surface.",
+            "Weights renormalized over 2 of 4 components."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        }
+      ]
+    },
+    {
+      "filename": "undulating workspace.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\workspaces\\v2\\original forms\\undulating workspace.obj",
+      "suggestedSlot": "O5",
+      "importOk": true,
+      "triangleCount": 4572,
+      "floorSamples": 25,
+      "levels": 0,
+      "interiorAreaFt2": 14,
+      "networkNodes": 0,
+      "regions": 0,
+      "entries": 0,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 7.732006380339951,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 12.888797778791858,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 7.142857142857142,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 0.4877769805644288,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 50% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Fewer than two viewing positions share a level.",
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 0,
+              "reason": "No sightlines tested.",
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Each level holds a single floor region; there is no second region to connect.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Same-Level Coverage",
+            "Region-Pair Connection"
+          ],
+          "notes": [
+            "Fewer than two eye-height viewing positions share a detected level. Visual connection is absent (scored 0) and the form is still ranked."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "No supported movement surface was found. Circulation is absent (scored 0) and the form is still ranked."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 34.80337394729613,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 3,
+          "measuredLayers": 2,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 81.81705596810211,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 3.1563275545532323,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "unavailable",
+              "precise": null,
+              "reason": "No supported standing surface.",
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [
+            "Occupiable Centrality"
+          ],
+          "notes": [
+            "Occupiable Centrality: No supported standing surface.",
+            "Weights renormalized over 3 of 4 components."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 1,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        }
+      ]
+    },
+    {
+      "filename": "void edge workspace.obj",
+      "path": "C:\\design 7\\assignment 2\\obj files\\workspaces\\v2\\original forms\\void edge workspace.obj",
+      "suggestedSlot": "O4",
+      "importOk": true,
+      "triangleCount": 4383,
+      "floorSamples": 44,
+      "levels": 1,
+      "interiorAreaFt2": 33,
+      "networkNodes": 20,
+      "regions": 0,
+      "entries": 10,
+      "descriptors": [
+        {
+          "id": "openVolume",
+          "name": "Open Volume",
+          "absoluteScore": 7.228022929884539,
+          "available": true,
+          "version": "v4.3.1",
+          "validity": "verified-geometric",
+          "layerCount": 7,
+          "measuredLayers": 5,
+          "components": [
+            {
+              "name": "Sheltered Clearance Share",
+              "status": "measured",
+              "precise": 0.2930123947289444,
+              "weight": 0.45
+            },
+            {
+              "name": "Open Void Share",
+              "status": "measured",
+              "precise": 25,
+              "weight": 0.25
+            },
+            {
+              "name": "Clearance Volume",
+              "status": "measured",
+              "precise": 2.820557840855046,
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "The counted field is the largest connected run, 33% of qualifying clear floor. Disconnected qualifying floor is not counted.",
+            "Sheltered clearance and clearance volume count only the largest connected qualifying field. Disconnected qualifying floor is not included.",
+            "7 ft² of floor has ambiguous lateral enclosure and is reported, not credited."
+          ],
+          "outcome": "PASS"
+        },
+        {
+          "id": "visuallyConnected",
+          "name": "Visually Connected",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 1,
+          "measuredLayers": 1,
+          "components": [
+            {
+              "name": "Same-Level Coverage",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Fewer than two viewing positions share a level.",
+              "weight": 0.4
+            },
+            {
+              "name": "Mean Clear Sightline",
+              "status": "measured",
+              "precise": 0,
+              "reason": "No sightlines tested.",
+              "weight": 0.3
+            },
+            {
+              "name": "Region-Pair Connection",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Each level holds a single floor region; there is no second region to connect.",
+              "weight": 0.3
+            }
+          ],
+          "naComponents": [
+            "Same-Level Coverage",
+            "Region-Pair Connection"
+          ],
+          "notes": [
+            "Fewer than two eye-height viewing positions share a detected level. Visual connection is absent (scored 0) and the form is still ranked."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        },
+        {
+          "id": "circulationActivated",
+          "name": "Circulation Activated",
+          "absoluteScore": 25.535714285714285,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 4,
+          "measuredLayers": 3,
+          "components": [
+            {
+              "name": "Network Continuity",
+              "status": "measured",
+              "precise": 45,
+              "weight": 0.25
+            },
+            {
+              "name": "Region Reach",
+              "status": "measured",
+              "precise": 0,
+              "reason": "No occupiable region of 16 ft² or more.",
+              "weight": 0.25
+            },
+            {
+              "name": "Interfaces",
+              "status": "measured",
+              "precise": 71.42857142857143,
+              "weight": 0.2
+            },
+            {
+              "name": "Junctions",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            },
+            {
+              "name": "Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "reason": "Single level; multi-level circulation distribution is absent.",
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [
+            "Level Distribution"
+          ],
+          "notes": [],
+          "outcome": "PASS_WITH_NA_COMPONENTS",
+          "cause": "N/A components scored as measured zero: Level Distribution.",
+          "proposedCorrection": "Mark those components unavailable so weights renormalize; do not invent architecture."
+        },
+        {
+          "id": "centralized",
+          "name": "Centralized",
+          "absoluteScore": 19.433308213880956,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "architectural-proxy",
+          "layerCount": 3,
+          "measuredLayers": 2,
+          "components": [
+            {
+              "name": "Mass Centre Concentration",
+              "status": "measured",
+              "precise": 24.470865010433652,
+              "weight": 0.35
+            },
+            {
+              "name": "Radial Concentration",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Inner Clearance Dominance",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.2
+            },
+            {
+              "name": "Occupiable Centrality",
+              "status": "measured",
+              "precise": 72.4567030681945,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [],
+          "outcome": "PASS"
+        },
+        {
+          "id": "verticallyIntegrated",
+          "name": "Vertically Integrated",
+          "absoluteScore": 0,
+          "available": true,
+          "version": "v4.3.0",
+          "validity": "verified-geometric",
+          "layerCount": 0,
+          "measuredLayers": 0,
+          "components": [
+            {
+              "name": "Vertical Void Continuity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Vertical Visual Connectivity",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.25
+            },
+            {
+              "name": "Vertical Circulation",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.3
+            },
+            {
+              "name": "Integrated-Level Distribution",
+              "status": "measured",
+              "precise": 0,
+              "weight": 0.15
+            }
+          ],
+          "naComponents": [],
+          "notes": [
+            "One architectural level. Vertical integration is absent (scored 0). The form is still ranked. Upper perimeter openings, if any, are potential future connections, not verified circulation."
+          ],
+          "outcome": "MEASURED_ZERO",
+          "cause": "Characteristic measured as absent or not present in this configuration.",
+          "proposedCorrection": "Keep as legitimate measured zero; improve explain copy if needed."
+        }
+      ]
+    }
+  ]
+}

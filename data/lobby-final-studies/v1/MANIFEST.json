@@ -1,0 +1,78 @@
+{
+  "purpose": "Approved lobby finals for adapter integration. Load these saved studies. Do not regenerate them from defaults, and do not replace the shared typology or letter-geometry files with these copies.",
+  "approved": [
+    {
+      "studyNumber": 77,
+      "name": "Linear Final New",
+      "typologyId": "linear-gallery-lobby",
+      "lobbyStudyId": "1aee9c6b-aa83-44e4-826f-7d9ff4123f59",
+      "architectureStudyId": "4b487d8c-aebe-4d4c-97c9-1d08c5584062",
+      "folder": "study-77-linear-final-new",
+      "screenshot": "reference-isometric.png",
+      "sourceMatchesArchitectureRequest": true
+    },
+    {
+      "studyNumber": 66,
+      "name": "Compressed Final New",
+      "typologyId": "compressed-sequential-lobby",
+      "lobbyStudyId": "142cde46-bc56-4d4f-9bdd-7680d6b3d74d",
+      "architectureStudyId": "bb7ebcd5-c9f6-45ca-b17b-c4fff24aeab5",
+      "folder": "study-66-compressed-final-new",
+      "screenshot": "reference-isometric.png",
+      "sourceMatchesArchitectureRequest": true
+    },
+    {
+      "studyNumber": 65,
+      "name": "Topo Final 2",
+      "typologyId": "topographic-ground-field-lobby",
+      "lobbyStudyId": "c1a4f058-850d-4dde-a043-fb997247d3e3",
+      "architectureStudyId": "8ee69779-cc51-4090-9efe-34678d9aa84e",
+      "folder": "study-65-topo-final-2",
+      "screenshot": "reference-isometric.png",
+      "sourceMatchesArchitectureRequest": true
+    },
+    {
+      "studyNumber": 26,
+      "name": "Vertical Final",
+      "typologyId": "vertical-void-lobby",
+      "lobbyStudyId": "6dafc1cb-4b29-49ae-92b5-42c702d07af4",
+      "architectureStudyId": "54376fdf-c5f2-4480-a34f-fd1a4eecf5c0",
+      "folder": "study-26-vertical-final",
+      "screenshot": "reference-isometric.png",
+      "sourceMatchesArchitectureRequest": true
+    },
+    {
+      "studyNumber": 10,
+      "name": "Continuous Hall Final",
+      "typologyId": "continuous-hall-lobby",
+      "lobbyStudyId": "1765eba0-d4e5-4549-8f16-c648d47116df",
+      "architectureStudyId": "d8dd7d39-3992-45f1-8fe8-8ecda105f299",
+      "folder": "study-10-continuous-hall-final",
+      "screenshot": "reference-isometric.png",
+      "sourceMatchesArchitectureRequest": true
+    }
+  ],
+  "storedParameters": "Each architecture request records proof lobby, generator source-preserving, organization proximity, articulationElevation feature, and articulation 0.75. Letter positions are x, y, z in feet. Orientations are rx, ry, rz in degrees. Dimensions are scale, scaleX, scaleY, and scaleZ.",
+  "notStored": [
+    "No arrangement or generation seed is stored. The letter transforms in study.json are the approved configuration.",
+    "No Rule A/B generation variant is stored. A, B, and C are display modes in Lobby Proof. Gathering Rule A/B checks belong to gathering studies and are not part of these lobby records."
+  ],
+  "geometry": "letters[].mesh in architecture.json is each saved architectural letter solid. primary is the combined envelope. Original LUV outlines are reconstructed from the letter identity and scales by the copied letterGeometry3d.ts. They are not a separate saved mesh.",
+  "code": [
+    "code/src/components/lobbyProof.ts",
+    "code/src/components/letterGeometry3d.ts",
+    "code/scripts/source-envelope.cjs",
+    "code/scripts/amphitheater-interactive-worker.cjs"
+  ],
+  "codeUse": "The code copies show how each typology places letters and how the source-preserving envelope is built. Integrate through an adapter. Leave the application copies of these files unchanged.",
+  "gitignored": [
+    "/exports/",
+    "/.lobby-runs/",
+    "/.amphitheater-runs/"
+  ],
+  "canonical": {
+    "configuration": ".lobby-runs/<lobbyStudyId>/study.json",
+    "meshes": ".amphitheater-runs/<architectureStudyId>/result.json"
+  },
+  "screenshots": "reference-isometric.png is the saved study opened in Lobby Proof, view B, isometric southeast. It is omitted when that capture is not on disk."
+}
