@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {it} from 'node:test';
+import {gatheringMetrics, type GatheringMeasurements} from './gatheringMetrics';
+const hall:GatheringMeasurements={area:200,width:12,clearHeight:7,openSky:false,independentApproaches:4,originsReachableArea:100,originsDisconnectedArea:0,originsUnknownArea:0};
+it('independent reference hall is 20+40+20 at 200 square feet',()=>assert.equal(gatheringMetrics(hall).scoreLower,80));
+it('one approach contributes 10 points rather than 40',()=>assert.equal(gatheringMetrics({...hall,independentApproaches:1}).scoreLower,50));
+it('unknown origins produce bounds rather than fabricated disconnections',()=>{const r=gatheringMetrics({...hall,originsUnknownArea:100});assert.equal(r.scoreLower,70);assert.equal(r.scoreUpper,80);assert.equal(r.definitive,false);});
+it('demonstrably disconnected origins lower both bounds',()=>{const r=gatheringMetrics({...hall,originsDisconnectedArea:100});assert.equal(r.scoreLower,70);assert.equal(r.scoreUpper,70);});
+it('a destination is not its own accessibility origin',()=>assert.equal(gatheringMetrics({...hall,originsReachableArea:0}).scoreLower,null));
+it('increases gradually without a finite maximum-area threshold',()=>{const score=gatheringMetrics({...hall,area:20000}).scoreLower!;assert.ok(score>99&&score<100);});
+it('keeps verified movement metrics independent of a missing headroom sample',()=>{const m=gatheringMetrics({...hall,clearHeight:null});assert.equal(m.convergence,1);assert.equal(m.reachability,1);});

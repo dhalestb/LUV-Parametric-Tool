@@ -1,0 +1,465 @@
+/**
+ * Open Volume measures architectural openness: unobstructed space and low solid mass.
+ * Enclosed cavities are reported separately and do not drive the score.
+ */
+
+export type Voxel = [number, number, number];
+
+export type OpenVolumeMeasurement = {
+  /** Free voxels inside the occupied bounds / occupied-bounds volume, 0–100. */
+  architecturalOpenSpace: number;
+  /** Equal average of the six axis pass rates, 0–100. */
+  permeability: number;
+  horizontalPermeability: number;
+  verticalPermeability: number;
+  /** Exterior-connected free space lying between surfaces, 0–100. */
+  interstitialOpenSpace: number;
+  /**
+   * 1 - mean 26-neighbor solidity, 0–100.
+   * Local material intensity, not free cells / bounding box.
+   */
+  lowMass: number;
+  /** Share of the occupied bounds that is fully surrounded. Informational. */
+  enclosedVoidRatio: number;
+  score: number;
+};
+
+const THIN_AXIS_RATIO = 0.4;
+const THIN_TARGET_RATIO = 0.4;
+
+const RAYS: Array<[number, number, number]> = [];
+for (let z = -1; z <= 1; z += 1) {
+  for (let y = -1; y <= 1; y += 1) {
+    for (let x = -1; x <= 1; x += 1) {
+      if (x || y || z) RAYS.push([x, y, z]);
+    }
+  }
+}
+
+const AXES: Array<{ dx: number; dy: number; dz: number; horizontal: boolean }> = [
+  { dx: 1, dy: 0, dz: 0, horizontal: true },
+  { dx: -1, dy: 0, dz: 0, horizontal: true },
+  { dx: 0, dy: 1, dz: 0, horizontal: true },
+  { dx: 0, dy: -1, dz: 0, horizontal: true },
+  { dx: 0, dy: 0, dz: 1, horizontal: false },
+  { dx: 0, dy: 0, dz: -1, horizontal: false },
+];
+
+const clamp100 = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
+
+function cellKey(x: number, y: number, z: number) {
+  return `${x},${y},${z}`;
+}
+
+function emptyMeasurement(): OpenVolumeMeasurement {
+  return {
+    architecturalOpenSpace: 0,
+    permeability: 0,
+    horizontalPermeability: 0,
+    verticalPermeability: 0,
+    interstitialOpenSpace: 0,
+    lowMass: 0,
+    enclosedVoidRatio: 0,
+    score: 0,
+  };
+}
+
+/**
+ * Tight envelope around occupied voxels.
+ * Thin axes (a single plate) are padded so the plate is judged against a
+ * small spatial field. A cube is not padded, so its shell does not count as openness.
+ */
+function envelopeBounds(min: Voxel, max: Voxel) {
+  const span = [max[0] - min[0] + 1, max[1] - min[1] + 1, max[2] - min[2] + 1];
+  const maxSpan = Math.max(...span);
+  const outMin: Voxel = [...min];
+  const outMax: Voxel = [...max];
+  for (let axis = 0; axis < 3; axis += 1) {
+    if (span[axis] / maxSpan >= THIN_AXIS_RATIO) continue;
+    const target = Math.max(span[axis], Math.round(maxSpan * THIN_TARGET_RATIO));
+    const extra = Math.max(0, target - span[axis]);
+    const before = Math.floor(extra / 2);
+    outMin[axis] -= before;
+    outMax[axis] += extra - before;
+  }
+  return { min: outMin, max: outMax, span };
+}
+
+function floodExterior(
+  occupied: Set<string>,
+  min: Voxel,
+  max: Voxel,
+) {
+  const outside = new Set<string>();
+  const queue: Voxel[] = [];
+  const push = (x: number, y: number, z: number) => {
+    if (x < min[0] || y < min[1] || z < min[2] || x > max[0] || y > max[1] || z > max[2]) return;
+    const key = cellKey(x, y, z);
+    if (occupied.has(key) || outside.has(key)) return;
+    outside.add(key);
+    queue.push([x, y, z]);
+  };
+  for (let x = min[0]; x <= max[0]; x += 1) {
+    for (let y = min[1]; y <= max[1]; y += 1) {
+      push(x, y, min[2]);
+      push(x, y, max[2]);
+    }
+  }
+  for (let x = min[0]; x <= max[0]; x += 1) {
+    for (let z = min[2]; z <= max[2]; z += 1) {
+      push(x, min[1], z);
+      push(x, max[1], z);
+    }
+  }
+  for (let y = min[1]; y <= max[1]; y += 1) {
+    for (let z = min[2]; z <= max[2]; z += 1) {
+      push(min[0], y, z);
+      push(max[0], y, z);
+    }
+  }
+  const steps: Voxel[] = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
+  for (let index = 0; index < queue.length; index += 1) {
+    const [x, y, z] = queue[index];
+    for (const [dx, dy, dz] of steps) push(x + dx, y + dy, z + dz);
+  }
+  return outside;
+}
+
+function rayHits(
+  occupied: Set<string>,
+  x: number,
+  y: number,
+  z: number,
+  dx: number,
+  dy: number,
+  dz: number,
+  min: Voxel,
+  max: Voxel,
+) {
+  let cx = x + dx;
+  let cy = y + dy;
+  let cz = z + dz;
+  while (cx >= min[0] && cy >= min[1] && cz >= min[2] && cx <= max[0] && cy <= max[1] && cz <= max[2]) {
+    if (occupied.has(cellKey(cx, cy, cz))) return true;
+    cx += dx;
+    cy += dy;
+    cz += dz;
+  }
+  return false;
+}
+
+function isInterstitial(
+  occupied: Set<string>,
+  x: number,
+  y: number,
+  z: number,
+  min: Voxel,
+  max: Voxel,
+) {
+  const hits: Array<[number, number, number]> = [];
+  for (const [dx, dy, dz] of RAYS) {
+    if (rayHits(occupied, x, y, z, dx, dy, dz, min, max)) hits.push([dx, dy, dz]);
+  }
+  for (let i = 0; i < hits.length; i += 1) {
+    for (let j = i + 1; j < hits.length; j += 1) {
+      const dot = hits[i][0] * hits[j][0] + hits[i][1] * hits[j][1] + hits[i][2] * hits[j][2];
+      if (dot <= 0) return true;
+    }
+  }
+  return false;
+}
+
+export type PermeabilityRay = {
+  origin: Voxel;
+  end: Voxel;
+  direction: Voxel;
+  passed: boolean;
+};
+
+function directionPassRate(
+  occupied: Set<string>,
+  min: Voxel,
+  max: Voxel,
+  dx: number,
+  dy: number,
+  dz: number,
+  record?: PermeabilityRay[],
+) {
+  let rays = 0;
+  let passed = 0;
+  const x0 = dx > 0 ? min[0] : max[0];
+  const y0 = dy > 0 ? min[1] : max[1];
+  const z0 = dz > 0 ? min[2] : max[2];
+  const yStart = dy === 0 ? min[1] : y0;
+  const yEnd = dy === 0 ? max[1] : y0;
+  const zStart = dz === 0 ? min[2] : z0;
+  const zEnd = dz === 0 ? max[2] : z0;
+  const xStart = dx === 0 ? min[0] : x0;
+  const xEnd = dx === 0 ? max[0] : x0;
+  for (let x = xStart; x <= xEnd; x += 1) {
+    for (let y = yStart; y <= yEnd; y += 1) {
+      for (let z = zStart; z <= zEnd; z += 1) {
+        rays += 1;
+        let cx = x;
+        let cy = y;
+        let cz = z;
+        let endX = x;
+        let endY = y;
+        let endZ = z;
+        let blocked = false;
+        while (cx >= min[0] && cy >= min[1] && cz >= min[2] && cx <= max[0] && cy <= max[1] && cz <= max[2]) {
+          if (occupied.has(cellKey(cx, cy, cz))) {
+            blocked = true;
+            endX = cx;
+            endY = cy;
+            endZ = cz;
+            break;
+          }
+          endX = cx;
+          endY = cy;
+          endZ = cz;
+          cx += dx || 0;
+          cy += dy || 0;
+          cz += dz || 0;
+          if (!dx && !dy && !dz) break;
+        }
+        if (!blocked) passed += 1;
+        record?.push({
+          origin: [x, y, z],
+          end: [endX, endY, endZ],
+          direction: [dx, dy, dz],
+          passed: !blocked,
+        });
+      }
+    }
+  }
+  return rays ? passed / rays : 0;
+}
+
+/** Mean share of the 26-neighborhood that is also solid. Thin plates score low; solid blocks score high. */
+export function meanNeighborSolidity(cells: Voxel[]) {
+  if (!cells.length) return 1;
+  const occupied = new Set(cells.map(([x, y, z]) => cellKey(x, y, z)));
+  const offsets: Voxel[] = [];
+  for (let z = -1; z <= 1; z += 1) {
+    for (let y = -1; y <= 1; y += 1) {
+      for (let x = -1; x <= 1; x += 1) {
+        if (x || y || z) offsets.push([x, y, z]);
+      }
+    }
+  }
+  let sum = 0;
+  for (const [x, y, z] of cells) {
+    let neighbors = 0;
+    for (const [dx, dy, dz] of offsets) {
+      if (occupied.has(cellKey(x + dx, y + dy, z + dz))) neighbors += 1;
+    }
+    sum += neighbors / offsets.length;
+  }
+  return sum / cells.length;
+}
+
+export function openVolumeScore(measurement: Pick<OpenVolumeMeasurement, "architecturalOpenSpace" | "permeability" | "interstitialOpenSpace" | "lowMass">) {
+  return clamp100(
+    0.35 * measurement.architecturalOpenSpace
+    + 0.3 * measurement.permeability
+    + 0.25 * measurement.interstitialOpenSpace
+    + 0.1 * measurement.lowMass,
+  );
+}
+
+type OpenCellScan = {
+  occupied: Set<string>;
+  envMin: Voxel;
+  envMax: Voxel;
+  formVolume: number;
+  freeInForm: number;
+  enclosed: number;
+  interstitial: number;
+  free: Voxel[];
+  interstitialCells: Voxel[];
+  enclosedCells: Voxel[];
+  outside: Set<string>;
+};
+
+/** Same free-cell walk measureOpenVolume uses. Extra arrays do not change the ratios. */
+function classifyOpenCells(cells: Voxel[]): OpenCellScan | null {
+  if (!cells.length) return null;
+  let minX = Infinity;
+  let minY = Infinity;
+  let minZ = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  let maxZ = -Infinity;
+  const occupied = new Set<string>();
+  for (const [x, y, z] of cells) {
+    occupied.add(cellKey(x, y, z));
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    minZ = Math.min(minZ, z);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+    maxZ = Math.max(maxZ, z);
+  }
+  const formMin: Voxel = [minX, minY, minZ];
+  const formMax: Voxel = [maxX, maxY, maxZ];
+  const { min: envMin, max: envMax } = envelopeBounds(formMin, formMax);
+  const outside = floodExterior(occupied, envMin, envMax);
+  const formVolume = (maxX - minX + 1) * (maxY - minY + 1) * (maxZ - minZ + 1);
+  let freeInForm = 0;
+  let enclosed = 0;
+  let interstitial = 0;
+  const free: Voxel[] = [];
+  const interstitialCells: Voxel[] = [];
+  const enclosedCells: Voxel[] = [];
+  for (let x = minX; x <= maxX; x += 1) {
+    for (let y = minY; y <= maxY; y += 1) {
+      for (let z = minZ; z <= maxZ; z += 1) {
+        const key = cellKey(x, y, z);
+        if (occupied.has(key)) continue;
+        freeInForm += 1;
+        free.push([x, y, z]);
+        const exterior = outside.has(key);
+        if (!exterior) {
+          enclosed += 1;
+          enclosedCells.push([x, y, z]);
+        }
+        else if (isInterstitial(occupied, x, y, z, formMin, formMax)) {
+          interstitial += 1;
+          interstitialCells.push([x, y, z]);
+        }
+      }
+    }
+  }
+  return { occupied, envMin, envMax, formVolume, freeInForm, enclosed, interstitial, free, interstitialCells, enclosedCells, outside };
+}
+
+/**
+ * Located cells from the Open Volume walk.
+ * `free` is every unoccupied cell inside the occupied bounds (architectural open space).
+ * `interstitial` is the subset that passes the same between-surface test as the score term.
+ */
+export function openVolumeRegions(cells: Voxel[]) {
+  const scan = classifyOpenCells(cells);
+  if (!scan) return { free: [] as Voxel[], interstitial: [] as Voxel[] };
+  return { free: scan.free, interstitial: scan.interstitialCells };
+}
+
+/** Score architectural openness from an occupied voxel set. Coordinates are in cell units. */
+export function measureOpenVolume(cells: Voxel[]): OpenVolumeMeasurement {
+  const scan = classifyOpenCells(cells);
+  if (!scan) return emptyMeasurement();
+  const { occupied, envMin, envMax, formVolume, freeInForm, enclosed, interstitial } = scan;
+
+  const rates = AXES.map((axis) => directionPassRate(occupied, envMin, envMax, axis.dx, axis.dy, axis.dz));
+  const permeability = rates.reduce((sum, rate) => sum + rate, 0) / rates.length;
+  const horizontalRates = rates.filter((_, index) => AXES[index].horizontal);
+  const verticalRates = rates.filter((_, index) => !AXES[index].horizontal);
+  const horizontal = horizontalRates.reduce((sum, rate) => sum + rate, 0) / horizontalRates.length;
+  const vertical = verticalRates.reduce((sum, rate) => sum + rate, 0) / verticalRates.length;
+
+  const measurement: OpenVolumeMeasurement = {
+    architecturalOpenSpace: clamp100((freeInForm / formVolume) * 100),
+    permeability: clamp100(permeability * 100),
+    horizontalPermeability: clamp100(horizontal * 100),
+    verticalPermeability: clamp100(vertical * 100),
+    interstitialOpenSpace: clamp100((interstitial / formVolume) * 100),
+    lowMass: clamp100((1 - meanNeighborSolidity(cells)) * 100),
+    enclosedVoidRatio: clamp100((enclosed / formVolume) * 100),
+    score: 0,
+  };
+  measurement.score = openVolumeScore(measurement);
+  return measurement;
+}
+
+export type VoidComponent = {
+  cells: Voxel[];
+  /** True when the component touches exterior-connected free space. Not pedestrian access. */
+  exterior: boolean;
+};
+
+export type SoliditySample = {
+  cell: Voxel;
+  /** Share of the 26 neighbors that are also occupied. */
+  solidity: number;
+};
+
+const SIX: Voxel[] = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
+
+function connectedFree(cells: Voxel[], outside: Set<string>): VoidComponent[] {
+  const remaining = new Set(cells.map(([x, y, z]) => cellKey(x, y, z)));
+  const components: VoidComponent[] = [];
+  for (const start of cells) {
+    const startKey = cellKey(start[0], start[1], start[2]);
+    if (!remaining.has(startKey)) continue;
+    remaining.delete(startKey);
+    const queue: Voxel[] = [start];
+    const component: Voxel[] = [start];
+    let exterior = outside.has(startKey);
+    for (let index = 0; index < queue.length; index += 1) {
+      const [x, y, z] = queue[index];
+      for (const [dx, dy, dz] of SIX) {
+        const next: Voxel = [x + dx, y + dy, z + dz];
+        const key = cellKey(next[0], next[1], next[2]);
+        if (!remaining.has(key)) continue;
+        remaining.delete(key);
+        queue.push(next);
+        component.push(next);
+        if (outside.has(key)) exterior = true;
+      }
+    }
+    components.push({ cells: component, exterior });
+  }
+  components.sort((left, right) => right.cells.length - left.cells.length);
+  return components;
+}
+
+function soliditySamples(cells: Voxel[]): SoliditySample[] {
+  const occupied = new Set(cells.map(([x, y, z]) => cellKey(x, y, z)));
+  const offsets: Voxel[] = [];
+  for (let z = -1; z <= 1; z += 1) {
+    for (let y = -1; y <= 1; y += 1) {
+      for (let x = -1; x <= 1; x += 1) {
+        if (x || y || z) offsets.push([x, y, z]);
+      }
+    }
+  }
+  return cells.map((cell) => {
+    let neighbors = 0;
+    for (const [dx, dy, dz] of offsets) {
+      if (occupied.has(cellKey(cell[0] + dx, cell[1] + dy, cell[2] + dz))) neighbors += 1;
+    }
+    return { cell, solidity: neighbors / offsets.length };
+  });
+}
+
+/**
+ * Located Open Volume evidence from the same walks as the score.
+ * The returned score is measureOpenVolume's score. Nothing here is added to it.
+ */
+export function diagnoseOpenVolume(cells: Voxel[]) {
+  const measurement = measureOpenVolume(cells);
+  const scan = classifyOpenCells(cells);
+  if (!scan) {
+    return {
+      measurement,
+      rays: [] as PermeabilityRay[],
+      solidity: [] as SoliditySample[],
+      voids: [] as VoidComponent[],
+      enclosedCells: [] as Voxel[],
+      largestVoidFraction: 0,
+    };
+  }
+  const rays: PermeabilityRay[] = [];
+  for (const axis of AXES) directionPassRate(scan.occupied, scan.envMin, scan.envMax, axis.dx, axis.dy, axis.dz, rays);
+  const voids = connectedFree(scan.free, scan.outside);
+  const largest = voids[0]?.cells.length ?? 0;
+  return {
+    measurement,
+    rays,
+    solidity: soliditySamples(cells),
+    voids,
+    enclosedCells: scan.enclosedCells,
+    largestVoidFraction: scan.free.length ? largest / scan.free.length : 0,
+  };
+}

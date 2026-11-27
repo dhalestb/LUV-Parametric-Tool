@@ -1,6 +1,7 @@
-import ArchitecturalEvaluations from "@/components/evaluations/ArchitecturalEvaluations";
+import ArchitecturalEvaluations from "@/components/evaluations-v50e47fa/ArchitecturalEvaluations";
+import {EvaluationsSourceProvider} from "@/components/evaluations-v50e47fa/evaluationSource";
 
-/** Architectural OBJ descriptor evaluations (15 Lattice forms × 12 descriptors). */
+/** Five visible descriptors; source controls and results belong to Evaluations. */
 export default function EvaluationsPage() {
-  return <ArchitecturalEvaluations />;
+  return <EvaluationsSourceProvider><ArchitecturalEvaluations /></EvaluationsSourceProvider>;
 }

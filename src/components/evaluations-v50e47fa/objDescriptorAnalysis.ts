@@ -1,0 +1,737 @@
+import {evaluationSessionStorage} from './evaluationStorage';
+import type { ObjFace, TileModel, TileVariant, UpAxis } from "../lattice/types";
+import { fileToSpec, unpackCell } from "../lattice/types";
+import {
+  measureSpatialDescriptors,
+  type MeshTri,
+  type SpatialDescriptors,
+} from "./descriptorV2";
+import { CENTRALIZED_ALGORITHM_VERSION, DESCRIPTOR_ALGORITHM_VERSION, LEGACY_DESCRIPTOR_ALGORITHM_VERSION, OPEN_VOLUME_ALGORITHM_VERSION, OPEN_VOLUME_EVIDENCE_VERSION, type DescriptorAlgorithmVersion } from "./descriptorVersion";
+import { assignComparativeRanks, DESCRIPTOR_RANK_STORAGE_KEY, type DescriptorRankSnapshot } from "./descriptorRank";
+import { measureOpenVolume, type OpenVolumeMeasurement, type Voxel } from "./openVolume";
+import { CLEARANCE_MIN_AREA, measureSurfaceClearance, rateSurfaceClearance, type SurfaceClearance } from "./openVolumeClearance";
+import type { DescriptorEvidence } from "./v4/evidence";
+import { evaluateOpenVolumeDescriptor, evaluateV4, type V4DescriptorResult, type V4Options } from "./v4/evaluateV4";
+
+export { DESCRIPTOR_ALGORITHM_VERSION, LEGACY_DESCRIPTOR_ALGORITHM_VERSION, OPEN_VOLUME_ALGORITHM_VERSION } from "./descriptorVersion";
+
+/** The 12 architectural descriptors required for Part 2 OBJ evaluation. */
+export const ARCH_DESCRIPTORS = [
+  { id: "openVolume", name: "Open Volume" },
+  { id: "convergent", name: "Convergent" },
+  { id: "sculptural", name: "Sculptural" },
+  { id: "visuallyConnected", name: "Visually Connected" },
+  { id: "surreal", name: "Surreal" },
+  { id: "monumental", name: "Monumental" },
+  { id: "hierarchical", name: "Hierarchical" },
+  { id: "sequential", name: "Sequential" },
+  { id: "circulationActivated", name: "Circulation Activated" },
+  { id: "centralized", name: "Centralized" },
+  { id: "verticallyIntegrated", name: "Vertically Integrated" },
+  { id: "luminous", name: "Luminous" },
+] as const;
+
+export type ArchDescriptorId = (typeof ARCH_DESCRIPTORS)[number]["id"];
+
+export type MetricComponent = {
+  name: string;
+  /** Rounded 0–100 term. */
+  value: number;
+  /** Unrounded 0–100 term. Ranking uses this when present. */
+  precise?: number;
+  unit?: string;
+  /** Unscaled measurement named by rawUnit. Full precision. */
+  raw?: number;
+  rawUnit?: string;
+  weight: number;
+  /** This term's points toward the 0–100 score. */
+  contribution?: number;
+  /** v4: "unavailable" when the geometry offers no evidence for this term. It is then left out of the score. */
+  status?: "measured" | "unavailable";
+  /** v4: why the term is unavailable. */
+  reason?: string;
+  /** v4 documentation carried with the term. */
+  intent?: string;
+  formula?: string;
+  normalization?: string;
+};
+
+export type DescriptorResult = {
+  floorResults?: { candidates?: {region:number;area:number;percent:number|null;levelUsableArea:number;patch?:number[]}[]; level: number; score: number | null; primary?: number; secondary: number[]; status: string }[];
+  id: ArchDescriptorId;
+  name: string;
+  /** Rounded absolute geometric score, 0–100. 0 when unavailable; check `available`. */
+  score: number;
+  /** Full-precision absolute geometric score. Ranking uses this, not `score`. NaN when unavailable. */
+  absoluteScore: number;
+  components: MetricComponent[];
+  /** Algorithm that produced this result. */
+  version?: DescriptorAlgorithmVersion;
+  /** False only when processing failed (NaN). A measured 0 is available and ranked. */
+  available?: boolean;
+  unavailableReason?: string;
+  /** v4 evidence: layers, measurements, and component documentation. */
+  evidence?: DescriptorEvidence;
+  /** Unique rank in the current set. The highest number is the strongest expression. */
+  comparativeRank?: number;
+  /** Same value as comparativeRank. Kept so older readers see the new direction. */
+  relativeRank?: number;
+  relativePercentile?: number;
+  cohortSize?: number;
+  /** True only when stable form id was required to separate identical geometry. */
+  tieBreakUsed?: boolean;
+};
+
+export type DescriptorSource = {
+  positions: ArrayLike<number>;
+  faces: Array<Pick<ObjFace, "vertices">>;
+  up: UpAxis;
+  unitScale: number;
+};
+
+export type RawObjMetrics = {
+  occupiedCells: number;
+  floorCells: number;
+  passageCells: number;
+  voidCells: number;
+  verticalCells: number;
+  occupiedVolume: number;
+  horizontalArea: number;
+  verticalArea: number;
+  openBoundary: number;
+  projection: number;
+  recess: number;
+  bboxX: number;
+  bboxY: number;
+  bboxZ: number;
+  spanCellsX: number;
+  spanCellsY: number;
+  spanCellsZ: number;
+  floorLevels: number;
+  centroidOffsetPlan: number;
+  edgeFloorRatio: number;
+  skyOpenRatio: number;
+  portCount: number;
+  cellFeet: number;
+  vertexCount: number;
+  faceCount: number;
+};
+
+export type FormDescriptorEvaluation = {
+  meshId: string;
+  slotId: string;
+  filename: string;
+  category: "Gathering" | "Office" | "Lobby";
+  code: string;
+  name: string;
+  status: "idle" | "analyzing" | "ready" | "error";
+  confidence: number;
+  error?: string;
+  raw: RawObjMetrics | null;
+  descriptors: DescriptorResult[];
+};
+
+const clamp100 = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
+
+/** Shared normalizations. Exported so calibration uses the same values as the scores. */
+export type NormalizedDescriptorTerms = {
+  voidShare: number;
+  passageShare: number;
+  porosity: number;
+  verticalShare: number;
+  floorShare: number;
+  aspectTall: number;
+  planAspect: number;
+  areaBalance: number;
+  recessNorm: number;
+  projectionNorm: number;
+  levelNorm: number;
+  portNorm: number;
+};
+
+export function normalizedDescriptorTerms(raw: RawObjMetrics): NormalizedDescriptorTerms {
+  return {
+    voidShare: raw.voidCells / Math.max(1, raw.occupiedCells + raw.voidCells),
+    passageShare: raw.passageCells / Math.max(1, raw.floorCells + raw.passageCells),
+    porosity: raw.openBoundary / Math.max(1, raw.occupiedCells + raw.openBoundary),
+    verticalShare: raw.verticalCells / Math.max(1, raw.occupiedCells),
+    floorShare: raw.floorCells / Math.max(1, raw.occupiedCells),
+    aspectTall: raw.bboxZ / Math.max(raw.bboxX, raw.bboxY, 0.01),
+    // 0.01 is a zero-axis guard. It must not be an argument to Math.min, or every plan aspect becomes ~2000.
+    planAspect: Math.max(raw.bboxX, raw.bboxY) / Math.max(0.01, Math.min(raw.bboxX, raw.bboxY)),
+    areaBalance: raw.horizontalArea / Math.max(raw.horizontalArea + raw.verticalArea, 0.01),
+    recessNorm: Math.min(1, raw.recess / 8),
+    projectionNorm: Math.min(1, raw.projection / 12),
+    levelNorm: Math.min(1, (raw.floorLevels - 1) / 4),
+    portNorm: Math.min(1, raw.portCount / 8),
+  };
+}
+
+function collectRawMetrics(model: TileModel): RawObjMetrics {
+  const variant: TileVariant = model.variants[0] ?? {
+    rotation: 0,
+    mirror: "none",
+    occupied: [],
+    floor: [],
+    passage: [],
+    voidCells: [],
+    vertical: [],
+    bounds: { minX: 0, minY: 0, minZ: 0, maxX: 0, maxY: 0, maxZ: 0 },
+    faces: {} as TileVariant["faces"],
+  };
+  const occupied = variant.occupied.length;
+  const floor = variant.floor.length;
+  const passage = variant.passage.length;
+  const voids = variant.voidCells.length;
+  const vertical = variant.vertical.length;
+  const bx = Math.max(0.01, model.bboxMax[0] - model.bboxMin[0]);
+  const by = Math.max(0.01, model.bboxMax[1] - model.bboxMin[1]);
+  const bz = Math.max(0.01, model.bboxMax[2] - model.bboxMin[2]);
+  const spanX = Math.max(1, variant.bounds.maxX - variant.bounds.minX + 1);
+  const spanY = Math.max(1, variant.bounds.maxY - variant.bounds.minY + 1);
+  const spanZ = Math.max(1, variant.bounds.maxZ - variant.bounds.minZ + 1);
+  const floorZs = new Set(variant.floor.map((packed) => unpackCell(packed)[2]));
+  const floorLevels = Math.max(1, floorZs.size);
+
+  let floorSumX = 0;
+  let floorSumY = 0;
+  let edgeFloor = 0;
+  for (const packed of variant.floor) {
+    const [x, y] = unpackCell(packed);
+    floorSumX += x;
+    floorSumY += y;
+    if (
+      x === variant.bounds.minX ||
+      x === variant.bounds.maxX ||
+      y === variant.bounds.minY ||
+      y === variant.bounds.maxY
+    ) {
+      edgeFloor += 1;
+    }
+  }
+  const midX = (variant.bounds.minX + variant.bounds.maxX) / 2;
+  const midY = (variant.bounds.minY + variant.bounds.maxY) / 2;
+  const meanX = floor ? floorSumX / floor : midX;
+  const meanY = floor ? floorSumY / floor : midY;
+  const planDiagonal = Math.hypot(spanX, spanY) || 1;
+  const centroidOffsetPlan = Math.hypot(meanX - midX, meanY - midY) / planDiagonal;
+
+  const topZ = variant.bounds.maxZ;
+  const topCells = spanX * spanY;
+  let topOpen = 0;
+  const topOccupied = new Set(
+    variant.occupied.filter((packed) => unpackCell(packed)[2] === topZ).map((packed) => {
+      const [x, y] = unpackCell(packed);
+      return `${x}:${y}`;
+    }),
+  );
+  for (let x = variant.bounds.minX; x <= variant.bounds.maxX; x += 1) {
+    for (let y = variant.bounds.minY; y <= variant.bounds.maxY; y += 1) {
+      if (!topOccupied.has(`${x}:${y}`)) topOpen += 1;
+    }
+  }
+
+  return {
+    occupiedCells: occupied,
+    floorCells: floor,
+    passageCells: passage,
+    voidCells: voids,
+    verticalCells: vertical,
+    occupiedVolume: model.occupiedVolume,
+    horizontalArea: model.horizontalArea,
+    verticalArea: model.verticalArea,
+    openBoundary: model.openBoundary,
+    projection: model.projection,
+    recess: model.recess,
+    bboxX: bx,
+    bboxY: by,
+    bboxZ: bz,
+    spanCellsX: spanX,
+    spanCellsY: spanY,
+    spanCellsZ: spanZ,
+    floorLevels,
+    centroidOffsetPlan,
+    edgeFloorRatio: floor ? edgeFloor / floor : 0,
+    skyOpenRatio: topCells ? topOpen / topCells : 0,
+    portCount: variant.ports?.length ?? 0,
+    cellFeet: model.cellFeet,
+    vertexCount: model.vertexCount,
+    faceCount: model.faceCount,
+  };
+}
+
+function absoluteScoreOf(components: MetricComponent[]) {
+  const weightSum = components.reduce((sum, item) => sum + item.weight, 0) || 1;
+  return components.reduce((sum, item) => sum + (item.precise ?? item.value) * item.weight, 0) / weightSum;
+}
+
+function withContribution(components: MetricComponent[]): MetricComponent[] {
+  const weightSum = components.reduce((sum, item) => sum + item.weight, 0) || 1;
+  return components.map((item) => {
+    const precise = item.precise ?? item.value;
+    return {
+      ...item,
+      value: clamp100(item.value),
+      precise,
+      contribution: Math.round((precise * item.weight / weightSum) * 10) / 10,
+    };
+  });
+}
+
+function fromDrafts(drafts: SpatialDescriptors[keyof SpatialDescriptors]): MetricComponent[] {
+  return withContribution(drafts.map((item) => ({
+    name: item.name,
+    value: item.value,
+    precise: item.precise ?? item.value,
+    raw: item.raw,
+    rawUnit: item.rawUnit,
+    weight: item.weight,
+  })));
+}
+
+function scoreDescriptors(open: OpenVolumeMeasurement, spatial: SpatialDescriptors, clearance?: SurfaceClearance | null): DescriptorResult[] {
+  const rated = clearance ? rateSurfaceClearance(clearance) : null;
+  const make = (id: ArchDescriptorId, name: string, components: MetricComponent[]): DescriptorResult => {
+    const absoluteScore = absoluteScoreOf(components);
+    return {
+      id,
+      name,
+      absoluteScore,
+      score: clamp100(absoluteScore),
+      components,
+    };
+  };
+
+  return [
+    make("openVolume", "Open Volume", rated
+      ? withContribution([
+        {
+          name: "Surface Clearance",
+          raw: rated.raw,
+          rawUnit: "area-weighted share; exterior-open counts as fully open, clearance at or below 5 ft counts as 0, then rises to fully open at 10 ft",
+          value: rated.value,
+          precise: rated.value,
+          weight: 1,
+        },
+      ])
+      : withContribution([
+        { name: "Architectural Open Space", raw: open.architecturalOpenSpace / 100, rawUnit: "free cells / occupied bounds", value: open.architecturalOpenSpace, weight: 0.35 },
+        { name: "Permeability", raw: open.permeability / 100, rawUnit: "mean of six axis pass rates", value: open.permeability, weight: 0.3 },
+        { name: "Interstitial Space", raw: open.interstitialOpenSpace / 100, rawUnit: "between-surface free cells / bounds", value: open.interstitialOpenSpace, weight: 0.25 },
+        { name: "Low Mass", raw: open.lowMass / 100, rawUnit: "1 - mean 26-neighbor solidity", value: open.lowMass, weight: 0.1 },
+        { name: "Enclosed Void (informational)", raw: open.enclosedVoidRatio / 100, rawUnit: "enclosed free cells / bounds", value: open.enclosedVoidRatio, weight: 0 },
+      ])),
+    make("convergent", "Convergent", fromDrafts(spatial.convergent)),
+    make("sculptural", "Sculptural", fromDrafts(spatial.sculptural)),
+    make("visuallyConnected", "Visually Connected", fromDrafts(spatial.visuallyConnected)),
+    make("surreal", "Surreal", fromDrafts(spatial.surreal)),
+    make("monumental", "Monumental", fromDrafts(spatial.monumental)),
+    make("hierarchical", "Hierarchical", fromDrafts(spatial.hierarchical)),
+    make("sequential", "Sequential", fromDrafts(spatial.sequential)),
+    make("circulationActivated", "Circulation Activated", fromDrafts(spatial.circulationActivated)),
+    make("centralized", "Centralized", fromDrafts(spatial.centralized)),
+    make("verticallyIntegrated", "Vertically Integrated", fromDrafts(spatial.verticallyIntegrated)),
+    make("luminous", "Luminous", fromDrafts(spatial.luminous)),
+  ];
+}
+
+/** Confidence from voxel coverage and mesh complexity — not a fabricated quality grade. */
+export function confidenceFromRaw(raw: RawObjMetrics) {
+  const coverage = Math.min(1, raw.occupiedCells / 80);
+  const floors = Math.min(1, raw.floorCells / 20);
+  const verts = Math.min(1, raw.vertexCount / 500);
+  return clamp100(40 + coverage * 25 + floors * 20 + verts * 15);
+}
+
+function vertexInCells(positions: ArrayLike<number>, index: number, up: UpAxis, unitScale: number, anchor: [number, number, number], cellFeet: number): [number, number, number] {
+  const [x, y, z] = fileToSpec(positions[index * 3] ?? 0, positions[index * 3 + 1] ?? 0, positions[index * 3 + 2] ?? 0, up);
+  return [
+    (x * unitScale - anchor[0]) / cellFeet,
+    (y * unitScale - anchor[1]) / cellFeet,
+    (z * unitScale - anchor[2]) / cellFeet,
+  ];
+}
+
+export function sourceTriangles(source: DescriptorSource, anchor: [number, number, number], cellFeet: number): MeshTri[] {
+  const triangles: MeshTri[] = [];
+  for (const face of source.faces) {
+    for (let index = 1; index < face.vertices.length - 1; index += 1) {
+      const a = vertexInCells(source.positions, face.vertices[0], source.up, source.unitScale, anchor, cellFeet);
+      const b = vertexInCells(source.positions, face.vertices[index], source.up, source.unitScale, anchor, cellFeet);
+      const c = vertexInCells(source.positions, face.vertices[index + 1], source.up, source.unitScale, anchor, cellFeet);
+      const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+      const ac = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+      const cross: [number, number, number] = [
+        ab[1] * ac[2] - ab[2] * ac[1],
+        ab[2] * ac[0] - ab[0] * ac[2],
+        ab[0] * ac[1] - ab[1] * ac[0],
+      ];
+      const length = Math.hypot(cross[0], cross[1], cross[2]);
+      if (length < 1e-8) continue;
+      triangles.push({
+        normal: [cross[0] / length, cross[1] / length, cross[2] / length],
+        area: length / 2,
+        centroid: [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3, (a[2] + b[2] + c[2]) / 3],
+        corners: [a, b, c],
+      });
+    }
+  }
+  return triangles;
+}
+
+function geometryKey(cells: Voxel[], triangles: MeshTri[], cellFeet: number, bbox: [number, number, number]) {
+  let hash = 2166136261;
+  const mix = (value: number) => {
+    hash ^= value | 0;
+    hash = Math.imul(hash, 16777619);
+  };
+  mix(Math.round(cellFeet * 100));
+  mix(cells.length);
+  mix(triangles.length);
+  mix(Math.round(bbox[0] * 10));
+  mix(Math.round(bbox[1] * 10));
+  mix(Math.round(bbox[2] * 10));
+  for (const [x, y, z] of cells) {
+    mix(x);
+    mix(y);
+    mix(z);
+  }
+  let area = 0;
+  for (const triangle of triangles) area += triangle.area;
+  mix(Math.round(area * 10));
+  const step = Math.max(1, Math.floor(triangles.length / 24));
+  for (let index = 0; index < triangles.length; index += step) {
+    const triangle = triangles[index];
+    mix(Math.round(triangle.normal[0] * 100));
+    mix(Math.round(triangle.normal[2] * 100));
+    mix(Math.round(triangle.centroid[0] * 10));
+  }
+  return `${LEGACY_DESCRIPTOR_ALGORITHM_VERSION}:${hash >>> 0}`;
+}
+
+type CachedEvaluation = Omit<FormDescriptorEvaluation, "slotId" | "category" | "code" | "name" | "status">;
+
+const analysisCache = new Map<string, CachedEvaluation>();
+let analysisCacheHits = 0;
+
+/** How many evaluations were served from the geometry cache. */
+export function descriptorAnalysisCacheHits() {
+  return analysisCacheHits;
+}
+
+function cloneEvaluation(evaluation: CachedEvaluation): CachedEvaluation {
+  return {
+    ...evaluation,
+    raw: evaluation.raw ? { ...evaluation.raw } : null,
+    descriptors: evaluation.descriptors.map((descriptor) => ({
+      ...descriptor,
+      components: descriptor.components.map((component) => ({ ...component })),
+      comparativeRank: undefined,
+      relativeRank: undefined,
+      relativePercentile: undefined,
+      cohortSize: undefined,
+      tieBreakUsed: undefined,
+    })),
+  };
+}
+
+export type EvaluateOptions = {
+  /** "v4.0" (default when source geometry is supplied) or the retained "v3.5" legacy evaluation. */
+  algorithm?: DescriptorAlgorithmVersion;
+  /** v4 eye height for sightline tests, feet. */
+  eyeHeightFeet?: number;
+  /** Include counted uncovered top decks in Open Volume, visibility, and light. */
+  includeTopDecks?: boolean;
+  centralityWeights?: V4Options["centralityWeights"];
+  /**
+   * Descriptors already scored for this mesh. Used only when the geometry cache
+   * has no current Open Volume result, so the other descriptors are not recomputed.
+   */
+  retainedDescriptors?: DescriptorResult[];
+};
+
+/**
+ * Evaluate a form. v4.0 measures the original surfaces and needs `source`;
+ * without source geometry the legacy v3.5 voxel evaluation is used and marked.
+ */
+export function evaluateTileModel(model: TileModel, source?: DescriptorSource, options: EvaluateOptions = {}): CachedEvaluation {
+  const algorithm = options.algorithm ?? (source ? DESCRIPTOR_ALGORITHM_VERSION : LEGACY_DESCRIPTOR_ALGORITHM_VERSION);
+  if (algorithm === LEGACY_DESCRIPTOR_ALGORITHM_VERSION || !source) return evaluateTileModelLegacy(model, source);
+  return evaluateTileModelV4(model, source, {
+    eyeHeightFeet: options.eyeHeightFeet,
+    includeTopDecks: options.includeTopDecks,
+    centralityWeights: options.centralityWeights,
+    lobbySlotId: model.slotId ?? undefined,
+  }, options.retainedDescriptors);
+}
+
+const V4_CACHE_GLOBAL = "__luvEvaluations50e47faV4Cache";
+
+function v4CacheMap(): Map<string, CachedEvaluation> {
+  const host = globalThis as typeof globalThis & { [V4_CACHE_GLOBAL]?: Map<string, CachedEvaluation> };
+  if (!host[V4_CACHE_GLOBAL]) host[V4_CACHE_GLOBAL] = new Map();
+  return host[V4_CACHE_GLOBAL];
+}
+
+const v4Cache = v4CacheMap();
+
+function geometryStamp(model: TileModel, source: DescriptorSource, options: V4Options) {
+  let hash = 2166136261;
+  const mix = (value: number) => {
+    hash ^= value | 0;
+    hash = Math.imul(hash, 16777619);
+  };
+  const positions = source.positions;
+  mix(positions.length);
+  for (let index = 0; index < positions.length; index += 1) mix(Math.round(positions[index] * 1000));
+  mix(source.faces.length);
+  mix(Math.round(source.unitScale * 1000));
+  mix(source.up === "y" ? 1 : 2);
+  mix(Math.round((options.eyeHeightFeet ?? 0) * 100));
+  mix(options.includeTopDecks ? 1 : 0);
+  const slot = options.lobbySlotId ?? "";
+  for (let index = 0; index < slot.length; index += 1) mix(slot.charCodeAt(index));
+  if (options.centralityWeights) for (const key of ["harmonic", "freeman", "betweenness", "hierarchy"] as const) mix(Math.round(options.centralityWeights[key] * 1000000));
+  return `${model.id}:${hash >>> 0}`;
+}
+
+function v4Key(model: TileModel, source: DescriptorSource, options: V4Options) {
+  return `${DESCRIPTOR_ALGORITHM_VERSION}:${OPEN_VOLUME_ALGORITHM_VERSION}:${geometryStamp(model, source, options)}`;
+}
+
+/** Cache key for the current suite version and the current Open Volume version. */
+export function v4CacheKeyFor(model: TileModel, source: DescriptorSource, options: V4Options = {}) {
+  return v4Key(model, source, options);
+}
+
+/** In-memory v4 evaluations. Tests use this to plant a stale Open Volume result. */
+export function readV4Cache() {
+  return v4Cache;
+}
+
+function descriptorFromV4(item: V4DescriptorResult): DescriptorResult {
+  const components: MetricComponent[] = item.evidence.components.map((term) => ({
+    name: term.name,
+    value: term.precise === null ? 0 : clamp100(term.precise),
+    precise: term.precise ?? undefined,
+    raw: term.raw ?? undefined,
+    rawUnit: term.units,
+    weight: term.weight,
+    status: term.status,
+    reason: term.reason,
+    intent: term.intent,
+    formula: term.formula,
+    normalization: term.normalization,
+  }));
+  const measured = components.filter((component) => component.status !== "unavailable");
+  const weightSum = measured.reduce((sum, component) => sum + component.weight, 0) || 1;
+  for (const component of components) {
+    component.contribution = component.status === "unavailable" || component.precise === undefined
+      ? 0
+      : Math.round(((component.precise * component.weight) / weightSum) * 10) / 10;
+  }
+  return {
+    id: item.id as ArchDescriptorId,
+    name: item.name,
+    absoluteScore: item.absoluteScore,
+    score: Number.isFinite(item.absoluteScore) ? clamp100(item.absoluteScore) : 0,
+    components,
+    version: item.evidence.version as DescriptorAlgorithmVersion,
+    available: item.available,
+    unavailableReason: item.unavailableReason,
+    evidence: item.evidence,
+  };
+}
+
+function withoutRanks(descriptor: DescriptorResult): DescriptorResult {
+  return {
+    ...descriptor,
+    components: descriptor.components.map((component) => ({ ...component })),
+    comparativeRank: undefined,
+    relativeRank: undefined,
+    relativePercentile: undefined,
+    cohortSize: undefined,
+    tieBreakUsed: undefined,
+  };
+}
+
+/** Other descriptors stay only when each stored version is exactly the suite version. */
+function retainedOthers(descriptors: DescriptorResult[]): DescriptorResult[] | null {
+  const others = ARCH_DESCRIPTORS.filter((spec) => spec.id !== "openVolume").map((spec) => {
+    const found = descriptors.find((descriptor) => descriptor.id === spec.id);
+    if (!found || found.version !== (spec.id === "centralized" ? CENTRALIZED_ALGORITHM_VERSION : DESCRIPTOR_ALGORITHM_VERSION)) return null;
+    return withoutRanks(found);
+  });
+  if (others.some((item) => item === null)) return null;
+  return others as DescriptorResult[];
+}
+
+function storedOpenVolumeVersion(descriptors: DescriptorResult[]) {
+  const open = descriptors.find((descriptor) => descriptor.id === "openVolume");
+  if (!open?.version || open.evidence?.version !== open.version) return undefined;
+  return open.version;
+}
+
+function openVolumeIsCurrent(descriptors: DescriptorResult[]) {
+  const open = descriptors.find((descriptor) => descriptor.id === "openVolume");
+  return storedOpenVolumeVersion(descriptors) === OPEN_VOLUME_ALGORITHM_VERSION
+    && open?.evidence?.measurements.qualifyingRegionsEvidenceVersion === OPEN_VOLUME_EVIDENCE_VERSION;
+}
+
+function preservableEntry(stamp: string): CachedEvaluation | undefined {
+  const currentKey = `${DESCRIPTOR_ALGORITHM_VERSION}:${OPEN_VOLUME_ALGORITHM_VERSION}:${stamp}`;
+  const current = v4Cache.get(currentKey);
+  if (current) return current;
+  const legacy = v4Cache.get(`${DESCRIPTOR_ALGORITHM_VERSION}:${stamp}`);
+  if (legacy) return legacy;
+  for (const [key, value] of v4Cache) {
+    if (key.startsWith(`${DESCRIPTOR_ALGORITHM_VERSION}:`) && key.endsWith(`:${stamp}`)) return value;
+  }
+  return undefined;
+}
+
+function refreshOpenVolume(base: CachedEvaluation, model: TileModel, source: DescriptorSource, options: V4Options): CachedEvaluation | null {
+  const others = retainedOthers(base.descriptors);
+  if (!others) return null;
+  const open = descriptorFromV4(evaluateOpenVolumeDescriptor(source, model.id, options));
+  const byId = new Map<ArchDescriptorId, DescriptorResult>(others.map((descriptor) => [descriptor.id, descriptor]));
+  byId.set("openVolume", open);
+  const evaluation: CachedEvaluation = {
+    ...base,
+    meshId: model.id,
+    filename: model.filename,
+    descriptors: ARCH_DESCRIPTORS.map((spec) => byId.get(spec.id)!),
+  };
+  v4Cache.set(v4Key(model, source, options), evaluation);
+  return evaluation;
+}
+
+/** v4.0 surface-based evaluation. Raw voxel metrics are still reported for the diagnostic panel. */
+export function evaluateTileModelV4(model: TileModel, source: DescriptorSource, options: V4Options = {}, retainedDescriptors?: DescriptorResult[]): CachedEvaluation {
+  const stamp = geometryStamp(model, source, options);
+  const key = v4Key(model, source, options);
+  const cached = preservableEntry(stamp);
+  const hasCurrentVisualEvidence=(descriptors:DescriptorResult[])=>descriptors.find(d=>d.id==='visuallyConnected')?.evidence?.measurements?.hotspotEvidenceVersion===3 && descriptors.find(d=>d.id==='circulationActivated')?.evidence?.measurements?.circulationDisplayVersion===7 && descriptors.find(d=>d.id==='verticallyIntegrated')?.evidence?.measurements?.verticalDisplayVersion===2 && descriptors.find(d=>d.id==='centralized')?.version===CENTRALIZED_ALGORITHM_VERSION;
+  const hasGatheringEvidence = (descriptors: DescriptorResult[]) => descriptors.find((d) => d.id === "centralized")?.evidence?.measurements.gatheringDisplayVersion === 1;
+  if (cached && openVolumeIsCurrent(cached.descriptors) && hasCurrentVisualEvidence(cached.descriptors) && hasGatheringEvidence(cached.descriptors)) {
+    analysisCacheHits += 1;
+    if (!v4Cache.has(key)) v4Cache.set(key, cached);
+    return cloneEvaluation(cached);
+  }
+  const preserved = cached ?? (retainedDescriptors ? {
+    meshId: model.id,
+    filename: model.filename,
+    confidence: 0,
+    raw: null,
+    descriptors: retainedDescriptors,
+  } satisfies CachedEvaluation : undefined);
+  if (preserved && hasCurrentVisualEvidence(preserved.descriptors) && hasGatheringEvidence(preserved.descriptors) && !openVolumeIsCurrent(preserved.descriptors)) {
+    const raw = collectRawMetrics(model);
+    const refreshed = refreshOpenVolume({ ...preserved, raw, confidence: confidenceFromRaw(raw) }, model, source, options);
+    if (refreshed) return cloneEvaluation(refreshed);
+  }
+  const raw = collectRawMetrics(model);
+  const v4 = evaluateV4(source, model.id, options);
+  const evaluation: CachedEvaluation = {
+    meshId: model.id,
+    filename: model.filename,
+    confidence: confidenceFromRaw(raw),
+    raw,
+    descriptors: v4.descriptors.map(descriptorFromV4),
+  };
+  v4Cache.set(key, evaluation);
+  return cloneEvaluation(evaluation);
+}
+
+/** The retained v3.5 evaluation. Formulas, thresholds, and weights are unchanged. */
+export function evaluateTileModelLegacy(model: TileModel, source?: DescriptorSource): CachedEvaluation {
+  const raw = collectRawMetrics(model);
+  const occupied = (model.variants[0]?.occupied ?? []).map((packed) => unpackCell(packed));
+  const triangles = source ? sourceTriangles(source, model.anchor, model.cellFeet) : [];
+  const key = geometryKey(occupied, triangles, model.cellFeet, [raw.bboxX, raw.bboxY, raw.bboxZ]);
+  const cached = analysisCache.get(key);
+  if (cached && cached.meshId === model.id) {
+    analysisCacheHits += 1;
+    return cloneEvaluation(cached);
+  }
+  const open = measureOpenVolume(occupied);
+  const clearance = source
+    ? measureSurfaceClearance({
+      mesh: source,
+      unitScale: source.unitScale,
+      up: source.up,
+      anchor: model.anchor,
+      cellFeet: model.cellFeet,
+      occupied,
+      minArea: CLEARANCE_MIN_AREA,
+    })
+    : null;
+  const spatial = measureSpatialDescriptors({
+    cells: occupied,
+    cellFeet: model.cellFeet,
+    bboxFeet: [raw.bboxX, raw.bboxY, raw.bboxZ],
+    occupiedVolumeFeet: model.occupiedVolume,
+    triangles,
+  });
+  const evaluation: CachedEvaluation = {
+    meshId: model.id,
+    filename: model.filename,
+    confidence: confidenceFromRaw(raw),
+    raw,
+    descriptors: scoreDescriptors(open, spatial, clearance).map((descriptor) => ({
+      ...descriptor,
+      version: LEGACY_DESCRIPTOR_ALGORITHM_VERSION,
+      available: Number.isFinite(descriptor.absoluteScore),
+    })),
+  };
+  analysisCache.set(key, evaluation);
+  return cloneEvaluation(evaluation);
+}
+
+export { DESCRIPTOR_RANK_STORAGE_KEY, type DescriptorRankSnapshot } from "./descriptorRank";
+
+/** Publish this versioned Evaluations session's ranks; the Lattice rank key remains untouched. */
+export function publishDescriptorRanks(forms: Array<Pick<FormDescriptorEvaluation, "slotId" | "meshId" | "filename" | "descriptors">>) {
+  if (typeof window === "undefined") return;
+  const payload: DescriptorRankSnapshot = {
+    version: DESCRIPTOR_ALGORITHM_VERSION,
+    openVolumeVersion: OPEN_VOLUME_ALGORITHM_VERSION,
+    centralizedVersion: forms.find(f=>f.descriptors.some(d=>d.id==='centralized'))?.descriptors.find(d=>d.id==='centralized')?.version??CENTRALIZED_ALGORITHM_VERSION,
+    forms: forms.map((form) => ({
+      slotId: form.slotId,
+      meshId: form.meshId,
+      filename: form.filename,
+      descriptors: Object.fromEntries(form.descriptors.map((descriptor) => [descriptor.id, {
+        // NaN is not valid JSON; unavailable descriptors publish null and no rank.
+        absoluteScore: Number.isFinite(descriptor.absoluteScore) ? descriptor.absoluteScore : null,
+        comparativeRank: descriptor.comparativeRank,
+      }])),
+    })),
+  };
+  const previous = evaluationSessionStorage.getItem(DESCRIPTOR_RANK_STORAGE_KEY);
+  if (previous) {
+    let previousOpenVolumeVersion: unknown;
+    try { previousOpenVolumeVersion = (JSON.parse(previous) as DescriptorRankSnapshot).openVolumeVersion; } catch { /* Keep unreadable historical data under its existing archive policy. */ }
+    if (previousOpenVolumeVersion !== OPEN_VOLUME_ALGORITHM_VERSION) {
+      const version = typeof previousOpenVolumeVersion === "string" ? previousOpenVolumeVersion.replace(/[^a-zA-Z0-9.-]/g, "_") : "unversioned";
+      const archiveKey = `${DESCRIPTOR_RANK_STORAGE_KEY}-before-open-volume-${version}`;
+      if (!evaluationSessionStorage.getItem(archiveKey)) evaluationSessionStorage.setItem(archiveKey, previous);
+    }
+    let needsArchive = true;
+    try { needsArchive = (JSON.parse(previous) as DescriptorRankSnapshot).centralizedVersion !== CENTRALIZED_ALGORITHM_VERSION; } catch { /* Preserve unreadable historic data as well. */ }
+    const archiveKey = `${DESCRIPTOR_RANK_STORAGE_KEY}-before-centralized-graph`;
+    if (needsArchive && !evaluationSessionStorage.getItem(archiveKey)) evaluationSessionStorage.setItem(archiveKey, previous);
+  }
+  evaluationSessionStorage.setItem(DESCRIPTOR_RANK_STORAGE_KEY, JSON.stringify(payload));
+}
+
+/**
+ * Unique ranks across the supplied forms. The highest rank is the strongest
+ * expression. Unchanged forms keep their cached absolute scores.
+ */
+export function assignRelativeRanks(forms: Array<{ slotId?: string; meshId?: string; descriptors: DescriptorResult[] }>) {
+  assignComparativeRanks(forms.map((form, index) => ({
+    formId: form.slotId || form.meshId || String(index).padStart(4, "0"),
+    descriptors: form.descriptors,
+  })));
+}
