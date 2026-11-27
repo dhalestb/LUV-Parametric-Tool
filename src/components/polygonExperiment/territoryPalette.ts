@@ -9,6 +9,9 @@ const fills={
   'vertical-void-lobby':'#B9BEC6',
   'compressed-sequential-lobby':'#095775',
   'topographic-ground-field-lobby':'#71BEDA',
+  'open-hall-workspace':'#43A9CF',
+  'void-edge-workspace':'#095775',
+  'flat-deep-plan-plate':'#D5AC50',
   'linear-gallery-lobby':'#43A9CF',
 } satisfies Record<Typology,string>;
 

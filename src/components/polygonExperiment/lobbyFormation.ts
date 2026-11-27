@@ -62,16 +62,22 @@ export async function formLobby(typology:LobbyTypology,api:ManifoldToplevel,doma
   label:Point,clustering:number,cap:number,bands:HeightBand[],rule:RegistryItem,target:number|undefined,distributed:boolean,extend:boolean){
   const {name,limit}=layouts[typology];
   const letterTarget=target??automaticLetterTarget(domain.area());
-  if(!Number.isInteger(letterTarget)||letterTarget<2||letterTarget>maxLetterTarget)
+  if(!Number.isInteger(letterTarget)||letterTarget<2||(target!==undefined&&letterTarget>maxLetterTarget))
     throw Error(name+' needs a target between 2 and '+maxLetterTarget+' letters.');
   const motifSize=typology==='vertical-void-lobby'||typology==='topographic-ground-field-lobby'?3:4;
-  const minimum=Math.ceil(letterTarget/limit);
-  const preferred=distributed?Math.max(1,Math.floor(letterTarget/motifSize)):minimum;
+  let attempt=letterTarget;
   let bestCount=0;
+  while(attempt>=2){
+  const minimum=Math.ceil(attempt/limit);
+  const preferred=distributed?Math.max(1,Math.floor(attempt/motifSize)):minimum;
+  bestCount=0;
   for(let groups=preferred;groups>=minimum;groups--){
-    const layout=await tryLobbyLayout(typology,api,domain,origin,datum,label,clustering,cap,bands,rule,letterTarget,distributed,groups,extend);
-    if(!('placedCount' in layout))return layout;
+    const layout=await tryLobbyLayout(typology,api,domain,origin,datum,label,clustering,cap,bands,rule,attempt,distributed,groups,extend);
+    if(!('placedCount' in layout))return {...layout,letterTarget};
     bestCount=Math.max(bestCount,layout.placedCount??0);
+  }
+  if(target===undefined||bestCount>=attempt)break;
+  attempt=bestCount;
   }
   throw Error(name+' placed '+bestCount+' of '+letterTarget+' letters in the available layouts. Reduce the letter target or increase its territory.');
 }

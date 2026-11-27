@@ -1,4 +1,6 @@
 'use client';
+import {officePlacement} from './model';
+import {officeRules} from './officeRegistry';
 
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {descriptorNames,descriptorRegions,influenceVersion,type AreaShares,type Descriptor} from './descriptorInfluence';
@@ -13,7 +15,7 @@ import {ensureSiteSelection,saveOrientation,removeAllocatedOrientations,type Ori
 import {useSiteHandoff} from './siteHandoffStore';
 import {generateAllocatedSite} from './allocatedDesign';
 import {generateContinuousSite} from './continuousDesign';
-import {compositionControls,validateAllocation} from './territories';
+import {compositionControls,hallControls,validateAllocation} from './territories';
 import {CompositionDistribution} from './SitePlan';
 import {categoryByTypology,spaceCategories,type SpaceCategory} from './typologyCategories';
 import DesignPanel from './DesignPanel';
@@ -46,19 +48,20 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
   const rules=(!zone&&pending['hybrid-rule'])||draft.rules||defaultRules, areas:AreaShares=(!zone&&pending.descriptor)||draft.descriptors||{openVolume:100};
   const assignment=(zoneId&&state.assignments[zoneId])||newAssignment();
   const areaValues=(!zone&&pending['typology-area'])||assignment.shares;
-  const territory=(zoneId&&state.territoryByZone[zoneId]?.controls)||territoryDefaults();
+  const territory=hallControls((zoneId&&state.territoryByZone[zoneId]?.controls)||territoryDefaults(),officePlacement(draft,'open-hall-workspace')==='boundary');
   const latest=useRef(state);
   latest.current=state;
   const [preparing,setPreparing]=useState(false),[planNotice,setPlanNotice]=useState('');
   useEffect(()=>{setMessage('');setPlanNotice('');},[site?.fingerprint,zoneId,method]);
   const enabledZones=site?.zones.filter(z=>z.enabled)??[];
+  const hasWorkspace=enabledZones.some(z=>['flat-deep-plan-plate',...officeRules.map(t=>t.id)].some(id=>(state.assignments[z.id]?.shares[id as Typology]??0)>0));
   const zoneHasLobbies=(id:string)=>registry.items.some(t=>isLobbyTypology(t.id)&&(state.assignments[id]?.shares[t.id]??0)>0);
   const hasLobby=enabledZones.some(z=>zoneHasLobbies(z.id));
   const preparationBlocker=!site?.protectionMetadataComplete?'Refresh the site polygons in Section 1 to load their protection geometry.':
     !enabledZones.length?'Enable a polygon in Site Development, then refresh the site polygons in Section 1.':'';
   const preparedCount=enabledZones.filter(z=>{
     const stored=state.territoryByZone[z.id],area=stored?.results.area;
-    return site&&area&&currentTerritoryResult(site,z,state.assignments[z.id]??newAssignment(),stored.controls,area);
+    return site&&area&&currentTerritoryResult(site,z,state.assignments[z.id]??newAssignment(),hallControls(stored.controls,officePlacement(zones[JSON.stringify([site.fingerprint,z.id])],'open-hall-workspace')==='boundary'),area);
   }).length;
   async function prepareAreas(){
     if(!site||preparationBlocker||busy||preparing)return;
@@ -69,18 +72,18 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       const next={...state.territoryByZone};
       for(const z of enabledZones){
         try{
-          const c=compositionControls(next[z.id]?.controls);
+          const c=compositionControls(hallControls(next[z.id]?.controls,officePlacement(zones[JSON.stringify([site.fingerprint,z.id])],'open-hall-workspace')==='boundary'));
           const area=generateTerritories(kernel,site,z,state.assignments[z.id]??newAssignment(),c,'area',registry);
           if(!area.metrics.valid)throw Error('Territory validation failed.');
           next[z.id]={controls:c,results:{...next[z.id]?.results,area}};
         }catch(e){throw Error(z.name+' · '+(e instanceof Error?e.message:String(e)));}
       }
-      patch({territoryByZone:next});
+      patch({territoryByZone:next,territoriesOnly:true});
     }catch(e){setPlanNotice(e instanceof Error?e.message:String(e));}finally{setPreparing(false);}
   }
   const handoff=useSiteHandoff();
   const rows=method==='descriptor'?Object.entries(descriptorNames).map(([id,name])=>({id,name,value:areas[id as Descriptor]??0,locked:false,category:undefined})):
-    registry.items.filter(t=>method!=='hybrid-rule'||!isLobbyTypology(t.id)).map(t=>({id:t.id,name:t.name,category:categoryByTypology[t.id],value:(method==='hybrid-rule'?rules:areaValues)[t.id]??0,
+    registry.items.filter(t=>method!=='hybrid-rule'||(!isLobbyTypology(t.id)&&!t.id.endsWith('-workspace')&&t.id!=='flat-deep-plan-plate')).map(t=>({id:t.id,name:t.name,category:categoryByTypology[t.id],value:(method==='hybrid-rule'?rules:areaValues)[t.id]??0,
       locked:method==='typology-area'&&(territory.locked[t.id]||!territory.enabled[t.id])}));
   const total=rows.reduce((sum,r)=>sum+r.value,0),positive=rows.filter(r=>r.value>0);
   const summary=positive.map(r=>r.name+' '+r.value+'%').join(' · ')||'No allocation selected';
@@ -194,8 +197,11 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         await Promise.all([removeAllocatedArchitectures(ids),removeAllocatedOrientations(ids)]);
         throw e;
       }
-      patch({territoryByZone:batch.territoryByZone});
-      for(const record of batch.records)onSaved(record.orientation);
+      patch({territoryByZone:batch.territoryByZone,territoriesOnly:false});
+      // Record every polygon, then leave the detailed viewer on the polygon being edited.
+      const focused=batch.records.find(record=>record.orientation.zoneId===zoneId);
+      for(const record of batch.records)if(record!==focused)onSaved(record.orientation);
+      if(focused)onSaved(focused.orientation);
       const count=batch.records.reduce((n,r)=>n+r.architecture.provenance.members.length,0);
       setMessage('Generated '+count+(nativeStudies?' typology placements across ':' typology compositions across ')+ids.length+' polygon'+(ids.length===1?'':'s')+'.');
       document.getElementById('combined-site-plan')?.scrollIntoView({block:'start'});
@@ -263,6 +269,25 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       }}>Apply draft percentages to this polygon</button>}
       <div className={styles.total}><b data-valid={!percentageError}>Total {Number(total.toFixed(6))}% / 100%</b><span>{method==='typology-area'?'Total across all space categories, including open court floors and terraces.':'Building footprint coverage is measured after generation.'}</span></div>
       {method==='typology-area'&&site&&<div className={styles.zoneTabs}><button type="button" onClick={prepareAreas} aria-describedby="territory-preparation-status" disabled={busy||preparing||!!preparationBlocker}>{preparing?'Preparing territories…':'Prepare site territories'}</button>
+        {zone&&registry.items.some(t=>categoryByTypology[t.id]==='Workspaces'&&assignment.shares[t.id]>0)&&<label className={styles.extensionRule}>
+          <input type="checkbox" checked={draft.distributeWorkspaceForms??false} disabled={busy||preparing||!zone.enabled} onChange={e=>{
+            patch({generation:{method,zones:{...zones,[draftKey]:{...draft,distributeWorkspaceForms:e.currentTarget.checked}}}});
+            setMessage('');
+          }}/>
+          Distribute Workspace forms across their territories · {zone.name}
+        </label>}
+        {zone&&assignment.shares['flat-deep-plan-plate']>0&&<fieldset disabled={busy||preparing||!zone.enabled}>
+          <legend>Flat-Deep fields · {zone.name}</legend>
+          <label>Placement method <select value={draft.flatDeepMode??'native'} onChange={e=>patch({generation:{method,zones:{...zones,[draftKey]:{...draft,flatDeepMode:e.target.value as 'native'|'adaptive'|'boundary'|'proportional'}}}})}>
+            <option value="native">Fixed native fields · 20 × 60 × 20 ft</option><option value="adaptive">Adaptive rectangular fields</option><option value="boundary">Boundary-adaptive · 16 ft capped reference</option><option value="proportional">Boundary-adaptive · proportional half-span</option>
+          </select></label>
+          {(draft.flatDeepMode==='adaptive'||draft.flatDeepMode==='boundary'||draft.flatDeepMode==='proportional')&&<>
+            <label>Target footprint (% of Workspace territory) <input type="number" min="1" max="100" value={draft.flatDeepCoverage??100} onChange={e=>patch({generation:{method,zones:{...zones,[draftKey]:{...draft,flatDeepCoverage:e.target.valueAsNumber||0}}}})}/></label>
+            <label>Territory setback (ft) <input type="number" min="0" step="0.5" value={draft.flatDeepSetback??0} onChange={e=>patch({generation:{method,zones:{...zones,[draftKey]:{...draft,flatDeepSetback:e.target.valueAsNumber||0}}}})}/></label>
+          </>}
+        </fieldset>}
+        {zone&&officeRules.filter(t=>assignment.shares[t.id]>0).map(t=><label key={t.id}>{t.name} placement · {zone.name}<select disabled={busy||preparing||!zone.enabled} value={officePlacement(draft,t.id)} onChange={e=>patch({generation:{method,zones:{...zones,[draftKey]:{...draft,officeModes:{...draft.officeModes,[t.id]:e.target.value}}}}})}>
+          <option value="native">Fixed native field</option><option value="adaptive">Adaptive field</option><option value="boundary">{t.id==='open-hall-workspace'?'Boundary-adaptive · fill assigned territory':'Boundary-adaptive'}</option></select></label>)}
         {zone&&zoneHasLobbies(zone.id)&&<label id="lobby-territory-extension" className={styles.extensionRule}>
           <input type="checkbox" checked={draft.extendLobbyTerritories??true} disabled={busy||preparing||!zone.enabled} onChange={e=>{
             patch({generation:{method,zones:{...zones,[draftKey]:{...draft,extendLobbyTerritories:e.currentTarget.checked}}}});
@@ -272,7 +297,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
         </label>}
         <a href="#combined-site-plan">View site plan</a></div>}
       {method==='typology-area'&&site&&<p role="status" id="territory-preparation-status">{planNotice||preparationBlocker||(
-        preparedCount===enabledZones.length?'Territories prepared. View the site plan or prepare again after editing percentages.':
+        preparedCount===enabledZones.length?'Territories prepared for '+enabledZones.length+' '+(enabledZones.length===1?'polygon':'polygons')+'. View the combined site plan.':
         preparedCount>0?preparedCount+' of '+enabledZones.length+' polygons have current territories. Prepare again to update the site plan.':
         'Generate Design prepares territories automatically. Use Prepare site territories to preview the allocation.'
       )}</p>}
@@ -286,7 +311,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
     </section>
     {method==='typology-area'?<>
       <WorkflowAction local site={site?.name??'No site selected'} method={hasLobby?'Typology Area Distribution':'Continuous typology composition'}
-        allocation={<><span>{hasLobby?'Generate the lobby forms using each cluster’s extension setting.':'Forms connected galleries, decks, terraces, rooms and courts across the enabled polygons.'}</span>{enabledZones.map(z=><span key={z.id} style={{display:'block'}}><strong>{z.name}</strong>{zoneHasLobbies(z.id)&&(zones[JSON.stringify([site!.fingerprint,z.id])]?.extendLobbyTerritories===false?' · Native lobby forms only':' · Lobby forms extended')}{' · '+registry.items.filter(t=>(state.assignments[z.id]??newAssignment()).shares[t.id]>0).map(t=>t.name+' '+(state.assignments[z.id]??newAssignment()).shares[t.id]+'%').join(' · ')}</span>)}</>}
+        allocation={<><span>{hasWorkspace?'Generate Workspace architecture using the method selected for each polygon.':hasLobby?'Generate the lobby forms using each cluster’s extension setting.':'Forms connected galleries, decks, terraces, rooms and courts across the enabled polygons.'}</span>{enabledZones.map(z=><span key={z.id} style={{display:'block'}}><strong>{z.name}</strong>{zoneHasLobbies(z.id)&&(zones[JSON.stringify([site!.fingerprint,z.id])]?.extendLobbyTerritories===false?' · Native lobby forms only':' · Lobby forms extended')}{' · '+registry.items.filter(t=>(state.assignments[z.id]??newAssignment()).shares[t.id]>0).map(t=>t.name+' '+(state.assignments[z.id]??newAssignment()).shares[t.id]+'%').join(' · ')}</span>)}</>}
         action={{run:()=>generateAll(),busy:busy||preparing,reason:allocationBlocker,message,fix:!site?recovery:undefined}}/>
       <details className={styles.advanced}><summary>Generate a single typology with custom settings</summary>
         <DesignPanel state={state} controls={controls} onSaved={onSaved} onBusy={setBusy} commonBlocked={!!reason||busy} openTerritories={openTerritories}
@@ -296,7 +321,7 @@ export default function GenerationMethods({state,registry,patch,onSaved,controls
       </details>
     </>:action({run:generate,busy,message,eligible:method==='descriptor'?'Inserted Horizontal Plate and Stepped Amphitheater':undefined,correction:<button onClick={()=>reveal('allocation-inputs')}>Edit percentages</button>})}
     <details className={styles.advanced}><summary>Advanced generation settings</summary>{advanced}
-      {method==='typology-area'&&<button disabled={busy||preparing||!!allocationBlocker} onClick={()=>generateAll(true)}>Generate individual native study placements</button>}
+      {method==='typology-area'&&!hasWorkspace&&<button disabled={busy||preparing||!!allocationBlocker} onClick={()=>generateAll(true)}>Generate individual native study placements</button>}
       {method!=='typology-area'&&<p>Miami Cluster Zone 1 uses the Roadways/Water 60/40/20-ft height regions. Plate seed 39 supplies stations for the three native lifts of Stepped seed 69. Within-lift spacing and orientation are preserved. The planning clearance is {Math.max(territory.minimumDiameter['vertical-walls'],territory.minimumDiameter['inserted-plate'])} ft in diameter.</p>}
       {method==='descriptor'&&<p>Evaluations {cohort.version} measures the two independent Rule B studies with {cohort.forms[0].cellFeet}-ft voxels. A sweep along the site X axis allocates the requested areas. A lift receives its rule weights from its source-letter footprint in each region. Every selected region requires native source geometry.</p>}{method!=='typology-area'&&handoff.enabled&&<label><input type="checkbox" checked={useFullZone} onChange={e=>chooseDomain(e.target.checked)}/> Use the full polygon for {meta.name}</label>}</details>
   </>;

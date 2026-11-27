@@ -141,7 +141,7 @@ async function main(){
   for(const [i,z] of state.site.zones.entries()){
     const controls=state.territoryByZone[z.id].controls;
     Object.assign(controls,{clustering:65,areaCutAngle:i===0?0:90,reserved:[]});
-    for(const t of model.TYPOLOGIES)state.assignments[z.id].shares[t]=model.isLobbyTypology(t)||t===(i===0?'void-field':'inserted-plate')?0:25;
+    for(const t of model.TYPOLOGIES)state.assignments[z.id].shares[t]=!['linear-edge-gallery','inserted-plate','vertical-walls','room-within-volume','void-field'].includes(t)||t===(i===0?'void-field':'inserted-plate')?0:25;
   }
   const {miamiParcelScale}=require('../src/components/siteDevelopment/siteImport.ts');
   // The native gold Site-layer extents distinguish the two saved Miami frames.

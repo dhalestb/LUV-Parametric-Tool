@@ -14,7 +14,7 @@ const bands=['#095775','#1293C2','#9BD5E4','#F7F6F5'];
 const bandLabels=['0–20 ft','>20–40 ft','>40–60 ft','>60 ft'];
 const number=(n:number,places:number)=>n.toLocaleString('en-US',{minimumFractionDigits:places,maximumFractionDigits:places});
 
-function measurements(record:OrientationResult,design:Design,registry:Registry):Row[]{
+export function measurements(record:OrientationResult,design:Design,registry:Registry):Row[]{
   const name=(id:string)=>registry.items.find(t=>t.id===id)?.name??id;
   const members=design.provenance.members??[];
   if(members.length)return members.map(m=>{
@@ -43,7 +43,7 @@ function makePath(contours:Ring[],project:(p:Point)=>Point){
 
 // Rasterize in plan and keep the topmost built triangle at each pixel.
 // Interpolating world Y also measures sloping roofs between their vertices.
-function roofHeights(mesh:FormMesh,datum:number,project:(p:Point)=>Point,w:number,h:number){
+export function roofHeights(mesh:FormMesh,datum:number,project:(p:Point)=>Point,w:number,h:number){
   const heights=new Float32Array(w*h).fill(-Infinity),p=mesh.positions,ix=mesh.indices;
   const vertices=new Float64Array(p.length);
   for(let i=0;i<p.length;i+=3){

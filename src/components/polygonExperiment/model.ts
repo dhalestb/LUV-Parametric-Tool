@@ -3,7 +3,7 @@ import { polygonArea, polygonSelfIntersects } from '../siteDevelopment/geometry'
 import type { SiteCoordinates, SiteDevelopmentProject } from '../siteDevelopment/types';
 
 export const STORAGE_KEY = 'luv-experiment-site-polygon-morphogenesis-v1';
-export const TYPOLOGIES = ['linear-edge-gallery','inserted-plate','vertical-walls','room-within-volume','void-field','vertical-void-lobby','compressed-sequential-lobby','topographic-ground-field-lobby','linear-gallery-lobby'] as const;
+export const TYPOLOGIES = ['linear-edge-gallery','inserted-plate','vertical-walls','room-within-volume','void-field','vertical-void-lobby','compressed-sequential-lobby','topographic-ground-field-lobby','linear-gallery-lobby','flat-deep-plan-plate','open-hall-workspace','void-edge-workspace'] as const;
 export type Typology = typeof TYPOLOGIES[number];
 export type LobbyTypology = Extract<Typology, `${string}-lobby`>;
 export function isLobbyTypology(id:string):id is LobbyTypology {return id.endsWith('-lobby')&&TYPOLOGIES.some(type=>type===id);}
@@ -15,16 +15,20 @@ export type SiteInput = { modelReference?:{id:string;scale:number}; unitConfirma
 export type Assignment = { shares:Record<Typology,number>; variants:Record<Typology,string>; targets:Five<number|null> };
 export type GenerationMethod = 'typology-area'|'hybrid-rule'|'descriptor';
 export type LetterTargets = Partial<Record<Typology,number>>;
-export const maxLetterTarget = 48;
-export const automaticLetterTarget = (areaFeet2:number) => Math.min(maxLetterTarget, Math.max(3, Math.round(areaFeet2 / 850)));
-export type MethodDrafts = {extendLobbyTerritories?:boolean;letterTargets?:LetterTargets;fullZone?:Partial<Record<'hybrid-rule'|'descriptor',string>>;rules?:Record<Typology,number>; descriptors?:Partial<Record<import('./descriptorInfluence').Descriptor,number>>};
-export type Experiment = { lobbyLetterLayout?:'compact'|'distributed'; generation?:{method:GenerationMethod;zones:Record<string,MethodDrafts>}; version:2; territoryByZone:Record<string,TerritoryState>; descriptorAllocation:boolean; descriptorSpatialTargeting:boolean; legacyDescriptorDrafts?:unknown; site:SiteInput|null; selected:string[]; focus:string|null; unitsConfirmed:boolean; transform:'within'|'derived'; allocation:'territories'|'blended'; seedMethod:'letters'|'features'; assignments:Record<string,Assignment>; descriptorIds:Five<string|null>; profiles:Record<Typology,RuleProfile> };
+export const maxLetterTarget = 100;
+export const automaticLetterTarget = (areaFeet2:number) => Math.max(3, Math.round(areaFeet2 / 850));
+export type MethodDrafts = {distributeWorkspaceForms?:boolean;officeModes?:Partial<Record<"open-hall-workspace"|"void-edge-workspace","native"|"adaptive"|"boundary">>;flatDeepMode?:"native"|"adaptive"|"boundary"|"proportional";flatDeepCoverage?:number;flatDeepSetback?:number;extendLobbyTerritories?:boolean;letterTargets?:LetterTargets;fullZone?:Partial<Record<'hybrid-rule'|'descriptor',string>>;rules?:Record<Typology,number>; descriptors?:Partial<Record<import('./descriptorInfluence').Descriptor,number>>};
+export type Experiment = { territoriesOnly?:boolean; lobbyLetterLayout?:'compact'|'distributed'; generation?:{method:GenerationMethod;zones:Record<string,MethodDrafts>}; version:2; territoryByZone:Record<string,TerritoryState>; descriptorAllocation:boolean; descriptorSpatialTargeting:boolean; legacyDescriptorDrafts?:unknown; site:SiteInput|null; selected:string[]; focus:string|null; unitsConfirmed:boolean; transform:'within'|'derived'; allocation:'territories'|'blended'; seedMethod:'letters'|'features'; assignments:Record<string,Assignment>; descriptorIds:Five<string|null>; profiles:Record<Typology,RuleProfile> };
 export type Rule = { entry:string; statements:string[]; parameters:Record<string,unknown>; bindings:{category:'A'|'B';sourceFile:string;sha256:string}[] };
 export type RegistryItem = { id:Typology; name:string; A:Rule; B:Rule; variants:string[]; evidence:{id:string;variant:string;sourceCount:number;request:Record<string,unknown>;validation:unknown;architecturalValidation:unknown}[] };
 export type Registry = { snapshot:string; boardCommit:string; siteCommit:string; counts:{boardFiles:number;siteFiles:number;savedStudies:number}; items:RegistryItem[] };
 const emptyFive = ():Five<null> => [null,null,null,null,null];
 export function initialState():Experiment { return {version:2,territoryByZone:{},descriptorAllocation:false,descriptorSpatialTargeting:false,site:null,selected:[],focus:null,unitsConfirmed:false,transform:'within',allocation:'territories',seedMethod:'letters',assignments:{},descriptorIds:[...DESCRIPTORS],profiles:Object.fromEntries(TYPOLOGIES.map(id=>[id,{scale:'percentage',values:emptyFive()}])) as Experiment['profiles']}; }
-export function newAssignment():Assignment { return {shares:{'linear-edge-gallery':100,'inserted-plate':0,'vertical-walls':0,'room-within-volume':0,'void-field':0,'vertical-void-lobby':0,'compressed-sequential-lobby':0,'topographic-ground-field-lobby':0,'linear-gallery-lobby':0},variants:{'linear-edge-gallery':'print-contour','inserted-plate':'edge-connected','vertical-walls':'vertical-walls','room-within-volume':'perimeter-room/fullProfiles/suspendedLLV/edgePlatforms','void-field':'face-normal/neighbor-taper/adjacent','vertical-void-lobby':'vertical-stack','compressed-sequential-lobby':'sequential-shell','topographic-ground-field-lobby':'spiral-ground-field','linear-gallery-lobby':'linear-gallery'},targets:emptyFive()}; }
+export function officePlacement(draft:MethodDrafts|undefined,id:'open-hall-workspace'|'void-edge-workspace'){
+  return draft?.officeModes?.[id]??(id==='open-hall-workspace'?'boundary':'native');
+}
+
+export function newAssignment():Assignment { return {shares:{'linear-edge-gallery':100,'inserted-plate':0,'vertical-walls':0,'room-within-volume':0,'void-field':0,'vertical-void-lobby':0,'compressed-sequential-lobby':0,'topographic-ground-field-lobby':0,'linear-gallery-lobby':0,'open-hall-workspace':0,'void-edge-workspace':0,'flat-deep-plan-plate':0},variants:{'linear-edge-gallery':'print-contour','inserted-plate':'edge-connected','vertical-walls':'vertical-walls','room-within-volume':'perimeter-room/fullProfiles/suspendedLLV/edgePlatforms','void-field':'face-normal/neighbor-taper/adjacent','vertical-void-lobby':'vertical-stack','compressed-sequential-lobby':'sequential-shell','topographic-ground-field-lobby':'spiral-ground-field','linear-gallery-lobby':'linear-gallery','open-hall-workspace':'native-v1.6.0','void-edge-workspace':'native-v2.21.0','flat-deep-plan-plate':'native-v2.2.0'},targets:emptyFive()}; }
 export async function fingerprint(value:unknown) { const bytes=new TextEncoder().encode(JSON.stringify(value)); const digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),n=>n.toString(16).padStart(2,'0')).join(''); }
 export function validRing(ring:unknown):ring is [number,number][] { return Array.isArray(ring)&&ring.length>=3&&ring.every(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite))&&!polygonSelfIntersects(ring)&&polygonArea(ring)>0; }
 export async function importSite(raw:string,origin:SiteInput['origin']):Promise<SiteInput> {
@@ -61,7 +65,7 @@ export function withImportedSite(state:Experiment,site:SiteInput):Experiment {
     }
     if(!sameSnapshot&&sameBoundary&&generation){
       const prior=generation.zones[JSON.stringify([previous!.fingerprint,zone.id])];
-      if(prior)generation.zones[JSON.stringify([site.fingerprint,zone.id])]={rules:prior.rules,descriptors:prior.descriptors,letterTargets:prior.letterTargets,extendLobbyTerritories:prior.extendLobbyTerritories};
+      if(prior)generation.zones[JSON.stringify([site.fingerprint,zone.id])]= {distributeWorkspaceForms:prior.distributeWorkspaceForms,officeModes:prior.officeModes,flatDeepMode:prior.flatDeepMode,flatDeepCoverage:prior.flatDeepCoverage,flatDeepSetback:prior.flatDeepSetback,rules:prior.rules,descriptors:prior.descriptors,letterTargets:prior.letterTargets,extendLobbyTerritories:prior.extendLobbyTerritories};
     }
   }
   const enabled=site.zones.filter(z=>z.enabled).map(z=>z.id);
@@ -91,7 +95,7 @@ export function loadState(raw:string):Experiment {
    }
    delete state.distributedLobbyLetters;
  }
- for(const lobby of TYPOLOGIES.filter(isLobbyTypology)){
+ for(const lobby of TYPOLOGIES.filter(id=>isLobbyTypology(id)||id.endsWith('-workspace')||id==='flat-deep-plan-plate')){
    state.profiles[lobby]??={scale:'percentage',values:emptyFive()};
    for(const assignment of Object.values(state.assignments) as Assignment[]){
      assignment.shares[lobby]??=0;

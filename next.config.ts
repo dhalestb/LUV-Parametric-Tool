@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "node:path";
 
 const siteWorkers = [
   "./scripts/*.cjs",
@@ -30,7 +31,20 @@ const siteWorkerConfig = {
 
 const nextConfig: NextConfig = {
   ...siteWorkerConfig,
+  webpack(config, { isServer }) {
+    if (!isServer) {
+      // The locked Study 194 helpers require Three.js as CommonJS. Resolve
+      // those imports to the same browser build used by the site viewer.
+      config.module.rules.push({
+        test: /(?:full-perimeter-lofts|room-edge-platforms)\.cjs$/,
+        include: path.resolve("vendor/architectural-board/scripts"),
+        resolve: { alias: { three$: path.join(path.dirname(require.resolve("three")), "three.module.js") } },
+      });
+    }
+    return config;
+  },
   serverExternalPackages: ["manifold-3d", "rhino3dm"],
 };
 
 export default nextConfig;
+

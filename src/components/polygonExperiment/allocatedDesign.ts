@@ -21,13 +21,14 @@ export const hashes={...originalHashes,'vertical-void-lobby':stackHashes['40-10'
 type Mesh={positions:number[];indices:number[]};
 type Letter=OrientationResult['components'][number];
 type Part={id:string;sources:string[];mesh:Mesh};
-type Study={type:Typology;datum:number;letters:Letter[];components:Part[];architecture:Mesh;envelope:Ring;
+type SavedTypology=keyof typeof hashes;
+type Study={type:SavedTypology;datum:number;letters:Letter[];components:Part[];architecture:Mesh;envelope:Ring;
   metrics:{sourceArea:number;footprintArea:number};provenance:Record<string,unknown>};
 type PreparedStudy=Study & {center:Point;height:number};
 type Placement={heightCheck:{requiredFeet:number;siteCapFeet:number|null;zoneCapFeet:number|null;eligibleRegionIds:string[]};study:PreparedStudy;center:Point;angle:number;boundary:Ring;territory:Territory};
 const cache=new Map<string,Promise<PreparedStudy>>();
 
-async function loadStudy(type:Typology,file:string,hash:string):Promise<PreparedStudy>{
+async function loadStudy(type:SavedTypology,file:string,hash:string):Promise<PreparedStudy>{
   const response=await fetch('/allocated-studies/'+file+'.json.gz?v='+hash);
   if(!response.ok||!response.body)throw Error('Could not load the '+type+' architectural study.');
   const bytes=await new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
@@ -41,7 +42,7 @@ async function loadStudy(type:Typology,file:string,hash:string):Promise<Prepared
   }
   return {...study,center,height};
 }
-function cachedStudy(type:Typology,file:string,hash:string){
+function cachedStudy(type:SavedTypology,file:string,hash:string){
   if(!cache.has(file))cache.set(file,loadStudy(type,file,hash).catch(e=>{cache.delete(file);throw e;}));
   return cache.get(file)!;
 }
@@ -52,6 +53,7 @@ export function lobbyStudy(type:LobbyTypology,height:number,count:number){
   return cachedStudy(type,type+'/'+key,hash);
 }
 export function studyFor(type:Typology){
+  if(type==='flat-deep-plan-plate'||type==='open-hall-workspace'||type==='void-edge-workspace')throw Error('Use Generate Design to generate the live Workspace ruleset in this territory.');
   if(isLobbyTypology(type))return cachedStudy(type,type+'/'+referenceStudy[type],hashes[type]);
   return cachedStudy(type,type,hashes[type]);
 }

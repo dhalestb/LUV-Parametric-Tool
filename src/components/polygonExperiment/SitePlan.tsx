@@ -45,17 +45,19 @@ export function CompositionDistribution({site,zone,assignment,controls,registry,
   </figure></div>
     {visibleTerritories.length>0&&<fieldset className={styles.inputs} disabled={disabled}>
       <legend>Letter density · {zone.name}</legend>
-      <p className={styles.densityHint}>Set a target count per typology. Full-size letters are placed where they fit.</p>
+      <p className={styles.densityHint}>Automatic uses the typology rules. Set a manual target up to 100 letters. Step 4 reports the count that fits.</p>
       <div className={styles.densityFields}>{visibleTerritories.map(t=>{
         const id='letter-target-'+t.typology;
         const name=registry.items.find(item=>item.id===t.typology)!.name;
+        const workspace=categoryByTypology[t.typology]==='Workspaces';
         const custom=letterTargets?.[t.typology];
-        const count=custom??automaticLetterTarget(t.area);
+        const auto=automaticLetterTarget(t.area), count=custom??Math.min(auto,maxLetterTarget);
         return <div key={id}>
           <label htmlFor={id}>{name}</label>
-          <output htmlFor={id}>{count} {count===1?'letter':'letters'}{custom===undefined?' · Auto':''}</output>
+          <output htmlFor={id}>{custom===undefined?(workspace?'Automatic · by Workspace rules':t.typology==='linear-edge-gallery'?'Automatic · fit both perimeters':t.typology==='room-within-volume'?'Automatic · fit perimeter lofts':auto+' letters · Automatic'):count+' letters · Manual target'+(t.typology==='linear-edge-gallery'?' · complete perimeter courses take priority':'')}</output>
           <input id={id} type="range" min={isLobbyTypology(t.typology)?2:1} max={maxLetterTarget} step={1} value={count}
-            aria-valuetext={count+' source letters'} onChange={e=>onLetterTarget(t.typology,Number(e.currentTarget.value))}/>
+            aria-valuetext={custom===undefined?'Automatic':count+' source letters'} onChange={e=>onLetterTarget(t.typology,Number(e.currentTarget.value))}/>
+          {custom===undefined&&<button type="button" className={styles.textButton} aria-label={'Set manual count for '+name} onClick={()=>onLetterTarget(t.typology,count)}>Set manual target</button>}
           {custom!==undefined&&<button type="button" className={styles.textButton} aria-label={'Use automatic count for '+name}
             onClick={()=>onLetterTarget(t.typology)}>Use auto</button>}
         </div>;
