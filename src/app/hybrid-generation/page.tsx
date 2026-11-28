@@ -10,6 +10,7 @@ import HybridViewer from "@/components/hybrid/HybridViewer";
 import HybridRulesetLibrary from "@/components/hybrid/HybridRulesetLibrary";
 import { UNIT_TO_FEET, type UnitName, type UpAxisMode } from "@/components/lattice/types";
 import type { Family } from "@/components/hybrid/analyzeHybrid";
+import { pngPercentageFits, shownPercent } from "@/components/hybrid/pngPercentages";
 
 import type { HybridRequest, HybridReply, StoredForm } from "@/components/hybrid/hybrid.worker";
 
@@ -46,7 +47,10 @@ export default function HybridGeneration() {
   const [drag,setDrag] = useState(false);
   const worker = useRef<Worker|null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const pngInput = useRef<HTMLInputElement>(null);
+  const [pngPreviews, setPngPreviews] = useState<Record<string, { url: string }[]>>({});
   const form = forms[selected.id];
+  const fromPng = form?.fits?.some(fit => fit.evidence.some(line => line.startsWith("Uploaded PNG:")));
 
   useEffect(()=>{
     let active = true;
@@ -75,8 +79,11 @@ export default function HybridGeneration() {
           };
           repositoryRequest.onerror = () => reject(repositoryRequest.error);
         });
-        // Retain uploads saved before the repository was introduced.
-        for (const form of Object.values(records)) library[form.mesh.id] ??= { ...form, fits: null, ruleset: undefined };
+        // Keep a saved ruleset with the repository form. Slot records are the source when the repository copy was stored without one.
+        for (const form of Object.values(records)) {
+          const saved = library[form.mesh.id];
+          if (!saved || (form.ruleset && !saved.ruleset)) library[form.mesh.id] = { ...saved, ...form };
+        }
         await new Promise<void>((resolve, reject) => {
           const tx = db.transaction("repository", "readwrite");
           for (const [id, form] of Object.entries(library)) tx.objectStore("repository").put(form, id);
@@ -119,7 +126,7 @@ export default function HybridGeneration() {
       else delete next[slotId];
       return next;
     });
-    if (result) setRepository(current => ({ ...current, [result.mesh.id]: { ...result, fits: null, ruleset: undefined } }));
+    if (result) setRepository(current => ({ ...current, [result.mesh.id]: result }));
     const db = await openLibrary();
     try {
       await new Promise<void>((resolve, reject) => {
@@ -129,7 +136,7 @@ export default function HybridGeneration() {
         const slotStore = tx.objectStore("forms");
         if (result) {
           slotStore.put(result, slotId);
-          tx.objectStore("repository").put({ ...result, fits: null, ruleset: undefined }, result.mesh.id);
+          tx.objectStore("repository").put(result, result.mesh.id);
         } else slotStore.delete(slotId);
       });
     } finally { db.close(); }
@@ -142,7 +149,7 @@ export default function HybridGeneration() {
     setBusy(true);
     setMessage("");
     try {
-      await persist(slot.id, choice ? { ...choice.form, fits: null, ruleset: undefined } : null);
+      await persist(slot.id, choice ? choice.form : null);
     } catch { setMessage("Loaded for this session. Browser storage could not save this form."); }
     finally { setBusy(false); }
   }
@@ -165,8 +172,10 @@ export default function HybridGeneration() {
     task.onmessage = async ({ data }: MessageEvent<HybridReply>) => {
       try {
         if ("error" in data) { setMessage(data.error); return; }
+        const pngFits = request.action === "analyze" && request.form.fits?.some(fit => fit.evidence.some(line => line.startsWith("Uploaded PNG:")))
+          ? request.form.fits : null;
         const result = "stored" in data ? data.stored
-          : request.action === "analyze" ? { ...request.form, fits: data.fits, ruleset: data.ruleset } : null;
+          : request.action === "analyze" ? { ...request.form, fits: pngFits ?? data.fits, ruleset: data.ruleset } : null;
         if (!result) throw Error("Unexpected worker reply");
         await persist(slotId, result);
         setMessage("");
@@ -212,7 +221,7 @@ export default function HybridGeneration() {
       });
       setRepository(current => {
         const next = { ...current };
-        for (const item of loaded) next[item.form.mesh.id] = { ...item.form, fits: null, ruleset: undefined };
+        for (const item of loaded) next[item.form.mesh.id] = item.form;
         return next;
       });
       try {
@@ -224,13 +233,50 @@ export default function HybridGeneration() {
             tx.onabort = tx.onerror = () => reject(tx.error);
             for (const item of loaded) {
               tx.objectStore("forms").put(item.form, item.slotId);
-              tx.objectStore("repository").put({ ...item.form, fits: null, ruleset: undefined }, item.form.mesh.id);
+              tx.objectStore("repository").put(item.form, item.form.mesh.id);
             }
           });
         } finally { db.close(); }
       } catch { errors.push("Browser storage could not save this load."); }
       const names = loaded.map(item => item.form.mesh.filename).join(", ");
       setMessage(errors.length ? names + " loaded. " + errors[0] : names + " loaded. Select Analyze Form.");
+    } finally { setBusy(false); }
+  }
+
+  async function loadPngPercentages(files: FileList | null) {
+    const pngs = [...(files ?? [])].filter(file => file.type === "image/png" || /\.png$/i.test(file.name));
+    if (!form) {
+      setMessage("Load an OBJ, then upload PNG percentages for this slot.");
+      return;
+    }
+    if (!pngs.length) {
+      setMessage("Choose a PNG that shows typology percentages, such as Vertical Void Lobby 25%.");
+      return;
+    }
+    setBusy(true);
+    setMessage(pngs.length === 1 ? "Reading percentages shown in the PNG…" : "Reading percentages shown in the PNGs…");
+    try {
+      const sources: { filename: string; text: string }[] = [];
+      for (const file of pngs) {
+        const body = new FormData();
+        body.set("image", file);
+        const response = await fetch("/api/png-percentages", { method: "POST", body });
+        const payload = await response.json() as { text?: string; error?: string };
+        if (!response.ok) throw Error(payload.error || "Could not read " + file.name);
+        sources.push({ filename: file.name, text: payload.text ?? "" });
+      }
+      const read = pngPercentageFits(sources, selected.family);
+      const previews = pngs.map(file => ({ url: URL.createObjectURL(file) }));
+      setPngPreviews(current => {
+        for (const preview of current[selected.id] ?? []) URL.revokeObjectURL(preview.url);
+        return { ...current, [selected.id]: previews };
+      });
+      await persist(selected.id, { ...form, fits: read.fits });
+      setMessage(read.warnings[0]
+        ? "Typology mix replaced with the percentages shown in the PNG. " + read.warnings[0]
+        : "Typology mix replaced with the percentages shown in the PNG.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not read the PNG percentages.");
     } finally { setBusy(false); }
   }
 
@@ -273,15 +319,24 @@ export default function HybridGeneration() {
             <input ref={fileInput} className="sr-only" type="file" accept=".obj" multiple disabled={busy}
               onChange={event => { void loadObjFiles(event.target.files); event.target.value = ""; }} />
           </label>
+          <label className={control + (busy || !form ? " pointer-events-none opacity-50" : " cursor-pointer")}>
+            Upload PNG percentages
+            <input ref={pngInput} className="sr-only" type="file" accept="image/png,.png" multiple disabled={busy || !form}
+              onChange={event => { void loadPngPercentages(event.target.files); event.target.value = ""; }} />
+          </label>
           <button disabled={busy || !form} className={control} onClick={()=>form && run({action:"analyze", form, family:selected.family})}>Analyze Form</button>
         </div>
         <p role="status" className="my-3 text-sm">{message || (form ? (form.fits ? (form.ruleset ? "Analysis complete." : "Analyze Form again to generate a hybrid ruleset.") : "OBJ loaded. Select Analyze Form to see its typology mix.") : "Drop OBJ files here, or use Load OBJ. The first file fills this slot. Extra files fill the following slots.")}</p>
         {form && <><p className="text-sm">{form.mesh.filename} · {form.unit} · {form.up.toUpperCase()} up</p>
           <HybridViewer key={selected.id + ":" + form.mesh.id} form={form} /></>}
       </section>
-      <section className="space-y-4"><HybridRulesetLibrary label={selected.label} form={form} ready={ready} /><h2 className="font-semibold">Typology mix</h2><p className="my-2 text-xs text-[var(--muted)]">Relative matches to {selected.family==="Hybrid"?"all 15":selected.family.toLowerCase()} typologies. Expand a match to see measured criteria. OBJ measurements approximate generator features such as named halls and rooms.</p>
+      <section className="space-y-4"><HybridRulesetLibrary label={selected.label} form={form} ready={ready} /><h2 className="font-semibold">Typology mix</h2>
+        <p className="my-2 text-xs text-[var(--muted)]">{fromPng
+          ? "These percentages are the ones shown in the uploaded PNG."
+          : <>Relative matches to {selected.family==="Hybrid"?"all 15":selected.family.toLowerCase()} typologies. Upload a PNG to replace this mix with the percentages shown in the image.</>}</p>
+      {pngPreviews[selected.id]?.map(preview => <img key={preview.url} src={preview.url} alt="Uploaded percentage PNG" className="max-h-48 rounded border border-[var(--line)]" />)}
       {form?.fits && !form.fits.some(f=>f.percent>0) && <p>No measurable match in this group.</p>}
-      {form?.fits?.map(f=><details key={f.name} className="border-b border-[var(--line)] py-2 text-sm"><summary className="cursor-pointer">{f.name} <strong>{f.percent}%</strong></summary>
+      {form?.fits?.map(f=><details key={f.name} className="border-b border-[var(--line)] py-2 text-sm"><summary className="cursor-pointer">{f.name} <strong>{shownPercent(f.percent)}%</strong></summary>
         <ul className="pl-4 text-xs">{f.evidence.map(line=><li key={line}>{line}</li>)}</ul></details>)}
       </section>
     </div>

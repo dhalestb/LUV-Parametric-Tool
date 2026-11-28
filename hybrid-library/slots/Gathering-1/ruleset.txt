@@ -1,0 +1,40 @@
+Gathering Hybrid 1 — Hybrid Ruleset
+Form: Hybrid 1.obj
+Model units: feet · Up axis: Y
+
+Typology mix
+- Inserted Horizontal Plate: 28%
+- Contained Room-Within-Volume: 29%
+- Stepped Amphitheater: 27%
+- Linear Edge Gallery: 16%
+- Void-Field Gathering: 0%
+
+Rules
+Projecting perimeter branches — Met
+Target: at least 2 · Measured: 4
+Shared by: Inserted Horizontal Plate, Linear Edge Gallery
+
+Open area (ft²) — Met
+Target: at least 6 · Measured: 64
+Shared by: Inserted Horizontal Plate, Contained Room-Within-Volume
+
+Sheltered floor regions — Met
+Target: at least 1 · Measured: 1
+From: Contained Room-Within-Volume
+
+Interior opening (ft²) — Met
+Target: at least 1 · Measured: 33
+From: Contained Room-Within-Volume
+
+Occupied levels — Met
+Target: at least 3 · Measured: 4
+From: Stepped Amphitheater
+
+Gathering focus share — Outside target
+Target: at least 0.5 · Measured: 0.49
+From: Stepped Amphitheater
+
+Plan length / width — Outside target
+Target: at least 1.8 · Measured: 1
+From: Linear Edge Gallery
+

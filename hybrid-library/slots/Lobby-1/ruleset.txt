@@ -1,0 +1,44 @@
+Lobby Hybrid 1 — Hybrid Ruleset
+Form: cell_7_4_flat_2026-11-28T07-28-53.obj
+Model units: feet · Up axis: Y
+
+Typology mix
+- Continuous Hall Lobby: 67.6%
+- Topographic / Ground-Field Lobby: 9.6%
+- Vertical Void Lobby: 8.8%
+- Linear Gallery Lobby: 7.4%
+- Compressed Sequential Lobby: 6.5%
+
+Rules
+Vertical extent (ft) — Met
+Target: at least 2 · Measured: 16.56
+Shared by: Vertical Void Lobby, Topographic / Ground-Field Lobby
+
+Plan length / width — Outside target
+Target: at least 1.8 · Measured: 1
+Shared by: Linear Gallery Lobby, Continuous Hall Lobby
+
+Walkable route (ft) — Met
+Target: at least 4 · Measured: 19.61
+Shared by: Linear Gallery Lobby, Continuous Hall Lobby
+
+Interior opening (ft²) — Met
+Target: at least 6 · Measured: 42
+From: Vertical Void Lobby
+
+Occupied levels — Met
+Target: at least 2 · Measured: 2
+From: Vertical Void Lobby
+
+Inclined surface rise (ft) — Met
+Target: at least 1 · Measured: 1.22
+From: Topographic / Ground-Field Lobby
+
+Floor-width transitions — Outside target
+Target: at least 7 · Measured: 6
+From: Compressed Sequential Lobby
+
+Connected circulation share — Outside target
+Target: at least 1 · Measured: 0.63
+From: Continuous Hall Lobby
+

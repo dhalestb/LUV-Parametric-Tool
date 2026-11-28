@@ -1,0 +1,126 @@
+{
+  "source": "Hybrid 1.obj",
+  "units": "feet",
+  "upAxis": "y",
+  "typologyMix": [
+    {
+      "name": "Vertical Void Lobby",
+      "percent": 25,
+      "evidence": [
+        "Interior opening (ft²): 33 (target at least 6)",
+        "Vertical extent (ft): 16.56 (target at least 2)",
+        "Occupied levels: 4 (target at least 2)"
+      ]
+    },
+    {
+      "name": "Compressed Sequential Lobby",
+      "percent": 25,
+      "evidence": [
+        "Floor-width transitions: 11 (target at least 7)"
+      ]
+    },
+    {
+      "name": "Topographic / Ground-Field Lobby",
+      "percent": 25,
+      "evidence": [
+        "Inclined surface rise (ft): 1.28 (target at least 1)",
+        "Vertical extent (ft): 16.56 (target at least 1)"
+      ]
+    },
+    {
+      "name": "Linear Gallery Lobby",
+      "percent": 14,
+      "evidence": [
+        "Plan length / width: 1 (target at least 1.8)",
+        "Walkable route (ft): 22.04 (target at least 4)"
+      ]
+    },
+    {
+      "name": "Continuous Hall Lobby",
+      "percent": 11,
+      "evidence": [
+        "Plan length / width: 1 (target at least 1.5)",
+        "Connected circulation share: 0.65 (target at least 1)",
+        "Walkable route (ft): 22.04 (target at least 1)"
+      ]
+    }
+  ],
+  "ruleset": {
+    "contributors": [
+      "Vertical Void Lobby",
+      "Compressed Sequential Lobby",
+      "Topographic / Ground-Field Lobby",
+      "Linear Gallery Lobby",
+      "Continuous Hall Lobby"
+    ],
+    "rules": [
+      {
+        "label": "Vertical extent (ft)",
+        "value": 16.55656987428665,
+        "min": 2,
+        "sources": [
+          "Vertical Void Lobby",
+          "Topographic / Ground-Field Lobby"
+        ]
+      },
+      {
+        "label": "Plan length / width",
+        "value": 1.0007878057071484,
+        "min": 1.8,
+        "sources": [
+          "Linear Gallery Lobby",
+          "Continuous Hall Lobby"
+        ]
+      },
+      {
+        "label": "Walkable route (ft)",
+        "value": 22.04284206473999,
+        "min": 4,
+        "sources": [
+          "Linear Gallery Lobby",
+          "Continuous Hall Lobby"
+        ]
+      },
+      {
+        "label": "Interior opening (ft²)",
+        "value": 33,
+        "min": 6,
+        "sources": [
+          "Vertical Void Lobby"
+        ]
+      },
+      {
+        "label": "Occupied levels",
+        "value": 4,
+        "min": 2,
+        "sources": [
+          "Vertical Void Lobby"
+        ]
+      },
+      {
+        "label": "Floor-width transitions",
+        "value": 11,
+        "min": 7,
+        "sources": [
+          "Compressed Sequential Lobby"
+        ]
+      },
+      {
+        "label": "Inclined surface rise (ft)",
+        "value": 1.277970314025879,
+        "min": 1,
+        "sources": [
+          "Topographic / Ground-Field Lobby"
+        ]
+      },
+      {
+        "label": "Connected circulation share",
+        "value": 0.6467391304347826,
+        "min": 1,
+        "sources": [
+          "Continuous Hall Lobby"
+        ]
+      }
+    ]
+  }
+}

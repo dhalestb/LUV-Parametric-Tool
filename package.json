@@ -20,9 +20,11 @@
     "mp4-muxer": "^5.2.2",
     "next": "15.5.27",
     "pdfjs-dist": "^4.10.38",
+    "pngjs": "^7.0.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "rhino3dm": "^8.35.0",
+    "tesseract.js": "^7.0.0",
     "three": "^0.186.0"
   },
   "devDependencies": {

@@ -1,0 +1,117 @@
+{
+  "hybrid": "Gathering Hybrid 1",
+  "source": "Hybrid 1.obj",
+  "units": "feet",
+  "upAxis": "y",
+  "typologyMix": [
+    {
+      "name": "Inserted Horizontal Plate",
+      "percent": 28,
+      "evidence": [
+        "Projecting perimeter branches: 4 (target at least 2)",
+        "Open area (ft²): 64 (target at least 6)"
+      ]
+    },
+    {
+      "name": "Contained Room-Within-Volume",
+      "percent": 29,
+      "evidence": [
+        "Sheltered floor regions: 1 (target at least 1)",
+        "Interior opening (ft²): 33 (target at least 1)",
+        "Open area (ft²): 64 (target at least 6)"
+      ]
+    },
+    {
+      "name": "Stepped Amphitheater",
+      "percent": 27,
+      "evidence": [
+        "Occupied levels: 4 (target at least 3)",
+        "Gathering focus share: 0.49 (target at least 0.5)"
+      ]
+    },
+    {
+      "name": "Linear Edge Gallery",
+      "percent": 16,
+      "evidence": [
+        "Plan length / width: 1 (target at least 1.8)",
+        "Projecting perimeter branches: 4 (target at least 1)"
+      ]
+    },
+    {
+      "name": "Void-Field Gathering",
+      "percent": 0,
+      "evidence": [
+        "Interior voids: 3 (target at least 3)",
+        "Connected level links: 0 (target at least 2)"
+      ]
+    }
+  ],
+  "ruleset": {
+    "contributors": [
+      "Inserted Horizontal Plate",
+      "Contained Room-Within-Volume",
+      "Stepped Amphitheater",
+      "Linear Edge Gallery"
+    ],
+    "rules": [
+      {
+        "label": "Projecting perimeter branches",
+        "value": 4,
+        "min": 2,
+        "sources": [
+          "Inserted Horizontal Plate",
+          "Linear Edge Gallery"
+        ]
+      },
+      {
+        "label": "Open area (ft²)",
+        "value": 64,
+        "min": 6,
+        "sources": [
+          "Inserted Horizontal Plate",
+          "Contained Room-Within-Volume"
+        ]
+      },
+      {
+        "label": "Sheltered floor regions",
+        "value": 1,
+        "min": 1,
+        "sources": [
+          "Contained Room-Within-Volume"
+        ]
+      },
+      {
+        "label": "Interior opening (ft²)",
+        "value": 33,
+        "min": 1,
+        "sources": [
+          "Contained Room-Within-Volume"
+        ]
+      },
+      {
+        "label": "Occupied levels",
+        "value": 4,
+        "min": 3,
+        "sources": [
+          "Stepped Amphitheater"
+        ]
+      },
+      {
+        "label": "Gathering focus share",
+        "value": 0.49178051959990704,
+        "min": 0.5,
+        "sources": [
+          "Stepped Amphitheater"
+        ]
+      },
+      {
+        "label": "Plan length / width",
+        "value": 1.0007878057071484,
+        "min": 1.8,
+        "sources": [
+          "Linear Edge Gallery"
+        ]
+      }
+    ]
+  }
+}
